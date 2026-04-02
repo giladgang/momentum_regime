@@ -1,0 +1,19 @@
+\begin{table}[htbp]
+\centering
+\caption{HMM posterior regime-mean separation.}
+\label{tab:hmm_separation}
+\begin{tabular}{l r r r r c}
+\toprule
+ & $\hat{\mu}_{\text{calm}}$ & $\hat{\mu}_{\text{panic}}$ & $\Delta$ & 95\% CI & 0 $\notin$ CI \\
+\midrule
+DD$_z$ & 0.532 & $-$0.916 & $-$1.447 & [$-$1.735,\,$-$1.139] & Yes \\
+VOL$_z$ & $-$0.449 & 1.200 & +1.650 & [+1.430,\,+1.861] & Yes \\
+DISP$_z$ & $-$0.425 & 0.657 & +1.081 & [+0.836,\,+1.321] & Yes \\
+REL\_N$_z$ & 0.558 & $-$0.893 & $-$1.451 & [$-$1.630,\,$-$1.265] & Yes \\
+\bottomrule
+\end{tabular}
+
+\medskip
+\small
+\textbf{Notes:} This table reports posterior mean estimates of regime-conditional feature means from the Bayesian two-state HMM, estimated via Gibbs sampling (2{,}000 iterations, 500 burn-in, averaged over 5 seeds) on the 1990--2010 training period. All features are standardised to zero mean and unit variance. $\Delta = \hat{\mu}_{\text{panic}} - \hat{\mu}_{\text{calm}}$ is the separation between regimes. The 95\% CI is the Bayesian posterior credible interval for $\Delta$. The final column indicates whether zero lies outside the interval, confirming statistically significant regime separation. DD = market drawdown; VOL = realised volatility; DISP = log cross-sectional return dispersion; REL\_N = relative market participation.
+\end{table}

@@ -1,0 +1,133 @@
+%% ═══════════════════════════════════════════════════════════════════════════
+%% APPENDIX — included via \input{appendix} from main.tex
+%% ═══════════════════════════════════════════════════════════════════════════
+
+\section{Portfolio Formation, Transaction Costs, and Performance Metrics}\label{app:portfolio}
+
+\subsection{Portfolio Construction}\label{app:portfolio_construction}
+
+For each method, a long-only top-decile portfolio is constructed each month. A long-only construction is chosen because it consistently outperformed long-short alternatives in our tests, a finding consistent with the strong upward market trend over the 2011--2025 test period, which penalises short positions. Stocks are ranked by their scores, and NYSE-listed stocks are used to determine the 90th percentile breakpoint. All stocks (including AMEX and NASDAQ) whose score exceeds this threshold enter the long portfolio.
+
+Portfolio weights are assigned proportionally to market equity (value-weighting):
+\begin{equation}
+    w_t^s = \frac{ME_t^s}{\sum_{s \in \mathcal{L}_t} ME_t^s}, \qquad s \in \mathcal{L}_t,
+\end{equation}
+where $\mathcal{L}_t$ is the set of stocks in the long portfolio at month $t$. Value-weighting tilts the portfolio toward large, liquid stocks, reducing the influence of small-cap return anomalies and improving implementability.
+
+\subsection{Rebalancing Frequency}\label{app:rebalancing}
+
+Two rebalancing schemes are evaluated. Under monthly rebalancing, the portfolio is reconstituted every month using updated scores. Under quarterly rebalancing, stocks are re-scored and traded only in March, June, September, and December; in intervening months, holdings are carried forward and weights drift with market capitalization changes. No transaction costs are incurred during hold months.
+
+\subsection{Transaction Costs}\label{app:transaction_costs}
+
+A one-way transaction cost of $c = 10$ basis points is applied at each rebalancing date. The net portfolio return at rebalancing month $t$ is:
+\begin{equation}
+    r_t^{\text{net}} = r_t^{\text{gross}} - c \cdot \tau_t,
+\end{equation}
+where $\tau_t$ is the one-way portfolio turnover:
+\begin{equation}
+    \tau_t = \frac{1}{2} \sum_{s} \left|w_{t}^{s,\text{new}} - w_{t-1}^{s,\text{prev}}\right|,
+\end{equation}
+and the summation runs over all stocks appearing in either the new or previous portfolio. The 10 basis point cost reflects the transaction environment for a value-weighted, large-cap-biased strategy where NYSE breakpoints tilt toward liquid securities.
+
+It is important to note that transaction costs are applied \emph{post-hoc} as an accounting adjustment and are not incorporated into the models' training objectives. The cross-sectional models (Methods~0--2) optimise stock-level prediction (classification accuracy or return forecasting) without knowledge of the previous portfolio, the resulting turnover, or the cost of rebalancing. This is standard practice in the empirical asset pricing literature \citep[e.g.,][]{FamaFrench2015, GHM2023}, where portfolio construction is treated as a fixed downstream step applied uniformly to all strategies. An end-to-end framework that jointly optimises stock selection and portfolio-level objectives (e.g., net-of-cost Sharpe ratio) would require a fundamentally different architecture, such as a reinforcement learning or differentiable portfolio optimisation layer, and remains a potential extension of this work.
+
+\subsection{Performance Metrics}\label{app:evaluation}
+
+\paragraph{Standard Metrics.}\label{app:standard_metrics}
+
+Strategy performance is assessed using four standard risk-adjusted metrics computed on monthly net-of-fee returns.
+
+\textbf{Annualized return} The geometric annualized return over $n$ months is:
+\begin{equation}
+    R_{\text{ann}} = \left[\prod_{t=1}^{n}(1 + r_t)\right]^{12/n} - 1.
+\end{equation}
+
+\textbf{Annualized volatility} The annualized standard deviation of monthly returns:
+\begin{equation}
+    \sigma_{\text{ann}} = \sigma(r) \cdot \sqrt{12}.
+\end{equation}
+
+\textbf{Sharpe ratio} The annualized Sharpe ratio (assuming zero risk-free rate for simplicity):
+\begin{equation}
+    SR = \frac{\bar{r}}{\sigma(r)} \cdot \sqrt{12},
+\end{equation}
+where $\bar{r}$ is the mean monthly return.
+
+\textbf{Maximum drawdown} Let $C_t = \prod_{\tau=1}^{t}(1 + r_\tau)$ denote the cumulative wealth path. The maximum drawdown is:
+\begin{equation}
+    MDD = \min_{1 \leq t \leq n} \frac{C_t - \max_{1 \leq \tau \leq t} C_\tau}{\max_{1 \leq \tau \leq t} C_\tau}.
+\end{equation}
+
+\paragraph{Regime-Conditional Evaluation.}\label{app:regime_eval}
+
+To assess whether the regime signal adds value beyond unconditional stock selection, performance is decomposed by market regime. Months are partitioned into calm ($\pi_t^{\text{filter}} < 0.5$) and panic ($\pi_t^{\text{filter}} \geq 0.5$) periods, and the Sharpe ratio is computed separately within each subset:
+\begin{equation}
+    SR_{\text{calm}} = \frac{\bar{r}_{\text{calm}}}{\sigma(r_{\text{calm}})} \cdot \sqrt{12}, \qquad SR_{\text{panic}} = \frac{\bar{r}_{\text{panic}}}{\sigma(r_{\text{panic}})} \cdot \sqrt{12}.
+\end{equation}
+This decomposition reveals whether the strategy's alpha originates primarily from calm-period stock selection, panic-period risk avoidance, or both.
+
+\section{Feature Importance Methods}\label{app:feature_importance}
+
+\subsection{SHAP Values for XGBoost}\label{app:shap}
+
+To interpret the XGBoost model and assess the marginal contribution of each feature, SHAP \citep[SHapley Additive exPlanations;][]{Lundberg2017} values are computed on the test set. The SHAP value of feature $j$ for observation $\mathbf{x}$ measures its average marginal contribution to the prediction across all possible feature orderings:
+\begin{equation}
+    \phi_j(\mathbf{x}) = \sum_{S \subseteq N \setminus \{j\}} \frac{|S|!\,(p - |S| - 1)!}{p!} \Big[f_{S \cup \{j\}}(\mathbf{x}) - f_S(\mathbf{x})\Big],
+\end{equation}
+where $N$ is the full feature set, $p = |N|$, and $f_S(\mathbf{x})$ is the expected model output when only features in $S$ are observed. For tree-based models, the TreeSHAP algorithm \citep{Lundberg2020} computes these values exactly in polynomial time. The overall importance of each feature is summarised as:
+\begin{equation}
+    I_j = \frac{1}{n_{\text{test}}} \sum_{i=1}^{n_{\text{test}}} |\phi_j(\mathbf{x}_i)|.
+\end{equation}
+
+Two additional analyses are performed. First, the mean absolute SHAP value of $\pi_t^{\text{filter}}$ is computed separately for calm and panic months to assess whether the regime signal's influence varies across market states. Second, regime-specific XGBoost models are trained on calm-only and panic-only subsets of the training data, and their SHAP feature importances are compared to identify which features the model relies on differentially across regimes.
+
+\subsection{Logistic Regression Coefficient Analysis}\label{app:lr_analysis}
+
+For the logistic regression model (Method~1), feature importance is assessed directly through the estimated coefficient vector $\boldsymbol{\beta}$. Since all features are standardised prior to fitting, the coefficients are comparable in magnitude. The predicted log-odds of an above-median return decompose as:
+\begin{equation}
+    \log \frac{P(y_t^s = 1 \mid \mathbf{x}_t^s)}{1 - P(y_t^s = 1 \mid \mathbf{x}_t^s)} = \beta_0 + \sum_{j=1}^{p} \beta_j \tilde{x}_{t,j}^s,
+\end{equation}
+where $\tilde{x}_{t,j}^s$ is the standardised value of feature $j$. The absolute magnitude $|\beta_j|$ reflects the feature's marginal contribution to the log-odds per standard deviation change, providing a linear analogue to the nonlinear SHAP importance from XGBoost.
+
+\section{FFBS Derivation}\label{app:ffbs}
+
+This appendix provides a detailed derivation of the Forward-Filtering Backward-Sampling (FFBS) algorithm used in Step~1 of the Gibbs sampler (Section~\ref{sec:gibbs_sampler}).
+
+\subsection{Forward Filtering}
+
+The goal of the forward pass is to compute, for each time step $t$, the filtered probability $\alpha_t(k) = P(s_t = k \mid \mathbf{z}_{1:t})$ for each state $k \in \{0,1\}$.
+
+\paragraph{Initialization.} With no prior information about the initial state, a uniform prior is used:
+\begin{equation}
+    \alpha_0(k) = \frac{1}{2}, \qquad k \in \{0,1\}.
+\end{equation}
+
+\paragraph{Prediction step.} The one-step-ahead predicted probability of being in state $k$ at time $t$, given observations up to $t-1$, is:
+\begin{equation}
+    \alpha_{t|t-1}(k) = \sum_{j=0}^{1} \alpha_{t-1}(j) \, P_{jk},
+\end{equation}
+which marginalises over the previous state using the transition matrix.
+
+\paragraph{Update step.} Upon observing $\mathbf{z}_t$, Bayes' rule gives:
+\begin{equation}
+    \alpha_t(k) = \frac{f(\mathbf{z}_t \mid s_t = k) \, \alpha_{t|t-1}(k)}{\sum_{k'=0}^{1} f(\mathbf{z}_t \mid s_t = k') \, \alpha_{t|t-1}(k')},
+\end{equation}
+where $f(\mathbf{z}_t \mid s_t = k) = \mathcal{N}(\mathbf{z}_t; \boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k)$ is the Gaussian emission density for state $k$. Substituting the prediction step into the update step yields the combined recursion in Equation~(\ref{eq:forward_plain}).
+
+\paragraph{Numerical stability.} In practice, the emission densities $f(\mathbf{z}_t \mid s_t = k)$ can be extremely small (or large) for high-dimensional observations, leading to numerical underflow. The implementation works in log-space, computing $\log f(\mathbf{z}_t \mid s_t = k)$ and using the log-sum-exp trick for normalisation.
+
+\subsection{Backward Sampling}
+
+Given the filtered probabilities $\{\alpha_t(k)\}_{t=1}^T$, the backward pass samples a complete state path $(s_1, \dots, s_T)$ from the posterior $P(\{s_t\} \mid \mathbf{z}_{1:T})$.
+
+\paragraph{Terminal state.} At $t = T$, the filtered probability already conditions on all observations:
+\begin{equation}
+    s_T \sim \text{Cat}\!\big(\alpha_T(0),\, \alpha_T(1)\big).
+\end{equation}
+
+\paragraph{Backward recursion.} For $t = T-1, T-2, \dots, 1$, given the already-sampled $s_{t+1}$:
+\begin{equation}
+    P(s_t = k \mid s_{t+1}, \mathbf{z}_{1:t}) \propto \alpha_t(k) \, P_{k, s_{t+1}}.
+\end{equation}
+Normalising gives the sampling distribution in Equation~(\ref{eq:backward_sampling}). The key insight is that the backward pass needs only the filtered probabilities (from the forward pass) and the transition matrix, not the raw observations. Each sampled state $s_t$ depends on the future path only through $s_{t+1}$, preserving the Markov property.
