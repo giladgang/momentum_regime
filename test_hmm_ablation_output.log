@@ -1,0 +1,120 @@
+================================================================================
+  HMM FEATURE ABLATION STUDY
+================================================================================
+
+Computing features ...
+  DISP: OK
+  REL_N: OK
+
+Preparing stock data ...
+
+================================================================================
+  RUNNING 11 TESTS x 3 SEEDS
+================================================================================
+
+  Single: DD  (features: DD)
+    seed= 2201  SR=0.964  ESS=975  (45s)
+    seed=   42  SR=0.953  ESS=1069  (45s)
+    seed= 1337  SR=1.009  ESS=971  (45s)
+
+  Single: VOL  (features: VOL)
+    seed= 2201  SR=0.878  ESS=617  (44s)
+    seed=   42  SR=1.054  ESS=601  (45s)
+    seed= 1337  SR=0.781  ESS=573  (44s)
+
+  Single: CS  (features: CS)
+    seed= 2201  SR=0.840  ESS=1171  (45s)
+    seed=   42  SR=0.767  ESS=1185  (46s)
+    seed= 1337  SR=0.728  ESS=1131  (44s)
+
+  Single: DISP  (features: DISP)
+    seed= 2201  SR=0.926  ESS=162  (45s)
+    seed=   42  SR=0.982  ESS=12  (45s)
+    seed= 1337  SR=0.995  ESS=31  (45s)
+
+  Single: REL_N  (features: REL_N)
+    seed= 2201  SR=0.758  ESS=943  (43s)
+    seed=   42  SR=0.940  ESS=922  (44s)
+    seed= 1337  SR=0.726  ESS=1120  (44s)
+
+  LOO: drop DD  (features: VOL, CS, DISP, REL_N)
+    seed= 2201  SR=0.973  ESS=9  (43s)
+    seed=   42  SR=0.958  ESS=14  (43s)
+    seed= 1337  SR=0.854  ESS=57  (43s)
+
+  LOO: drop VOL  (features: DD, CS, DISP, REL_N)
+    seed= 2201  SR=0.946  ESS=1282  (43s)
+    seed=   42  SR=1.098  ESS=994  (43s)
+    seed= 1337  SR=1.114  ESS=1274  (44s)
+
+  LOO: drop CS  (features: DD, VOL, DISP, REL_N)
+    seed= 2201  SR=1.132  ESS=772  (43s)
+    seed=   42  SR=1.110  ESS=944  (43s)
+    seed= 1337  SR=1.220  ESS=747  (43s)
+
+  LOO: drop DISP  (features: DD, VOL, CS, REL_N)
+    seed= 2201  SR=0.973  ESS=821  (43s)
+    seed=   42  SR=0.904  ESS=737  (43s)
+    seed= 1337  SR=0.707  ESS=816  (43s)
+
+  LOO: drop REL_N  (features: DD, VOL, CS, DISP)
+    seed= 2201  SR=0.877  ESS=155  (44s)
+    seed=   42  SR=0.976  ESS=49  (45s)
+    seed= 1337  SR=1.058  ESS=87  (45s)
+
+  Full 5F: DD+VOL+CS+DISP+REL_N  (features: DD, VOL, CS, DISP, REL_N)
+    seed= 2201  SR=1.142  ESS=993  (43s)
+    seed=   42  SR=1.129  ESS=27  (43s)
+    seed= 1337  SR=1.100  ESS=200  (43s)
+
+  Total time: 1448s
+
+================================================================================
+  SINGLE-FEATURE RESULTS (which feature matters most alone)
+================================================================================
+
+  Test                             Mean SR   Std SR     Min     Max
+  ------------------------------------------------------------
+  Single: DD                         0.975    0.024   0.953   1.009
+  Single: DISP                       0.968    0.030   0.926   0.995
+  Single: VOL                        0.904    0.113   0.781   1.054
+  Single: REL_N                      0.808    0.094   0.726   0.940
+  Single: CS                         0.778    0.046   0.728   0.840
+
+================================================================================
+  LEAVE-ONE-OUT RESULTS (which feature's removal hurts most)
+================================================================================
+
+  Full 5F baseline: Mean SR = 1.123
+
+  Test                             Mean SR     Drop   Std SR
+  ------------------------------------------------------------
+  LOO: drop DISP                     0.861   +0.262    0.113
+  LOO: drop DD                       0.928   +0.195    0.053
+  LOO: drop REL_N                    0.970   +0.153    0.074
+  LOO: drop VOL                      1.053   +0.071    0.076
+  LOO: drop CS                       1.154   -0.030    0.048
+
+  Interpretation:
+  - Largest positive 'Drop' = most important feature (removing it hurts most)
+  - Negative 'Drop' = feature is actually hurting performance
+
+================================================================================
+  FULL COMPARISON
+================================================================================
+
+  Test                                       Mean SR   Std SR
+  ------------------------------------------------------------
+  LOO: drop CS                                 1.154    0.048
+  Full 5F: DD+VOL+CS+DISP+REL_N                1.123    0.018
+  LOO: drop VOL                                1.053    0.076
+  Single: DD                                   0.975    0.024
+  LOO: drop REL_N                              0.970    0.074
+  Single: DISP                                 0.968    0.030
+  LOO: drop DD                                 0.928    0.053
+  Single: VOL                                  0.904    0.113
+  LOO: drop DISP                               0.861    0.113
+  Single: REL_N                                0.808    0.094
+  Single: CS                                   0.778    0.046
+
+================================================================================

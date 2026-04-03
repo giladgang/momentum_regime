@@ -1,0 +1,116 @@
+================================================================================
+  COMPREHENSIVE VALIDATION: DD+VOL+DISP+REL_N
+================================================================================
+
+Computing features ...
+  DISP: OK
+  REL_N: OK
+  T_train=241, T_test=167, D=4
+
+Preparing stock data ...
+
+================================================================================
+  TEST 1: 10-SEED STABILITY
+================================================================================
+  seed= 2201  SR=1.131  (44s)
+  seed=   42  SR=1.131  (44s)
+  seed= 1337  SR=0.973  (43s)
+  seed= 7777  SR=1.049  (43s)
+  seed=31415  SR=1.092  (43s)
+  seed=   99  SR=1.011  (44s)
+  seed=54321  SR=1.116  (43s)
+  seed=12345  SR=1.142  (43s)
+  seed= 8080  SR=1.089  (46s)
+  seed= 1001  SR=1.108  (43s)
+
+  Mean SR: 1.084
+  Std SR:  0.053
+  Min SR:  0.973
+  Max SR:  1.142
+  95% CI:  [0.981, 1.140]
+  All > 0.9: True
+  All > 1.0: False
+
+================================================================================
+  TEST 2: SUB-PERIOD STABILITY (2011-2017 vs 2018-2025)
+================================================================================
+  seed= 2201  Full=1.131  2011-17=1.415  2018-25=1.027
+  seed=   42  Full=1.131  2011-17=1.257  2018-25=1.107
+  seed= 1337  Full=0.973  2011-17=1.279  2018-25=0.844
+
+================================================================================
+  TEST 3: GELMAN-RUBIN R-HAT CONVERGENCE DIAGNOSTIC
+================================================================================
+
+  Running 4 chains ...
+  Chain seed= 2201  (35s)
+  Chain seed=   42  (35s)
+  Chain seed= 1337  (35s)
+  Chain seed= 7777  (35s)
+
+  R-hat values (should be < 1.1 for convergence):
+  Parameter                    R-hat    Status
+  ---------------------------------------------
+  mu[panic, DD]               0.9999        OK
+  mu[panic, VOL]              0.9997        OK
+  mu[panic, DISP]             1.0003        OK
+  mu[panic, REL_N]            1.0001        OK
+  mu[calm, DD]                1.0003        OK
+  mu[calm, VOL]               1.0006        OK
+  mu[calm, DISP]              1.0000        OK
+  mu[calm, REL_N]             0.9999        OK
+
+  Max R-hat: 1.0006
+  PASS: All R-hat < 1.1, chains have converged
+
+================================================================================
+  TEST 4: CRISIS ALIGNMENT
+================================================================================
+
+  Crisis periods (should have high pi):
+    Dot-com         (train)  mean_pi=0.962  max_pi=1.000  OK
+    GFC             (train)  mean_pi=0.861  max_pi=1.000  OK
+    COVID           (test )  mean_pi=0.999  max_pi=1.000  OK
+    2022 Bear       (test )  mean_pi=0.667  max_pi=1.000  OK
+
+  Calm periods (should have low pi):
+    Mid-90s         (train)  mean_pi=0.003  OK
+    Mid-00s         (train)  mean_pi=0.177  OK
+    2013-2019       (test )  mean_pi=0.098  OK
+
+  Regime-mean separation:
+  Feature        mu_calm   mu_panic    Delta
+  ----------------------------------------
+  DD              +0.532     -0.928   -1.460
+  VOL             -0.446     +1.207   +1.652
+  DISP            -0.412     +0.646   +1.058
+  REL_N           +0.552     -0.893   -1.445
+
+================================================================================
+  TEST 5: ITERATION SENSITIVITY
+================================================================================
+  iter= 1000  burnin= 250  SR=1.125  ESS=421  GFC=0.86  COVID=1.00  (26s)
+  iter= 2000  burnin= 500  SR=1.131  ESS=772  GFC=0.86  COVID=1.00  (43s)
+  iter= 3000  burnin= 750  SR=1.080  ESS=1087  GFC=0.86  COVID=1.00  (62s)
+  iter= 5000  burnin=1250  SR=1.109  ESS=1775  GFC=0.86  COVID=1.00  (98s)
+
+================================================================================
+  VALIDATION SUMMARY
+================================================================================
+
+  Feature set: DD + VOL + DISP + REL_N
+
+  1. Seed stability (10 seeds):
+     Mean SR = 1.084, Std = 0.053
+     Range: [0.973, 1.142]
+     All seeds > 0.9: True
+
+  2. Sub-period: See above (both halves should be > 0.5)
+
+  3. Gelman-Rubin: Max R-hat = 1.0006 (PASS)
+
+  4. Crisis alignment: GFC detected, COVID detected, calm periods clean
+
+  5. Iteration sensitivity: Results stable across 1000-5000 iterations
+
+================================================================================

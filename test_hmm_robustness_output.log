@@ -1,0 +1,182 @@
+================================================================================
+  HMM ROBUSTNESS ANALYSIS
+================================================================================
+
+Computing candidate features ...
+  CP_SPREAD: OK
+  DISP: OK
+  ADR: OK
+  SKEW: OK
+  REL_N: OK
+
+Preparing stock data ...
+
+================================================================================
+  STEP 1: Fit HMMs for 14 combos
+================================================================================
+  [1/14] DD+CS+DISP+SKEW ... done (36s)
+  [2/14] DD+TERM+CPS+REL_N ... done (60s)
+  [3/14] DD+TERM+CPS+ADR ... done (84s)
+  [4/14] DD+VOL+ADR+REL_N ... done (119s)
+  [5/14] DD+CS+DISP+REL_N ... done (153s)
+  [6/14] DD+VOL+DISP+REL_N ... done (188s)
+  [7/14] DD+HY_OAS+DISP+REL_N ... done (212s)
+  [8/14] DD+DISP+SKEW+REL_N ... done (249s)
+  [9/14] CS+CPS+SKEW+REL_N ... done (275s)
+  [10/14] VOL+CS+LVIX+SKEW ... done (312s)
+  [11/14] DD+VOL+LVIX+SKEW ... done (350s)
+  [12/14] DD+DISP+ADR+SKEW ... done (386s)
+  [13/14] CS+CPS+HY_OAS+DISP ... done (410s)
+  [14/14] DD+VOL+CS+LVIX (BASELINE) ... done (446s)
+
+================================================================================
+  STEP 2: Sub-period stability (2011-2017 vs 2018-2025)
+================================================================================
+
+  DD+CS+DISP+SKEW:
+    Full: 0.941  |  2011-17: 1.093  |  2018-25: 0.906  -> STABLE
+
+  DD+TERM+CPS+REL_N:
+    Full: 0.953  |  2011-17: 0.997  |  2018-25: 0.954  -> STABLE
+
+  DD+TERM+CPS+ADR:
+    Full: 1.162  |  2011-17: 1.139  |  2018-25: 1.240  -> STABLE
+
+  DD+VOL+ADR+REL_N:
+    Full: 0.997  |  2011-17: 1.020  |  2018-25: 1.031  -> STABLE
+
+  DD+CS+DISP+REL_N:
+    Full: 0.946  |  2011-17: 1.148  |  2018-25: 0.832  -> STABLE
+
+  DD+VOL+DISP+REL_N:
+    Full: 1.132  |  2011-17: 1.280  |  2018-25: 1.057  -> STABLE
+
+  DD+HY_OAS+DISP+REL_N:
+    Full: 1.006  |  2011-17: 1.272  |  2018-25: 0.859  -> STABLE
+
+  DD+DISP+SKEW+REL_N:
+    Full: 0.951  |  2011-17: 1.002  |  2018-25: 0.934  -> STABLE
+
+  CS+CPS+SKEW+REL_N:
+    Full: 0.952  |  2011-17: 1.183  |  2018-25: 0.795  -> STABLE
+
+  VOL+CS+LVIX+SKEW:
+    Full: 0.969  |  2011-17: 1.273  |  2018-25: 0.798  -> STABLE
+
+  DD+VOL+LVIX+SKEW:
+    Full: 1.076  |  2011-17: 1.276  |  2018-25: 0.980  -> STABLE
+
+  DD+DISP+ADR+SKEW:
+    Full: 1.011  |  2011-17: 1.092  |  2018-25: 0.991  -> STABLE
+
+  CS+CPS+HY_OAS+DISP:
+    Full: 0.865  |  2011-17: 0.935  |  2018-25: 0.885  -> STABLE
+
+  DD+VOL+CS+LVIX:
+    Full: 0.760  |  2011-17: 1.074  |  2018-25: 0.600  -> STABLE
+
+  Sub-period stability summary:
+  Combo                                        Full  2011-17  2018-25    Status
+  ---------------------------------------------------------------------------
+  DD+TERM+CPS+ADR                             1.162    1.139    1.240    STABLE
+  DD+VOL+DISP+REL_N                           1.132    1.280    1.057    STABLE
+  DD+VOL+LVIX+SKEW                            1.076    1.276    0.980    STABLE
+  DD+DISP+ADR+SKEW                            1.011    1.092    0.991    STABLE
+  DD+HY_OAS+DISP+REL_N                        1.006    1.272    0.859    STABLE
+  DD+VOL+ADR+REL_N                            0.997    1.020    1.031    STABLE
+  VOL+CS+LVIX+SKEW                            0.969    1.273    0.798    STABLE
+  DD+TERM+CPS+REL_N                           0.953    0.997    0.954    STABLE
+  CS+CPS+SKEW+REL_N                           0.952    1.183    0.795    STABLE
+  DD+DISP+SKEW+REL_N                          0.951    1.002    0.934    STABLE
+  DD+CS+DISP+REL_N                            0.946    1.148    0.832    STABLE
+  DD+CS+DISP+SKEW                             0.941    1.093    0.906    STABLE
+  CS+CPS+HY_OAS+DISP                          0.865    0.935    0.885    STABLE
+  DD+VOL+CS+LVIX(BL)                          0.760    1.074    0.600    STABLE
+
+================================================================================
+  STEP 3: Bootstrap multiple testing correction
+================================================================================
+
+  Observed best Sharpe: 1.162 (DD+TERM+CPS+ADR)
+  Testing against null: 14 combos, 167 months
+
+  Bootstrap results (10000 replications, block size 12):
+    Null distribution of max Sharpe: mean=0.183, 95th pct=0.570
+    Observed best: 1.162
+    p-value (multiple testing adjusted): 0.0002
+    -> SIGNIFICANT at 5% level: the best combo is unlikely due to chance
+
+  Bonferroni correction:
+    DD+CS+DISP+SKEW                           Sharpe=0.941  95% CI=[0.637, 1.369]
+    DD+TERM+CPS+REL_N                         Sharpe=0.953  95% CI=[0.526, 1.474]
+    DD+TERM+CPS+ADR                           Sharpe=1.162  95% CI=[0.750, 1.638]
+    DD+VOL+ADR+REL_N                          Sharpe=0.997  95% CI=[0.617, 1.526]
+    DD+CS+DISP+REL_N                          Sharpe=0.946  95% CI=[0.558, 1.492]
+    DD+VOL+DISP+REL_N                         Sharpe=1.132  95% CI=[0.744, 1.641]
+    DD+HY_OAS+DISP+REL_N                      Sharpe=1.006  95% CI=[0.624, 1.506]
+    DD+DISP+SKEW+REL_N                        Sharpe=0.951  95% CI=[0.464, 1.534]
+    CS+CPS+SKEW+REL_N                         Sharpe=0.952  95% CI=[0.505, 1.499]
+    VOL+CS+LVIX+SKEW                          Sharpe=0.969  95% CI=[0.448, 1.502]
+    DD+VOL+LVIX+SKEW                          Sharpe=1.076  95% CI=[0.667, 1.568]
+    DD+DISP+ADR+SKEW                          Sharpe=1.011  95% CI=[0.588, 1.521]
+    CS+CPS+HY_OAS+DISP                        Sharpe=0.865  95% CI=[0.403, 1.348]
+    DD+VOL+CS+LVIX                            Sharpe=0.760  95% CI=[0.388, 1.225]
+
+================================================================================
+  STEP 4: Ensemble of stable combos
+================================================================================
+
+  Stable combos: 14
+    DD+CS+DISP+SKEW                           Full=0.941  Early=1.093  Late=0.906
+    DD+TERM+CPS+REL_N                         Full=0.953  Early=0.997  Late=0.954
+    DD+TERM+CPS+ADR                           Full=1.162  Early=1.139  Late=1.240
+    DD+VOL+ADR+REL_N                          Full=0.997  Early=1.020  Late=1.031
+    DD+CS+DISP+REL_N                          Full=0.946  Early=1.148  Late=0.832
+    DD+VOL+DISP+REL_N                         Full=1.132  Early=1.280  Late=1.057
+    DD+HY_OAS+DISP+REL_N                      Full=1.006  Early=1.272  Late=0.859
+    DD+DISP+SKEW+REL_N                        Full=0.951  Early=1.002  Late=0.934
+    CS+CPS+SKEW+REL_N                         Full=0.952  Early=1.183  Late=0.795
+    VOL+CS+LVIX+SKEW                          Full=0.969  Early=1.273  Late=0.798
+    DD+VOL+LVIX+SKEW                          Full=1.076  Early=1.276  Late=0.980
+    DD+DISP+ADR+SKEW                          Full=1.011  Early=1.092  Late=0.991
+    CS+CPS+HY_OAS+DISP                        Full=0.865  Early=0.935  Late=0.885
+    DD+VOL+CS+LVIX                            Full=0.760  Early=1.074  Late=0.600
+
+  Ensemble pi_filter: 419 months
+  Mean pi: 0.328
+  Correlation matrix of component pi_filters:
+                         pi_DD+CS+DISP+SKEW  pi_DD+TERM+CPS+REL_N  pi_DD+TERM+CPS+ADR  pi_DD+VOL+ADR+REL_N  pi_DD+CS+DISP+REL_N  pi_DD+VOL+DISP+REL_N  pi_DD+HY_OAS+DISP+REL_N  pi_DD+DISP+SKEW+REL_N  pi_CS+CPS+SKEW+REL_N  pi_VOL+CS+LVIX+SKEW  pi_DD+VOL+LVIX+SKEW  pi_DD+DISP+ADR+SKEW  pi_CS+CPS+HY_OAS+DISP  pi_DD+VOL+CS+LVIX
+pi_DD+CS+DISP+SKEW                 1.000000              0.662123            0.686038             0.892693             0.804655              0.766610                 0.663943               0.812814              0.136151             0.658892             0.678258             0.917932               0.321120           0.889910
+pi_DD+TERM+CPS+REL_N               0.662123              1.000000            0.836817             0.747111             0.825731              0.898728                 0.473923               0.837353              0.367238             0.495322             0.534160             0.674314               0.373025           0.642014
+pi_DD+TERM+CPS+ADR                 0.686038              0.836817            1.000000             0.796523             0.736111              0.762328                 0.561933               0.700291              0.338025             0.479448             0.512856             0.763810               0.361096           0.742956
+pi_DD+VOL+ADR+REL_N                0.892693              0.747111            0.796523             1.000000             0.794715              0.806604                 0.680539               0.789679              0.208624             0.600603             0.631051             0.864783               0.327526           0.915205
+pi_DD+CS+DISP+REL_N                0.804655              0.825731            0.736111             0.794715             1.000000              0.922685                 0.622207               0.866290              0.339289             0.624308             0.626699             0.728062               0.231818           0.803935
+pi_DD+VOL+DISP+REL_N               0.766610              0.898728            0.762328             0.806604             0.922685              1.000000                 0.545970               0.933025              0.306802             0.622049             0.654474             0.730850               0.244735           0.738182
+pi_DD+HY_OAS+DISP+REL_N            0.663943              0.473923            0.561933             0.680539             0.622207              0.545970                 1.000000               0.503143              0.247337             0.498502             0.468284             0.636413               0.229810           0.750504
+pi_DD+DISP+SKEW+REL_N              0.812814              0.837353            0.700291             0.789679             0.866290              0.933025                 0.503143               1.000000              0.168913             0.670506             0.689892             0.776414               0.256923           0.716407
+pi_CS+CPS+SKEW+REL_N               0.136151              0.367238            0.338025             0.208624             0.339289              0.306802                 0.247337               0.168913              1.000000             0.096049             0.092591             0.128281               0.586446           0.210547
+pi_VOL+CS+LVIX+SKEW                0.658892              0.495322            0.479448             0.600603             0.624308              0.622049                 0.498502               0.670506              0.096049             1.000000             0.958668             0.628647               0.266274           0.642017
+pi_DD+VOL+LVIX+SKEW                0.678258              0.534160            0.512856             0.631051             0.626699              0.654474                 0.468284               0.689892              0.092591             0.958668             1.000000             0.672957               0.284857           0.657732
+pi_DD+DISP+ADR+SKEW                0.917932              0.674314            0.763810             0.864783             0.728062              0.730850                 0.636413               0.776414              0.128281             0.628647             0.672957             1.000000               0.315012           0.848414
+pi_CS+CPS+HY_OAS+DISP              0.321120              0.373025            0.361096             0.327526             0.231818              0.244735                 0.229810               0.256923              0.586446             0.266274             0.284857             0.315012               1.000000           0.318430
+pi_DD+VOL+CS+LVIX                  0.889910              0.642014            0.742956             0.915205             0.803935              0.738182                 0.750504               0.716407              0.210547             0.642017             0.657732             0.848414               0.318430           1.000000
+
+  Running portfolio tests with ensemble pi_filter ...
+
+  ENSEMBLE RESULTS (XGB):
+    Full:    Sharpe=0.984  Return=19.6%  Vol=20.3%  MaxDD=-27.3%
+    2011-17: Sharpe=1.105
+    2018-25: Sharpe=0.928
+    M0:      Sharpe=0.928
+    M1 LR:   Sharpe=1.027
+
+================================================================================
+  FINAL COMPARISON
+================================================================================
+
+  Baseline (DD+VOL+CS+LVIX):  Full=0.760  Early=1.074  Late=0.600
+  Best single combo (DD+TERM+CPS+ADR):  Full=1.162  Early=1.139  Late=1.240
+
+  Ensemble: see above
+
+================================================================================

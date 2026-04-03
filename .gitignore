@@ -1,0 +1,10 @@
+*.pkl
+*.parquet
+data/
+*.whl
+.DS_Store
+.idea/
+.vscode/
+.venv/
+.venv-2/
+__pycache__/
