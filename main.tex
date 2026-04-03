@@ -34,7 +34,7 @@
 \maketitle
 
 \begin{abstract}
-This thesis develops a two-stage framework for regime-conditioned cross-sectional momentum investing. In the first stage, a Bayesian two-state Hidden Markov Model is estimated via Gibbs sampling on four equity market stress indicators (drawdown, realised volatility, return dispersion, and relative market participation), producing a real-time filtered probability of the market being in a panic state. In the second stage, three portfolio construction methods of increasing complexity (a deterministic formula, logistic regression, and XGBoost) combine this regime signal with momentum at multiple lookback horizons and fundamental stock characteristics to rank stocks each month. Out-of-sample evaluation on 2011--2025 (167 months) reveals that the regime-conditioned machine learning models substantially outperform both unconditional momentum strategies and the market-state approach of Grobys, Haga, and Mutikainen (2023). Decomposition analysis shows that fundamental quality screening, not the regime signal, drives the Sharpe ratio improvement. The regime signal instead functions as a context variable: it does not predict returns directly, but governs which momentum lookback horizons are informative in each market state. This interaction, invisible to linear models, enables XGBoost to generate substantially higher absolute returns through regime-adaptive stock selection, revealing that cross-sectional momentum is not a single stable anomaly but a family of horizon-specific effects whose composition rotates with market conditions.
+Cross-sectional momentum is one of the most robust return anomalies in empirical finance, yet its strength varies substantially across market conditions. This thesis investigates how a real-time regime signal reshapes the structure of momentum by developing a two-stage framework that combines a Bayesian Hidden Markov Model with machine learning stock selection. In the first stage, a two-state HMM estimated via Gibbs sampling on four equity market stress indicators (drawdown, realised volatility, return dispersion, and relative market participation) produces a filtered probability of the market being in a panic state. In the second stage, three portfolio construction methods of increasing complexity (a deterministic formula, logistic regression, and XGBoost) combine this regime signal with momentum at 12 lookback horizons and fundamental stock characteristics to rank stocks each month. Out-of-sample evaluation on 2011--2025 (167 months) reveals that the regime-conditioned machine learning models substantially outperform both unconditional momentum strategies and existing market-state approaches. The central finding is that cross-sectional momentum is not a single stable anomaly but a family of horizon-specific effects whose composition rotates with market conditions: intermediate-horizon momentum (8--11 months) dominates in calm markets, while 1-month reversal becomes the relevant signal during panic. The HMM regime probability, despite having no direct predictive power for returns, is the variable that governs this rotation. This interaction is invisible to linear models but is captured by XGBoost through tree splits, enabling it to generate substantially higher absolute returns through regime-adaptive stock selection.
 \end{abstract}
 
 \newpage
@@ -42,9 +42,12 @@ This thesis develops a two-stage framework for regime-conditioned cross-sectiona
 \newpage
 
 %% –– Body ––
+\input{latex/introduction}
+\input{latex/literature_review}
 \input{latex/data_section}
 \input{latex/methodology}
 \input{latex/main_results}
+\input{latex/conclusion}
 
 %% –– Bibliography ––
 \newpage

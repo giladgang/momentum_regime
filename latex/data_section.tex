@@ -54,7 +54,7 @@ The four features are:
     \begin{equation}
         DD_t = \frac{P_t - \max(P_{t-11}, \dots, P_t)}{\max(P_{t-11}, \dots, P_t)},
     \end{equation}
-    where $P_t = 100 \times \prod_{\tau=1}^{t}(1 + r_\tau^{\text{mkt}})$ is the cumulative value-weighted market return index. DD is always non-positive and captures the magnitude of an ongoing downturn, directly measuring the losses that trigger forced selling and margin calls central to the momentum crash mechanism of \citet{DanielMoskowitz2016}.
+    where $P_t = 100 \times \prod_{\tau=1}^{t}(1 + r_\tau^{\text{mkt}})$ is the cumulative value-weighted market return index. DD is always non-positive and captures the magnitude of an ongoing downturn. \citet{DanielMoskowitz2016} show that the conditional volatility of momentum strategies is strongly related to past market declines, as drawdowns trigger forced selling and margin calls that reverse momentum profits. DD directly measures this mechanism and, as shown in Section~\ref{sec:ablation}, is the single most informative HMM input feature for downstream portfolio performance.
 
     \item \textbf{VOL (Realised Volatility):} The log annualised standard deviation of daily market returns within each month:
     \begin{equation}
@@ -72,7 +72,7 @@ The four features are:
     \begin{equation}
         REL\_N_t = \log\!\left(\frac{N_t}{\frac{1}{12}\sum_{\ell=1}^{12} N_{t-\ell}}\right),
     \end{equation}
-    where $N_t$ is the number of stocks with valid return observations in month~$t$. REL\_N is close to zero in normal times and turns negative when stocks delist or halt at an above-average rate, capturing structural market damage that the other three features do not measure.
+    where $N_t$ is the number of stocks with valid return observations in month~$t$. REL\_N is close to zero in normal times but turns negative during crises when stocks delist, halt trading, or are acquired at elevated rates. For example, during the 2008 financial crisis, a wave of delistings and trading halts caused $N_t$ to drop sharply relative to its trailing average. This captures structural market damage that the other three features do not measure.
 \end{enumerate}
 
 \begin{figure}[htbp]
@@ -103,7 +103,7 @@ Eleven monthly macrofinancial indicators are considered as candidate inputs for 
     \item \emph{Credit:} the BAA--AAA credit spread (CS), the ICE BofA high-yield option-adjusted spread (HY\_OAS), the 3-month commercial paper--Treasury bill spread (CPS), and the 10-year minus 2-year Treasury term spread (TERM).
     \item \emph{Equity decline:} market drawdown (DD), the advance--decline ratio (ADR), cross-sectional return skewness (SKEW), and relative market participation (REL\_N).
 \end{itemize}
-All candidates are observable in real time at the end of each month. Three indicators (CPS, HY\_OAS, and TERM) have data beginning in the mid- to late 1990s rather than 1990, which reduces the available training sample for combinations that include them. Combinations containing only features available from 1990 have access to 252 training months, including the full dot-com crash, while combinations requiring post-1996 data have approximately 168 training months.
+All candidates are observable in real time at the end of each month. Three credit indicators (CPS, HY\_OAS, and TERM) have data beginning in the mid- to late 1990s rather than 1990, which reduces the available training sample for combinations that include them. These shorter-history features are included in the candidate pool for completeness, but the feature selection procedure (described below) ultimately selects a combination that uses only features available from 1990, providing the full 252 training months including both the dot-com crash and the global financial crisis.
 
 \paragraph{Step 1: Exhaustive search.}
 All $\binom{11}{4} = 330$ four-feature combinations are evaluated. For each combination, the two-state Bayesian HMM is estimated on the training sample using the same Gibbs sampling procedure as the main model (2{,}000 iterations, 500 burn-in, identical priors; see Section~\ref{sec:gibbs}). A combination passes the quality screen if it satisfies four criteria: (i)~minimum effective sample size (ESS) across all posterior mean parameters exceeds 50, indicating adequate MCMC convergence; (ii)~at least two features exhibit statistically significant regime separation, defined as the 95\% posterior credible interval for the difference in regime means excluding zero; (iii)~the average filtered panic probability during the global financial crisis (October 2007 to June 2009) exceeds 0.5; and (iv)~the average panic probability during a non-crisis reference period (January 2003 to December 2006) is below 0.4.

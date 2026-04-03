@@ -2,11 +2,53 @@
 %% APPENDIX — included via \input{appendix} from main.tex
 %% ═══════════════════════════════════════════════════════════════════════════
 
+\section{Data Summary}\label{app:data_summary}
+
+Table~\ref{tab:data_summary} provides a comprehensive overview of all data variables used in this thesis, their sources, and their roles in the analysis.
+
+\begin{table}[htbp]
+\centering
+\caption{Summary of all data variables used in the analysis.}
+\label{tab:data_summary}
+\small
+\begin{tabular}{l l l l}
+\toprule
+Variable & Source & Description & Used in \\
+\midrule
+\multicolumn{4}{l}{\emph{Stock-level variables}} \\
+Monthly returns & CRSP \texttt{msf} & Adjusted holding-period returns & Sections 3, 5 \\
+Price, shares out. & CRSP \texttt{msf} & For market equity computation & Section 3.5 \\
+Exchange, share codes & CRSP \texttt{msf} & Universe filtering (codes 10, 11) & Section 3.2 \\
+Delisting returns & CRSP \texttt{msedelist} & Survivorship bias correction & Section 3.2 \\
+Book equity (\texttt{ceqq}) & Compustat \texttt{fundq} & Book-to-market, ROE & Section 3.5 \\
+Total assets (\texttt{atq}) & Compustat \texttt{fundq} & Asset growth, gross profit & Section 3.5 \\
+Income (\texttt{ibq}) & Compustat \texttt{fundq} & ROE, earnings growth & Section 3.5 \\
+Revenue (\texttt{revtq}) & Compustat \texttt{fundq} & Gross profitability & Section 3.5 \\
+COGS (\texttt{cogsq}) & Compustat \texttt{fundq} & Gross profitability & Section 3.5 \\
+Debt (\texttt{dlttq}, \texttt{dlcq}) & Compustat \texttt{fundq} & Leverage ratio & Section 3.5 \\
+\midrule
+\multicolumn{4}{l}{\emph{Market-level variables (HMM inputs)}} \\
+Daily market returns & CRSP \texttt{dsi} & Realised volatility (VOL) & Section 3.3 \\
+Market price index & CRSP \texttt{dsi} & Drawdown (DD) & Section 3.3 \\
+Cross-sect.\ stock returns & CRSP \texttt{msf} & Dispersion (DISP), REL\_N & Section 3.3 \\
+\midrule
+\multicolumn{4}{l}{\emph{Derived features}} \\
+$mom_1, \dots, mom_{12}$ & Computed & 12 trailing momentum signals & Section 3.5 \\
+$\pi_t^{\text{filter}}$ & HMM output & Filtered panic probability & Section 4.1 \\
+7 fundamentals & Computed & bm, roe, gross profit, etc. & Section 3.5 \\
+\bottomrule
+\end{tabular}
+
+\medskip
+\small
+\textbf{Notes:} All data accessed via WRDS. Compustat linked to CRSP via the CCM bridge table using primary link types (LU, LC). Fundamentals are lagged four months from fiscal quarter end to ensure real-time availability. The sample covers January 1990 to November 2025 (training: 1990--2010; test: 2011--2025).
+\end{table}
+
 \section{Portfolio Formation, Transaction Costs, and Performance Metrics}\label{app:portfolio}
 
 \subsection{Portfolio Construction}\label{app:portfolio_construction}
 
-For each method, a long-only top-decile portfolio is constructed each month. A long-only construction is chosen because it consistently outperformed long-short alternatives in our tests, a finding consistent with the strong upward market trend over the 2011--2025 test period, which penalises short positions. Stocks are ranked by their scores, and NYSE-listed stocks are used to determine the 90th percentile breakpoint. All stocks (including AMEX and NASDAQ) whose score exceeds this threshold enter the long portfolio.
+For each method, a long-only top-decile portfolio is constructed each month. A long-only construction is chosen because it consistently outperformed long-short alternatives in preliminary tests, a finding consistent with the strong upward market trend over the 2011--2025 test period, which penalises short positions. Stocks are ranked by their scores, and NYSE-listed stocks are used to determine the 90th percentile breakpoint. All stocks (including AMEX and NASDAQ) whose score exceeds this threshold enter the long portfolio.
 
 Portfolio weights are assigned proportionally to market equity (value-weighting):
 \begin{equation}
@@ -48,7 +90,7 @@ Strategy performance is assessed using four standard risk-adjusted metrics compu
     \sigma_{\text{ann}} = \sigma(r) \cdot \sqrt{12}.
 \end{equation}
 
-\textbf{Sharpe ratio} The annualized Sharpe ratio (assuming zero risk-free rate for simplicity):
+\textbf{Sharpe ratio} The annualized Sharpe ratio:\footnote{All Sharpe ratios in this thesis are computed using raw returns rather than excess returns above the risk-free rate. Since the same convention is applied to every strategy, relative comparisons and rankings are unaffected. The risk-free rate was near zero for most of the test period (2011--2021) and averaged roughly 2\% annualized over the full 2011--2025 window, so absolute Sharpe ratios are overstated by approximately 0.05--0.10.}
 \begin{equation}
     SR = \frac{\bar{r}}{\sigma(r)} \cdot \sqrt{12},
 \end{equation}

@@ -1,0 +1,26 @@
+\section{Conclusion}\label{sec:conclusion}
+
+This thesis developed a two-stage framework for regime-conditioned cross-sectional momentum investing. A Bayesian two-state Hidden Markov Model, estimated via Gibbs sampling on four macrofinancial stress indicators, produces a real-time filtered probability of market panic. Three portfolio construction methods of increasing complexity combine this regime signal with momentum at multiple horizons and fundamental characteristics to rank stocks each month.
+
+Out-of-sample evaluation over 167 months (2011--2025) yields three main findings. First, both machine learning methods substantially outperform unconditional momentum strategies and the market-state approach of \citet{GHM2023}. Second, the regime signal functions as a context variable rather than a direct return predictor: it governs which momentum lookback horizons are informative in each market state, an interaction that XGBoost captures through tree splits but that is invisible to the linear logistic regression. Third, cross-sectional momentum is not a single stable anomaly but a family of horizon-specific effects whose composition rotates with market conditions.
+
+These results offer a different perspective from the view, articulated by \citet{DanielMoskowitz2016} and \citet{BarrosoSantaClara2015}, that the primary benefit of regime awareness for momentum strategies is crash avoidance. In a long-only, cross-sectional framework, panic-period Sharpe ratios are already high for all strategies (1.15--1.45), because many months the HMM labels as ``panic'' are in fact recovery months with strong positive returns while stress indicators have not yet normalised. The economically meaningful gap lies in the calm periods that constitute two-thirds of the test period, where the regime-conditioned methods improve Sharpe ratios from 0.38--0.42 to 0.77--0.80. The regime signal's primary contribution is not protecting the portfolio during crashes but improving stock selection during normal times.
+
+\subsection{Future Work}\label{sec:future_work}
+
+Several directions could extend this framework.
+
+\paragraph{Adaptive regime estimation.}
+The current HMM is trained on 1990--2010 data and its parameters are held fixed during the test period. This assumes that the statistical properties of calm and panic regimes remain stationary over time. If the market undergoes structural change, for instance a permanent increase in baseline volatility due to algorithmic trading, higher-frequency information flow, or shifting monetary policy regimes, the trained thresholds may become miscalibrated. Concretely, features that were one standard deviation above the training mean may become the new normal, causing the model to classify structurally calm periods as panic. This concern is not hypothetical: the sustained elevation of $\pi_t^{\text{filter}}$ in the most recent years of the sample may partly reflect such drift rather than genuine prolonged stress. Rolling or expanding-window re-estimation of the HMM, or an online Bayesian updating scheme that allows the emission parameters to evolve over time, would address this limitation and likely improve the reliability of the regime signal in extended out-of-sample periods.
+
+\paragraph{More than two regimes.}
+The binary calm/panic classification may be too coarse. A three-state model distinguishing, for example, low-volatility trending markets, choppy range-bound markets, and crisis episodes could enable more granular portfolio adaptation. Bayesian model selection criteria (e.g., marginal likelihood comparison) could guide the choice of the number of states.
+
+\paragraph{Alternative feature sets.}
+The current HMM uses four stress indicators chosen for economic interpretability. High-frequency data (intraday volatility, order flow imbalances) or textual sentiment indicators could provide earlier regime detection. Similarly, the cross-sectional scoring models could be enriched with additional firm-level characteristics or alternative data sources.
+
+\paragraph{Transaction costs and implementation.}
+The analysis applies a uniform 10 basis point one-way transaction cost, but does not model the higher costs that may affect smaller or less liquid stocks. Incorporating more realistic, stock-specific transaction cost estimates, particularly for the more volatile XGBoost strategy that may have higher turnover, would provide a more accurate comparison of net-of-cost performance across methods.
+
+\paragraph{Investor-specific portfolio selection.}
+The results show that M1 and M2 represent different risk-return profiles: M1 delivers the highest Sharpe ratio with low volatility, while M2 generates substantially higher absolute returns at the cost of greater risk. A natural extension would be to incorporate a risk aversion parameter that blends the two strategies or selects between them based on investor preferences, formalising the choice between the conservative and aggressive paths identified in this thesis.

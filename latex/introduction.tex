@@ -1,0 +1,37 @@
+%% ═══════════════════════════════════════════════════════════════════════════
+%% INTRODUCTION — included via \input{latex/introduction} from main.tex
+%% ═══════════════════════════════════════════════════════════════════════════
+
+\section{Introduction}\label{sec:introduction}
+
+Cross-sectional momentum, the tendency for recent stock market winners to continue outperforming and losers to continue underperforming, is one of the most robust and widely documented anomalies in empirical finance. Since the seminal work of \citet{JegadeeshTitman1993}, momentum strategies have been shown to generate significant risk-adjusted returns across markets, asset classes, and time periods.
+
+Yet momentum is also one of the most fragile anomalies: it is subject to severe and sudden crashes, most notably during market stress episodes such as the 2009 rebound from the global financial crisis, when momentum portfolios suffered losses exceeding 50\% in a matter of months \citep{DanielMoskowitz2016}. This tension between the strategy's long-run profitability and its vulnerability to regime shifts motivates the central question of this thesis: can a systematic, real-time regime classification improve cross-sectional momentum investing?
+
+The existing literature offers two broad responses to momentum's fragility. The first, exemplified by \citet{BarrosoSantaClara2015}, scales momentum exposure inversely with recent volatility, treating risk management as a post-construction overlay. The second, pursued by \citet{GHM2023}, conditions the momentum signal itself on the market state, blending short-term and long-term lookback horizons according to a classification of market cycles derived from trailing market returns. Both approaches improve upon unconditional momentum, but both rely on backward-looking indicators (recent portfolio volatility or past market returns) to infer the current market regime.
+
+This thesis proposes an alternative: using a Bayesian Hidden Markov Model (HMM) estimated on forward-looking equity market stress indicators to produce a real-time regime signal, and then feeding this signal into machine learning models that learn how to adapt cross-sectional stock selection to the current regime. To the best of the author's knowledge, the combination of a Bayesian HMM for regime classification with machine learning for cross-sectional momentum stock selection has not been explored in the literature. While each individual component (HMMs, XGBoost, SHAP) is well established, their integration into a unified framework that both generates portfolios and provides economic insight into the regime-dependent structure of momentum has not been previously explored.
+
+The approach differs from prior work in three respects. First, the regime classification is based on real-time stress indicators (market drawdown, realised volatility, cross-sectional return dispersion, and relative market participation) rather than trailing returns, providing earlier detection of regime shifts. Second, the regime signal enters the stock selection models as one feature among many, allowing the models to learn its optimal use rather than imposing a fixed rule for how regime information should affect portfolio construction. Third, by comparing a linear model (logistic regression) with a nonlinear model (XGBoost), the framework reveals that the regime signal contributes not as a direct return predictor but as a context variable that governs which momentum lookback horizons are informative in each market state.
+
+\subsection{Research Questions}\label{sec:research_questions}
+
+This thesis addresses three research questions:
+
+\begin{enumerate}
+    \item Do regime-conditioned cross-sectional momentum strategies outperform unconditional momentum and the market-state approach of \citet{GHM2023} on a risk-adjusted basis?
+    \item What drives the performance improvement: the regime signal, the inclusion of fundamental stock characteristics, or the use of nonlinear models?
+    \item How does the regime signal interact with momentum at different lookback horizons, and what does this interaction reveal about the structure of the momentum anomaly?
+\end{enumerate}
+
+\subsection{Preview of Main Findings}\label{sec:preview}
+
+The empirical analysis yields three main findings. First, the two-state Bayesian HMM, estimated via Gibbs sampling on training data from 1990 to 2010, produces a filtered panic probability that correctly identifies all major stress episodes in the 2011--2025 out-of-sample period, including the European debt crisis, the 2018 volatility spike, the COVID-19 crash, and the 2022 bear market.
+
+Second, the regime-conditioned machine learning models (logistic regression and XGBoost) substantially outperform both unconditional momentum and the GHM benchmark. The logistic regression achieves an annualised Sharpe ratio of 1.03 with 14.5\% volatility, while XGBoost generates the highest raw returns (21.6\% annualised) with a Sharpe of 1.01. Both are statistically significant improvements over the market benchmark.
+
+Third, decomposition analysis reveals that fundamental quality screening, selecting stocks that are profitable, reasonably valued, and not overleveraged, is the primary driver of the Sharpe ratio improvement. The regime signal contributes differently: it does not improve risk-adjusted returns beyond what a linear model with fundamentals achieves, but it enables XGBoost to generate substantially higher absolute returns by adapting its use of momentum signals to the current market state. This finding reveals that cross-sectional momentum is not a single stable anomaly but a family of horizon-specific effects whose composition rotates with market conditions.
+
+\subsection{Outline}\label{sec:outline}
+
+The remainder of this thesis is organised as follows. Section~\ref{sec:literature} reviews the relevant literature on the momentum anomaly, regime-switching models in finance, and machine learning approaches to cross-sectional asset pricing. Section~\ref{sec:data} describes the data sources, sample construction, and feature definitions. Section~\ref{sec:methodology} develops the two-stage empirical framework: the Bayesian HMM for regime classification and the three portfolio construction methods. Section~\ref{sec:results} presents the out-of-sample results, including performance comparisons, decomposition analysis, feature importance, and the analysis of the regime signal as a context variable. Section~\ref{sec:conclusion} summarises the findings, discusses limitations, and suggests directions for future research.

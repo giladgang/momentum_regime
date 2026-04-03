@@ -1,32 +1,32 @@
 \begin{table}[htbp]
 \centering
-\caption{Logistic regression (Method~1) coefficient estimates. Features are standardized prior to fitting. The model is re-estimated without regularization (using \texttt{statsmodels.Logit}) to obtain valid standard errors; the portfolio is constructed using the $\ell_2$-regularized fit ($C = 1.0$) described in Section~\ref{sec:method1}. Dependent variable: $\mathbb{1}[r_{t+1}^s > \text{median}]$.}
+\caption{Logistic regression (Method~1) coefficient estimates. Features are standardized prior to fitting. The model is re-estimated without regularization (using \texttt{statsmodels.Logit}) to obtain valid standard errors; the portfolio is constructed using the $\ell_2$-regularized fit ($C = 1.0$) described in Section~\ref{sec:method1}. Dependent variable: $\mathbb{1}[r_{t+1}^s > \text{median}]$. All coefficients with $|z| > 1.96$ are significant at the 5\% level.}
 \label{tab:lr_coef}
 \small
-\begin{tabular}{l r r r r}
+\begin{tabular}{l r r r}
 \toprule
-Feature & $\hat{\beta}$ & Std.\ Err. & $z$ & Sig. \\
+Feature & $\hat{\beta}$ & Std.\ Err. & $z$ \\
 \midrule
-Log market equity & 0.0718 & 0.0020 & 35.65 & *** \\
-mom\_11 & 0.0528 & 0.0072 & 7.36 & *** \\
-Book-to-market & 0.0461 & 0.0021 & 21.98 & *** \\
-mom\_12 & -0.0413 & 0.0054 & -7.68 & *** \\
-Asset growth & -0.0358 & 0.0019 & -18.72 & *** \\
-Gross profitability & 0.0322 & 0.0019 & 16.64 & *** \\
-mom\_8 & 0.0313 & 0.0064 & 4.86 & *** \\
-mom\_4 & -0.0284 & 0.0050 & -5.71 & *** \\
-Return on equity & 0.0205 & 0.0019 & 10.56 & *** \\
-Earnings growth & 0.0177 & 0.0019 & 9.38 & *** \\
-mom\_2 & 0.0161 & 0.0036 & 4.51 & *** \\
-mom\_1 & -0.0161 & 0.0026 & -6.24 & *** \\
-mom\_7 & -0.0104 & 0.0062 & -1.68 & * \\
-mom\_5 & 0.0092 & 0.0055 & 1.67 & * \\
-Leverage & -0.0087 & 0.0019 & -4.60 & *** \\
-mom\_3 & -0.0062 & 0.0043 & -1.43 &  \\
-$\pi^{\text{filter}}$ & -0.0050 & 0.0019 & -2.60 & *** \\
-mom\_9 & -0.0034 & 0.0067 & -0.52 &  \\
-mom\_10 & -0.0031 & 0.0069 & -0.44 &  \\
-mom\_6 & 0.0008 & 0.0059 & 0.13 &  \\
+Log market equity & 0.0718 & 0.0020 & 35.65 \\
+mom\_11 & 0.0528 & 0.0072 & 7.36 \\
+Book-to-market & 0.0461 & 0.0021 & 21.98 \\
+mom\_12 & $-$0.0413 & 0.0054 & $-$7.68 \\
+Asset growth & $-$0.0358 & 0.0019 & $-$18.72 \\
+Gross profitability & 0.0322 & 0.0019 & 16.64 \\
+mom\_8 & 0.0313 & 0.0064 & 4.86 \\
+mom\_4 & $-$0.0284 & 0.0050 & $-$5.71 \\
+Return on equity & 0.0205 & 0.0019 & 10.56 \\
+Earnings growth & 0.0177 & 0.0019 & 9.38 \\
+mom\_2 & 0.0161 & 0.0036 & 4.51 \\
+mom\_1 & $-$0.0161 & 0.0026 & $-$6.24 \\
+mom\_7 & $-$0.0104 & 0.0062 & $-$1.68 \\
+mom\_5 & 0.0092 & 0.0055 & 1.67 \\
+Leverage & $-$0.0087 & 0.0019 & $-$4.60 \\
+mom\_3 & $-$0.0062 & 0.0043 & $-$1.43 \\
+$\pi^{\text{filter}}$ & $-$0.0050 & 0.0019 & $-$2.60 \\
+mom\_9 & $-$0.0034 & 0.0067 & $-$0.52 \\
+mom\_10 & $-$0.0031 & 0.0069 & $-$0.44 \\
+mom\_6 & 0.0008 & 0.0059 & 0.13 \\
 \bottomrule
 \end{tabular}
 \end{table}

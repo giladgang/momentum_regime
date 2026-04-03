@@ -1,8 +1,8 @@
 \section{Results}\label{sec:results}
 
-This section evaluates all strategies out-of-sample on the test period (January 2011 to November 2025, 167 months). Each method produces a long-only, value-weighted, top-decile portfolio rebalanced monthly with one-way transaction costs of 10 basis points. Portfolio construction details and performance metric definitions are provided in Appendix~\ref{app:portfolio}. Feature importance is assessed via SHAP values \citep{Lundberg2017} for XGBoost and coefficient analysis for logistic regression; the methodological details are in Appendix~\ref{app:feature_importance}.
+This section evaluates all strategies out-of-sample on the test period (January 2011 to November 2025, 167 months). Each method produces a long-only, value-weighted, top-decile portfolio rebalanced monthly with one-way transaction costs of 10 basis points (i.e., 10 basis points charged on each buy or sell trade). Portfolio construction details and performance metric definitions are provided in Appendix~\ref{app:portfolio}. Feature importance is assessed via SHAP values \citep{Lundberg2017} for XGBoost and coefficient analysis for logistic regression; the methodological details are in Appendix~\ref{app:feature_importance}.
 
-The analysis proceeds in five stages. First, Section~\ref{sec:performance_results} compares the overall performance of the ten strategies. Section~\ref{sec:regime_results} decomposes performance by market regime, revealing that the main benefit of the regime-conditioned models lies in calm-period stock selection rather than crash avoidance. Section~\ref{sec:decomposition} isolates the contributions of lookback flexibility, fundamental characteristics, and the regime signal $\pi_t^{\text{filter}}$ to the observed Sharpe ratio improvement. Section~\ref{sec:feature_results} examines which features drive the predictions through coefficient analysis and SHAP values. Finally, Section~\ref{sec:context_results} synthesises these findings into the central insight of the thesis: that $\pi_t^{\text{filter}}$ functions as a context variable that reveals the regime-dependent structure of cross-sectional momentum.
+The analysis proceeds in six stages. Section~\ref{sec:performance_results} compares the overall performance of all strategies. Section~\ref{sec:regime_results} decomposes performance by market regime, revealing that the main benefit of the regime-conditioned models lies in calm-period stock selection rather than crash avoidance. Section~\ref{sec:decomposition} isolates the contributions of lookback flexibility, fundamental characteristics, and the regime signal $\pi_t^{\text{filter}}$ to the observed Sharpe ratio improvement. Section~\ref{sec:feature_results} examines which features drive the predictions through coefficient analysis and SHAP values. Section~\ref{sec:context_results} synthesises these findings into the central insight of the thesis: that $\pi_t^{\text{filter}}$ functions as a context variable that reveals the regime-dependent structure of cross-sectional momentum. Finally, Section~\ref{sec:ablation} presents ablation studies that isolate the sources of the regime signal's value.
 
 \subsection{Portfolio Performance}\label{sec:performance_results}
 
@@ -32,13 +32,6 @@ The GHM benchmark strategies, which use backward-looking market return momentum 
     \label{fig:ghm_comparison}
 \end{figure}
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.8\textwidth]{ghm_sharpe_comparison.png}
-    \caption{Sharpe ratio comparison across all strategies. The regime-conditioned machine learning methods (M1 and M2) achieve Sharpe ratios above 1.0, substantially exceeding both unconditional momentum and the GHM benchmarks.}
-    \label{fig:ghm_sharpe}
-\end{figure}
-
 \subsection{Regime-Conditional Performance}\label{sec:regime_results}
 
 Table~\ref{tab:regime_sharpe} decomposes performance by market regime. A striking pattern emerges: all strategies perform substantially better during panic months than during calm months. The market itself achieves a Sharpe ratio of 1.15 in panic versus 0.67 in calm, and even unconditional 12-month momentum achieves a Sharpe of 1.25 during panic compared to only 0.38 during calm.
@@ -49,7 +42,7 @@ This pattern arises because the HMM classifies months based on the \emph{level} 
 
 The regime-conditioned methods (M1 and M2) do achieve modestly higher panic-period Sharpes (1.43--1.45) than unconditional momentum (1.24--1.25), reflecting better stock selection during recoveries. However, the economically meaningful gap lies in calm periods: unconditional momentum strategies achieve Sharpe ratios of only 0.38--0.42 during the 112 calm months that constitute two-thirds of the test period, while M1 and M2 achieve 0.77--0.80. Since the portfolio spends most of its life in calm markets, this improvement drives the bulk of the overall Sharpe gain.
 
-This finding challenges the prevailing narrative in the momentum literature, which frames regime detection primarily as a crash-avoidance tool \citep{DanielMoskowitz2016, BarrosoSantaClara2015}. Crash avoidance is not where the value lies: panic-period performance is already strong for all strategies, including unconditional momentum. The regime signal's primary contribution is improving stock selection during normal times.
+This finding offers a different perspective from the momentum literature, which has primarily framed regime detection as a crash-avoidance tool \citep{DanielMoskowitz2016, BarrosoSantaClara2015}. While crash avoidance is important in long-short strategies, where short momentum positions can suffer catastrophic losses during market reversals, it is less relevant in the long-only, cross-sectional setting of this thesis, where panic-period performance is already strong for all strategies. In this framework, the regime signal's primary contribution is improving stock selection during normal times.
 
 \subsection{Decomposing the Sources of Improvement}\label{sec:decomposition}
 
@@ -79,7 +72,7 @@ Table~\ref{tab:lr_coef} reports the standardised coefficient estimates for the l
 
 \input{tables/table_lr_coef}
 
-The dominant features are log market equity ($\hat{\beta} = 0.072$), 11-month momentum ($0.053$), and book-to-market ($0.046$). These reflect the model's primary strategy: select large, high-momentum stocks that are also attractively valued. Among the momentum horizons, the model loads most heavily on intermediate lookbacks (mom$_{8}$ and mom$_{11}$) while assigning a negative coefficient to 12-month momentum ($-0.041$) and 1-month momentum ($-0.016$). This pattern reflects the well-documented short-term reversal and long-horizon mean-reversion effects that bookend the intermediate-term continuation premium.
+The dominant features are log market equity ($\hat{\beta} = 0.072$), 11-month momentum ($0.053$), and book-to-market ($0.046$). These reflect the model's primary strategy: select large, high-momentum stocks that are also attractively valued. Among the momentum horizons, the model loads most heavily on intermediate lookbacks (mom$_{8}$ and mom$_{11}$) while assigning a negative coefficient to 12-month momentum ($-0.041$) and 1-month momentum ($-0.016$). This pattern reflects the well-documented short-term reversal and long-horizon mean-reversion effects that bookend the intermediate-term continuation premium. In aggregate, the sum of absolute momentum coefficients ($\sum_{k=1}^{12}|\hat{\beta}_{mom_k}| = 0.22$) exceeds the sum of absolute fundamental coefficients ($0.16$), confirming that momentum remains the primary signal even in the presence of quality screens.
 
 The fundamental characteristics (gross profitability, asset growth, return on equity, earnings growth, leverage) all receive statistically significant coefficients, confirming their role as quality screens. The regime signal $\pi_t^{\text{filter}}$ ranks 17th out of 20 features by absolute magnitude, with a coefficient of $-0.005$. While statistically significant ($z = -2.60$), its economic contribution to the linear prediction is negligible.
 
@@ -96,19 +89,9 @@ Table~\ref{tab:shap} reports the mean absolute SHAP values for the XGBoost model
     \label{fig:shap_importance}
 \end{figure}
 
-The most striking finding is the contrast with the logistic regression: while $\pi_t^{\text{filter}}$ is essentially irrelevant in the linear model, it is the \emph{second most important feature} in XGBoost, trailing only aggregate momentum. Its SHAP importance increases from 0.015 during calm months to 0.020 during panic months, indicating that the model relies more heavily on the regime signal precisely when markets are stressed. This pattern, combined with the negligible logistic regression coefficient, provides direct evidence that $\pi_t^{\text{filter}}$ contributes through nonlinear interactions rather than as a linear predictor.
+The most striking finding is the contrast with the logistic regression: while $\pi_t^{\text{filter}}$ is essentially irrelevant in the linear model, it is the \emph{second most important feature} in XGBoost, trailing only aggregate momentum. Its SHAP importance increases from 0.015 during calm months to 0.020 during panic months, indicating that the model relies more heavily on the regime signal precisely when markets are stressed. This pattern, combined with the negligible logistic regression coefficient, provides direct evidence that $\pi_t^{\text{filter}}$ contributes through nonlinear interactions rather than as a linear predictor. The mechanism is that XGBoost uses $\pi_t^{\text{filter}}$ as a tree-split variable to condition its reliance on different momentum horizons: when $\pi_t^{\text{filter}}$ is high, the model shifts weight from intermediate-horizon momentum toward short-term reversal, a regime-dependent reweighting that a linear model with fixed coefficients cannot represent.
 
 The fundamental characteristics (book-to-market, log market equity, return on equity) also appear in the top features, consistent with the quality-screening role identified in the decomposition analysis. Their SHAP values are smaller than the regime signal's, suggesting that in the nonlinear model, the regime-momentum interaction dominates the quality screen in explanatory power.
-
-\subsubsection{Information Coefficient Analysis}
-
-Table~\ref{tab:ic} reports the monthly information coefficients (Spearman rank correlation between stock scores and realised forward returns) for each signal.
-
-\input{tables/table_ic}
-
-The logistic regression score achieves the highest mean IC (0.054, $t = 7.91$), significantly above raw 12-month momentum (0.027, $t = 3.15$). The paired $t$-test confirms that the IC improvement of M1 over momentum alone is statistically significant ($t = 2.78$, $p < 0.01$). The XGBoost score, despite producing higher portfolio returns, has a lower IC (0.004, not significant). This apparent paradox arises because IC measures rank-order correlation across the \emph{entire cross-section}, while portfolio returns depend only on the \emph{top decile}. XGBoost may rank top stocks more precisely than logistic regression even though its rank-ordering of the full cross-section is noisier.
-
-The regime-conditional decomposition of IC is informative: momentum's IC drops from 0.030 in calm to 0.019 in panic, a 37\% decline. This confirms that momentum's cross-sectional predictive power weakens during stress, consistent with the economic intuition that regime-dependent strategies should outperform unconditional ones precisely because the optimal signal changes across market states.
 
 \subsection{The Regime Signal as a Context Variable}\label{sec:context_results}
 
@@ -125,26 +108,28 @@ The logistic regression essentially ignores the regime signal (coefficient $-0.0
 
 A linear model cannot represent this interaction: it assigns a single coefficient to $\pi_t^{\text{filter}}$ that must hold across all market conditions. XGBoost, through its tree-based splits, naturally conditions on $\pi_t^{\text{filter}}$ and then branches on different momentum horizons within each regime. This distinction, between a feature that predicts returns directly and one that governs the \emph{relevance} of other features, is central to understanding why the regime signal contributes to XGBoost but not to logistic regression.
 
-\subsubsection{Two Paths to Outperformance}
+The SHAP decomposition confirms that the momentum term structure is not stable: which lookback horizons predict returns depends on the market regime. In calm markets, continuation dominates at 8--11 month horizons. In panic markets, short-term reversal at the 1-month horizon becomes the relevant signal. This provides direct evidence that momentum is not a single, stable anomaly but a family of horizon-specific effects whose composition varies with market conditions. The HMM regime probability, despite having no direct predictive power for returns, is the variable that governs this rotation.
 
-The fact that M1 achieves a comparable Sharpe ratio (1.03 versus 1.01) without using $\pi_t^{\text{filter}}$ does not diminish this finding. M1 succeeds through a fundamentally different mechanism: it combines fundamental quality screens with intermediate momentum in a way that happens to perform well across both regimes. Its calm-period performance comes from filtering out low-quality momentum stocks; its panic-period performance comes from the same quality filter favouring defensive, profitable firms that rebound more reliably. M1's approach is robust but static: it applies the same feature weights regardless of market conditions.
+\subsection{Ablation Analysis}\label{sec:ablation}
 
-M2, by contrast, adapts. Through the regime signal, it learns that momentum is not one signal but a family of signals whose informativeness rotates with market conditions. In calm periods, 8-to-11-month momentum identifies continuation winners. In panic periods, 1-month reversal identifies oversold stocks poised to rebound. This regime-dependent feature weighting is the mechanism that generates M2's higher absolute returns (21.6\% versus 14.8\%), even though the risk-adjusted returns are similar.
+Two ablation studies isolate the sources of the regime signal's value: the first compares alternative regime indicators, and the second decomposes the contribution of each HMM input feature.
 
-These two paths correspond to different investor profiles. M1 is the conservative choice: it delivers the highest Sharpe ratio with the lowest volatility (14.5\%) and terminal wealth of \$6.80 from \$1 invested. M2 is the aggressive choice: it delivers terminal wealth of \$14.70 at the cost of higher volatility (21.8\%). The regime signal does not make the portfolio ``better'' in a risk-adjusted sense; it makes it \emph{different}, enabling a higher-return profile that trades on the regime-dependent structure of momentum.
+\subsubsection{Regime Signal Comparison: HMM vs GHM vs None}
 
-\subsubsection{The Regime-Dependent Structure of Momentum}
+Table~\ref{tab:regime_signal_ablation} replaces $\pi_t^{\text{filter}}$ with the GHM market-cycle variable (a numeric encoding of the Bull/Correction/Bear/Rebound classification from trailing market returns) or removes the regime signal entirely, holding all other features and XGBoost hyperparameters fixed.
 
-The deeper scientific contribution lies in what the M1-versus-M2 comparison reveals about the nature of cross-sectional momentum itself. The SHAP decomposition shows that the momentum term structure is not stable: which lookback horizons predict returns depends on the market regime. In calm markets, continuation dominates at 8--11 month horizons. In panic markets, short-term reversal at the 1-month horizon becomes the relevant signal. The logistic regression, by assigning fixed coefficients, blends these effects into a single average weighting that works reasonably well in both regimes but captures neither optimally.
+\input{tables/table_regime_signal_ablation}
 
-This finding has implications beyond portfolio construction. It provides direct evidence that momentum is not a single, stable anomaly but a family of horizon-specific effects whose composition varies with market conditions. The HMM regime probability, despite having no direct predictive power for returns, is the variable that governs this rotation. This interaction between the regime state and the momentum term structure is not visible in unconditional analyses and cannot be captured by linear models.
+The HMM signal improves the Sharpe ratio by +0.125 over the GHM cycle (1.007 vs 0.882). The GHM cycle, by contrast, adds nothing over no regime signal at all (Sharpe 0.882 vs 0.888), confirming that the backward-looking market return classification used in \citet{GHM2023} does not provide useful conditioning information for a nonlinear model that already observes 12 momentum lookback horizons. The GHM cycle is essentially redundant with the momentum features themselves, since it is constructed from the same underlying market returns. The HMM signal, built from stress indicators (drawdown, volatility, dispersion, market participation) that are not spanned by cross-sectional momentum, provides genuinely complementary information.
 
-\subsubsection{Granger Causality: Does the Regime Signal Predict Momentum Effectiveness?}
+\subsubsection{HMM Input Feature Ablation}
 
-To test formally whether the regime signal contains leading information about momentum's predictive power, Table~\ref{tab:granger} reports Granger causality tests between $\pi_t^{\text{filter}}$ and momentum's monthly information coefficient.
+Table~\ref{tab:hmm_feature_ablation} tests how much each of the four HMM input features contributes to the regime signal's downstream value. For each variant, a single-feature HMM is estimated via Gibbs sampling (3 seeds averaged), and the resulting $\pi_t^{\text{filter}}$ is fed into both M1 and M2.
 
-\input{tables/table_granger}
+\input{tables/table_hmm_feature_ablation}
 
-The results show that $\pi_t^{\text{filter}}$ Granger-causes momentum's IC at conventional significance levels (lag 3: $F = 3.48$, $p = 0.017$). This means that changes in the regime signal predict subsequent changes in how well momentum ranks stocks cross-sectionally. The reverse direction is also significant at lag 3 ($F = 4.20$, $p = 0.007$), suggesting a feedback loop: deteriorating momentum effectiveness and rising market stress reinforce each other.
+The results reveal two important patterns. First, the logistic regression (M1) is completely insensitive to the quality of the regime signal: its Sharpe ratio varies by only 0.006 across all variants (1.032 to 1.038), confirming once more that M1 effectively ignores $\pi_t^{\text{filter}}$.
 
-This bidirectional relationship is economically intuitive. When stress indicators rise (higher $\pi_t^{\text{filter}}$), the cross-sectional return patterns shift, and long-horizon momentum becomes less informative. Conversely, when momentum breaks down (lower IC), it often reflects the forced selling and correlation spikes that characterise stress regimes, which in turn push the HMM toward the panic state. The Granger causality results confirm that $\pi_t^{\text{filter}}$ is not merely a coincident indicator of momentum regime shifts but contains leading information that a forecasting model can exploit.
+Second, XGBoost (M2) shows clear differentiation. Market drawdown (DD) alone produces a Sharpe of 0.997, nearly matching the full four-feature baseline (1.007). This is intuitive: DD measures how far the market stands below its trailing peak, providing a clean, monotonic signal of market stress that directly captures the regime shifts that alter momentum's term structure. Return dispersion (DISP) is the second most informative single feature (Sharpe 0.955), consistent with the finding that cross-sectional return dispersion rises during stress and signals changes in the correlation structure that affect momentum strategies. Realised volatility (VOL, Sharpe 0.855) and relative market participation (REL\_N, Sharpe 0.810) are weaker in isolation, though their inclusion in the full model contributes a modest incremental improvement.
+
+The dominance of DD is consistent with the economic mechanism proposed in Section~\ref{sec:context_results}: the regime signal's value lies in identifying when long-horizon momentum breaks down and short-term reversal becomes informative. Market drawdown is the most direct measure of this transition, as it captures the sustained price declines that trigger momentum crashes and the subsequent recoveries where reversal strategies thrive.

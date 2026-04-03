@@ -8,7 +8,7 @@ The second stage uses this regime signal to guide cross-sectional stock selectio
 
 \subsubsection{Model Specification}\label{sec:hmm_spec}
 
-This thesis employs a two-state Bayesian Hidden Markov Model to classify the market into latent regimes. The hidden state $s_t \in \{0, 1\}$ represents the unobserved regime at month $t$, where $s_t = 0$ denotes the \emph{calm} regime and $s_t = 1$ denotes the \emph{panic} regime.
+This thesis employs a two-state Bayesian Hidden Markov Model to classify the market into latent regimes. The hidden state $s_t \in \{0, 1\}$ represents the unobserved regime at month $t$, where $s_t = 0$ denotes the \emph{calm} regime and $s_t = 1$ denotes the \emph{panic} regime. Crucially, as emphasized by \citet{Hamilton1989}, market regimes are not directly observable: an investor cannot know with certainty whether the market is currently in a calm or panic state. While regime classifications may appear obvious in retrospect -- for example, the 2008 financial crisis is clearly identifiable as a panic period when viewed historically -- distinguishing regimes in real time is fundamentally uncertain. The HMM formalises this uncertainty by treating regimes as hidden states that must be inferred probabilistically from observable market data (see Figure~\ref{fig:hmm_diagram}).
 
 \textbf{Observation equation} Conditional on the regime, the vector of standardized features $\mathbf{z}_t \in \mathbb{R}^D$ (where $D = 4$) is drawn from a regime-specific multivariate Gaussian:
 \begin{equation}
@@ -23,10 +23,16 @@ Each regime is characterized by its own mean vector $\boldsymbol{\mu}_k \in \mat
 \end{equation}
 where $P_{ij} = P(s_t = j \mid s_{t-1} = i)$ and each row sums to one. The diagonal elements $P_{00}$ (calm persistence) and $P_{11}$ (panic persistence) govern how likely each regime is to continue into the next month. The expected duration of the calm regime is $1 / (1 - P_{00})$ months, and likewise $1 / (1 - P_{11})$ for the panic regime.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{markov_chain_diagram.pdf}
+    \caption{Architecture of the two-state Hidden Markov Model. The upper panel shows the three layers of the model. The hidden layer (dashed box) contains two latent regime states, Calm ($s_t = 0$) and Panic ($s_t = 1$), whose true identity is never directly observed by the investor. These states evolve over time according to a first-order Markov chain governed by transition probabilities $P_{ij}$, where the diagonal elements $P_{00}$ and $P_{11}$ capture regime persistence. Each hidden state generates (emits) a four-dimensional observation vector $\mathbf{z}_t$ consisting of measurable market stress indicators: drawdown, realised volatility, cross-sectional return dispersion, and relative market participation. The model inverts this generative process: given only the observed features $\mathbf{z}_{1:t}$, it infers the filtered probability $\pi_t^{\text{filter}} = P(s_t = 1 \mid \mathbf{z}_{1:t})$, a real-time estimate of whether the market is currently in a panic state. The lower panel illustrates an example hidden state sequence over 16 months, showing the characteristic persistence within each regime and the abrupt transitions between them.}
+    \label{fig:hmm_diagram}
+\end{figure}
 
 \subsubsection{Bayesian Estimation via Gibbs Sampling}\label{sec:gibbs}
 
-Rather than estimating the model by maximum likelihood, I adopt a Bayesian approach and draw from the joint posterior:
+Rather than estimating the model by maximum likelihood, this thesis adopts a Bayesian approach and draws from the joint posterior:
 \[
 p\!\left(\{s_t\}_{t=1}^T,\; \{\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k\}_{k=0}^1,\; \mathbf{P} \,\middle|\, \mathbf{z}_{1:T}\right).
 \]
@@ -102,11 +108,18 @@ These initial parameters give the first FFBS forward pass emission densities tha
 \paragraph{Iterative updates.}
 One Gibbs iteration consists of three steps:
 \begin{enumerate}
-    \item sample a complete state path $\{s_t\}_{t=1}^T$ given the current parameters;
-    \item sample $(\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k)$ for each regime given the sampled state path;
-    \item sample $\mathbf{P}$ given the sampled state path.
+    \item sample a complete state path $\{s_t\}_{t=1}^T$ given the current emission parameters and transition matrix;
+    \item sample $(\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k)$ for each regime given the sampled state path, holding $\mathbf{P}$ fixed;
+    \item sample $\mathbf{P}$ given the sampled state path, holding the emission parameters fixed.
 \end{enumerate}
-These steps are repeated many times. Early draws depend strongly on the starting values, so the first part of the chain is discarded as burn-in. The remaining draws approximate the joint posterior.
+In each step, all parameters not being updated are held at their most recently sampled values. These steps are repeated many times. Early draws depend strongly on the starting values, so the first part of the chain is discarded as burn-in. The remaining draws approximate the joint posterior. Figure~\ref{fig:gibbs_diagram} summarises the three-step Gibbs iteration graphically.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\textwidth]{gibbs_sampling_diagram.pdf}
+    \caption{Flowchart of the Gibbs sampler. Each iteration cycles through three conditional updates: (1)~sample the full hidden state path via FFBS, holding emission parameters and the transition matrix fixed; (2)~update the regime-specific means and covariances from a Normal-Inverse-Wishart posterior, holding the state path and transition matrix fixed; (3)~update each row of the transition matrix from a Dirichlet posterior, holding the state path and emission parameters fixed. The loop repeats for $M = 2{,}000$ iterations, with the first $B = 500$ discarded as burn-in.}
+    \label{fig:gibbs_diagram}
+\end{figure}
 
 \paragraph{Step 1: Sampling the hidden state path via FFBS.}
 
@@ -122,7 +135,7 @@ The forward pass computes the filtered probability $\alpha_t(k) = P(s_t=k \mid \
 \end{equation}
 where $f(\mathbf{z}_t \mid s_t=k) = \mathcal{N}(\mathbf{z}_t;\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k)$ is the Gaussian emission density. The recursion is initialized with $\alpha_0(k) = 1/2$. The filtered probability at each month reflects both how well the current features fit each regime and how likely each regime was given the previous month's classification.
 
-The backward pass then samples a coherent state path in reverse order: $s_T \sim \text{Cat}(\alpha_T(0),\alpha_T(1))$, and for $t=T-1,\dots,1$,
+The backward pass then samples a coherent state path in reverse order: $s_T \sim \text{Cat}(\alpha_T(0),\alpha_T(1))$, where $\text{Cat}$ denotes the categorical distribution (a single draw from a discrete probability vector), and for $t=T-1,\dots,1$,
 \begin{equation}
 s_t \sim \text{Cat}\!\left(
 \frac{\alpha_t(k)\,P_{k,s_{t+1}}}
@@ -130,11 +143,18 @@ s_t \sim \text{Cat}\!\left(
 \right),
 \label{eq:backward_sampling}
 \end{equation}
-ensuring that the sampled path respects the Markov transition dynamics. The output is one draw from the posterior over state paths; across Gibbs iterations, different paths are sampled, exploring the full posterior uncertainty. A detailed derivation of the FFBS recursion is provided in Appendix~\ref{app:ffbs}.
+ensuring that the sampled path respects the Markov transition dynamics. Importantly, this backward sampling step is performed only during model \emph{training} (the Gibbs sampler on 1990--2010 data). It is not used to construct the trading signal: the real-time filtered probability $\pi_t^{\text{filter}}$ used for portfolio construction relies solely on the causal forward filter, which conditions only on past and current observations $\mathbf{z}_{1:t}$. The backward pass serves to improve the quality of posterior parameter estimates by providing the Gibbs sampler with more accurate state assignments, but it does not introduce any future information into the regime signal applied during the test period. The output is one draw from the posterior over state paths; across Gibbs iterations, different paths are sampled, exploring the full posterior uncertainty. A detailed derivation of the FFBS recursion is provided in Appendix~\ref{app:ffbs}. Figure~\ref{fig:ffbs_diagram} illustrates the two-pass structure of the algorithm.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\textwidth]{ffbs_diagram.pdf}
+    \caption{Flowchart of the Forward-Filtering Backward-Sampling (FFBS) algorithm. The forward pass sweeps through $t = 1, \dots, T$, computing the filtered probability $\alpha_t(k)$ at each month by combining the emission density with the predicted probability from the previous step. The terminal state $s_T$ is then drawn from the final filtered distribution. The backward pass samples states in reverse order $t = T{-}1, \dots, 1$, conditioning each draw on the filtered belief and the transition probability to the already-sampled future state $s_{t+1}$. The output is a complete regime assignment $\{s_1, \dots, s_T\}$ returned to the Gibbs sampler.}
+    \label{fig:ffbs_diagram}
+\end{figure}
 
 \paragraph{Step 2: Updating the emission parameters.}
 
-Conditional on the sampled state path, the observations assigned to each regime $k$ yield sufficient statistics: the sample mean $\bar{\mathbf{x}}_k$ and scatter matrix $\mathbf{S}_k$. The Normal-Inverse-Wishart prior updates to a posterior with hyperparameters
+Conditional on the sampled state path, the $n_k$ observations assigned to regime $k$ yield sufficient statistics: the sample mean $\bar{\mathbf{x}}_k = \frac{1}{n_k}\sum_{t:\,s_t=k}\mathbf{z}_t$ and the scatter matrix $\mathbf{S}_k = \sum_{t:\,s_t=k}(\mathbf{z}_t - \bar{\mathbf{x}}_k)(\mathbf{z}_t - \bar{\mathbf{x}}_k)^\top$. The Normal-Inverse-Wishart prior updates to a posterior with hyperparameters
 \begin{equation}
 \kappa_n = \kappa_0 + n_k,
 \quad
@@ -180,7 +200,7 @@ This Bayesian model averaging reduces the variance of the regime signal and prod
 
 \paragraph{Convergence Diagnostics.}\label{sec:convergence}
 
-Convergence is assessed in two ways. First, trace plots of the regime means and persistence probabilities are visually inspected to verify that the chain mixes around a stable posterior region after burn-in. Second, effective sample sizes (ESS) are computed for key parameters. For a post-burn-in chain of length $n$,
+Convergence is assessed in two ways. First, trace plots of the regime means and persistence probabilities are visually inspected to verify that the chain mixes around a stable posterior region after burn-in. Second, effective sample sizes (ESS) are computed for key parameters. Because successive MCMC draws are autocorrelated, $n$ draws from the chain contain less information than $n$ independent samples. The ESS quantifies the number of truly independent draws the chain is equivalent to. For a post-burn-in chain of length $n$,
 \begin{equation}
 ESS
 =
@@ -193,7 +213,7 @@ Figure~\ref{fig:convergence_trace} displays the trace plots for the regime means
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{convergence_trace.png}
-    \caption{Trace plots of the Gibbs sampler. Each panel shows the sampled regime means (calm in blue, panic in red) for one feature, with the bottom panel showing the persistence probabilities. The dashed line at iteration $500$ marks the end of burn-in.}
+    \caption{Trace plots of the Gibbs sampler. Each panel shows the sampled regime means (calm in blue, panic in red) for one of the four HMM input features: drawdown (DD), realised volatility (VOL), return dispersion (DISP), and relative market participation (REL\_N). The bottom panel shows the persistence probabilities $P_{00}$ (calm) and $P_{11}$ (panic). The dashed line at iteration $500$ marks the end of burn-in.}
     \label{fig:convergence_trace}
 \end{figure}
 
@@ -211,11 +231,11 @@ Because the four HMM features respond to stress in different directions (VOL and
 -1 & \text{otherwise}.
 \end{cases}
 \end{equation}
-Features that spike upward during crises receive $\text{sign}_j = +1$; features that decline receive $\text{sign}_j = -1$. The panic state is then identified as the one whose posterior mean vector aligns with the crisis direction:
+Features that spike upward during crises receive $\text{sign}_j = +1$; features that decline receive $\text{sign}_j = -1$. The panic state is then identified as the regime $k \in \{0, 1\}$ whose posterior mean vector $\hat{\boldsymbol{\mu}}_k$ best aligns with the crisis direction:
 \begin{equation}
-k^\ast = \arg\max_k \sum_{j=1}^{D} \text{sign}_j \cdot \hat{\mu}_{k,j}.
+k^\ast = \arg\max_{k \in \{0,1\}} \sum_{j=1}^{D} \text{sign}_j \cdot \hat{\mu}_{k,j}.
 \end{equation}
-This procedure is robust to the heterogeneous directional responses of the four features and yields consistent panic identification across all random seeds used in estimation (see below).
+The state labelled $k^\ast$ is designated as ``panic'' and the other as ``calm.'' If the Gibbs sampler happens to assign the panic characteristics to state~0 rather than state~1, the labels are swapped so that $\pi_t^{\text{filter}}$ always represents the probability of the panic state. This procedure is robust to the heterogeneous directional responses of the four features and yields consistent panic identification across all random seeds used in estimation.
 
 \paragraph{Filtered Regime Probability.}\label{sec:trading_signal}
 
@@ -239,7 +259,7 @@ This quantity represents the probability that the market is in the panic regime 
 
 The filtered regime probability $\pi_t^{\text{filter}}$ from Stage~1 provides a monthly measure of market stress, but on its own it does not select stocks. This stage translates the regime signal into cross-sectional portfolios. Three scoring methods of increasing complexity are developed: a deterministic regime-adaptive momentum formula (Method~0), a logistic regression classifier (Method~1), and an XGBoost gradient-boosted tree regressor (Method~2). Each method combines $\pi_t^{\text{filter}}$ with a set of momentum and fundamental stock characteristics to produce a monthly score for every stock, which is then used to rank stocks into a long-only top-decile value-weighted portfolio.
 
-The deterministic formula serves as a transparent baseline that tests whether simply varying the momentum lookback horizon with market conditions adds value. The two machine learning methods go further by jointly learning how all features (momentum at multiple horizons, fundamentals, and the regime signal) interact to predict forward returns. In the results that follow (Section~\ref{sec:results}), I not only compare the out-of-sample performance of the three portfolios but also use SHAP values and coefficient analysis to examine \emph{which} features drive the predictions and \emph{how} their importance shifts across calm and panic regimes. This feature-level analysis provides economic insight into the signals that distinguish regime-conditioned stock selection from standard momentum.
+The deterministic formula serves as a transparent baseline that tests whether simply varying the momentum lookback horizon with market conditions adds value. The two machine learning methods go further by jointly learning how all features (momentum at multiple horizons, fundamentals, and the regime signal) interact to predict forward returns. The results that follow (Section~\ref{sec:results}) not only compare the out-of-sample performance of the three portfolios but also use SHAP values and coefficient analysis to examine \emph{which} features drive the predictions and \emph{how} their importance shifts across calm and panic regimes. This feature-level analysis provides economic insight into the signals that distinguish regime-conditioned stock selection from standard momentum.
 
 \subsubsection{Scoring Methods}\label{sec:methods}
 
@@ -277,13 +297,7 @@ Stocks with higher predicted probability of beating the cross-sectional median r
 
 \paragraph{Method 2: XGBoost Regressor.}\label{sec:method2}
 
-An XGBoost gradient-boosted tree regressor \citep{Chen2016} is trained to predict the forward monthly return directly. The feature vector for each stock-month observation comprises three groups:
-\begin{enumerate}
-    \item \textbf{Momentum features} ($mom_1, \dots, mom_{12}$): trailing cumulative returns at each of the 12 monthly lookback horizons, providing the model with the full term structure of past performance rather than a single pre-selected horizon.
-    \item \textbf{Regime signal} ($\pi_t^{\text{filter}}$): the filtered panic probability from Stage~1, which is identical across all stocks in a given month but allows the model to condition its use of the other features on the current market state.
-    \item \textbf{Fundamental characteristics}: book-to-market ($bm$), return on equity ($roe$), earnings growth, leverage, asset growth, gross profitability scaled by assets ($gross\_profit\_a$), and log market equity ($\log\_me$). These capture value, profitability, investment, and size dimensions of cross-sectional return variation.
-\end{enumerate}
-By including all features jointly, XGBoost can learn which momentum horizons and fundamentals matter most in each regime. For example, it may rely on long-horizon momentum when $\pi_t^{\text{filter}}$ is low but shift toward short-term reversal and defensive fundamentals when $\pi_t^{\text{filter}}$ is high.
+An XGBoost gradient-boosted tree regressor \citep{Chen2016} is trained to predict the forward monthly return directly. The feature vector for each stock-month observation comprises the same 20 features described in Section~\ref{sec:cs_features}: the 12 momentum lookbacks ($mom_1, \dots, mom_{12}$), the regime signal ($\pi_t^{\text{filter}}$), and the 7 fundamental characteristics. By including all features jointly, XGBoost can learn which momentum horizons and fundamentals matter most in each regime. For example, it may rely on long-horizon momentum when $\pi_t^{\text{filter}}$ is low but shift toward short-term reversal and defensive fundamentals when $\pi_t^{\text{filter}}$ is high.
 
 XGBoost builds an additive ensemble of $M$ regression trees, where each successive tree fits the residuals of the current ensemble:
 \begin{equation}
