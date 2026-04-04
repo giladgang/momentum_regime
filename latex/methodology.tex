@@ -2,13 +2,15 @@
 
 The two-stage empirical framework underlying the analysis is developed as follows. The first stage estimates market regimes using a Bayesian Hidden Markov Model (Section~\ref{sec:stage1}). A two-state HMM is fit to four macrofinancial stress indicators via Gibbs sampling, producing a monthly filtered probability $\pi_t^{\text{filter}}$ that quantifies how likely the market is to be in a panic state. Because this probability is computed using only information available at time $t$, it can serve as a real-time trading signal.
 
-The second stage uses this regime signal to guide cross-sectional stock selection (Section~\ref{sec:stage2}). Three portfolio construction methods (a deterministic formula, logistic regression, and XGBoost) combine $\pi_t^{\text{filter}}$ with momentum and fundamental characteristics to rank stocks each month. In this research . By conditioning on $\pi_t^{\text{filter}}$, the models can learn these regime-dependent patterns and adapt portfolio composition accordingly.
+The second stage uses this regime signal to guide cross-sectional stock selection (Section~\ref{sec:stage2}). Three portfolio construction methods (a deterministic formula, logistic regression, and XGBoost) combine $\pi_t^{\text{filter}}$ with momentum and fundamental characteristics to rank stocks each month.
+
+By conditioning on $\pi_t^{\text{filter}}$, the models can learn regime-dependent patterns and adapt portfolio composition accordingly.
 
 \subsection{Stage 1: Regime Classification via Hidden Markov Model}\label{sec:stage1}
 
 \subsubsection{Model Specification}\label{sec:hmm_spec}
 
-This thesis employs a two-state Bayesian Hidden Markov Model to classify the market into latent regimes. The hidden state $s_t \in \{0, 1\}$ represents the unobserved regime at month $t$, where $s_t = 0$ denotes the \emph{calm} regime and $s_t = 1$ denotes the \emph{panic} regime. Crucially, as emphasized by \citet{Hamilton1989}, market regimes are not directly observable: an investor cannot know with certainty whether the market is currently in a calm or panic state. While regime classifications may appear obvious in retrospect -- for example, the 2008 financial crisis is clearly identifiable as a panic period when viewed historically -- distinguishing regimes in real time is fundamentally uncertain. The HMM formalises this uncertainty by treating regimes as hidden states that must be inferred probabilistically from observable market data (see Figure~\ref{fig:hmm_diagram}).
+This thesis employs a two-state Bayesian Hidden Markov Model to classify the market into latent regimes. The hidden state $s_t \in \{0, 1\}$ represents the unobserved regime at month $t$, where $s_t = 0$ denotes the \emph{calm} regime and $s_t = 1$ denotes the \emph{panic} regime. Crucially, as emphasized by \citet{Hamilton1989}, market regimes are not directly observable: an investor cannot know with certainty whether the market is currently in a calm or panic state. While regime classifications may appear obvious in retrospect, distinguishing regimes in real time is fairly difficult. The HMM formalises this uncertainty by treating regimes as hidden states that must be inferred probabilistically from observable market data (see Figure~\ref{fig:hmm_diagram}).
 
 \textbf{Observation equation} Conditional on the regime, the vector of standardized features $\mathbf{z}_t \in \mathbb{R}^D$ (where $D = 4$) is drawn from a regime-specific multivariate Gaussian:
 \begin{equation}
