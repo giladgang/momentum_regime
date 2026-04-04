@@ -141,13 +141,13 @@ The forward pass tells us how likely each regime is at every month, but if we si
 
 The backward pass proceeds in two steps:
 
-\paragraph{Terminal state.} At $t = T$, the filtered probability already conditions on all observations, so the terminal state is drawn directly:
+\paragraph{Terminal state} At $t = T$, the filtered probability already conditions on all observations, so the terminal state is drawn directly:
 \[
 s_T \sim \text{Cat}(\alpha_T(0),\, \alpha_T(1)),
 \]
-where $\text{Cat}$ denotes the categorical distribution: a weighted coin flip between the two states, where $\alpha_T(0)$ is the probability of drawing calm and $\alpha_T(1)$ the probability of drawing panic. For instance, if the forward filter assigns $\alpha_T(0) = 0.8$ and $\alpha_T(1) = 0.2$, the algorithm draws calm with 80\% probability and panic with 20\%.
+where $\text{Cat}$ denotes the categorical distribution: a weighted coin flip between the two states, and $\alpha_T(0)$ is the probability of drawing calm and $\alpha_T(1)$ the probability of drawing panic. For instance, if the forward filter assigns $\alpha_T(0) = 0.8$ and $\alpha_T(1) = 0.2$, the algorithm draws calm with 80\% probability and panic with 20\%.
 
-\paragraph{Backward recursion.} For each earlier time step $t = T-1, T-2, \dots, 1$, the algorithm chooses a state consistent with two pieces of information: (i) the filtered belief $\alpha_t(k)$, which summarises what the data up to time $t$ say about the state, and (ii) the already-sampled future state $s_{t+1}$, which constrains the current state via the transition probability $P_{k, s_{t+1}}$. Combining these two terms and normalising gives:
+\paragraph{Backward recursion} For each earlier time step $t = T-1, T-2, \dots, 1$, the algorithm chooses a state consistent with two pieces of information: (i) the filtered belief $\alpha_t(k)$, which summarises what the data up to time $t$ say about the state, and (ii) the already-sampled future state $s_{t+1}$, which constrains the current state via the transition probability $P_{k, s_{t+1}}$. Combining these two terms and normalising gives:
 \begin{equation}
 P(s_t = k \mid s_{t+1}, \mathbf{z}_{1:t}) = \frac{\alpha_t(k)\,P_{k,s_{t+1}}}
 {\alpha_t(0)\,P_{0,s_{t+1}} + \alpha_t(1)\,P_{1,s_{t+1}}}.
