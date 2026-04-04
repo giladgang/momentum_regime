@@ -43,7 +43,7 @@ This posterior is not available in closed form because the hidden states and mod
 The priors encode two economic beliefs. First, before seeing the data, neither regime should be forced to have extreme values in any feature; the model should learn the characteristics of calm and panic states from the data. Second, regimes should be persistent rather than switching every few months.
 
 \paragraph{Emission parameters.}
-For each regime $k$, the mean vector and covariance matrix are given a conjugate Normal-Inverse-Wishart prior:
+For each regime $k$, the mean vector and covariance matrix are given a conjugate Normal-Inverse-Wishart (NIW) prior. The Inverse-Wishart distribution is a probability distribution over positive-definite matrices, making it the natural prior for a covariance matrix: it ensures that sampled covariance matrices are always symmetric and positive-definite (i.e., valid covariance matrices). The Normal-Inverse-Wishart combines this with a conditional Normal prior on the mean, and is called \emph{conjugate} because when the data are Gaussian, the posterior has the same NIW form as the prior, with updated hyperparameters. This conjugacy makes the Gibbs updates exact. Formally:
 \begin{equation}
 \boldsymbol{\Sigma}_k \sim \mathcal{IW}(\nu_0,\boldsymbol{\Psi}_0),
 \qquad
