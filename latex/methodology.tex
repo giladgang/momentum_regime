@@ -155,7 +155,9 @@ Importantly, the backward pass is performed only during model \emph{training} (t
 
 \paragraph{Step 2: Updating the emission parameters.}
 
-Conditional on the sampled state path, the $n_k$ observations assigned to regime $k$ yield sufficient statistics: the sample mean $\bar{\mathbf{x}}_k = \frac{1}{n_k}\sum_{t:\,s_t=k}\mathbf{z}_t$ and the scatter matrix $\mathbf{S}_k = \sum_{t:\,s_t=k}(\mathbf{z}_t - \bar{\mathbf{x}}_k)(\mathbf{z}_t - \bar{\mathbf{x}}_k)^\top$. The Normal-Inverse-Wishart prior updates to a posterior with hyperparameters
+Conditional on the sampled state path, the $n_k$ observations assigned to regime $k$ yield sufficient statistics: the sample mean $\bar{\mathbf{x}}_k = \frac{1}{n_k}\sum_{t:\,s_t=k}\mathbf{z}_t$ and the scatter matrix $\mathbf{S}_k = \sum_{t:\,s_t=k}(\mathbf{z}_t - \bar{\mathbf{x}}_k)(\mathbf{z}_t - \bar{\mathbf{x}}_k)^\top$. The Normal-
+
+Inverse-Wishart prior updates to a posterior with hyperparameters
 \begin{equation}
 \kappa_n = \kappa_0 + n_k,
 \quad
