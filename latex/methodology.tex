@@ -114,7 +114,7 @@ One Gibbs iteration consists of three steps:
     \item sample $(\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k)$ for each regime given the sampled state path, holding $\mathbf{P}$ fixed;
     \item sample $\mathbf{P}$ given the sampled state path, holding the emission parameters fixed.
 \end{enumerate}
-In each step, all parameters not being updated are held at their most recently sampled values. These steps are repeated many times. Early draws depend strongly on the starting values, so the first part of the chain is discarded as burn-in. The remaining draws approximate the joint posterior. Figure~\ref{fig:gibbs_diagram} summarises the three-step Gibbs iteration graphically.
+In each step, all parameters not being updated are held at their most recently sampled values. These steps are repeated many times. Early draws depend strongly on the starting values, so the first part of the chain is discarded as burn-in. The remaining draws approximate the joint posterior. Figure~\ref{fig:gibbs_diagram} summarizes the three-step Gibbs iteration graphically.
 
 \begin{figure}[H]
     \centering
