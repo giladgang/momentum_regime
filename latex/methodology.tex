@@ -143,14 +143,7 @@ s_t \sim \text{Cat}\!\left(
 \right),
 \label{eq:backward_sampling}
 \end{equation}
-ensuring that the sampled path respects the Markov transition dynamics. Importantly, this backward sampling step is performed only during model \emph{training} (the Gibbs sampler on 1990--2010 data). It is not used to construct the trading signal: the real-time filtered probability $\pi_t^{\text{filter}}$ used for portfolio construction relies solely on the causal forward filter, which conditions only on past and current observations $\mathbf{z}_{1:t}$. The backward pass serves to improve the quality of posterior parameter estimates by providing the Gibbs sampler with more accurate state assignments, but it does not introduce any future information into the regime signal applied during the test period. The output is one draw from the posterior over state paths; across Gibbs iterations, different paths are sampled, exploring the full posterior uncertainty. A detailed derivation of the FFBS recursion is provided in Appendix~\ref{app:ffbs}. Figure~\ref{fig:ffbs_diagram} illustrates the two-pass structure of the algorithm.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.82\textwidth]{ffbs_diagram.pdf}
-    \caption{Flowchart of the Forward-Filtering Backward-Sampling (FFBS) algorithm. The forward pass sweeps through $t = 1, \dots, T$, computing the filtered probability $\alpha_t(k)$ at each month by combining the emission density with the predicted probability from the previous step. The terminal state $s_T$ is then drawn from the final filtered distribution. The backward pass samples states in reverse order $t = T{-}1, \dots, 1$, conditioning each draw on the filtered belief and the transition probability to the already-sampled future state $s_{t+1}$. The output is a complete regime assignment $\{s_1, \dots, s_T\}$ returned to the Gibbs sampler.}
-    \label{fig:ffbs_diagram}
-\end{figure}
+ensuring that the sampled path respects the Markov transition dynamics. Importantly, this backward sampling step is performed only during model \emph{training} (the Gibbs sampler on 1990--2010 data). It is not used to construct the trading signal: the real-time filtered probability $\pi_t^{\text{filter}}$ used for portfolio construction relies solely on the causal forward filter, which conditions only on past and current observations $\mathbf{z}_{1:t}$. The backward pass serves to improve the quality of posterior parameter estimates by providing the Gibbs sampler with more accurate state assignments, but it does not introduce any future information into the regime signal applied during the test period. The output is one draw from the posterior over state paths; across Gibbs iterations, different paths are sampled, exploring the full posterior uncertainty. A detailed derivation of the FFBS recursion and a flowchart of the algorithm are provided in Appendix~\ref{app:ffbs}.
 
 \paragraph{Step 2: Updating the emission parameters.}
 
@@ -208,7 +201,14 @@ ESS
 \end{equation}
 where $\hat{\rho}(\ell)$ is the estimated autocorrelation at lag $\ell$, and $L^\ast$ is the first lag at which the autocorrelation becomes negative. High ESS indicates that the chain provides many effectively independent posterior draws.
 
-Figure~\ref{fig:convergence_trace} (Appendix~\ref{app:convergence}) displays the trace plots, confirming that the chains fluctuate around stable values after burn-in.
+Figure~\ref{fig:convergence_trace} displays the trace plots for the regime means of all four features and the persistence probabilities $P_{00}$ and $P_{11}$ across $2{,}000$ Gibbs iterations. The dashed vertical line marks the end of the burn-in period at iteration $500$. After burn-in, the chains fluctuate around stable values, indicating that the sampler has converged to the posterior distribution.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{convergence_trace.png}
+    \caption{Trace plots of the Gibbs sampler. Each panel shows the sampled regime means (calm in blue, panic in red) for one of the four HMM input features: drawdown (DD), realised volatility (VOL), return dispersion (DISP), and relative market participation (REL\_N). The bottom panel shows the persistence probabilities $P_{00}$ (calm) and $P_{11}$ (panic). The dashed line at iteration $500$ marks the end of burn-in.}
+    \label{fig:convergence_trace}
+\end{figure}
 
 \subsubsection{Regime Identification and Trading Signal}\label{sec:regime_signal}
 
