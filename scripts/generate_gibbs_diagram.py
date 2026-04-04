@@ -30,9 +30,9 @@ EQ_COLOR = '#333333'
 plt.rcParams['font.family'] = 'sans-serif'
 plt.rcParams['font.sans-serif'] = ['Helvetica', 'Arial', 'DejaVu Sans']
 
-fig, ax = plt.subplots(1, 1, figsize=(11, 18))
+fig, ax = plt.subplots(1, 1, figsize=(11, 26))
 ax.set_xlim(-1.5, 12.5)
-ax.set_ylim(-26, 2.5)
+ax.set_ylim(-36, 2.5)
 ax.set_aspect('equal')
 ax.axis('off')
 
@@ -172,17 +172,64 @@ ax.text(loop_x - 0.45, (loop_bottom_y + s1_y) / 2, 'next\niteration',
         bbox=dict(boxstyle='round,pad=0.2', facecolor=LOOP_BG, edgecolor='none'))
 
 # ═══════════════════════════════════════════
+# MULTI-SEED NOTE
+# ═══════════════════════════════════════════
+SEED_FILL = '#FFF8E1'
+SEED_EDGE = '#F9A825'
+CONV_FILL = '#E8EAF6'
+CONV_EDGE = '#3949AB'
+LABEL_FILL = '#FBE9E7'
+LABEL_EDGE = '#D84315'
+
+seed_y = loop_bot - 2.0
+seed_h = 1.4
+arrow_down(ax, cx, loop_bot - 0.35, seed_y + seed_h/2 + 0.1, SEED_EDGE)
+
+add_box(ax, cx, seed_y, 10.0, seed_h, [
+    ('Repeat with 5 independent seeds', 13, SEED_EDGE, True),
+    ('', 2, TEXT_DARK, False),
+    ('Each seed runs the full Gibbs loop above from a different random start', 10.5, TEXT_DARK, False),
+], SEED_FILL, SEED_EDGE)
+
+# ═══════════════════════════════════════════
+# CONVERGENCE
+# ═══════════════════════════════════════════
+conv_y = seed_y - seed_h/2 - 1.6
+conv_h = 1.4
+arrow_down(ax, cx, seed_y - seed_h/2, conv_y + conv_h/2 + 0.1, CONV_EDGE)
+
+add_box(ax, cx, conv_y, 10.0, conv_h, [
+    ('Convergence diagnostics', 13, CONV_EDGE, True),
+    ('', 2, TEXT_DARK, False),
+    ('Trace plots + effective sample size (ESS > 100)', 10.5, TEXT_DARK, False),
+], CONV_FILL, CONV_EDGE)
+
+# ═══════════════════════════════════════════
+# REGIME IDENTIFICATION
+# ═══════════════════════════════════════════
+label_y = conv_y - conv_h/2 - 1.6
+label_h = 1.4
+arrow_down(ax, cx, conv_y - conv_h/2, label_y + label_h/2 + 0.1, LABEL_EDGE)
+
+add_box(ax, cx, label_y, 10.0, label_h, [
+    ('Regime identification', 13, LABEL_EDGE, True),
+    ('', 2, TEXT_DARK, False),
+    (r'Label switching: state with higher $\bar{\mu}_{\mathrm{VOL}}$ $\;\rightarrow\;$ panic', 10.5, TEXT_DARK, False),
+], LABEL_FILL, LABEL_EDGE)
+
+# ═══════════════════════════════════════════
 # OUTPUT
 # ═══════════════════════════════════════════
-out_y = loop_bot - 2.5
-arrow_down(ax, cx, loop_bot - 0.35, out_y + 1.1, GREEN)
+out_y = label_y - label_h/2 - 2.0
+out_h = 2.2
+arrow_down(ax, cx, label_y - label_h/2, out_y + out_h/2 + 0.1, GREEN)
 
-add_box(ax, cx, out_y, 10.0, 2.2, [
+add_box(ax, cx, out_y, 10.0, out_h, [
     ('Output', 13, GREEN, True),
     ('', 3, TEXT_DARK, False),
-    (r'Average the post-burn-in draws: $\bar{\boldsymbol{\mu}}_k,\, \bar{\boldsymbol{\Sigma}}_k,\, \bar{\mathbf{P}}$', 11.5, TEXT_DARK, False),
+    (r'Average posterior draws per seed: $\bar{\boldsymbol{\mu}}_k,\, \bar{\boldsymbol{\Sigma}}_k,\, \bar{\mathbf{P}}$', 11, TEXT_DARK, False),
     ('', 2, TEXT_DARK, False),
-    (r'Apply forward filter $\longrightarrow$ $\pi_t^{\,\mathrm{filter}} = P(s_t = 1 \mid \mathbf{z}_{1:t})$', 11.5, TEXT_DARK, False),
+    (r'Apply forward filter per seed, average across seeds $\;\rightarrow\; \pi_t^{\,\mathrm{filter}}$', 11, TEXT_DARK, False),
 ], OUTPUT_FILL, OUTPUT_EDGE)
 
 plt.savefig('gibbs_sampling_diagram.png', dpi=300, bbox_inches='tight',
