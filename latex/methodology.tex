@@ -143,7 +143,7 @@ s_t \sim \text{Cat}\!\left(
 \right),
 \label{eq:backward_sampling}
 \end{equation}
-ensuring that the sampled path respects the Markov transition dynamics. Importantly, this backward sampling step is performed only during model \emph{training} (the Gibbs sampler on 1990--2010 data). It is not used to construct the trading signal: the real-time filtered probability $\pi_t^{\text{filter}}$ used for portfolio construction relies solely on the causal forward filter, which conditions only on past and current observations $\mathbf{z}_{1:t}$. The backward pass serves to improve the quality of posterior parameter estimates by providing the Gibbs sampler with more accurate state assignments, but it does not introduce any future information into the regime signal applied during the test period. The output is one draw from the posterior over state paths; across Gibbs iterations, different paths are sampled, exploring the full posterior uncertainty. A detailed derivation of the FFBS recursion is provided in Section~\ref{app:ffbs}. Figure~\ref{fig:ffbs_diagram} illustrates the two-pass structure of the algorithm.
+ensuring that the sampled path respects the Markov transition dynamics. Importantly, this backward sampling step is performed only during model \emph{training} (the Gibbs sampler on 1990--2010 data). It is not used to construct the trading signal: the real-time filtered probability $\pi_t^{\text{filter}}$ used for portfolio construction relies solely on the causal forward filter, which conditions only on past and current observations $\mathbf{z}_{1:t}$. The backward pass serves to improve the quality of posterior parameter estimates by providing the Gibbs sampler with more accurate state assignments, but it does not introduce any future information into the regime signal applied during the test period. The output is one draw from the posterior over state paths; across Gibbs iterations, different paths are sampled, exploring the full posterior uncertainty. A detailed derivation of the FFBS recursion is provided in Appendix~\ref{app:ffbs}. Figure~\ref{fig:ffbs_diagram} illustrates the two-pass structure of the algorithm.
 
 \begin{figure}[H]
     \centering
@@ -279,7 +279,7 @@ and each stock's score is simply its momentum return at the selected horizon:
 \begin{equation}
     score_t^s = mom_{\ell_t, t}^s.
 \end{equation}
-Stocks are then ranked by this score, and the top decile forms the long portfolio as described in Section~\ref{app:portfolio_construction}.
+Stocks are then ranked by this score, and the top decile forms the long portfolio as described in Appendix~\ref{app:portfolio_construction}.
 
 When $\pi_t^{\text{filter}} \approx 0$ (calm), $\ell_t = 12$, recovering the standard 12-month momentum signal that captures continuation in trending markets. When $\pi_t^{\text{filter}} \approx 1$ (panic), $\ell_t = 1$, switching to 1-month reversal to exploit the tendency of oversold stocks to snap back after panic selling. At intermediate values, the lookback smoothly interpolates between these extremes.
 

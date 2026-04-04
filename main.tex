@@ -12,6 +12,7 @@
 \usepackage[round]{natbib}
 \usepackage{hyperref}
 \usepackage{cleveref}
+\crefname{appendix}{Appendix}{Appendices}
 
 %% –– Settings ––
 \graphicspath{{./}}          % images live at project root
@@ -57,6 +58,7 @@ Cross-sectional momentum is one of the most robust return anomalies in empirical
 %% –– Appendix ––
 \newpage
 \appendix
+\renewcommand{\thesection}{Appendix \Alph{section}}
 \input{latex/appendix}
 
 \end{document}
