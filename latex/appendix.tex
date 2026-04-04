@@ -134,11 +134,11 @@ where $\tilde{x}_{t,j}^s$ is the standardised value of feature $j$. The absolute
 
 \section{FFBS Derivation}\label{app:ffbs}
 
-A detailed derivation of the Forward-Filtering Backward-Sampling (FFBS) algorithm used in Step~1 of the Gibbs sampler (Section~\ref{sec:gibbs_sampler}) is provided below.
+The Forward-Filtering Backward-Sampling (FFBS) algorithm, used in Step~1 of the Gibbs sampler (Section~\ref{sec:gibbs_sampler}), draws a complete hidden state path $(s_1, \dots, s_T)$ from the conditional posterior $P(\{s_t\}_{t=1}^T \mid \mathbf{z}_{1:T}, \boldsymbol{\mu}, \boldsymbol{\Sigma}, \mathbf{P})$, given the current values of the emission parameters and transition matrix. The algorithm proceeds in two passes. The forward pass sweeps through the data chronologically, computing a filtered belief about the current state at each time step. The backward pass then walks in reverse, drawing a state at each step that is consistent with both the filtered belief and the state already sampled one step ahead. Together, the two passes produce a single draw from the joint posterior over the entire state sequence, respecting the Markov transition dynamics throughout.
 
 \subsection{Forward Filtering}
 
-The goal of the forward pass is to compute, for each time step $t$, the filtered probability $\alpha_t(k) = P(s_t = k \mid \mathbf{z}_{1:t})$ for each state $k \in \{0,1\}$.
+The forward pass computes, for each time step $t$, the filtered probability $\alpha_t(k) = P(s_t = k \mid \mathbf{z}_{1:t})$ for each state $k \in \{0,1\}$. This quantity summarises everything the observed data up to time $t$ reveal about the current regime.
 
 \paragraph{Initialization.} With no prior information about the initial state, a uniform prior is used:
 \begin{equation}
@@ -161,7 +161,7 @@ where $f(\mathbf{z}_t \mid s_t = k) = \mathcal{N}(\mathbf{z}_t; \boldsymbol{\mu}
 
 \subsection{Backward Sampling}
 
-Given the filtered probabilities $\{\alpha_t(k)\}_{t=1}^T$, the backward pass samples a complete state path $(s_1, \dots, s_T)$ from the posterior $P(\{s_t\} \mid \mathbf{z}_{1:T})$.
+The forward pass produces marginal beliefs $\alpha_t(k)$ at each time step, but these do not define a joint distribution over the full state path. To obtain a coherent sample $(s_1, \dots, s_T)$ where consecutive states respect the Markov transition probabilities, the backward pass samples states in reverse chronological order, conditioning each draw on the already-sampled future state.
 
 \paragraph{Terminal state.} At $t = T$, the filtered probability already conditions on all observations:
 \begin{equation}
@@ -172,4 +172,6 @@ Given the filtered probabilities $\{\alpha_t(k)\}_{t=1}^T$, the backward pass sa
 \begin{equation}
     P(s_t = k \mid s_{t+1}, \mathbf{z}_{1:t}) \propto \alpha_t(k) \, P_{k, s_{t+1}}.
 \end{equation}
-Normalising gives the sampling distribution in Equation~(\ref{eq:backward_sampling}). The key insight is that the backward pass needs only the filtered probabilities (from the forward pass) and the transition matrix, not the raw observations. Each sampled state $s_t$ depends on the future path only through $s_{t+1}$, preserving the Markov property.
+Normalising gives the sampling distribution in Equation~(\ref{eq:backward_sampling}). Intuitively, the term $\alpha_t(k)$ captures what the data up to time $t$ say about the state, while $P_{k, s_{t+1}}$ ensures that the sampled state is consistent with the transition to the already-chosen future state. The backward pass needs only the filtered probabilities (from the forward pass) and the transition matrix, not the raw observations. Each sampled state $s_t$ depends on the future path only through $s_{t+1}$, preserving the Markov property.
+
+The complete FFBS procedure is run once per Gibbs iteration. Each run produces a different state path, reflecting the posterior uncertainty over regime assignments. Across many Gibbs iterations, these paths explore the full posterior distribution, and the emission parameters and transition matrix are updated conditional on each sampled path.
