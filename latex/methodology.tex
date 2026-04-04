@@ -162,13 +162,13 @@ Importantly, the backward pass is performed only during model \emph{training} (t
 \paragraph{Step 2: Updating the emission parameters.}
 
 Conditional on the sampled state path, the $n_k$ observations assigned to regime $k$ yield sufficient statistics: the sample mean $\bar{\mathbf{x}}_k = \frac{1}{n_k}\sum_{t:\,s_t=k}\mathbf{z}_t$ and the scatter matrix $\mathbf{S}_k = \sum_{t:\,s_t=k}(\mathbf{z}_t - \bar{\mathbf{x}}_k)(\mathbf{z}_t - \bar{\mathbf{x}}_k)^\top$. The Normal-Inverse-Wishart prior updates to a posterior with hyperparameters:
-\begin{align}
-\kappa_n &= \kappa_0 + n_k, \label{eq:niw_kappa} \\[6pt]
-\mathbf{m}_n &= \frac{\kappa_0 \mathbf{m}_0 + n_k \bar{\mathbf{x}}_k}{\kappa_n}, \label{eq:niw_mean} \\[6pt]
-\nu_n &= \nu_0 + n_k, \label{eq:niw_nu} \\[6pt]
-\boldsymbol{\Psi}_n &= \boldsymbol{\Psi}_0 + \mathbf{S}_k + \frac{\kappa_0 n_k}{\kappa_n}(\bar{\mathbf{x}}_k-\mathbf{m}_0)(\bar{\mathbf{x}}_k-\mathbf{m}_0)^\top. \label{eq:niw_psi}
-\end{align}
-Each update blends the prior with the data. $\kappa_n$ adds the prior's pseudo-observations ($\kappa_0 = 0.01$) to the $n_k$ real observations, giving the total confidence in the mean estimate. $\mathbf{m}_n$ is a weighted average of the prior mean $\mathbf{m}_0$ and the sample mean $\bar{\mathbf{x}}_k$, weighted by their respective observation counts; since $\kappa_0 \ll n_k$, the data dominate. $\nu_n$ accumulates degrees of freedom for the covariance estimate. $\boldsymbol{\Psi}_n$ combines three sources: the prior scale $\boldsymbol{\Psi}_0$, the within-regime scatter $\mathbf{S}_k$, and a correction term that adds extra variance when the prior mean and sample mean disagree.
+\begin{alignat}{2}
+\kappa_n &= \kappa_0 + n_k, &\qquad& \text{(total confidence: prior + data)} \label{eq:niw_kappa} \\[6pt]
+\mathbf{m}_n &= \frac{\kappa_0 \mathbf{m}_0 + n_k \bar{\mathbf{x}}_k}{\kappa_n}, &\qquad& \text{(weighted average of prior and sample mean)} \label{eq:niw_mean} \\[6pt]
+\nu_n &= \nu_0 + n_k, &\qquad& \text{(degrees of freedom for covariance)} \label{eq:niw_nu} \\[6pt]
+\boldsymbol{\Psi}_n &= \boldsymbol{\Psi}_0 + \mathbf{S}_k + \frac{\kappa_0 n_k}{\kappa_n}(\bar{\mathbf{x}}_k-\mathbf{m}_0)(\bar{\mathbf{x}}_k-\mathbf{m}_0)^\top. &\qquad& \text{(prior scale + scatter + mean-disagreement correction)} \label{eq:niw_psi}
+\end{alignat}
+Since $\kappa_0 = 0.01 \ll n_k$, the posterior is driven almost entirely by the data.
 
 New regime parameters are then drawn from the updated posterior:
 $\boldsymbol{\Sigma}_k \sim \mathcal{IW}(\nu_n,\boldsymbol{\Psi}_n)$ and
