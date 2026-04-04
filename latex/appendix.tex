@@ -134,14 +134,7 @@ where $\tilde{x}_{t,j}^s$ is the standardised value of feature $j$. The absolute
 
 \section{FFBS Derivation}\label{app:ffbs}
 
-A detailed derivation of the Forward-Filtering Backward-Sampling (FFBS) algorithm used in Step~1 of the Gibbs sampler (Section~\ref{sec:gibbs_sampler}) is provided below. Figure~\ref{fig:ffbs_diagram} illustrates the two-pass structure.
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.82\textwidth]{ffbs_diagram.pdf}
-    \caption{Flowchart of the Forward-Filtering Backward-Sampling (FFBS) algorithm. The forward pass sweeps through $t = 1, \dots, T$, computing the filtered probability $\alpha_t(k)$ at each month by combining the emission density with the predicted probability from the previous step. The terminal state $s_T$ is then drawn from the final filtered distribution. The backward pass samples states in reverse order $t = T{-}1, \dots, 1$, conditioning each draw on the filtered belief and the transition probability to the already-sampled future state $s_{t+1}$. The output is a complete regime assignment $\{s_1, \dots, s_T\}$ returned to the Gibbs sampler.}
-    \label{fig:ffbs_diagram}
-\end{figure}
+A detailed derivation of the Forward-Filtering Backward-Sampling (FFBS) algorithm used in Step~1 of the Gibbs sampler (Section~\ref{sec:gibbs_sampler}) is provided below.
 
 \subsection{Forward Filtering}
 
@@ -165,6 +158,13 @@ which marginalises over the previous state using the transition matrix.
 where $f(\mathbf{z}_t \mid s_t = k) = \mathcal{N}(\mathbf{z}_t; \boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k)$ is the Gaussian emission density for state $k$. Substituting the prediction step into the update step yields the combined recursion in Equation~(\ref{eq:forward_plain}).
 
 \paragraph{Numerical stability.} In practice, the emission densities $f(\mathbf{z}_t \mid s_t = k)$ can be extremely small (or large) for high-dimensional observations, leading to numerical underflow. The implementation works in log-space, computing $\log f(\mathbf{z}_t \mid s_t = k)$ and using the log-sum-exp trick for normalisation.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.82\textwidth]{ffbs_diagram.pdf}
+    \caption{Flowchart of the Forward-Filtering Backward-Sampling (FFBS) algorithm. The forward pass sweeps through $t = 1, \dots, T$, computing the filtered probability $\alpha_t(k)$ at each month by combining the emission density with the predicted probability from the previous step. The terminal state $s_T$ is then drawn from the final filtered distribution. The backward pass samples states in reverse order $t = T{-}1, \dots, 1$, conditioning each draw on the filtered belief and the transition probability to the already-sampled future state $s_{t+1}$. The output is a complete regime assignment $\{s_1, \dots, s_T\}$ returned to the Gibbs sampler.}
+    \label{fig:ffbs_diagram}
+\end{figure}
 
 \subsection{Backward Sampling}
 
