@@ -93,7 +93,7 @@ In other words, the prior expects each regime to continue with probability $0.9$
 \paragraph{Gibbs Sampler.}\label{sec:gibbs_sampler}
 
 \paragraph{Initialization.}
-The Gibbs sampler requires starting values for the emission parameters and the transition matrix. A crude volatility-based partition is used: months with above-median $VOL_t^z$ are initially assigned to the panic state ($s_t=1$), and the remaining months to the calm state ($s_t=0$). The initial emission parameters are then computed from each group:
+The Gibbs sampler requires starting values for the emission parameters and the transition matrix. A crude volatility-based partition is used:\footnote{The choice of initialization has negligible impact on the posterior: the sampler is run for 2{,}000 iterations with 500 discarded as burn-in, and convergence diagnostics (Section~\ref{sec:convergence}) confirm that the chain mixes well regardless of the starting partition.} months with above-median $VOL_t^z$ are initially assigned to the panic state ($s_t=1$), and the remaining months to the calm state ($s_t=0$). The initial emission parameters are then computed from each group:
 \[
 \boldsymbol{\mu}_k^{(0)} = \frac{1}{n_k}\sum_{t:\,s_t=k}\mathbf{z}_t,
 \qquad
@@ -259,7 +259,14 @@ This quantity represents the probability that the market is in the panic regime 
 
 The filtered regime probability $\pi_t^{\text{filter}}$ from Stage~1 provides a monthly measure of market stress, but on its own it does not select stocks. This stage translates the regime signal into cross-sectional portfolios. Three scoring methods of increasing complexity are developed: a deterministic regime-adaptive momentum formula (Method~0), a logistic regression classifier (Method~1), and an XGBoost gradient-boosted tree regressor (Method~2). Each method combines $\pi_t^{\text{filter}}$ with a set of momentum and fundamental stock characteristics to produce a monthly score for every stock, which is then used to rank stocks into a long-only top-decile value-weighted portfolio.
 
-The deterministic formula serves as a transparent baseline that tests whether simply varying the momentum lookback horizon with market conditions adds value. The two machine learning methods go further by jointly learning how all features (momentum at multiple horizons, fundamentals, and the regime signal) interact to predict forward returns. The results that follow (Section~\ref{sec:results}) not only compare the out-of-sample performance of the three portfolios but also use SHAP values and coefficient analysis to examine \emph{which} features drive the predictions and \emph{how} their importance shifts across calm and panic regimes. This feature-level analysis provides economic insight into the signals that distinguish regime-conditioned stock selection from standard momentum.
+The deterministic formula serves as a transparent baseline that tests whether simply varying the momentum lookback horizon with market conditions adds value. The two machine learning methods go further by jointly learning how all features (momentum at multiple horizons, fundamentals, and the regime signal) interact to predict forward returns. The results that follow (Section~\ref{sec:results}) not only compare the out-of-sample performance of the three portfolios but also use SHAP values and coefficient analysis to examine \emph{which} features drive the predictions and \emph{how} their importance shifts across calm and panic regimes. This feature-level analysis provides economic insight into the signals that distinguish regime-conditioned stock selection from standard momentum. Figure~\ref{fig:cs_model_diagram} illustrates the Stage~2 pipeline.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{cs_model_diagram.png}
+    \caption{Pipeline for Stage~2 (cross-sectional portfolio construction). The feature vector for each stock-month observation comprises 12 momentum lookbacks, the filtered panic probability $\pi_t^{\text{filter}}$ from Stage~1, and 7 fundamental characteristics. Two machine learning models (logistic regression and XGBoost) score every stock each month, and the top decile by score forms a long-only, value-weighted portfolio using NYSE breakpoints.}
+    \label{fig:cs_model_diagram}
+\end{figure}
 
 \subsubsection{Scoring Methods}\label{sec:methods}
 

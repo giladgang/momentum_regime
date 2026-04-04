@@ -8,3 +8,14 @@ data/
 .venv/
 .venv-2/
 __pycache__/
+
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.blg
+*.out
+*.toc
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+main.log
