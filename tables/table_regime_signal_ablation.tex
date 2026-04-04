@@ -1,7 +1,5 @@
 \begin{table}[htbp]
 \centering
-\caption{Regime signal ablation: XGBoost performance with alternative regime indicators. The HMM filtered probability ($\pi_t^{\text{filter}}$) is replaced by the GHM market-cycle variable (Bull/Correction/Bear/Rebound) or removed entirely. All other features (12 momentum lookbacks, 7 fundamentals) and XGBoost hyperparameters are held fixed. The HMM signal improves the Sharpe ratio by +0.125 over the GHM cycle, which itself adds nothing over no regime signal at all.}
-\label{tab:regime_signal_ablation}
 \smallskip
 \begin{tabular}{lcccc}
 \toprule
@@ -14,4 +12,6 @@ XGB (no regime signal)                   & 19.1\% & 21.6\% & 0.888 & $-$23.7\% \
 \multicolumn{5}{l}{\footnotesize Sharpe difference: HMM vs GHM = +0.125; HMM vs None = +0.119; GHM vs None = $-$0.006} \\
 \bottomrule
 \end{tabular}
+\caption{Regime signal ablation: XGBoost performance with alternative regime indicators. The HMM filtered probability ($\pi_t^{\text{filter}}$) is replaced by the GHM market-cycle variable (Bull/Correction/Bear/Rebound) or removed entirely. All other features (12 momentum lookbacks, 7 fundamentals) and XGBoost hyperparameters are held fixed. The HMM signal improves the Sharpe ratio by +0.125 over the GHM cycle, which itself adds nothing over no regime signal at all.}
+\label{tab:regime_signal_ablation}
 \end{table}

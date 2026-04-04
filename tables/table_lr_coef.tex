@@ -1,7 +1,5 @@
 \begin{table}[htbp]
 \centering
-\caption{Logistic regression (Method~1) coefficient estimates. Features are standardized prior to fitting. The model is re-estimated without regularization (using \texttt{statsmodels.Logit}) to obtain valid standard errors; the portfolio is constructed using the $\ell_2$-regularized fit ($C = 1.0$) described in Section~\ref{sec:method1}. Dependent variable: $\mathbb{1}[r_{t+1}^s > \text{median}]$. All coefficients with $|z| > 1.96$ are significant at the 5\% level.}
-\label{tab:lr_coef}
 \small
 \begin{tabular}{l r r r}
 \toprule
@@ -29,4 +27,6 @@ mom\_10 & $-$0.0031 & 0.0069 & $-$0.44 \\
 mom\_6 & 0.0008 & 0.0059 & 0.13 \\
 \bottomrule
 \end{tabular}
+\caption{Logistic regression (Method~1) coefficient estimates. Features are standardized prior to fitting. The model is re-estimated without regularization (using \texttt{statsmodels.Logit}) to obtain valid standard errors; the portfolio is constructed using the $\ell_2$-regularized fit ($C = 1.0$) described in Section~\ref{sec:method1}. Dependent variable: $\mathbb{1}[r_{t+1}^s > \text{median}]$. All coefficients with $|z| > 1.96$ are significant at the 5\% level.}
+\label{tab:lr_coef}
 \end{table}

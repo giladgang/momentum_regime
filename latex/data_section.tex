@@ -8,8 +8,6 @@ This section describes the data sources, sample construction, and feature defini
 
 \begin{table}[htbp]
 \centering
-\caption{Sample summary.}
-\label{tab:sample_summary}
 \begin{tabular}{l r r r}
 \toprule
  & Train (1990--2010) & Test (2011--2025) & Full \\
@@ -20,6 +18,8 @@ Avg.\ stocks per month & 5{,}723 & 3{,}811 & 4{,}958 \\
 Market-level months & 252 & 167 & 419 \\
 \bottomrule
 \end{tabular}
+\caption{Sample summary.}
+\label{tab:sample_summary}
 
 \medskip
 \small
@@ -118,8 +118,6 @@ Because Gibbs sampling is stochastic, a robust feature combination should produc
 
 \begin{table}[htbp]
 \centering
-\caption{Seed stability of top feature combinations.}
-\label{tab:seed_stability}
 \begin{tabular}{l r r r r}
 \toprule
 Combination & Mean SR & Std SR & Min SR & Max SR \\
@@ -131,6 +129,8 @@ DD+VOL+LVIX+SKEW & 1.021 & 0.046 & 0.973 & 1.078 \\
 DD+VOL+CS+LVIX (baseline) & 0.843 & 0.070 & 0.760 & 0.938 \\
 \bottomrule
 \end{tabular}
+\caption{Seed stability of top feature combinations.}
+\label{tab:seed_stability}
 
 \medskip
 \small

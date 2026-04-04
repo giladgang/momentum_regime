@@ -1,7 +1,5 @@
 \begin{table}[htbp]
 \centering
-\caption{HMM input feature ablation. Each row uses a single-feature HMM (3-seed averaged) to produce $\pi_t^{\text{filter}}$, which is then fed into Methods~1 and~2. M1 (logistic regression) is insensitive to the quality of the regime signal, confirming that it effectively ignores $\pi_t^{\text{filter}}$. M2 (XGBoost) shows clear differentiation: market drawdown (DD) alone nearly matches the full four-feature model, while relative market participation (REL\_N) produces the weakest signal.}
-\label{tab:hmm_feature_ablation}
 \smallskip
 \begin{tabular}{lcccc}
 \toprule
@@ -17,4 +15,6 @@ VOL only (realised volatility)         & 1.034 & 14.8\% & 0.855 & 16.5\% \\
 REL\_N only (relative participation)   & 1.033 & 14.8\% & 0.810 & 15.4\% \\
 \bottomrule
 \end{tabular}
+\caption{HMM input feature ablation. Each row uses a single-feature HMM (3-seed averaged) to produce $\pi_t^{\text{filter}}$, which is then fed into Methods~1 and~2. M1 (logistic regression) is insensitive to the quality of the regime signal, confirming that it effectively ignores $\pi_t^{\text{filter}}$. M2 (XGBoost) shows clear differentiation: market drawdown (DD) alone nearly matches the full four-feature model, while relative market participation (REL\_N) produces the weakest signal.}
+\label{tab:hmm_feature_ablation}
 \end{table}

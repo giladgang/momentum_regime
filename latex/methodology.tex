@@ -259,15 +259,7 @@ This quantity represents the probability that the market is in the panic regime 
 
 The filtered regime probability $\pi_t^{\text{filter}}$ from Stage~1 provides a monthly measure of market stress, but on its own it does not select stocks. This stage translates the regime signal into cross-sectional portfolios. Three scoring methods of increasing complexity are developed: a deterministic regime-adaptive momentum formula (Method~0), a logistic regression classifier (Method~1), and an XGBoost gradient-boosted tree regressor (Method~2). Each method combines $\pi_t^{\text{filter}}$ with a set of momentum and fundamental stock characteristics to produce a monthly score for every stock, which is then used to rank stocks into a long-only top-decile value-weighted portfolio.
 
-The deterministic formula serves as a transparent baseline that tests whether simply varying the momentum lookback horizon with market conditions adds value. The two machine learning methods go further by jointly learning how all features (momentum at multiple horizons, fundamentals, and the regime signal) interact to predict forward returns. The results that follow (Section~\ref{sec:results}) not only compare the out-of-sample performance of the three portfolios but also use SHAP values and coefficient analysis to examine \emph{which} features drive the predictions and \emph{how} their importance shifts across calm and panic regimes. This feature-level analysis provides economic insight into the signals that distinguish regime-conditioned stock selection from standard momentum. Figure~\ref{fig:cs_model_diagram} illustrates the Stage~2 pipeline.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{cs_model_diagram.png}
-    \caption{Pipeline for Stage~2 (cross-sectional portfolio construction). The feature vector for each stock-month observation comprises 12 momentum lookbacks, the filtered panic probability $\pi_t^{\text{filter}}$ from Stage~1, and 7 fundamental characteristics. Two machine learning models (logistic regression and XGBoost) score every stock each month, and the top decile by score forms a long-only, value-weighted portfolio using NYSE breakpoints.}
-    \label{fig:cs_model_diagram}
-\end{figure}
-
+The deterministic formula serves as a transparent baseline that tests whether simply varying the momentum lookback horizon with market conditions adds value. The two machine learning methods go further by jointly learning how all features (momentum at multiple horizons, fundamentals, and the regime signal) interact to predict forward returns. The results that follow (Section~\ref{sec:results}) not only compare the out-of-sample performance of the three portfolios but also use SHAP values and coefficient analysis to examine \emph{which} features drive the predictions and \emph{how} their importance shifts across calm and panic regimes. This feature-level analysis provides economic insight into the signals that distinguish regime-conditioned stock selection from standard momentum.
 \subsubsection{Scoring Methods}\label{sec:methods}
 
 All three methods are trained on the pre-2011 sample and evaluated out-of-sample on 2011--2025.
@@ -314,8 +306,6 @@ where $h_m$ is the $m$-th decision tree and $\eta$ is the learning rate that shr
 
 \begin{table}[htbp]
     \centering
-    \caption{XGBoost hyperparameters.}
-    \label{tab:xgb_params}
     \begin{tabular}{ll}
         \toprule
         Parameter & Value \\
@@ -327,6 +317,8 @@ where $h_m$ is the $m$-th decision tree and $\eta$ is the learning rate that shr
         Column subsampling per tree & 0.8 \\
         \bottomrule
     \end{tabular}
+    \caption{XGBoost hyperparameters.}
+    \label{tab:xgb_params}
 \end{table}
 
 Row and column subsampling introduce stochasticity into each boosting round, reducing variance and improving generalization. A maximum depth of 4 allows the model to capture pairwise and higher-order interactions. Critically, this means XGBoost can learn splits that condition on $\pi_t^{\text{filter}}$ and then branch on momentum horizons differently within each regime, without requiring explicit interaction terms. XGBoost also natively handles missing values in the fundamental features by learning optimal split directions for missing entries during training, eliminating the need for imputation.
