@@ -1,21 +1,21 @@
 \begin{table}[htbp]
 \centering
-\begin{tabular}{l r r r r r}
+\begin{tabular}{l r r r}
 \toprule
- & Full & Calm & Panic & $N_{\text{calm}}$ & $N_{\text{panic}}$ \\
+ & Full & Calm & Panic \\
 \midrule
-Market & 0.84 & 0.67 & 1.15 & 112 & 55 \\
+Market & 0.84 & 0.67 & 1.15 \\
 \midrule
-Fixed 12-mo mom & 0.70 & 0.38 & 1.25 & 112 & 55 \\
-Fixed 1-mo mom & 0.72 & 0.42 & 1.24 & 112 & 55 \\
-M0: Formula & 0.73 & 0.41 & 1.27 & 112 & 55 \\
-M1: LR & 1.03 & 0.80 & 1.45 & 112 & 55 \\
-M2: XGB & 1.01 & 0.77 & 1.43 & 112 & 55 \\
+Fixed 12-mo mom & 0.70 & 0.38 & 1.25 \\
+Fixed 1-mo mom & 0.72 & 0.42 & 1.24 \\
+M0: Formula & 0.73 & 0.41 & 1.27 \\
+M1: LR & 1.03 & 0.80 & 1.45 \\
+M2: XGB & 1.01 & 0.77 & 1.43 \\
 \midrule
-GHM SLOW & 0.70 & 0.38 & 1.25 & 112 & 55 \\
-GHM MED & 0.75 & 0.44 & 1.28 & 112 & 55 \\
-GHM FAST & 0.72 & 0.42 & 1.24 & 112 & 55 \\
-GHM DYN & 0.80 & 0.50 & 1.30 & 112 & 55 \\
+GHM SLOW & 0.70 & 0.38 & 1.25 \\
+GHM MED & 0.75 & 0.44 & 1.28 \\
+GHM FAST & 0.72 & 0.42 & 1.24 \\
+GHM DYN & 0.80 & 0.50 & 1.30 \\
 \bottomrule
 \end{tabular}
 \caption{Regime-conditional Sharpe ratios.}
@@ -23,5 +23,5 @@ GHM DYN & 0.80 & 0.50 & 1.30 & 112 & 55 \\
 
 \medskip
 \small
-\textbf{Notes:} This table reports annualized Sharpe ratios computed over all test-period months (Full) and separately for months classified as calm ($\pi_t^{\text{filter}} < 0.5$) or panic ($\pi_t^{\text{filter}} \geq 0.5$). $N$ denotes the number of months in each regime. The Sharpe ratio is computed as $\bar{r}/\sigma(r) \times \sqrt{12}$ within each subset. Portfolio construction and transaction costs are as described in Table~\ref{tab:performance}.
+\textbf{Notes:} Annualized Sharpe ratios computed over all test-period months (Full) and separately for months classified as calm ($\pi_t^{\text{filter}} < 0.5$, 112 months) or panic ($\pi_t^{\text{filter}} \geq 0.5$, 55 months). Portfolio construction and transaction costs are as described in Table~\ref{tab:performance}.
 \end{table}
