@@ -277,15 +277,15 @@ When $\pi_t^{\text{filter}} \approx 0$ (calm), $\ell_t = 12$, recovering the sta
 
 \paragraph{Method 1: Logistic Regression}\label{sec:method1}
 
-A logistic regression classifier is trained to predict whether a stock's forward return exceeds the cross-sectional median in each month:
+A logistic regression classifier is trained to predict whether a stock's forward return exceeds the cross-sectional median in each month. Classification is chosen over direct return regression because monthly stock returns are extremely noisy, and predicting the binary outcome ``above or below median'' is a more stable learning target that still produces a useful ranking of stocks.\footnote{The logistic sigmoid function $\sigma(z) = 1/(1 + e^{-z})$ maps the linear combination $\boldsymbol{\beta}^\top \tilde{\mathbf{x}}$ from the real line to the interval $(0, 1)$, so the output can be interpreted as a probability.}
 \begin{equation}
     P(y_t^s = 1 \mid \mathbf{x}_t^s) = \sigma(\boldsymbol{\beta}^\top \tilde{\mathbf{x}}_t^s),
 \end{equation}
-where $\sigma(z) = 1/(1 + e^{-z})$ is the logistic sigmoid function and $y_t^s = \mathbb{1}(r_{t+1}^s > \text{median}_s\{r_{t+1}^s\})$ is a binary label indicating whether stock $s$ outperforms the cross-sectional median in the following month. The feature vector $\tilde{\mathbf{x}}_t^s$ is standardized using training-set means and standard deviations, with missing fundamental values imputed at the training-set median. The model is estimated by maximizing the $\ell_2$-regularized log-likelihood:
+where $y_t^s = \mathbb{1}(r_{t+1}^s > \text{median}_s\{r_{t+1}^s\})$ is a binary label indicating whether stock $s$ outperforms the cross-sectional median in the following month. The feature vector $\tilde{\mathbf{x}}_t^s$ is standardized using training-set means and standard deviations, with missing fundamental values imputed at the training-set median. The model is estimated by maximizing the $\ell_2$-regularized log-likelihood:
 \begin{equation}
     \hat{\boldsymbol{\beta}} = \arg\max_{\boldsymbol{\beta}} \left[\sum_{i} \Big(y_i \log \sigma(\boldsymbol{\beta}^\top \tilde{\mathbf{x}}_i) + (1 - y_i) \log(1 - \sigma(\boldsymbol{\beta}^\top \tilde{\mathbf{x}}_i))\Big) - \frac{1}{2C} \|\boldsymbol{\beta}\|_2^2\right],
 \end{equation}
-with regularization strength $C = 1.0$. Once $\hat{\boldsymbol{\beta}}$ is estimated on the training sample, the stock score for any observation is obtained by plugging $\hat{\boldsymbol{\beta}}$ back into the prediction equation:
+with regularization strength $C = 1.0$ (the scikit-learn default). The $\ell_2$ penalty shrinks coefficients toward zero to guard against overfitting given the large number of correlated momentum features; the default value was retained because preliminary experiments showed that performance was insensitive to moderate changes in $C$. Once $\hat{\boldsymbol{\beta}}$ is estimated on the training sample, the stock score for any observation is obtained by plugging $\hat{\boldsymbol{\beta}}$ back into the prediction equation:
 \begin{equation}
     score_t^s = \sigma(\hat{\boldsymbol{\beta}}^\top \tilde{\mathbf{x}}_t^s) = P(y_t^s = 1 \mid \mathbf{x}_t^s;\, \hat{\boldsymbol{\beta}}).
 \end{equation}
