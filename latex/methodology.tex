@@ -166,7 +166,7 @@ Conditional on the sampled state path, the $n_k$ observations assigned to regime
 \kappa_n &= \kappa_0 + n_k, &\qquad& \text{(total confidence: prior + data)} \label{eq:niw_kappa} \\[6pt]
 \mathbf{m}_n &= \frac{\kappa_0 \mathbf{m}_0 + n_k \bar{\mathbf{x}}_k}{\kappa_n}, &\qquad& \text{(weighted average of prior and sample mean)} \label{eq:niw_mean} \\[6pt]
 \nu_n &= \nu_0 + n_k, &\qquad& \text{(degrees of freedom for covariance)} \label{eq:niw_nu} \\[6pt]
-\boldsymbol{\Psi}_n &= \boldsymbol{\Psi}_0 + \mathbf{S}_k + \frac{\kappa_0 n_k}{\kappa_n}(\bar{\mathbf{x}}_k-\mathbf{m}_0)(\bar{\mathbf{x}}_k-\mathbf{m}_0)^\top. &\qquad& \text{(prior scale + scatter + mean-disagreement correction)} \label{eq:niw_psi}
+\boldsymbol{\Psi}_n &= \boldsymbol{\Psi}_0 + \mathbf{S}_k + \frac{\kappa_0 n_k}{\kappa_n}(\bar{\mathbf{x}}_k-\mathbf{m}_0)(\bar{\mathbf{x}}_k-\mathbf{m}_0)^\top &\qquad& \text{(prior scale + scatter + mean-disagreement)} \label{eq:niw_psi}
 \end{alignat}
 Since $\kappa_0 = 0.01 \ll n_k$, the posterior is driven almost entirely by the data.
 
