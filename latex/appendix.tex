@@ -159,13 +159,6 @@ where $f(\mathbf{z}_t \mid s_t = k) = \mathcal{N}(\mathbf{z}_t; \boldsymbol{\mu}
 
 \paragraph{Numerical stability.} In practice, the emission densities $f(\mathbf{z}_t \mid s_t = k)$ can be extremely small (or large) for high-dimensional observations, leading to numerical underflow. The implementation works in log-space, computing $\log f(\mathbf{z}_t \mid s_t = k)$ and using the log-sum-exp trick for normalisation.
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.82\textwidth]{ffbs_diagram.pdf}
-    \caption{Flowchart of the Forward-Filtering Backward-Sampling (FFBS) algorithm. The forward pass sweeps through $t = 1, \dots, T$, computing the filtered probability $\alpha_t(k)$ at each month by combining the emission density with the predicted probability from the previous step. The terminal state $s_T$ is then drawn from the final filtered distribution. The backward pass samples states in reverse order $t = T{-}1, \dots, 1$, conditioning each draw on the filtered belief and the transition probability to the already-sampled future state $s_{t+1}$. The output is a complete regime assignment $\{s_1, \dots, s_T\}$ returned to the Gibbs sampler.}
-    \label{fig:ffbs_diagram}
-\end{figure}
-
 \subsection{Backward Sampling}
 
 Given the filtered probabilities $\{\alpha_t(k)\}_{t=1}^T$, the backward pass samples a complete state path $(s_1, \dots, s_T)$ from the posterior $P(\{s_t\} \mid \mathbf{z}_{1:T})$.
