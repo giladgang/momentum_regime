@@ -32,7 +32,9 @@ where $P_{ij} = P(s_t = j \mid s_{t-1} = i)$ and each row sums to one. The diago
 
 \subsubsection{Bayesian Estimation via Gibbs Sampling}\label{sec:gibbs}
 
-Rather than estimating the model by maximum likelihood, this thesis adopts a Bayesian approach and draws from the joint posterior:
+The standard frequentist approach to HMM estimation is the Baum-Welch algorithm (a special case of Expectation-Maximisation), which finds maximum likelihood point estimates of the parameters and a single most-likely state path. This thesis instead adopts a fully Bayesian approach for three reasons. First, the training sample contains approximately 250 monthly observations with four features, a setting where maximum likelihood estimates can be unstable and prone to overfitting; Bayesian priors provide natural regularisation. Second, the Bayesian framework produces a full posterior distribution over model parameters rather than point estimates, so the filtered regime probability $\pi_t^{\text{filter}}$ used downstream reflects uncertainty about the parameters themselves, not just uncertainty about the current state. Third, the conjugate prior structure (Normal-Inverse-Wishart for emissions, Dirichlet for transitions) yields closed-form conditional posteriors, making Gibbs sampling both exact and computationally straightforward.
+
+The Bayesian approach draws from the joint posterior:
 \[
 p\!\left(\{s_t\}_{t=1}^T,\; \{\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k\}_{k=0}^1,\; \mathbf{P} \,\middle|\, \mathbf{z}_{1:T}\right).
 \]
