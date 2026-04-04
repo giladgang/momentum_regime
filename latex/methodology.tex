@@ -300,24 +300,7 @@ XGBoost builds an additive ensemble of $M$ regression trees, where each successi
 \begin{equation}
     F(\mathbf{x}) = \sum_{m=1}^{M} \eta \cdot h_m(\mathbf{x}),
 \end{equation}
-where $h_m$ is the $m$-th decision tree and $\eta$ is the learning rate that shrinks each tree's contribution to prevent overfitting. Each tree $h_m$ is grown to minimize a regularized objective combining the squared-error loss on the current residuals with penalty terms on tree complexity (number of leaves and leaf weights). The predicted return $\hat{r}_{t+1}^s = F(\mathbf{x}_t^s)$ serves as the stock score. Key hyperparameters are listed in Table~\ref{tab:xgb_params}.
-
-\begin{table}[htbp]
-    \centering
-    \begin{tabular}{ll}
-        \toprule
-        Parameter & Value \\
-        \midrule
-        Number of trees ($M$) & 500 \\
-        Maximum tree depth & 4 \\
-        Learning rate ($\eta$) & 0.05 \\
-        Row subsampling & 0.8 \\
-        Column subsampling per tree & 0.8 \\
-        \bottomrule
-    \end{tabular}
-    \caption{XGBoost hyperparameters.}
-    \label{tab:xgb_params}
-\end{table}
+where $h_m$ is the $m$-th decision tree and $\eta$ is the learning rate that shrinks each tree's contribution to prevent overfitting. Each tree $h_m$ is grown to minimize a regularized objective combining the squared-error loss on the current residuals with penalty terms on tree complexity (number of leaves and leaf weights). The predicted return $\hat{r}_{t+1}^s = F(\mathbf{x}_t^s)$ serves as the stock score. The model is trained with $M = 500$ trees, a learning rate of $\eta = 0.05$, maximum tree depth of 4, and row and column subsampling rates of 0.8.
 
 Row and column subsampling introduce stochasticity into each boosting round, reducing variance and improving generalization. A maximum depth of 4 allows the model to capture pairwise and higher-order interactions. Critically, this means XGBoost can learn splits that condition on $\pi_t^{\text{filter}}$ and then branch on momentum horizons differently within each regime, without requiring explicit interaction terms. XGBoost also natively handles missing values in the fundamental features by learning optimal split directions for missing entries during training, eliminating the need for imputation.
 
