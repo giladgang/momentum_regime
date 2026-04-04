@@ -159,7 +159,7 @@ The output of the full FFBS procedure is one draw from the posterior over state 
 
 Importantly, the backward pass is performed only during model \emph{training} (the Gibbs sampler on 1990--2010 data). It is not used to construct the trading signal: the real-time filtered probability $\pi_t^{\text{filter}}$ used for portfolio construction relies solely on the causal forward filter, which conditions only on past and current observations $\mathbf{z}_{1:t}$. The backward pass improves the quality of posterior parameter estimates by providing the Gibbs sampler with more accurate state assignments, but it does not introduce any future information into the regime signal applied during the test period.
 
-\paragraph{Step 2: Updating the emission parameters.}
+\paragraph{Step 2: Updating the emission parameters}
 
 Conditional on the sampled state path, the $n_k$ observations assigned to regime $k$ yield sufficient statistics: the sample mean $\bar{\mathbf{x}}_k = \frac{1}{n_k}\sum_{t:\,s_t=k}\mathbf{z}_t$ and the scatter matrix $\mathbf{S}_k = \sum_{t:\,s_t=k}(\mathbf{z}_t - \bar{\mathbf{x}}_k)(\mathbf{z}_t - \bar{\mathbf{x}}_k)^\top$. The Normal-Inverse-Wishart prior updates to a posterior with hyperparameters:
 \begin{alignat}{2}
@@ -174,9 +174,9 @@ New regime parameters are then drawn from the updated posterior:
 $\boldsymbol{\Sigma}_k \sim \mathcal{IW}(\nu_n,\boldsymbol{\Psi}_n)$ and
 $\boldsymbol{\mu}_k \mid \boldsymbol{\Sigma}_k \sim \mathcal{N}(\mathbf{m}_n, \boldsymbol{\Sigma}_k / \kappa_n)$.
 
-\paragraph{Step 3: Updating the transition matrix.}
+\paragraph{Step 3: Updating the transition matrix}
 
-First, the sampled state path is scanned to count transitions: $n_{ij} = \sum_{t=2}^T \mathbb{1}(s_{t-1}=i,\, s_t=j)$ records how many times the path moved from state $i$ to state $j$, where $\mathbb{1}(\cdot)$ is the indicator function (equal to 1 when the condition holds, 0 otherwise). For example, if the sampled path contains 140 calm-to-calm transitions and 10 calm-to-panic transitions, then $n_{00} = 140$ and $n_{01} = 10$. These observed counts are added to the Dirichlet prior pseudo-counts to obtain the posterior:
+First, the sampled state path is scanned to count transitions: $n_{ij} = \sum_{t=2}^T \mathbb{1}(s_{t-1}=i,\, s_t=j)$ records how many times the path moved from state $i$ to state $j$. For example, if the sampled path contains 140 calm-to-calm transitions and 10 calm-to-panic transitions, then $n_{00} = 140$ and $n_{01} = 10$. These observed counts are added to the Dirichlet prior pseudo-counts to obtain the posterior:
 \begin{equation}
 \mathbf{P}_{i,\cdot} \mid \{s_t\}
 \sim
