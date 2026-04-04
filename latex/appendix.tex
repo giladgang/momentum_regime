@@ -141,46 +141,10 @@ where $\tilde{x}_{t,j}^s$ is the standardised value of feature $j$. The absolute
     \label{fig:convergence_trace}
 \end{figure}
 
-\section{FFBS Derivation}\label{app:ffbs}
+\section{FFBS Implementation Note}\label{app:ffbs}
 
-The Forward-Filtering Backward-Sampling (FFBS) algorithm, used in Step~1 of the Gibbs sampler (Section~\ref{sec:gibbs_sampler}), draws a complete hidden state path $(s_1, \dots, s_T)$ from the conditional posterior $P(\{s_t\}_{t=1}^T \mid \mathbf{z}_{1:T}, \boldsymbol{\mu}, \boldsymbol{\Sigma}, \mathbf{P})$, given the current values of the emission parameters and transition matrix. The algorithm proceeds in two passes. The forward pass sweeps through the data chronologically, computing a filtered belief about the current state at each time step. The backward pass then walks in reverse, drawing a state at each step that is consistent with both the filtered belief and the state already sampled one step ahead. Together, the two passes produce a single draw from the joint posterior over the entire state sequence, respecting the Markov transition dynamics throughout.
-
-\subsection{Forward Filtering}
-
-The forward pass computes, for each time step $t$, the filtered probability $\alpha_t(k) = P(s_t = k \mid \mathbf{z}_{1:t})$ for each state $k \in \{0,1\}$. This quantity summarises everything the observed data up to time $t$ reveal about the current regime.
-
-\paragraph{Initialization.} With no prior information about the initial state, a uniform prior is used:
-\begin{equation}
-    \alpha_0(k) = \frac{1}{2}, \qquad k \in \{0,1\}.
-\end{equation}
-
-\paragraph{Prediction step.} To compute $\alpha_t(k)$, the algorithm first asks: before seeing this month's data $\mathbf{z}_t$, what is the probability of being in state $k$? Since the previous state is unknown, the algorithm marginalises (sums) over both possibilities, weighting each by its filtered probability from the previous step and the transition probability of moving from that state to $k$:
-\begin{equation}
-    \alpha_{t|t-1}(k) = P(s_t = k \mid \mathbf{z}_{1:t-1}) = \sum_{j=0}^{1} \underbrace{\alpha_{t-1}(j)}_{\text{belief about }s_{t-1}} \cdot \underbrace{P_{jk}}_{\text{transition }j \to k}.
-\end{equation}
-This is the law of total probability applied to the two possible previous states: the probability of being in state $k$ now equals the probability of having been in calm times the probability of transitioning from calm to $k$, plus the same for panic.
-
-\paragraph{Update step.} Once the current observation $\mathbf{z}_t$ arrives, this predicted belief is updated using Bayes' rule. The idea is straightforward: if the observed features look much more like a panic month than a calm month, the probability of being in panic should increase. Formally:
-\begin{equation}
-    \alpha_t(k) = P(s_t = k \mid \mathbf{z}_{1:t}) = \frac{\overbrace{f(\mathbf{z}_t \mid s_t = k)}^{\text{likelihood: how well do}} \cdot \overbrace{\alpha_{t|t-1}(k)}^{\text{the data fit state }k?}}{\underbrace{\sum_{k'=0}^{1} f(\mathbf{z}_t \mid s_t = k') \, \alpha_{t|t-1}(k')}_{\text{normalising constant (sum over both states)}}},
-\end{equation}
-where $f(\mathbf{z}_t \mid s_t = k) = \mathcal{N}(\mathbf{z}_t; \boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k)$ is the Gaussian emission density for state $k$. The numerator multiplies two terms: (i) the likelihood, which measures how probable the observed features are under regime $k$, and (ii) the predicted probability of being in regime $k$ from the prediction step. The denominator ensures the probabilities sum to one across the two states. Substituting the prediction step into the update step yields the combined recursion in Equation~(\ref{eq:forward_plain}).
-
-\paragraph{Numerical stability.} In practice, the emission densities $f(\mathbf{z}_t \mid s_t = k)$ can be extremely small (or large) for high-dimensional observations, leading to numerical underflow. The implementation works in log-space, computing $\log f(\mathbf{z}_t \mid s_t = k)$ and using the log-sum-exp trick for normalisation.
-
-\subsection{Backward Sampling}
-
-The forward pass produces marginal beliefs $\alpha_t(k)$ at each time step, but these do not define a joint distribution over the full state path. To obtain a coherent sample $(s_1, \dots, s_T)$ where consecutive states respect the Markov transition probabilities, the backward pass samples states in reverse chronological order, conditioning each draw on the already-sampled future state.
-
-\paragraph{Terminal state.} At $t = T$, the filtered probability already conditions on all observations:
-\begin{equation}
-    s_T \sim \text{Cat}\!\big(\alpha_T(0),\, \alpha_T(1)\big).
-\end{equation}
-
-\paragraph{Backward recursion.} For $t = T-1, T-2, \dots, 1$, given the already-sampled $s_{t+1}$:
-\begin{equation}
-    P(s_t = k \mid s_{t+1}, \mathbf{z}_{1:t}) \propto \alpha_t(k) \, P_{k, s_{t+1}}.
-\end{equation}
-Normalising gives the sampling distribution in Equation~(\ref{eq:backward_sampling}). Intuitively, the term $\alpha_t(k)$ captures what the data up to time $t$ say about the state, while $P_{k, s_{t+1}}$ ensures that the sampled state is consistent with the transition to the already-chosen future state. The backward pass needs only the filtered probabilities (from the forward pass) and the transition matrix, not the raw observations. Each sampled state $s_t$ depends on the future path only through $s_{t+1}$, preserving the Markov property.
-
-The complete FFBS procedure is run once per Gibbs iteration. Each run produces a different state path, reflecting the posterior uncertainty over regime assignments. Across many Gibbs iterations, these paths explore the full posterior distribution, and the emission parameters and transition matrix are updated conditional on each sampled path.
+In practice, the Gaussian emission densities $f(\mathbf{z}_t \mid s_t = k)$ evaluated during the forward pass can be extremely small (or large) for four-dimensional observations, leading to numerical underflow. The implementation avoids this by working in log-space: log-likelihoods $\log f(\mathbf{z}_t \mid s_t = k)$ are computed directly, and the log-sum-exp identity
+\[
+\log(e^a + e^b) = \max(a,b) + \log(1 + e^{-|a-b|})
+\]
+is used whenever probabilities must be normalised, ensuring that no intermediate quantity overflows or underflows to zero.
