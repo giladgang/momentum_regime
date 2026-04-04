@@ -131,8 +131,8 @@ Second, an \emph{update step} revises this prediction once the current observati
 \begin{equation}
 \alpha_t(k)
 =
-\frac{f(\mathbf{z}_t \mid s_t=k)\;\displaystyle\sum_{j=0}^{1} \alpha_{t-1}(j)\,P_{jk}}
-     {\displaystyle\sum_{k'=0}^{1} f(\mathbf{z}_t \mid s_t=k')\;\sum_{j=0}^{1} \alpha_{t-1}(j)\,P_{jk'}},
+\frac{f(\mathbf{z}_t \mid s_t=k)\;\alpha_{t|t-1}(k)}
+     {\displaystyle\sum_{k'=0}^{1} f(\mathbf{z}_t \mid s_t=k')\;\alpha_{t|t-1}(k')},
 \label{eq:forward_plain}
 \end{equation}
 where $f(\mathbf{z}_t \mid s_t=k) = \mathcal{N}(\mathbf{z}_t;\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k)$ is the Gaussian emission density. In the numerator, the likelihood $f(\mathbf{z}_t \mid s_t=k)$ measures how well the observed features fit state $k$, multiplied by the predicted probability $\alpha_{t|t-1}(k)$ from the prediction step. The denominator sums the same quantity over both states, ensuring the probabilities sum to one. The recursion is initialized with $\alpha_0(k) = 1/2$, reflecting no prior preference for either regime. A detailed derivation is provided in Appendix~\ref{app:ffbs}.
