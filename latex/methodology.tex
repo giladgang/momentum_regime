@@ -208,14 +208,7 @@ ESS
 \end{equation}
 where $\hat{\rho}(\ell)$ is the estimated autocorrelation at lag $\ell$, and $L^\ast$ is the first lag at which the autocorrelation becomes negative. High ESS indicates that the chain provides many effectively independent posterior draws.
 
-Figure~\ref{fig:convergence_trace} displays the trace plots for the regime means of all four features and the persistence probabilities $P_{00}$ and $P_{11}$ across $2{,}000$ Gibbs iterations. The dashed vertical line marks the end of the burn-in period at iteration $500$. After burn-in, the chains fluctuate around stable values, indicating that the sampler has converged to the posterior distribution.
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=\textwidth]{convergence_trace.png}
-    \caption{Trace plots of the Gibbs sampler. Each panel shows the sampled regime means (calm in blue, panic in red) for one of the four HMM input features: drawdown (DD), realised volatility (VOL), return dispersion (DISP), and relative market participation (REL\_N). The bottom panel shows the persistence probabilities $P_{00}$ (calm) and $P_{11}$ (panic). The dashed line at iteration $500$ marks the end of burn-in.}
-    \label{fig:convergence_trace}
-\end{figure}
+Figure~\ref{fig:convergence_trace} (Appendix~\ref{app:convergence}) displays the trace plots, confirming that the chains fluctuate around stable values after burn-in.
 
 \subsubsection{Regime Identification and Trading Signal}\label{sec:regime_signal}
 
