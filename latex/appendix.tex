@@ -154,17 +154,17 @@ The forward pass computes, for each time step $t$, the filtered probability $\al
     \alpha_0(k) = \frac{1}{2}, \qquad k \in \{0,1\}.
 \end{equation}
 
-\paragraph{Prediction step.} The one-step-ahead predicted probability of being in state $k$ at time $t$, given observations up to $t-1$, is:
+\paragraph{Prediction step.} To compute $\alpha_t(k)$, the algorithm first asks: before seeing this month's data $\mathbf{z}_t$, what is the probability of being in state $k$? Since the previous state is unknown, the algorithm marginalises (sums) over both possibilities, weighting each by its filtered probability from the previous step and the transition probability of moving from that state to $k$:
 \begin{equation}
-    \alpha_{t|t-1}(k) = \sum_{j=0}^{1} \alpha_{t-1}(j) \, P_{jk},
+    \alpha_{t|t-1}(k) = P(s_t = k \mid \mathbf{z}_{1:t-1}) = \sum_{j=0}^{1} \underbrace{\alpha_{t-1}(j)}_{\text{belief about }s_{t-1}} \cdot \underbrace{P_{jk}}_{\text{transition }j \to k}.
 \end{equation}
-which marginalises over the previous state using the transition matrix.
+This is the law of total probability applied to the two possible previous states: the probability of being in state $k$ now equals the probability of having been in calm times the probability of transitioning from calm to $k$, plus the same for panic.
 
-\paragraph{Update step.} Upon observing $\mathbf{z}_t$, Bayes' rule gives:
+\paragraph{Update step.} Once the current observation $\mathbf{z}_t$ arrives, this predicted belief is updated using Bayes' rule. The idea is straightforward: if the observed features look much more like a panic month than a calm month, the probability of being in panic should increase. Formally:
 \begin{equation}
-    \alpha_t(k) = \frac{f(\mathbf{z}_t \mid s_t = k) \, \alpha_{t|t-1}(k)}{\sum_{k'=0}^{1} f(\mathbf{z}_t \mid s_t = k') \, \alpha_{t|t-1}(k')},
+    \alpha_t(k) = P(s_t = k \mid \mathbf{z}_{1:t}) = \frac{\overbrace{f(\mathbf{z}_t \mid s_t = k)}^{\text{likelihood: how well do}} \cdot \overbrace{\alpha_{t|t-1}(k)}^{\text{the data fit state }k?}}{\underbrace{\sum_{k'=0}^{1} f(\mathbf{z}_t \mid s_t = k') \, \alpha_{t|t-1}(k')}_{\text{normalising constant (sum over both states)}}},
 \end{equation}
-where $f(\mathbf{z}_t \mid s_t = k) = \mathcal{N}(\mathbf{z}_t; \boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k)$ is the Gaussian emission density for state $k$. Substituting the prediction step into the update step yields the combined recursion in Equation~(\ref{eq:forward_plain}).
+where $f(\mathbf{z}_t \mid s_t = k) = \mathcal{N}(\mathbf{z}_t; \boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k)$ is the Gaussian emission density for state $k$. The numerator multiplies two terms: (i) the likelihood, which measures how probable the observed features are under regime $k$, and (ii) the predicted probability of being in regime $k$ from the prediction step. The denominator ensures the probabilities sum to one across the two states. Substituting the prediction step into the update step yields the combined recursion in Equation~(\ref{eq:forward_plain}).
 
 \paragraph{Numerical stability.} In practice, the emission densities $f(\mathbf{z}_t \mid s_t = k)$ can be extremely small (or large) for high-dimensional observations, leading to numerical underflow. The implementation works in log-space, computing $\log f(\mathbf{z}_t \mid s_t = k)$ and using the log-sum-exp trick for normalisation.
 
