@@ -38,11 +38,11 @@ p\!\left(\{s_t\}_{t=1}^T,\; \{\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k\}_{k=0}^1
 \]
 This posterior is not available in closed form because the hidden states and model parameters depend on each other. Therefore we employ Gibbs sampling \citep{AlbertChib1993}, a Markov chain Monte Carlo (MCMC) method, which resolves this by alternating between three conditional updates: (i) the full hidden state path $\{s_t\}_{t=1}^T$, (ii) the emission parameters $(\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k)$ for each regime, and (iii) the transition matrix $\mathbf{P}$. Because conjugate priors are used, each block can be sampled exactly from its conditional posterior. The Bayesian approach is preferred here for three reasons. First, the training sample contains approximately 250 monthly observations with four features, a setting where maximum likelihood estimates can be unstable and prone to overfitting; Bayesian priors provide natural regularisation. Second, the full posterior distribution over parameters means the filtered regime probability $\pi_t^{\text{filter}}$ used downstream reflects uncertainty about the parameters themselves, not just uncertainty about the current state. Third, the conjugate prior structure (Normal-Inverse-Wishart for emissions, Dirichlet for transitions) yields closed-form conditional posteriors, making Gibbs sampling both exact and computationally straightforward.
 
-\paragraph{Prior Specification.}\label{sec:priors}
+\paragraph{Prior Specification}\label{sec:priors}
 
 The priors encode two economic beliefs. First, before seeing the data, neither regime should be forced to have extreme values in any feature; the model should learn the characteristics of calm and panic states from the data. Second, regimes should be persistent rather than switching every few months.
 
-\paragraph{Emission parameters.}
+\paragraph{Emission parameters}
 For each regime $k$, the mean vector and covariance matrix are given a conjugate Normal-Inverse-Wishart (NIW) prior:\footnote{The Inverse-Wishart is a probability distribution over positive-definite matrices, making it the natural prior for a covariance matrix: every sample is guaranteed to be symmetric and positive-definite. The Normal-Inverse-Wishart combines this with a conditional Normal prior on the mean. The prior is called \emph{conjugate} because when the data are Gaussian, the posterior takes the same NIW form with updated hyperparameters, making each Gibbs update an exact draw rather than an approximation.}
 \begin{equation}
 \boldsymbol{\Sigma}_k \sim \mathcal{IW}(\nu_0,\boldsymbol{\Psi}_0),
@@ -66,7 +66,7 @@ where $D=4$ is the number of features. Each hyperparameter controls a different 
     \item $\boldsymbol{\Psi}_0$ is the scale matrix of the Inverse-Wishart prior. It is calibrated so that the prior expected covariance equals the identity matrix, $\mathbb{E}[\boldsymbol{\Sigma}_k] = \boldsymbol{\Psi}_0 / (\nu_0 - D - 1) = \mathbf{I}_D$, implying unit marginal variance and no cross-feature correlation before observing the data.
 \end{itemize}
 
-\paragraph{Transition matrix.}
+\paragraph{Transition matrix}
 Each row of the transition matrix is assigned an independent Dirichlet prior:
 \begin{equation}
 \mathbf{P}_{0,\cdot} \sim \text{Dir}(9,1),
@@ -92,9 +92,9 @@ This prior favors persistence in both regimes: absent data, the prior mean trans
 \end{equation}
 In other words, the prior expects each regime to continue with probability $0.9$, corresponding to an expected duration of roughly $10$ months. This prior is informative enough to discourage pathological solutions, but with hundreds of training observations its influence is dominated by the data.
 
-\paragraph{Gibbs Sampler.}\label{sec:gibbs_sampler}
+\paragraph{Gibbs Sampler}\label{sec:gibbs_sampler}
 
-\paragraph{Initialization.}
+\paragraph{Initialization}
 The Gibbs sampler requires starting values for the emission parameters and the transition matrix. A crude volatility-based partition is used:\footnote{The choice of initialization has negligible impact on the posterior: the sampler is run for 2{,}000 iterations with 500 discarded as burn-in, and convergence diagnostics (Section~\ref{sec:convergence}) confirm that the chain mixes well regardless of the starting partition.} months with above-median $VOL_t^z$ are initially assigned to the panic state ($s_t=1$), and the remaining months to the calm state ($s_t=0$). The initial emission parameters are then computed from each group:
 \[
 \boldsymbol{\mu}_k^{(0)} = \frac{1}{n_k}\sum_{t:\,s_t=k}\mathbf{z}_t,
@@ -103,7 +103,7 @@ The Gibbs sampler requires starting values for the emission parameters and the t
 \]
 where $n_k$ is the number of months assigned to regime $k$. The initial transition matrix is set to the prior mean, $\mathbf{P}^{(0)} = \mathbb{E}[\mathbf{P}]$ (Equation~11). These initial parameters give the first FFBS forward pass emission densities that can distinguish the two states.
 
-\paragraph{Iterative updates.}
+\paragraph{Iterative updates}
 One Gibbs iteration consists of three steps:
 \begin{enumerate}
     \item sample a complete state path $\{s_t\}_{t=1}^T$ given the current emission parameters and transition matrix;
@@ -119,9 +119,9 @@ In each step, all parameters not being updated are held at their most recently s
     \label{fig:gibbs_diagram}
 \end{figure}
 
-\paragraph{Step 1: Sampling the hidden state path via FFBS.}
+\paragraph{Step 1: Sampling the hidden state path via FFBS}
 
-The full latent regime sequence $(s_1,\dots,s_T)$ is sampled conditional on the current parameters using Forward-Filtering Backward-Sampling (FFBS).
+Holding the emission parameters $(\boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k)$ and the transition matrix $\mathbf{P}$ fixed at their current values, the full latent regime sequence $(s_1,\dots,s_T)$ is sampled using Forward-Filtering Backward-Sampling (FFBS).
 
 The forward pass computes the filtered probability $\alpha_t(k) = P(s_t=k \mid \mathbf{z}_{1:t})$, the probability of being in state $k$ at time $t$ given all observations so far. This quantity is built in two sub-steps. First, a \emph{prediction step} asks: before seeing this month's data, how likely is each state? Since the previous state is unknown, the algorithm sums over both possibilities, weighting each by its filtered probability from the previous month and the transition probability:
 \[
@@ -159,9 +159,9 @@ The output of the full FFBS procedure is one draw from the posterior over state 
 
 Importantly, the backward pass is performed only during model \emph{training} (the Gibbs sampler on 1990--2010 data). It is not used to construct the trading signal: the real-time filtered probability $\pi_t^{\text{filter}}$ used for portfolio construction relies solely on the causal forward filter, which conditions only on past and current observations $\mathbf{z}_{1:t}$. The backward pass improves the quality of posterior parameter estimates by providing the Gibbs sampler with more accurate state assignments, but it does not introduce any future information into the regime signal applied during the test period.
 
-\paragraph{Step 2: Updating the emission parameters.}
+\paragraph{Step 2: Updating the emission parameters}
 
-Given the sampled state path, each regime $k$ has $n_k$ observations assigned to it. From these, two summary statistics are computed: the sample mean $\bar{\mathbf{x}}_k = \frac{1}{n_k}\sum_{t:\,s_t=k}\mathbf{z}_t$ and the scatter matrix $\mathbf{S}_k = \sum_{t:\,s_t=k}(\mathbf{z}_t - \bar{\mathbf{x}}_k)(\mathbf{z}_t - \bar{\mathbf{x}}_k)^\top$. The Normal-Inverse-Wishart prior updates to a posterior with hyperparameters:
+Holding the sampled state path and the transition matrix $\mathbf{P}$ fixed, the emission parameters are updated. Each regime $k$ has $n_k$ observations assigned to it. From these, two summary statistics are computed: the sample mean $\bar{\mathbf{x}}_k = \frac{1}{n_k}\sum_{t:\,s_t=k}\mathbf{z}_t$ and the scatter matrix $\mathbf{S}_k = \sum_{t:\,s_t=k}(\mathbf{z}_t - \bar{\mathbf{x}}_k)(\mathbf{z}_t - \bar{\mathbf{x}}_k)^\top$. The Normal-Inverse-Wishart prior updates to a posterior with hyperparameters:
 \begin{alignat}{2}
 \kappa_n &= \kappa_0 + n_k, &\qquad& \text{(total confidence: prior + data)} \label{eq:niw_kappa} \\[6pt]
 \mathbf{m}_n &= \frac{\kappa_0 \mathbf{m}_0 + n_k \bar{\mathbf{x}}_k}{\kappa_n}, &\qquad& \text{(weighted average of prior and sample mean)} \label{eq:niw_mean} \\[6pt]
@@ -174,9 +174,9 @@ New regime parameters are then drawn from the updated posterior:
 $\boldsymbol{\Sigma}_k \sim \mathcal{IW}(\nu_n,\boldsymbol{\Psi}_n)$ and
 $\boldsymbol{\mu}_k \mid \boldsymbol{\Sigma}_k \sim \mathcal{N}(\mathbf{m}_n, \boldsymbol{\Sigma}_k / \kappa_n)$.
 
-\paragraph{Step 3: Updating the transition matrix.}
+\paragraph{Step 3: Updating the transition matrix}
 
-First, the sampled state path is scanned to count transitions: $n_{ij} = \sum_{t=2}^T \mathbb{1}(s_{t-1}=i,\, s_t=j)$ records how many times the path moved from state $i$ to state $j$, where $\mathbb{1}(\cdot)$ is the indicator function (equal to 1 when the condition holds, 0 otherwise). For example, if the sampled path contains 140 calm-to-calm transitions and 10 calm-to-panic transitions, then $n_{00} = 140$ and $n_{01} = 10$. These observed counts are added to the Dirichlet prior pseudo-counts to obtain the posterior:
+Holding the sampled state path and the emission parameters fixed, the transition matrix is updated. The sampled path is scanned to count transitions: $n_{ij} = \sum_{t=2}^T \mathbb{1}(s_{t-1}=i,\, s_t=j)$ records how many times the path moved from state $i$ to state $j$, where $\mathbb{1}(\cdot)$ is the indicator function (equal to 1 when the condition holds, 0 otherwise). For example, if the sampled path contains 140 calm-to-calm transitions and 10 calm-to-panic transitions, then $n_{00} = 140$ and $n_{01} = 10$. These observed counts are added to the Dirichlet prior pseudo-counts to obtain the posterior:
 \begin{equation}
 \mathbf{P}_{i,\cdot} \mid \{s_t\}
 \sim
@@ -185,7 +185,7 @@ First, the sampled state path is scanned to count transitions: $n_{ij} = \sum_{t
 \end{equation}
 For row 0 (calm), the prior pseudo-counts are $(\alpha_{00}, \alpha_{01}) = (9, 1)$ from Equation~(10), so the posterior becomes $\text{Dir}(9 + 140,\; 1 + 10) = \text{Dir}(149,\; 11)$. The expected persistence probability under this posterior is $149/160 = 0.93$, reflecting that the data reinforced the prior belief in regime persistence. A new transition matrix row is then drawn from this Dirichlet distribution, and the same procedure is applied independently to row 1 (panic).
 
-\paragraph{Implementation Details.}\label{sec:implementation}
+\paragraph{Implementation Details}\label{sec:implementation}
 
 The Gibbs sampler is estimated on the training sample only (1990--2010). To reduce sensitivity to MCMC initialization, the full sampler is run independently with $N_s = 5$ different random seeds. Each chain is run for $M=2{,}000$ iterations with the initialization described above. The first $B=500$ iterations are discarded as burn-in, leaving $1{,}500$ posterior draws per seed.
 
@@ -195,7 +195,7 @@ For each seed, posterior mean parameters $\bar{\boldsymbol{\mu}}_k$, $\bar{\bold
 \end{equation}
 This Bayesian model averaging reduces the variance of the regime signal and produces more stable downstream portfolio performance. No test-period data is used in estimation.
 
-\paragraph{Convergence Diagnostics.}\label{sec:convergence}
+\paragraph{Convergence Diagnostics}\label{sec:convergence}
 
 Convergence is assessed in two ways. First, trace plots of the regime means and persistence probabilities are visually inspected to verify that the chain mixes around a stable posterior region after burn-in. Second, effective sample sizes (ESS) are computed for key parameters. Because successive MCMC draws are autocorrelated, $n$ draws from the chain contain less information than $n$ independent samples. The ESS quantifies the number of truly independent draws the chain is equivalent to. For a post-burn-in chain of length $n$,
 \begin{equation}
@@ -209,7 +209,7 @@ Trace plots of the regime means and persistence probabilities (Figure~\ref{fig:c
 
 \subsubsection{Regime Identification and Trading Signal}\label{sec:regime_signal}
 
-\paragraph{Label Switching and Regime Naming.}\label{sec:label_switching}
+\paragraph{Label Switching and Regime Naming}\label{sec:label_switching}
 
 In a two-state HMM, the labels $0$ and $1$ are intrinsically arbitrary: relabeling the states leaves the likelihood unchanged. To attach an economically meaningful interpretation to the states, a \emph{crisis-calibrated sign correction} procedure is applied.
 
@@ -227,7 +227,7 @@ k^\ast = \arg\max_{k \in \{0,1\}} \sum_{j=1}^{D} \text{sign}_j \cdot \hat{\mu}_{
 \end{equation}
 The state labelled $k^\ast$ is designated as ``panic'' and the other as ``calm.'' If the Gibbs sampler happens to assign the panic characteristics to state~0 rather than state~1, the labels are swapped so that $\pi_t^{\text{filter}}$ always represents the probability of the panic state. This procedure is robust to the heterogeneous directional responses of the four features and yields consistent panic identification across all random seeds used in estimation.
 
-\paragraph{Filtered Regime Probability.}\label{sec:trading_signal}
+\paragraph{Filtered Regime Probability}\label{sec:trading_signal}
 
 The output of the HMM estimation is a time series of filtered regime probabilities. Using the posterior mean parameters $\bar{\boldsymbol{\mu}}_k$, $\bar{\boldsymbol{\Sigma}}_k$, and $\bar{\mathbf{P}}$ (estimated on the training sample only), the forward recursion from Equation~(\ref{eq:forward_plain}) is applied to the full sample to obtain, for each month $t$,
 \begin{equation}
@@ -259,7 +259,7 @@ The deterministic formula serves as a transparent baseline that tests whether si
 
 All three methods are trained on the pre-2011 sample and evaluated out-of-sample on 2011--2025.
 
-\paragraph{Method 0: Deterministic Regime-Adaptive Formula.}\label{sec:method0}
+\paragraph{Method 0: Deterministic Regime-Adaptive Formula}\label{sec:method0}
 
 The simplest approach exploits the economic intuition that the optimal momentum lookback horizon varies with market conditions. The lookback horizon is determined by:
 \begin{equation}
@@ -273,7 +273,7 @@ Stocks are then ranked by this score, and the top decile forms the long portfoli
 
 When $\pi_t^{\text{filter}} \approx 0$ (calm), $\ell_t = 12$, recovering the standard 12-month momentum signal that captures continuation in trending markets. When $\pi_t^{\text{filter}} \approx 1$ (panic), $\ell_t = 1$, switching to 1-month reversal to exploit the tendency of oversold stocks to snap back after panic selling. At intermediate values, the lookback smoothly interpolates between these extremes.
 
-\paragraph{Method 1: Logistic Regression.}\label{sec:method1}
+\paragraph{Method 1: Logistic Regression}\label{sec:method1}
 
 A logistic regression classifier is trained to predict whether a stock's forward return exceeds the cross-sectional median in each month:
 \begin{equation}
@@ -289,7 +289,7 @@ with regularization strength $C = 1.0$. Once $\hat{\boldsymbol{\beta}}$ is estim
 \end{equation}
 Stocks with higher predicted probability of beating the cross-sectional median receive higher scores and are more likely to enter the top-decile portfolio.
 
-\paragraph{Method 2: XGBoost Regressor.}\label{sec:method2}
+\paragraph{Method 2: XGBoost Regressor}\label{sec:method2}
 
 An XGBoost gradient-boosted tree regressor \citep{Chen2016} is trained to predict the forward monthly return directly. The feature vector for each stock-month observation comprises the same 20 features described in Section~\ref{sec:cs_features}: the 12 momentum lookbacks ($mom_1, \dots, mom_{12}$), the regime signal ($\pi_t^{\text{filter}}$), and the 7 fundamental characteristics. By including all features jointly, XGBoost can learn which momentum horizons and fundamentals matter most in each regime. For example, it may rely on long-horizon momentum when $\pi_t^{\text{filter}}$ is low but shift toward short-term reversal and defensive fundamentals when $\pi_t^{\text{filter}}$ is high.
 
@@ -301,6 +301,6 @@ where $h_m$ is the $m$-th decision tree and $\eta$ is the learning rate that shr
 
 Row and column subsampling introduce stochasticity into each boosting round, reducing variance and improving generalization. A maximum depth of 4 allows the model to capture pairwise and higher-order interactions. Critically, this means XGBoost can learn splits that condition on $\pi_t^{\text{filter}}$ and then branch on momentum horizons differently within each regime, without requiring explicit interaction terms. XGBoost also natively handles missing values in the fundamental features by learning optimal split directions for missing entries during training, eliminating the need for imputation.
 
-\paragraph{The Role of $\pi_t^{\text{filter}}$.}\label{sec:pi_context}
+\paragraph{The Role of $\pi_t^{\text{filter}}$}\label{sec:pi_context}
 
 A key distinction between Methods~1 and~2 lies in how each model uses the regime signal. Logistic regression assigns $\pi_t^{\text{filter}}$ a single linear coefficient, which is near zero because the regime signal is not a direct return predictor. XGBoost, by contrast, uses $\pi_t^{\text{filter}}$ as a \emph{context variable} through tree splits, conditioning its use of momentum horizons on the current market state. This interaction effect cannot be represented by a single linear coefficient. The empirical consequences of this distinction are analysed in Section~\ref{sec:context_results}.
