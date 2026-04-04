@@ -132,6 +132,20 @@ For the logistic regression model (Method~1), feature importance is assessed dir
 \end{equation}
 where $\tilde{x}_{t,j}^s$ is the standardised value of feature $j$. The absolute magnitude $|\beta_j|$ reflects the feature's marginal contribution to the log-odds per standard deviation change, providing a linear analogue to the nonlinear SHAP importance from XGBoost.
 
+\section{Additional Statistical Tests}\label{app:statistical_tests}
+
+\subsection{Information Coefficient Analysis}\label{app:ic}
+
+Table~\ref{tab:ic} reports the monthly information coefficients (Spearman rank correlations) between each model's stock scores and realised forward returns. The logistic regression (M1) achieves the highest mean IC (0.054), which is statistically significantly greater than momentum alone ($t = 2.78$, $p < 0.01$). Both M1 and momentum exhibit higher IC in calm months than in panic months, consistent with the finding that calm-period stock selection drives the overall performance improvement.
+
+\input{tables/table_ic}
+
+\subsection{Granger Causality Tests}\label{app:granger}
+
+Table~\ref{tab:granger} reports Granger causality tests between the regime signal and momentum's cross-sectional predictive power. The regime signal Granger-causes momentum IC at all lag specifications tested (significant at the 10\% level for lags 1--2, at the 5\% level for lag 3), providing evidence that the regime signal contains leading information about when momentum will be effective.
+
+\input{tables/table_granger}
+
 \section{FFBS Derivation}\label{app:ffbs}
 
 This appendix provides a detailed derivation of the Forward-Filtering Backward-Sampling (FFBS) algorithm used in Step~1 of the Gibbs sampler (Section~\ref{sec:gibbs_sampler}).
