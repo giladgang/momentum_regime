@@ -61,7 +61,7 @@ def shade_nber(ax):
 
 fig, ax = plt.subplots(figsize=(14, 4))
 
-ax.fill_between(dates, pi_filter_full, alpha=0.5, color='steelblue', label=r'$\pi_t^{\mathrm{filter}}$')
+ax.fill_between(dates, pi_filter_full, alpha=0.5, color='crimson', label=r'$\pi_t^{\mathrm{filter}}$')
 ax.axvline(pd.Timestamp('2011-01-01'), color='black', linewidth=1.2,
            linestyle='--', label='Train/test split')
 ax.axhline(0.5, color='black', linewidth=0.5, linestyle=':', alpha=0.5)

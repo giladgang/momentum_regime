@@ -650,7 +650,7 @@ axes[0].axhline(0.5, color='black', linewidth=0.5, linestyle=':')
 axes[0].legend(fontsize=8, loc='upper left')
 shade_crises(axes[0], label=True)
 
-axes[1].fill_between(dates, pi_filter_full, alpha=0.6, color='steelblue')
+axes[1].fill_between(dates, pi_filter_full, alpha=0.5, color='crimson')
 axes[1].axvline(pd.Timestamp('2011-01-01'), color='black', linewidth=1, linestyle='--')
 axes[1].set_ylabel('Filtered π_panic (trading signal)', fontsize=9)
 axes[1].set_ylim(0, 1)
