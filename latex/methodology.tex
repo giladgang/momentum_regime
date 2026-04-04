@@ -176,7 +176,7 @@ $\boldsymbol{\mu}_k \mid \boldsymbol{\Sigma}_k \sim \mathcal{N}(\mathbf{m}_n, \b
 
 \paragraph{Step 3: Updating the transition matrix}
 
-Holding the sampled state path and the emission parameters fixed, the transition matrix is updated. The sampled path is scanned to count transitions: $n_{ij} = \sum_{t=2}^T \mathbb{1}(s_{t-1}=i,\, s_t=j)$ records how many times the path moved from state $i$ to state $j$, where $\mathbb{1}(\cdot)$ is the indicator function (equal to 1 when the condition holds, 0 otherwise). For example, if the sampled path contains 140 calm-to-calm transitions and 10 calm-to-panic transitions, then $n_{00} = 140$ and $n_{01} = 10$. These observed counts are added to the Dirichlet prior pseudo-counts to obtain the posterior:
+Holding the sampled state path and the emission parameters fixed, the transition matrix is updated. The sampled path is scanned to count transitions: $n_{ij} = \sum_{t=2}^T \mathbb{1}(s_{t-1}=i,\, s_t=j)$ records how many times the path moved from state $i$ to state $j$. For example, if the sampled path contains 140 calm-to-calm transitions and 10 calm-to-panic transitions, then $n_{00} = 140$ and $n_{01} = 10$. These observed counts are added to the Dirichlet prior pseudo-counts to obtain the posterior:
 \begin{equation}
 \mathbf{P}_{i,\cdot} \mid \{s_t\}
 \sim
