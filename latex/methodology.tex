@@ -127,7 +127,11 @@ In each step, all parameters not being updated are held at their most recently s
 
 The full latent regime sequence $(s_1,\dots,s_T)$ is sampled conditional on the current parameters using Forward-Filtering Backward-Sampling (FFBS).
 
-The forward pass computes the filtered probability $\alpha_t(k) = P(s_t=k \mid \mathbf{z}_{1:t})$ via the recursion
+The forward pass computes the filtered probability $\alpha_t(k) = P(s_t=k \mid \mathbf{z}_{1:t})$, the probability of being in state $k$ at time $t$ given all observations so far. This quantity is built in two sub-steps. First, a \emph{prediction step} asks: before seeing this month's data, how likely is each state? Since the previous state is unknown, the algorithm sums over both possibilities, weighting each by its filtered probability from the previous month and the transition probability:
+\[
+\alpha_{t|t-1}(k) = \sum_{j=0}^{1} \alpha_{t-1}(j)\,P_{jk}.
+\]
+Second, an \emph{update step} revises this prediction once the current observation $\mathbf{z}_t$ arrives, using Bayes' rule: if the observed features look more like a panic month than a calm month, the probability of panic increases. Combining the two steps yields the recursion
 \begin{equation}
 \alpha_t(k)
 =
@@ -135,7 +139,7 @@ The forward pass computes the filtered probability $\alpha_t(k) = P(s_t=k \mid \
      {\displaystyle\sum_{k'=0}^{1} f(\mathbf{z}_t \mid s_t=k')\;\sum_{j=0}^{1} \alpha_{t-1}(j)\,P_{jk'}},
 \label{eq:forward_plain}
 \end{equation}
-where $f(\mathbf{z}_t \mid s_t=k) = \mathcal{N}(\mathbf{z}_t;\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k)$ is the Gaussian emission density. The recursion is initialized with $\alpha_0(k) = 1/2$. The filtered probability at each month reflects both how well the current features fit each regime and how likely each regime was given the previous month's classification.
+where $f(\mathbf{z}_t \mid s_t=k) = \mathcal{N}(\mathbf{z}_t;\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k)$ is the Gaussian emission density. In the numerator, the likelihood $f(\mathbf{z}_t \mid s_t=k)$ measures how well the observed features fit state $k$, multiplied by the predicted probability $\alpha_{t|t-1}(k)$ from the prediction step. The denominator sums the same quantity over both states, ensuring the probabilities sum to one. The recursion is initialized with $\alpha_0(k) = 1/2$, reflecting no prior preference for either regime. A detailed derivation is provided in Appendix~\ref{app:ffbs}.
 
 The backward pass then samples a coherent state path in reverse order: $s_T \sim \text{Cat}(\alpha_T(0),\alpha_T(1))$, where $\text{Cat}$ denotes the categorical distribution (a single draw from a discrete probability vector), and for $t=T-1,\dots,1$,
 \begin{equation}
