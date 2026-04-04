@@ -185,6 +185,8 @@ Holding the sampled state path and the emission parameters fixed, the transition
 \end{equation}
 For row 0 (calm), the prior pseudo-counts are $(\alpha_{00}, \alpha_{01}) = (9, 1)$ from Equation~(10), so the posterior becomes $\text{Dir}(9 + 140,\; 1 + 10) = \text{Dir}(149,\; 11)$. The expected persistence probability under this posterior is $149/160 = 0.93$, reflecting that the data reinforced the prior belief in regime persistence. A new transition matrix row is then drawn from this Dirichlet distribution, and the same procedure is applied independently to row 1 (panic).
 
+With all three blocks updated, the sampler returns to Step~1 and repeats the cycle using the newly drawn parameters. Each iteration refines the estimates, and after sufficient iterations the draws converge to samples from the joint posterior.
+
 \paragraph{Implementation Details}\label{sec:implementation}
 
 The Gibbs sampler is estimated on the training sample only (1990--2010). To reduce sensitivity to MCMC initialization, the full sampler is run independently with $N_s = 5$ different random seeds. Each chain is run for $M=2{,}000$ iterations with the initialization described above. The first $B=500$ iterations are discarded as burn-in, leaving $1{,}500$ posterior draws per seed.
