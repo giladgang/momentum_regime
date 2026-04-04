@@ -101,11 +101,7 @@ The Gibbs sampler requires starting values for the emission parameters and the t
 \qquad
 \boldsymbol{\Sigma}_k^{(0)} = \text{Cov}(\{\mathbf{z}_t : s_t=k\}),
 \]
-where $n_k$ is the number of months assigned to regime $k$. The initial transition matrix is set to
-\[
-\mathbf{P}^{(0)} = \left(\begin{array}{cc} 0.90 & 0.10 \\ 0.10 & 0.90 \end{array}\right).
-\]
-These initial parameters give the first FFBS forward pass emission densities that can distinguish the two states.
+where $n_k$ is the number of months assigned to regime $k$. The initial transition matrix is set to the prior mean, $\mathbf{P}^{(0)} = \mathbb{E}[\mathbf{P}]$ (Equation~11). These initial parameters give the first FFBS forward pass emission densities that can distinguish the two states.
 
 \paragraph{Iterative updates.}
 One Gibbs iteration consists of three steps:
