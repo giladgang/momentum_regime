@@ -9,9 +9,9 @@ The analysis proceeds in six stages:
     \item Section~\ref{sec:performance_results} compares the overall performance of all strategies.
     \item Section~\ref{sec:regime_results} decomposes performance by market regime, revealing that the main benefit of the regime-conditioned models lies in calm-period stock selection rather than crash avoidance.
     \item Section~\ref{sec:decomposition} isolates the contributions of lookback flexibility, fundamental characteristics, and the regime signal $\pi_t^{\text{filter}}$ to the observed Sharpe ratio improvement.
+    \item Section~\ref{sec:ablation} presents ablation studies that isolate the sources of the regime signal's value.
     \item Section~\ref{sec:feature_results} examines which features drive the predictions through coefficient analysis and SHAP values.
     \item Section~\ref{sec:context_results} synthesises these findings into the central insight of the thesis: that $\pi_t^{\text{filter}}$ functions as a context variable that reveals the regime-dependent structure of cross-sectional momentum.
-    \item Section~\ref{sec:ablation} presents ablation studies that isolate the sources of the regime signal's value.
 \end{enumerate}
 
 \subsection{Portfolio Performance}\label{sec:performance_results}
@@ -65,6 +65,33 @@ What $\pi_t^{\text{filter}}$ does change is the \emph{return profile}. M2 genera
 \paragraph{Summary.}
 The Sharpe ratio improvement from unconditional momentum (0.70) to the best strategy (M1, 1.03) is driven primarily by fundamental characteristics, not by the regime signal. Quality screening, combining momentum with profitability, valuation, and size, is the single most important source of risk-adjusted performance improvement in this framework. The regime signal $\pi_t^{\text{filter}}$ contributes differently: it does not improve Sharpe ratios beyond what a linear model with fundamentals achieves, but it enables a higher-return, higher-volatility portfolio that may be attractive to investors with greater risk tolerance.
 
+\subsection{Ablation Analysis}\label{sec:ablation}
+
+Two ablation studies isolate the sources of the regime signal's value: the first compares alternative regime indicators, and the second decomposes the contribution of each HMM input feature.
+
+\subsubsection{Regime Signal Comparison: HMM vs GHM vs None}
+
+Table~\ref{tab:regime_signal_ablation} replaces $\pi_t^{\text{filter}}$ with the GHM market-cycle variable (a numeric encoding of the Bull/Correction/Bear/Rebound classification from trailing market returns) or removes the regime signal entirely, holding all other features and XGBoost hyperparameters fixed.
+
+\input{tables/table_regime_signal_ablation}
+
+The HMM signal improves the Sharpe ratio by +0.125 over the GHM cycle (1.007 vs 0.882). The GHM cycle, by contrast, adds nothing over no regime signal at all (Sharpe 0.882 vs 0.888), confirming that the backward-looking market return classification used in \citet{GHM2023} does not provide useful conditioning information for a nonlinear model that already observes 12 momentum lookback horizons. The GHM cycle is essentially redundant with the momentum features themselves, since it is constructed from the same underlying market returns. The HMM signal, built from stress indicators (drawdown, volatility, dispersion, market participation) that are not spanned by cross-sectional momentum, provides genuinely complementary information.
+
+\subsubsection{HMM Input Feature Ablation}
+
+Table~\ref{tab:hmm_feature_ablation} tests how much each of the four HMM input features contributes to the regime signal's downstream value. For each variant, a single-feature HMM is estimated via Gibbs sampling (3 seeds averaged), and the resulting $\pi_t^{\text{filter}}$ is fed into both M1 and M2.
+
+\input{tables/table_hmm_feature_ablation}
+
+The results reveal two important patterns. First, the logistic regression (M1) is completely insensitive to the quality of the regime signal: its Sharpe ratio varies by only 0.006 across all variants (1.032 to 1.038), confirming once more that M1 effectively ignores $\pi_t^{\text{filter}}$.
+
+Second, XGBoost (M2) shows clear differentiation. Market drawdown (DD) alone produces a Sharpe of 0.997, nearly matching the full four-feature baseline (1.007). This is intuitive: DD measures how far the market stands below its trailing peak, providing a clean, monotonic signal of market stress that directly captures the regime shifts that alter momentum's term structure. Return dispersion (DISP) is the second most informative single feature (Sharpe 0.955), consistent with the finding that cross-sectional return dispersion rises during stress and signals changes in the correlation structure that affect momentum strategies. Realised volatility (VOL, Sharpe 0.855) and relative market participation (REL\_N, Sharpe 0.810) are weaker in isolation, though their inclusion in the full model contributes a modest incremental improvement.
+
+The dominance of DD is consistent with the economic mechanism proposed in Section~\ref{sec:context_results}: the regime signal's value lies in identifying when long-horizon momentum breaks down and short-term reversal becomes informative. Market drawdown is the most direct measure of this transition, as it captures the sustained price declines that trigger momentum crashes and the subsequent recoveries where reversal strategies thrive.
+
+\paragraph{Relation to \citet{DanielMoskowitz2016}}
+The ablation results clarify how this framework relates to the momentum crash literature. \citet{DanielMoskowitz2016} show that the conditional volatility and mean of momentum returns are strongly related to past market declines, and propose scaling momentum exposure based on backward-looking volatility. The finding that DD alone nearly matches the full four-feature HMM (Sharpe 0.997 vs 1.007) is consistent with their insight: drawdown captures the same market stress that drives momentum crashes. However, this thesis uses DD differently. Rather than scaling overall momentum exposure, the HMM translates DD (along with VOL, DISP, and REL\_N) into a continuous regime probability that conditions \emph{which} momentum horizons XGBoost relies on. The result is not crash avoidance but regime-adaptive stock selection, which improves performance primarily during calm periods (Section~\ref{sec:regime_results}) rather than during the crashes that \citet{DanielMoskowitz2016} focus on. The additional features (DISP, VOL, REL\_N) contribute modest incremental value beyond DD, but their primary role is to smooth the regime signal and reduce false positives, producing a more stable $\pi_t^{\text{filter}}$ that the downstream models can condition on reliably.
+
 \subsection{Feature Importance and Predictive Power}\label{sec:feature_results}
 
 To understand \emph{why} the regime-conditioned models outperform, this section examines which features drive the predictions and how their contributions differ between models and across regimes.
@@ -113,29 +140,3 @@ A linear model cannot represent this interaction: it assigns a single coefficien
 
 The SHAP decomposition confirms that the momentum term structure is not stable: which lookback horizons predict returns depends on the market regime. In calm markets, continuation dominates at 8--11 month horizons. In panic markets, short-term reversal at the 1-month horizon becomes the relevant signal. This provides direct evidence that momentum is not a single, stable anomaly but a family of horizon-specific effects whose composition varies with market conditions. The HMM regime probability, despite having no direct predictive power for returns, is the variable that governs this rotation.
 
-\subsection{Ablation Analysis}\label{sec:ablation}
-
-Two ablation studies isolate the sources of the regime signal's value: the first compares alternative regime indicators, and the second decomposes the contribution of each HMM input feature.
-
-\subsubsection{Regime Signal Comparison: HMM vs GHM vs None}
-
-Table~\ref{tab:regime_signal_ablation} replaces $\pi_t^{\text{filter}}$ with the GHM market-cycle variable (a numeric encoding of the Bull/Correction/Bear/Rebound classification from trailing market returns) or removes the regime signal entirely, holding all other features and XGBoost hyperparameters fixed.
-
-\input{tables/table_regime_signal_ablation}
-
-The HMM signal improves the Sharpe ratio by +0.125 over the GHM cycle (1.007 vs 0.882). The GHM cycle, by contrast, adds nothing over no regime signal at all (Sharpe 0.882 vs 0.888), confirming that the backward-looking market return classification used in \citet{GHM2023} does not provide useful conditioning information for a nonlinear model that already observes 12 momentum lookback horizons. The GHM cycle is essentially redundant with the momentum features themselves, since it is constructed from the same underlying market returns. The HMM signal, built from stress indicators (drawdown, volatility, dispersion, market participation) that are not spanned by cross-sectional momentum, provides genuinely complementary information.
-
-\subsubsection{HMM Input Feature Ablation}
-
-Table~\ref{tab:hmm_feature_ablation} tests how much each of the four HMM input features contributes to the regime signal's downstream value. For each variant, a single-feature HMM is estimated via Gibbs sampling (3 seeds averaged), and the resulting $\pi_t^{\text{filter}}$ is fed into both M1 and M2.
-
-\input{tables/table_hmm_feature_ablation}
-
-The results reveal two important patterns. First, the logistic regression (M1) is completely insensitive to the quality of the regime signal: its Sharpe ratio varies by only 0.006 across all variants (1.032 to 1.038), confirming once more that M1 effectively ignores $\pi_t^{\text{filter}}$.
-
-Second, XGBoost (M2) shows clear differentiation. Market drawdown (DD) alone produces a Sharpe of 0.997, nearly matching the full four-feature baseline (1.007). This is intuitive: DD measures how far the market stands below its trailing peak, providing a clean, monotonic signal of market stress that directly captures the regime shifts that alter momentum's term structure. Return dispersion (DISP) is the second most informative single feature (Sharpe 0.955), consistent with the finding that cross-sectional return dispersion rises during stress and signals changes in the correlation structure that affect momentum strategies. Realised volatility (VOL, Sharpe 0.855) and relative market participation (REL\_N, Sharpe 0.810) are weaker in isolation, though their inclusion in the full model contributes a modest incremental improvement.
-
-The dominance of DD is consistent with the economic mechanism proposed in Section~\ref{sec:context_results}: the regime signal's value lies in identifying when long-horizon momentum breaks down and short-term reversal becomes informative. Market drawdown is the most direct measure of this transition, as it captures the sustained price declines that trigger momentum crashes and the subsequent recoveries where reversal strategies thrive.
-
-\paragraph{Relation to \citet{DanielMoskowitz2016}.}
-The ablation results clarify how this framework relates to the momentum crash literature. \citet{DanielMoskowitz2016} show that the conditional volatility and mean of momentum returns are strongly related to past market declines, and propose scaling momentum exposure based on backward-looking volatility. The finding that DD alone nearly matches the full four-feature HMM (Sharpe 0.997 vs 1.007) is consistent with their insight: drawdown captures the same market stress that drives momentum crashes. However, this thesis uses DD differently. Rather than scaling overall momentum exposure, the HMM translates DD (along with VOL, DISP, and REL\_N) into a continuous regime probability that conditions \emph{which} momentum horizons XGBoost relies on. The result is not crash avoidance but regime-adaptive stock selection, which improves performance primarily during calm periods (Section~\ref{sec:regime_results}) rather than during the crashes that \citet{DanielMoskowitz2016} focus on. The additional features (DISP, VOL, REL\_N) contribute modest incremental value beyond DD, but their primary role is to smooth the regime signal and reduce false positives, producing a more stable $\pi_t^{\text{filter}}$ that the downstream models can condition on reliably.
