@@ -141,10 +141,3 @@ where $\tilde{x}_{t,j}^s$ is the standardised value of feature $j$. The absolute
     \label{fig:convergence_trace}
 \end{figure}
 
-\section{FFBS Implementation Note}\label{app:ffbs}
-
-In practice, the Gaussian emission densities $f(\mathbf{z}_t \mid s_t = k)$ evaluated during the forward pass can be extremely small (or large) for four-dimensional observations, leading to numerical underflow. The implementation avoids this by working in log-space: log-likelihoods $\log f(\mathbf{z}_t \mid s_t = k)$ are computed directly, and the log-sum-exp identity
-\[
-\log(e^a + e^b) = \max(a,b) + \log(1 + e^{-|a-b|})
-\]
-is used whenever probabilities must be normalised, ensuring that no intermediate quantity overflows or underflows to zero.
