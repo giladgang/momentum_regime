@@ -231,7 +231,7 @@ The state labelled $k^\ast$ is designated as ``panic'' and the other as ``calm.'
 
 \paragraph{Filtered Regime Probability}\label{sec:trading_signal}
 
-The output of the HMM estimation is a time series of filtered regime probabilities. Using the posterior mean parameters $\bar{\boldsymbol{\mu}}_k$, $\bar{\boldsymbol{\Sigma}}_k$, and $\bar{\mathbf{P}}$ (estimated on the training sample only), the forward recursion from Equation~(\ref{eq:forward_plain}) is applied to the full sample to obtain, for each month $t$,
+The output of the HMM estimation is a time series of filtered regime probabilities. Using the posterior mean parameters $\bar{\boldsymbol{\mu}}_k$, $\bar{\boldsymbol{\Sigma}}_k$, and $\bar{\mathbf{P}}$ (estimated on the training sample only), the forward recursion from Equation~(\ref{eq:forward_plain}) is applied to the full sample to obtain the probability of being in each state at time $t$,
 \begin{equation}
 \pi_t^{\text{filter}}
 =
@@ -253,7 +253,7 @@ Table~\ref{tab:hmm_separation} reports the posterior regime-mean separation for 
 
 \subsection{Stage 2: Regime-Conditioned Portfolio Construction}\label{sec:stage2}
 
-The filtered regime probability $\pi_t^{\text{filter}}$ from Stage~1 provides a monthly measure of market stress, but on its own it does not select stocks. This stage translates the regime signal into cross-sectional portfolios. Three scoring methods of increasing complexity are developed: a deterministic regime-adaptive momentum formula (Method~0), a logistic regression classifier (Method~1), and an XGBoost gradient-boosted tree regressor (Method~2). Each method combines $\pi_t^{\text{filter}}$ with a set of momentum and fundamental stock characteristics to produce a monthly score for every stock, which is then used to rank stocks into a long-only top-decile value-weighted portfolio.
+The filtered regime probability $\pi_t^{\text{filter}}$ from Stage~1 provides a monthly measure of market stress, but on its own it does not select stocks. This stage translates the regime signal into cross-sectional portfolios. Three scoring methods of increasing complexity are developed: a deterministic regime-adaptive momentum formula (Method~0), a logistic regression classifier (Method~1), and an XGBoost gradient-boosted tree regressor (Method~2). Each method combines $\pi_t^{\text{filter}}$ with a set of momentum and fundamental stock characteristics to produce a monthly score for every stock, which is then used to rank stocks into a long-only top-decile value-weighted portfolio. 
 
 The deterministic formula serves as a transparent baseline that tests whether simply varying the momentum lookback horizon with market conditions adds value. The two machine learning methods go further by jointly learning how all features (momentum at multiple horizons, fundamentals, and the regime signal) interact to predict forward returns. The results that follow (Section~\ref{sec:results}) not only compare the out-of-sample performance of the three portfolios but also use SHAP values and coefficient analysis to examine \emph{which} features drive the predictions and \emph{how} their importance shifts across calm and panic regimes. This feature-level analysis provides economic insight into the signals that distinguish regime-conditioned stock selection from standard momentum.
 
