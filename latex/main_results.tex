@@ -25,13 +25,6 @@ The deterministic formula (M0), which uses $\pi_t^{\text{filter}}$ only to selec
 
 The GHM benchmark strategies, which use backward-looking market return momentum to classify regimes, achieve Sharpe ratios between 0.70 and 0.80. The best GHM variant (DYN, Sharpe 0.80) is outperformed by both M1 and M2, suggesting that real-time stress indicators (volatility, return dispersion, drawdown, market participation) provide a richer regime signal than trailing market returns alone.
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=\textwidth]{ghm_vs_thesis.png}
-    \caption{Cumulative wealth comparison between the GHM benchmark strategies (SLOW, MED, FAST, DYN) and the regime-conditioned methods (M0, M1, M2). The GHM strategies cluster together, while M1 and M2 separate from the pack, particularly during calm-period stock selection.}
-    \label{fig:ghm_comparison}
-\end{figure}
-
 \subsection{Regime-Conditional Performance}\label{sec:regime_results}
 
 Table~\ref{tab:regime_sharpe} decomposes performance by market regime. A striking pattern emerges: all strategies perform substantially better during panic months than during calm months. The market itself achieves a Sharpe ratio of 1.15 in panic versus 0.67 in calm, and even unconditional 12-month momentum achieves a Sharpe of 1.25 during panic compared to only 0.38 during calm.
