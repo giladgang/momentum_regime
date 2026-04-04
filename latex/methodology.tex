@@ -143,7 +143,7 @@ At the final time step $t = T$, the filtered probability already conditions on a
 \[
 s_T \sim \text{Cat}(\alpha_T(0),\, \alpha_T(1)),
 \]
-where $\text{Cat}$ denotes the categorical distribution (a single draw from a discrete probability vector). For each earlier time step $t = T-1, T-2, \dots, 1$, the algorithm must choose a state that is consistent with two pieces of information: (i) the filtered belief $\alpha_t(k)$, which summarises what the data up to time $t$ say about the state, and (ii) the already-sampled future state $s_{t+1}$, which constrains how likely each current state is via the transition probability $P_{k, s_{t+1}}$. Combining these two terms and normalising gives the sampling distribution:
+where $\text{Cat}$ denotes the categorical distribution: a weighted coin flip between the two states, where $\alpha_T(0)$ is the probability of drawing calm and $\alpha_T(1)$ the probability of drawing panic. For instance, if the forward filter assigns $\alpha_T(0) = 0.8$ and $\alpha_T(1) = 0.2$, the algorithm draws calm with 80\% probability and panic with 20\%. For each earlier time step $t = T-1, T-2, \dots, 1$, the algorithm must choose a state that is consistent with two pieces of information: (i) the filtered belief $\alpha_t(k)$, which summarises what the data up to time $t$ say about the state, and (ii) the already-sampled future state $s_{t+1}$, which constrains how likely each current state is via the transition probability $P_{k, s_{t+1}}$. Combining these two terms and normalising gives the sampling distribution:
 \begin{equation}
 P(s_t = k \mid s_{t+1}, \mathbf{z}_{1:t}) = \frac{\alpha_t(k)\,P_{k,s_{t+1}}}
 {\alpha_t(0)\,P_{0,s_{t+1}} + \alpha_t(1)\,P_{1,s_{t+1}}}.
