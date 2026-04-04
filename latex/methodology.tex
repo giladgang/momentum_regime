@@ -2,9 +2,7 @@
 
 The two-stage empirical framework underlying the analysis is developed as follows. The first stage estimates market regimes using a Bayesian Hidden Markov Model (Section~\ref{sec:stage1}). A two-state HMM is fit to four macrofinancial stress indicators via Gibbs sampling, producing a monthly filtered probability $\pi_t^{\text{filter}}$ that quantifies how likely the market is to be in a panic state. Because this probability is computed using only information available at time $t$, it can serve as a real-time trading signal.
 
-The second stage uses this regime signal to guide cross-sectional stock selection (Section~\ref{sec:stage2}). Three portfolio construction methods (a deterministic formula, logistic regression, and XGBoost) combine $\pi_t^{\text{filter}}$ with momentum and fundamental characteristics to rank stocks each month.
-
-By conditioning on $\pi_t^{\text{filter}}$, the models can learn regime-dependent patterns and adapt portfolio composition accordingly.
+The second stage uses this regime signal to guide cross-sectional stock selection (Section~\ref{sec:stage2}). Three portfolio construction methods (a deterministic formula, logistic regression, and XGBoost) combine $\pi_t^{\text{filter}}$ with momentum and fundamental characteristics to rank stocks each month. By conditioning on $\pi_t^{\text{filter}}$, the models can learn regime-dependent patterns and adapt portfolio composition accordingly.
 
 \subsection{Stage 1: Regime Classification via Hidden Markov Model}\label{sec:stage1}
 
