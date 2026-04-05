@@ -107,7 +107,7 @@ This mechanism explains both the return gap and the volatility gap between M1 an
 
 The preceding analysis establishes that XGBoost relies heavily on the HMM-based regime signal while the logistic regression does not. Two natural questions follow: is the HMM signal superior to simpler alternatives, and which of the four HMM input features drives its value?
 
-\paragraph{HMM vs GHM vs no regime signal}
+\paragraph{Comparing regime signal alternatives}
 
 Table~\ref{tab:regime_signal_ablation} replaces $\pi_t^{\text{filter}}$ with the GHM market-cycle variable (a numeric encoding of the Bull/Correction/Bear/Rebound classification from trailing market returns) or removes the regime signal entirely, holding all other features and XGBoost hyperparameters fixed.
 
