@@ -117,7 +117,7 @@ The HMM signal improves the Sharpe ratio by +0.125 over the GHM cycle (1.007 vs 
 
 \paragraph{Which HMM input features matter}
 
-Table~\ref{tab:hmm_feature_ablation} tests each HMM input feature in isolation. For each variant, a single-feature HMM is estimated via Gibbs sampling (3 seeds averaged), and the resulting $\pi_t^{\text{filter}}$ is fed into both M1 and M2.
+A related question is which of the four HMM input features drives the regime signal's value. To investigate, Table~\ref{tab:hmm_feature_ablation} reports results from single-feature HMMs, each estimated via Gibbs sampling (3 seeds averaged), with the resulting $\pi_t^{\text{filter}}$ fed into both M1 and M2.
 
 \input{tables/table_hmm_feature_ablation}
 
