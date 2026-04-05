@@ -109,7 +109,7 @@ The preceding analysis establishes that XGBoost relies heavily on the HMM-based 
 
 \paragraph{Comparing regime signal alternatives}
 
-Table~\ref{tab:regime_signal_ablation} replaces $\pi_t^{\text{filter}}$ with the GHM market-cycle variable (a numeric encoding of the Bull/Correction/Bear/Rebound classification from trailing market returns) or removes the regime signal entirely, holding all other features and XGBoost hyperparameters fixed.
+To test whether the HMM-based regime signal is superior to simpler alternatives, Table~\ref{tab:regime_signal_ablation} reports XGBoost performance under three conditions: the baseline with $\pi_t^{\text{filter}}$, a variant that substitutes the GHM market-cycle variable (a numeric encoding of the Bull/Correction/Bear/Rebound classification from trailing market returns), and a variant with no regime signal at all. All other features and hyperparameters are held fixed.
 
 \input{tables/table_regime_signal_ablation}
 
