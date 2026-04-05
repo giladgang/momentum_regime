@@ -121,9 +121,9 @@ The ablation results clarify how this framework relates to the momentum crash li
 
 \subsection{The Regime Signal as a Context Variable}\label{sec:context_results}
 
-Although $\pi_t^{\text{filter}}$ does not improve risk-adjusted performance over M1, the contrast between Methods~1 and~2 reveals a key insight about the structure of cross-sectional momentum.
+The regime-conditional performance analysis (Section~\ref{sec:regime_results}) showed \emph{where} the regime signal adds value; the SHAP and coefficient analysis above showed \emph{which} features matter. This section addresses the deeper question: \emph{why} does $\pi_t^{\text{filter}}$ matter for XGBoost but not for logistic regression?
 
-The logistic regression essentially ignores the regime signal (coefficient $-0.005$, rank 17th). XGBoost, by contrast, treats it as its second most important feature. This divergence arises because $\pi_t^{\text{filter}}$ is not a direct return predictor. It does not forecast whether the market or individual stocks will go up or down. Rather, it is a \emph{context variable} that modulates which other features are informative. In calm markets, intermediate-horizon momentum (mom$_{8}$ through mom$_{11}$) predicts cross-sectional returns well, and the regime signal is largely redundant. In panic markets, long-horizon momentum breaks down as past winners reverse, and the regime signal tells the model to shift weight toward short-term reversal (mom$_1$) and defensive fundamentals.
+The answer is that $\pi_t^{\text{filter}}$ is not a direct return predictor. It does not forecast whether stocks will go up or down. Rather, it is a \emph{context variable} that modulates which other features are informative. A linear model assigns $\pi_t^{\text{filter}}$ a single coefficient that must hold across all market conditions, which is near zero precisely because the signal has no unconditional predictive power. XGBoost, through its tree-based splits, conditions on $\pi_t^{\text{filter}}$ and then branches on different momentum horizons within each regime, without requiring explicit interaction terms.
 
 \begin{figure}[htbp]
     \centering
@@ -132,9 +132,7 @@ The logistic regression essentially ignores the regime signal (coefficient $-0.0
     \label{fig:pdp_pi}
 \end{figure}
 
-A linear model cannot represent this interaction: it assigns a single coefficient to $\pi_t^{\text{filter}}$ that must hold across all market conditions. XGBoost, through its tree-based splits, naturally conditions on $\pi_t^{\text{filter}}$ and then branches on different momentum horizons within each regime. This distinction, between a feature that predicts returns directly and one that governs the \emph{relevance} of other features, is central to understanding why the regime signal contributes to XGBoost but not to logistic regression.
-
-The SHAP decomposition confirms that the momentum term structure is not stable: which lookback horizons predict returns depends on the market regime. In calm markets, continuation dominates at 8--11 month horizons. In panic markets, short-term reversal at the 1-month horizon becomes the relevant signal. This provides direct evidence that momentum is not a single, stable anomaly but a family of horizon-specific effects whose composition varies with market conditions. The HMM regime probability, despite having no direct predictive power for returns, is the variable that governs this rotation.
+This distinction, between a feature that predicts returns directly and one that governs the \emph{relevance} of other features, is central to understanding why the regime signal contributes to XGBoost but not to logistic regression. The SHAP decomposition confirms this mechanism: the momentum term structure is not stable, and $\pi_t^{\text{filter}}$ is the variable that governs which lookback horizons are informative in each market state.
 
 \subsection{Risk Aversion and the Value of the Regime Signal}\label{sec:risk_aversion}
 
