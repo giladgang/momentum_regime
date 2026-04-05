@@ -9,12 +9,19 @@ HMM Input Features & Sharpe & Ann.\ Ret & Sharpe & Ann.\ Ret \\
 \midrule
 Full 4F baseline (DD+VOL+DISP+REL\_N) & 1.038 & 14.9\% & 1.007 & 21.6\% \\
 \midrule
+\multicolumn{5}{l}{\textit{Include-one (single-feature HMM)}} \\[2pt]
 DD only (market drawdown)              & 1.035 & 14.9\% & 0.997 & 21.8\% \\
 DISP only (return dispersion)          & 1.032 & 14.8\% & 0.955 & 20.0\% \\
 VOL only (realised volatility)         & 1.034 & 14.8\% & 0.855 & 16.5\% \\
 REL\_N only (relative participation)   & 1.033 & 14.8\% & 0.810 & 15.4\% \\
+\midrule
+\multicolumn{5}{l}{\textit{Leave-one-out (three-feature HMM)}} \\[2pt]
+Drop DD                                & 1.035 & 14.9\% & 0.794 & 16.2\% \\
+Drop VOL                               & 1.037 & 14.9\% & 0.992 & 21.1\% \\
+Drop DISP                              & 1.034 & 14.9\% & 1.065 & 21.4\% \\
+Drop REL\_N                            & 1.036 & 14.9\% & 0.883 & 15.2\% \\
 \bottomrule
 \end{tabular}
-\caption{HMM input feature ablation. Each row uses a single-feature HMM (3-seed averaged) to produce $\pi_t^{\text{filter}}$, which is then fed into Methods~1 and~2. M1 (logistic regression) is insensitive to the quality of the regime signal, confirming that it effectively ignores $\pi_t^{\text{filter}}$. M2 (XGBoost) shows clear differentiation: market drawdown (DD) alone nearly matches the full four-feature model, while relative market participation (REL\_N) produces the weakest signal.}
+\caption{HMM input feature ablation: include-one and leave-one-out. The top panel uses a single-feature HMM (3-seed averaged) to produce $\pi_t^{\text{filter}}$; the bottom panel drops one feature from the full four-feature HMM. M1 is insensitive to the regime signal across all variants. For M2, DD is the dominant input: it alone nearly matches the full model (0.997 vs 1.007), while dropping it causes the largest decline (0.794). Dropping DISP marginally improves performance, suggesting it adds noise rather than signal.}
 \label{tab:hmm_feature_ablation}
 \end{table}
