@@ -40,7 +40,7 @@ Three primary data sources are used:
 
 The stock-level sample includes all ordinary common shares (CRSP share codes 10 and 11) listed on the NYSE, AMEX, or NASDAQ (exchange codes 1, 2, and 3). This excludes American Depositary Receipts (ADRs), Real Estate Investment Trusts (REITs), closed-end funds, and other non-standard securities. A minimum price filter of \$1 is applied to remove penny stocks, whose extreme percentage returns and low liquidity would distort momentum signals.\footnote{This filter is standard in the momentum literature; see, e.g., \citet{JegadeeshTitman2001}. Stocks priced below \$1 can exhibit percentage returns of hundreds of percent from small absolute price changes, contaminating momentum signals.}
 
-\paragraph{Delisting adjustment.}
+\paragraph{Delisting adjustment}
 Following \citet{Shumway2001}, delisting returns are incorporated to prevent survivorship bias. When a stock is delisted, its actual delisting return is used if available; for performance-related delistings (CRSP codes 500--584) with missing returns, $-30\%$ is imputed.
 
 \subsection{HMM Regime Features}\label{sec:hmm_features}
@@ -82,10 +82,10 @@ The four features are:
     \label{fig:features_hmm}
 \end{figure}
 
-\paragraph{Why these four features together.}
+\paragraph{Why these four features together}
 The four indicators span complementary dimensions of equity market stress: DD and VOL describe market-level behaviour (decline depth and turbulence), while DISP and REL\_N describe cross-sectional behaviour (stock disagreement and structural attrition). The feature selection procedure in Section~\ref{sec:feature_selection} confirms that this combination, drawn from a broader candidate pool including credit and options market indicators, produces the most robust regime signal for the downstream momentum strategies.
 
-\paragraph{Preprocessing.}
+\paragraph{Preprocessing}
 All four features are winsorised at the 1st and 99th percentiles to limit the influence of extreme outliers.\footnote{Winsorisation replaces observations below the $p$-th percentile with the $p$-th percentile value, and observations above the $(1-p)$-th percentile with the $(1-p)$-th percentile value. Unlike trimming, which discards extreme observations entirely, winsorisation retains all data points while bounding their magnitude. This is particularly important for the HMM emission densities, which assume multivariate normality and can be distorted by heavy-tailed outliers.} The winsorisation bounds are computed on the training sample (1990--2010) and applied unchanged to the test sample, preventing information leakage. After winsorisation, each feature is standardised to zero mean and unit variance using training-sample statistics:
 \begin{equation}
     z_{j,t} = \frac{x_{j,t} - \bar{x}_j^{\text{train}}}{\sigma_j^{\text{train}}}.
@@ -96,7 +96,7 @@ Standardisation ensures that all features contribute equally to the HMM's Gaussi
 
 The choice of HMM input features has a substantial impact on regime classification quality and, ultimately, on portfolio performance. Rather than selecting features based solely on economic intuition, this thesis employs a systematic search over a broad candidate pool, followed by rigorous validation to guard against data mining.
 
-\paragraph{Candidate pool.}
+\paragraph{Candidate pool}
 Eleven monthly macrofinancial indicators are considered as candidate inputs for the HMM. These span three broad categories of market stress:
 \begin{itemize}
     \item \emph{Volatility:} realised volatility (VOL), log VIX (LVIX), and cross-sectional return dispersion (DISP).
@@ -105,15 +105,15 @@ Eleven monthly macrofinancial indicators are considered as candidate inputs for 
 \end{itemize}
 All candidates are observable in real time at the end of each month. Three credit indicators (CPS, HY\_OAS, and TERM) have data beginning in the mid- to late 1990s rather than 1990, which reduces the available training sample for combinations that include them. These shorter-history features are included in the candidate pool for completeness, but the feature selection procedure (described below) ultimately selects a combination that uses only features available from 1990, providing the full 252 training months including both the dot-com crash and the global financial crisis.
 
-\paragraph{Step 1: Exhaustive search.}
+\paragraph{Step 1: Exhaustive search}
 All $\binom{11}{4} = 330$ four-feature combinations are evaluated. For each combination, the two-state Bayesian HMM is estimated on the training sample using the same Gibbs sampling procedure as the main model (2{,}000 iterations, 500 burn-in, identical priors; see Section~\ref{sec:gibbs}). A combination passes the quality screen if it satisfies four criteria: (i)~minimum effective sample size (ESS) across all posterior mean parameters exceeds 50, indicating adequate MCMC convergence; (ii)~at least two features exhibit statistically significant regime separation, defined as the 95\% posterior credible interval for the difference in regime means excluding zero; (iii)~the average filtered panic probability during the global financial crisis (October 2007 to June 2009) exceeds 0.5; and (iv)~the average panic probability during a non-crisis reference period (January 2003 to December 2006) is below 0.4.
 
 Of the 330 combinations, 222 pass this quality screen. For each passing combination, the full cross-sectional portfolio pipeline is run: the HMM's filtered panic probability is merged with stock-level data, and the M0 (formula), M1 (logistic regression), and M2 (XGBoost) strategies are evaluated on the out-of-sample test period (2011--2025).
 
-\paragraph{Step 2: Multiple testing correction.}
+\paragraph{Step 2: Multiple testing correction}
 Testing 222 combinations and selecting the best raises the concern that the highest-performing combination may simply be the luckiest. To address this, a block bootstrap procedure \citep[see][for an introduction to bootstrap methods]{ISLR2021} (block size 12 months, 10{,}000 replications) is used to construct the null distribution of the maximum Sharpe ratio across all 222 combinations under the hypothesis that all combinations have the same expected performance. The observed best Sharpe ratio of the top combination exceeds the 95th percentile of this null distribution ($p = 0.0002$), confirming that the result is not an artefact of multiple testing.
 
-\paragraph{Step 3: Seed stability.}
+\paragraph{Step 3: Seed stability}
 Because Gibbs sampling is stochastic, a robust feature combination should produce consistent results regardless of the random seed. The top eight combinations with full training data (available from 1990) are each run five times with different random seeds. DD+VOL+DISP+REL\_N achieves the highest mean XGBoost Sharpe ratio (1.12) with low standard deviation (0.06) across seeds, and its minimum Sharpe ratio across all seeds (1.03) exceeds the baseline's mean (0.84). Table~\ref{tab:seed_stability} reports these results.
 
 \begin{table}[htbp]
@@ -137,30 +137,30 @@ DD+VOL+CS+LVIX (baseline) & 0.843 & 0.070 & 0.760 & 0.938 \\
 \textbf{Notes:} Each combination is estimated five times with different random seeds. SR denotes the annualised XGBoost (M2) Sharpe ratio on the out-of-sample test period (2011--2025). The baseline (DD+VOL+CS+LVIX) uses the features employed by the initial specification.
 \end{table}
 
-\paragraph{Step 4: PCA factor analysis.}
+\paragraph{Step 4: PCA factor analysis}
 To understand why certain feature combinations outperform others, principal component analysis is applied within each of the three candidate categories. The first principal component of each group represents a composite stress factor: a volatility factor (VOL, LVIX, DISP), a credit factor (CS, HY\_OAS, CPS, TERM), and an equity decline factor (DD, ADR, SKEW, REL\_N). These three composite factors are then used as HMM inputs. The volatility factor exhibits the largest regime-mean separation ($\Delta = 1.54$), followed by the equity decline factor ($\Delta = 1.07$), while the credit factor contributes the least ($\Delta = 0.42$). This finding provides a structural explanation for the composition of the optimal feature set: DD+VOL+DISP+REL\_N spans the two dominant stress dimensions (volatility and equity decline) while excluding the weaker credit dimension, whose information is largely subsumed by the equity-based indicators.
 
-\paragraph{Step 5: Ablation analysis.}
+\paragraph{Step 5: Ablation analysis}
 Single-feature and leave-one-out experiments isolate each feature's marginal contribution. When each of the four selected features is used alone as the sole HMM input, DD produces the highest Sharpe ratio (0.98), followed by DISP (0.97), VOL (0.90), and REL\_N (0.81). In the leave-one-out analysis, removing DISP from the four-feature combination causes the largest performance drop ($-0.26$), followed by DD ($-0.20$) and REL\_N ($-0.15$), while removing VOL has a smaller effect ($-0.07$). DISP is therefore the single most valuable feature in the combination: it is strong on its own and contributes substantial incremental information beyond what the other three provide. REL\_N, while the weakest in isolation, has the third-largest leave-one-out impact, indicating that it captures information not present in DD, VOL, or DISP.
 
-\paragraph{Summary.}
+\paragraph{Summary}
 The selected feature set, DD+VOL+DISP+REL\_N, is the product of an exhaustive search over 330 candidate combinations, validated through multiple testing correction, seed stability analysis, PCA-based structural analysis, and ablation testing. It captures market stress through four complementary equity-based channels: the depth of market declines (DD), realised market turbulence (VOL), cross-sectional stock disagreement (DISP), and structural market attrition (REL\_N). All four features are available from January 1990, providing 252 training months that include two full crisis episodes.
 
 \subsection{Cross-Sectional Features}\label{sec:cs_features}
 
 The cross-sectional models use three groups of features to rank stocks each month: momentum signals, the HMM regime probability, and fundamental characteristics.
 
-\paragraph{Momentum lookbacks.}
+\paragraph{Momentum lookbacks}
 Twelve trailing momentum signals are computed for each stock, corresponding to lookback horizons of 1 to 12 months:
 \begin{equation}
     \text{mom}_{k,t}^s = \prod_{\ell=1}^{k}(1 + r_{t-\ell}^s) - 1, \qquad k = 1, \dots, 12,
 \end{equation}
 where $r_{t-\ell}^s$ is the adjusted return of stock $s$ in month $t - \ell$. Note that the current month's return is excluded from all lookbacks to avoid mechanical correlation with the forward return being predicted. Including all twelve horizons rather than a single lookback (e.g., the standard 12-month momentum of \citet{JegadeeshTitman1993}) allows the models to learn which horizons are most informative in each regime. As shown in Section~\ref{sec:context_results}, intermediate-term lookbacks (8--11 months) dominate in calm markets, while 1-month momentum becomes important during panic due to short-term reversal dynamics.
 
-\paragraph{Regime signal.}
+\paragraph{Regime signal}
 The filtered panic probability $\pi_t^{\text{filter}}$ from the HMM enters as a single feature. Because it varies only at the monthly market level (every stock in the same month receives the same value), it functions as a conditioning variable rather than a stock-level predictor. Its role in the cross-sectional models is discussed in Section~\ref{sec:context_results}.
 
-\paragraph{Fundamental characteristics.}
+\paragraph{Fundamental characteristics}
 Seven firm-level characteristics are computed from Compustat quarterly data. These variables are drawn from the established asset pricing literature: book-to-market and size are the original \citet{FamaFrench2015} factors, gross profitability follows \citet{NovyMarx2013}, and the remaining variables (leverage, asset growth, return on equity, earnings growth) capture investment and quality dimensions that have been shown to predict cross-sectional returns. Their role in the models is not to generate additional returns but to act as a quality screen that compresses portfolio volatility (see Section~\ref{sec:performance_results}).
 
 \begin{itemize}
@@ -177,7 +177,7 @@ Market equity is computed as the absolute value of the end-of-month stock price 
 
 All fundamental variables are lagged by four months relative to the fiscal quarter end to ensure that accounting data would have been publicly available at the time of portfolio formation, consistent with the standard approach in the empirical asset pricing literature. This lag accounts for the SEC filing deadline and prevents look-ahead bias. Each month, the most recent available quarter's fundamentals are assigned to each stock using a backward merge, so that no future accounting information is used. Fundamentals are winsorised at the 1st and 99th percentiles (5th and 95th for asset growth, which has a fatter right tail), with bounds computed on the training sample only.
 
-\paragraph{Missing data handling.}
+\paragraph{Missing data handling}
 Not all stocks have complete fundamental coverage in every month. Missing rates range from approximately 7\% (return on equity, leverage) to 17\% (gross profitability). For the logistic regression model, which cannot handle missing values, fundamentals are imputed at the training-sample median prior to standardisation. For XGBoost, which natively handles missing values by learning optimal split directions for absent features, no imputation is applied. In both cases, stocks are only excluded if core features (momentum lookbacks or the regime signal) are missing.
 
 \subsection{Train--Test Split and Information Leakage Prevention}\label{sec:split}

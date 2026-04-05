@@ -76,7 +76,7 @@ It is important to note that transaction costs are applied \emph{post-hoc} as an
 
 \subsection{Performance Metrics}\label{app:evaluation}
 
-\paragraph{Standard Metrics.}\label{app:standard_metrics}
+\paragraph{Standard Metrics}\label{app:standard_metrics}
 
 Strategy performance is assessed using four standard risk-adjusted metrics computed on monthly net-of-fee returns.
 
@@ -101,7 +101,7 @@ where $\bar{r}$ is the mean monthly return.
     MDD = \min_{1 \leq t \leq n} \frac{C_t - \max_{1 \leq \tau \leq t} C_\tau}{\max_{1 \leq \tau \leq t} C_\tau}.
 \end{equation}
 
-\paragraph{Regime-Conditional Evaluation.}\label{app:regime_eval}
+\paragraph{Regime-Conditional Evaluation}\label{app:regime_eval}
 
 To assess whether the regime signal adds value beyond unconditional stock selection, performance is decomposed by market regime. Months are partitioned into calm ($\pi_t^{\text{filter}} < 0.5$) and panic ($\pi_t^{\text{filter}} \geq 0.5$) periods, and the Sharpe ratio is computed separately within each subset:
 \begin{equation}

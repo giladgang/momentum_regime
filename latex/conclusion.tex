@@ -12,17 +12,17 @@ The ablation analysis further clarifies the HMM's contribution. Market drawdown 
 
 Several directions could extend this framework.
 
-\paragraph{Adaptive regime estimation.}
+\paragraph{Adaptive regime estimation}
 The current HMM is trained on 1990--2010 data and its parameters are held fixed during the test period. This assumes that the statistical properties of calm and panic regimes remain stationary over time. If the market undergoes structural change, for instance a permanent increase in baseline volatility due to algorithmic trading, higher-frequency information flow, or shifting monetary policy regimes, the trained thresholds may become miscalibrated. Concretely, features that were one standard deviation above the training mean may become the new normal, causing the model to classify structurally calm periods as panic. This concern is not hypothetical: the sustained elevation of $\pi_t^{\text{filter}}$ in the most recent years of the sample may partly reflect such drift rather than genuine prolonged stress. Rolling or expanding-window re-estimation of the HMM, or an online Bayesian updating scheme that allows the emission parameters to evolve over time, would address this limitation and likely improve the reliability of the regime signal in extended out-of-sample periods.
 
-\paragraph{More than two regimes.}
+\paragraph{More than two regimes}
 The binary calm/panic classification may be too coarse. A three-state model distinguishing, for example, low-volatility trending markets, choppy range-bound markets, and crisis episodes could enable more granular portfolio adaptation. Bayesian model selection criteria (e.g., marginal likelihood comparison) could guide the choice of the number of states.
 
-\paragraph{Alternative feature sets.}
+\paragraph{Alternative feature sets}
 The current HMM uses four stress indicators chosen for economic interpretability. High-frequency data (intraday volatility, order flow imbalances) or textual sentiment indicators could provide earlier regime detection. Similarly, the cross-sectional scoring models could be enriched with additional firm-level characteristics or alternative data sources.
 
-\paragraph{Transaction costs and implementation.}
+\paragraph{Transaction costs and implementation}
 The analysis applies a uniform 10 basis point one-way transaction cost,\footnote{The 10 basis point estimate reflects the transaction cost environment for large-cap, NYSE-listed securities. For a value-weighted portfolio using NYSE breakpoints, the effective cost may be even lower, as the portfolio is naturally tilted toward the most liquid names.} but does not model the higher costs that may affect smaller or less liquid stocks. Incorporating more realistic, stock-specific transaction cost estimates, particularly for the more volatile XGBoost strategy that may have higher turnover, would provide a more accurate comparison of net-of-cost performance across methods.
 
-\paragraph{Investor-specific portfolio selection.}
+\paragraph{Investor-specific portfolio selection}
 The risk-aversion analysis in Section~\ref{sec:risk_aversion} shows that incorporating a variance penalty into XGBoost's training objective reduces both volatility and the model's reliance on the regime signal, but at the cost of lower Sharpe ratios. An alternative approach would be to blend M1 and M2 portfolios directly, or to use a portfolio optimisation layer that jointly considers expected returns and covariances at the portfolio level rather than penalising individual stock variance. Such an end-to-end framework, for instance using differentiable portfolio optimisation or reinforcement learning, could potentially find risk-return combinations that neither model achieves alone.
