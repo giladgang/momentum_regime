@@ -26,14 +26,14 @@ The XGBoost regressor (M2) generates the highest raw returns at 21.6\% annualise
 
 The deterministic formula (M0), which uses $\pi_t^{\text{filter}}$ only to select a momentum lookback horizon, achieves a Sharpe of 0.73. While this modestly exceeds fixed 12-month momentum (0.70), it falls well short of the machine learning methods. The formula cannot capture the nonlinear interactions between the regime signal and the full feature set that M1 and M2 exploit.
 
-\begin{figure}[htbp]
+The GHM benchmark strategies, which use backward-looking market return momentum to classify regimes, achieve Sharpe ratios between 0.70 and 0.80. The best GHM variant (DYN, Sharpe 0.80) is outperformed by both M1 and M2, suggesting that real-time stress indicators (volatility, return dispersion, drawdown, market participation) provide a richer regime signal than trailing market returns alone.
+
+\begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{cs_performance.png}
     \caption{Cumulative wealth paths for all strategies (log scale), starting from \$1 in January 2011. M2 (XGBoost) achieves the highest terminal wealth (\$14.70), followed by M1 (logistic regression, \$6.80). Both regime-conditioned methods substantially outperform the market and unconditional momentum benchmarks.}
     \label{fig:cumulative}
 \end{figure}
-
-The GHM benchmark strategies, which use backward-looking market return momentum to classify regimes, achieve Sharpe ratios between 0.70 and 0.80. The best GHM variant (DYN, Sharpe 0.80) is outperformed by both M1 and M2, suggesting that real-time stress indicators (volatility, return dispersion, drawdown, market participation) provide a richer regime signal than trailing market returns alone.
 
 \subsection{Regime-Conditional Performance}\label{sec:regime_results}
 
