@@ -6,7 +6,7 @@
 
 The data sources, sample construction, and feature definitions used throughout the thesis are described below. All data are at the monthly frequency. The stock-level sample spans January 1990 to November 2025, while the HMM regime model uses data from January 1990 onward (determined by the availability of stock-level data for computing cross-sectional return dispersion and relative market participation). The sample is split into a training period (pre-2011) used to estimate the HMM and cross-sectional models, and an out-of-sample test period (2011--2025) used exclusively for performance evaluation. Table~\ref{tab:sample_summary} provides an overview of the sample.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \begin{tabular}{l r r r}
 \toprule
@@ -75,7 +75,7 @@ The four features are:
     where $N_t$ is the number of stocks with valid return observations in month~$t$. REL\_N is close to zero in normal times but turns negative during crises when stocks delist, halt trading, or are acquired at elevated rates. For example, during the 2008 financial crisis, a wave of delistings and trading halts caused $N_t$ to drop sharply relative to its trailing average. This captures structural market damage that the other three features do not measure.
 \end{enumerate}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{features_hmm.png}
     \caption{Time series of the four HMM input features (DD, VOL, DISP, REL\_N), standardised using training-sample statistics. Shaded regions indicate NBER recession periods. All four features spike during the dot-com bust (2000--2002) and the global financial crisis (2007--2009), but with distinct dynamics reflecting their complementary stress dimensions.}
@@ -116,7 +116,7 @@ Testing 222 combinations and selecting the best raises the concern that the high
 \paragraph{Step 3: Seed stability}
 Because Gibbs sampling is stochastic, a robust feature combination should produce consistent results regardless of the random seed. The top eight combinations with full training data (available from 1990) are each run five times with different random seeds. DD+VOL+DISP+REL\_N achieves the highest mean XGBoost Sharpe ratio (1.12) with low standard deviation (0.06) across seeds, and its minimum Sharpe ratio across all seeds (1.03) exceeds the baseline's mean (0.84). Table~\ref{tab:seed_stability} reports these results.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \begin{tabular}{l r r r r}
 \toprule

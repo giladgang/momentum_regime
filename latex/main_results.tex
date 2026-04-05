@@ -67,7 +67,7 @@ Fundamental characteristics, not the regime signal, drive the risk-adjusted impr
 
 \subsubsection{Step 2: Feature-Level Evidence}
 
-To understand why fundamentals improve the Sharpe ratio and why the regime signal affects only the return profile, this step examines which features each model actually uses.
+To understand why the inclusion of momentum at multiple horizons and fundamental characteristics improves the Sharpe ratio, and why the regime signal affects only the return profile, this step examines which features each model actually uses.
 
 \paragraph{What the logistic regression relies on}
 
@@ -83,7 +83,7 @@ Table~\ref{tab:shap} and Figure~\ref{fig:shap_importance} report the mean absolu
 
 \input{tables/table_shap}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{cs_feature_importance.png}
     \caption{Mean absolute SHAP values for the XGBoost model (M2), decomposed by calm and panic months. Momentum features (aggregated) dominate overall, but $\pi_t^{\text{filter}}$ is the second most important individual feature. Its importance increases from 0.015 in calm to 0.020 in panic, indicating that the model relies more heavily on the regime signal during stress.}
@@ -94,7 +94,7 @@ Table~\ref{tab:shap} and Figure~\ref{fig:shap_importance} report the mean absolu
 
 The divergence arises because $\pi_t^{\text{filter}}$ is not a direct return predictor -- it does not forecast whether stocks will go up or down. Rather, it functions as a \emph{context variable} that modulates which other features are informative. A linear model assigns $\pi_t^{\text{filter}}$ a single coefficient that must hold across all market conditions, which is near zero precisely because the signal has no unconditional predictive power. XGBoost, through its tree-based splits, conditions on $\pi_t^{\text{filter}}$ and then branches on different momentum horizons within each regime, without requiring explicit interaction terms. The partial dependence plot (Figure~\ref{fig:pdp_pi}) confirms this: the nonlinear, non-monotonic shape shows that $\pi_t^{\text{filter}}$'s effect on predicted returns depends on the values of other features, which is why it is invisible to the linear model but central to the tree-based one.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.85\textwidth]{cs_pdp_pi_filter.png}
     \caption{Partial dependence plot of the XGBoost predicted return on $\pi_t^{\text{filter}}$. The nonlinear, non-monotonic shape confirms that $\pi_t^{\text{filter}}$ functions as a context variable rather than a linear predictor: its effect on predicted returns depends on the values of other features (particularly momentum horizons), which is why the logistic regression coefficient is near zero while XGBoost treats it as a top feature.}
@@ -141,7 +141,7 @@ The preceding analysis established that the regime signal enables higher absolut
 \end{equation}
 where $\sigma_s^2$ is the trailing 12-month realised variance of stock $s$'s monthly returns and $\gamma \in \{0, 1, 2, \dots, 10\}$ is the risk-aversion parameter. At $\gamma = 0$ this recovers the baseline M2 model (pure return maximisation); as $\gamma$ increases, the model learns to favour lower-volatility stocks. All other features, hyperparameters, and portfolio construction rules are held fixed.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{risk_aversion_analysis.png}
     \caption{Effect of risk aversion on XGBoost portfolio performance and feature importance. \textbf{Top row}: out-of-sample Sharpe ratio, annualised return, and annualised volatility as a function of $\gamma$. \textbf{Bottom row}: relative SHAP feature importance (normalised to 100\%) across $\gamma$ values. The regime signal $\pi_t^{\text{filter}}$ accounts for nearly 30\% of total importance at $\gamma = 0$ but falls to approximately 6\% at $\gamma = 10$, while momentum's share rises correspondingly.}

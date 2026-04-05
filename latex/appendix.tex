@@ -6,7 +6,7 @@
 
 Table~\ref{tab:data_summary} provides a comprehensive overview of all data variables used in this thesis, their sources, and their roles in the analysis.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \small
 \begin{tabular}{l l l l}
@@ -134,7 +134,7 @@ where $\tilde{x}_{t,j}^s$ is the standardised value of feature $j$. The absolute
 
 \section{Convergence Diagnostics}\label{app:convergence}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{convergence_trace.png}
     \caption{Trace plots of the Gibbs sampler. Each panel shows the sampled regime means (calm in blue, panic in red) for one of the four HMM input features: drawdown (DD), realised volatility (VOL), return dispersion (DISP), and relative market participation (REL\_N). The bottom panel shows the persistence probabilities $P_{00}$ (calm) and $P_{11}$ (panic). The dashed line at iteration $500$ marks the end of burn-in.}

@@ -612,7 +612,8 @@ ax.legend(fontsize=8)
 ax = axes[1]
 ax.bar(['Calm\n($\\pi < 0.5$)', 'Panic\n($\\pi \\geq 0.5$)'],
        [shap_pi_calm, shap_pi_panic],
-       color=['steelblue', 'crimson'], alpha=0.8, width=0.4)
+       color=['steelblue', 'crimson'], alpha=0.8, width=0.5)
+ax.set_xlim(-0.5, 1.5)
 ax.set_ylabel(f'Mean |SHAP| of {pi_display}', fontsize=9)
 ax.set_title(f'How much does {pi_display}\nmatter by regime?', fontsize=10)
 for i, v in enumerate([shap_pi_calm, shap_pi_panic]):
