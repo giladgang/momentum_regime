@@ -16,6 +16,10 @@
 \usepackage{titlesec}
 
 \interfootnotelinepenalty=10000
+\pagestyle{empty}
+
+%% -- Start each section on a new page --
+\newcommand{\sectionbreak}{\clearpage}
 
 %% --Settings --
 \graphicspath{{./}}
@@ -36,6 +40,7 @@
 \begin{document}
 
 \maketitle
+\thispagestyle{empty}
 
 \setcounter{section}{3}
 \input{latex/methodology}
