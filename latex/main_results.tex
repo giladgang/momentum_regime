@@ -141,7 +141,7 @@ The Sharpe ratio improvement from unconditional momentum (0.70) to the best stra
 
 \subsection{Risk Aversion and the Value of the Regime Signal}\label{sec:risk_aversion}
 
-The preceding analysis established that the regime signal enables higher absolute returns at the cost of higher volatility, without improving risk-adjusted performance. A natural follow-up question is whether this finding depends on the investor's risk preferences. To investigate, XGBoost is retrained with a mean-variance utility target that penalises stock-level variance:
+The preceding analysis established that the regime signal enables higher absolute returns at the cost of higher volatility, without improving risk-adjusted performance. A natural follow-up question is whether this finding depends on the investor's risk preferences. To investigate, XGBoost is retrained with a mean-variance utility target \citep{Markowitz1952} that penalises stock-level variance:
 \begin{equation}
     y_t^s = r_{t+1}^s - \frac{\gamma}{2}\,\sigma_s^2,
 \end{equation}
