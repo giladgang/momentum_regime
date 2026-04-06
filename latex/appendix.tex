@@ -172,6 +172,58 @@ Baseline ($r$) & -- & 1.007 & 21.6\% & 21.8\% & $-$26.1\% \\
 
 The pattern is consistent: returns fall faster than volatility under every risk penalty, regardless of functional form. The mildest adjustments (mean-variance with $\gamma = 0.5$, Sharpe-like with $a = 0.5$) come closest to the baseline but still underperform. This confirms that the finding in Section~\ref{sec:risk_aversion} is not specific to the mean-variance utility formulation.
 
+\section{Robustness Checks}\label{app:robustness}
+
+This section reports five robustness checks that complement the main results in Section~\ref{sec:results}.
+
+\subsection{Sub-Period Stability}\label{app:subperiod}
+
+To assess whether the main findings are driven by a single favourable sub-period, the test sample is split into three roughly equal windows: 2011--2015, 2016--2020, and 2021--2025.
+
+\input{tables/table_subperiod}
+
+M1 is the most temporally stable strategy, maintaining a Sharpe ratio above 0.93 in every sub-period. M2 is similarly consistent (0.92--1.09). By contrast, fixed 12-month momentum collapses to 0.42 in the most recent sub-period, a window characterised by elevated inflation, rapid rate hikes, and two sharp corrections -- precisely the conditions under which an unconditional momentum strategy struggles and a regime-conditioned approach should add value.
+
+\subsection{Turnover and Transaction Cost Sensitivity}\label{app:turnover}
+
+A strategy's net-of-cost performance depends critically on its turnover. Table~\ref{tab:turnover} reports average monthly one-way turnover for each strategy.
+
+\input{tables/table_turnover}
+
+M1's low turnover (10.1\% per month) reflects the stability of its quality-momentum selections: the same large, profitable momentum winners tend to remain in the portfolio month after month. M2's higher turnover (64.2\%) arises from its regime-conditional switching between different stock types. Fixed 1-month momentum has the highest turnover (91.3\%), as the set of recent winners changes almost entirely each month.
+
+Table~\ref{tab:cost_sensitivity} translates these turnover differences into Sharpe ratio sensitivity across a range of transaction cost assumptions.
+
+\input{tables/table_cost_sensitivity}
+
+M1 is nearly immune to transaction costs: even at 50\,bps one-way (five times the baseline), its Sharpe ratio declines by only 0.04. M2 degrades more noticeably but remains above 0.87 at 50\,bps. The baseline 10\,bps assumption is therefore conservative for M1 and reasonable for M2.
+
+\subsection{XGBoost Hyperparameter Sensitivity}\label{app:xgb_sensitivity}
+
+The XGBoost model uses hyperparameters selected via cross-validation on the training set. To verify that the results are not an artefact of a particular configuration, Table~\ref{tab:xgb_hyperparams} reports out-of-sample performance under alternative tree depths, learning rates, and ensemble sizes.
+
+\input{tables/table_xgb_hyperparams}
+
+The Sharpe ratio ranges from 0.93 to 1.12 across all configurations tested. The baseline (depth=4, lr=0.05, $n$=500) is not the single best configuration -- a lower learning rate (0.01) achieves a Sharpe of 1.12 -- but all variants substantially outperform unconditional momentum (Sharpe $\approx$ 0.70). The results are robust to reasonable hyperparameter perturbations.
+
+\subsection{Regime Threshold Sensitivity}\label{app:threshold}
+
+The regime-conditional analysis in Section~\ref{sec:regime_results} uses $\pi_t^{\text{filter}} = 0.50$ to classify months as calm or panic. Table~\ref{tab:threshold_sensitivity} checks whether the findings are sensitive to this cutoff.
+
+\input{tables/table_threshold_sensitivity}
+
+The regime-conditional Sharpe ratios are stable across all three thresholds, with panic-period Sharpes ranging from 1.45 to 1.52 for M1 and calm-period Sharpes from 0.76 to 0.80. The qualitative finding -- that panic months contribute higher Sharpe ratios than calm months -- holds regardless of the classification threshold.
+
+\subsection{Number of Hidden States}\label{app:num_states}
+
+The baseline HMM uses $K = 2$ states (calm and panic). A natural question is whether finer regime granularity -- for example, distinguishing mild corrections from severe crises -- would improve the downstream portfolio models. Table~\ref{tab:multistate_hmm} reports out-of-sample Sharpe ratios for $K = 2, 3, 4, 5$, each averaged over five independent Gibbs sampler seeds.
+
+\input{tables/table_multistate_hmm}
+
+M1 is completely insensitive to $K$, consistent with its near-zero loading on $\pi_t^{\text{filter}}$. M2 shows no consistent improvement beyond $K = 2$: the mean Sharpe ratios for $K = 3, 4, 5$ (0.90, 1.02, 1.03) are within one standard deviation of the $K = 2$ baseline (1.00), and cross-seed variability increases with $K$. The $K = 3$ model actually performs worst on average, despite one seed producing a Sharpe of 1.14 -- illustrating the danger of drawing conclusions from a single run.
+
+The intermediate states that emerge for $K \geq 3$ are interpretable -- they typically capture periods of elevated volatility without deep drawdowns -- but they lack the persistence needed to provide a stable conditioning signal. In the $K = 3$ model, the intermediate state has a self-transition probability of only 0.83 compared to 0.94 for stressed and 0.94 for calm, meaning the model frequently reclassifies months between intermediate and the other states across seeds. With only 241 training months, the data cannot reliably separate more than two regimes for the purpose of downstream cross-sectional stock selection.
+
 \section{Convergence Diagnostics}\label{app:convergence}
 
 \begin{figure}[H]
