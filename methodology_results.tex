@@ -18,9 +18,6 @@
 \interfootnotelinepenalty=10000
 \pagestyle{empty}
 
-%% -- Start each section on a new page --
-\newcommand{\sectionbreak}{\clearpage}
-
 %% --Settings --
 \graphicspath{{./}}
 \onehalfspacing
@@ -43,7 +40,9 @@
 \thispagestyle{empty}
 
 \setcounter{section}{3}
+\newpage
 \input{latex/methodology}
+\newpage
 \input{latex/main_results}
 
 %% --Bibliography --
