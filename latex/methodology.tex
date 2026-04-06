@@ -12,7 +12,7 @@ This thesis employs a two-state Bayesian Hidden Markov Model to classify the mar
 
 \textbf{Observation equation} Conditional on the regime, the vector of standardized features $\mathbf{z}_t \in \mathbb{R}^D$ (where $D = 4$) is drawn from a regime-specific multivariate Gaussian. The shorthand $\mathbf{z}_{1:t} = (\mathbf{z}_1, \mathbf{z}_2, \dots, \mathbf{z}_t)$ denotes the full history of observations up to and including month~$t$:
 \begin{equation}
-    \mathbf{z}_t \mid s_t = 0 \sim \mathcal{N}(\boldsymbol{\mu}_0, \boldsymbol{\Sigma}_0), \qquad \mathbf{z}_t \mid s_t = 1 \sim \mathcal{N}(\boldsymbol{\mu}_1, \boldsymbol{\Sigma}_1).
+    (\mathbf{z}_t \mid s_t = 0) \sim \mathcal{N}(\boldsymbol{\mu}_0, \boldsymbol{\Sigma}_0), \qquad (\mathbf{z}_t \mid s_t = 1) \sim \mathcal{N}(\boldsymbol{\mu}_1, \boldsymbol{\Sigma}_1).
 \end{equation}
 Each regime is characterized by its own mean vector $\boldsymbol{\mu}_k \in \mathbb{R}^D$ and covariance matrix $\boldsymbol{\Sigma}_k \in \mathbb{R}^{D \times D}$, where $k \in \{0\text{ (calm)},\, 1\text{ (panic)}\}$. The multivariate specification allows the model to capture not only level differences in individual features across regimes, but also changes in the correlation structure; for instance, stress features may become more correlated during panic periods.
 
