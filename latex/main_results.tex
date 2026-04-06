@@ -105,6 +105,10 @@ The divergence arises because $\pi_t^{\text{filter}}$ is not a direct return pre
 
 This mechanism explains both the return gap and the volatility gap between M1 and M2. XGBoost uses the regime signal to switch between intermediate-horizon momentum continuation in calm markets and short-term reversal plays in panic. When the regime classification is correct, this switching generates higher returns -- but it also produces a more volatile portfolio, because panic-period selections (recently crashed names poised for recovery) are inherently more volatile than the steady quality-momentum picks that dominate in calm periods.
 
+\paragraph{Can the logistic regression be improved with polynomial terms?}
+
+A natural objection is that the logistic regression's inability to use $\pi_t^{\text{filter}}$ may simply reflect a missing functional form. To test this, the logistic regression is re-estimated with polynomial expansions ($\pi^2$, $\pi^2 + \pi^3$, up to $\pi^4$) and with explicit interaction terms ($\pi \times \text{mom}_k$ for all 12 lookbacks). None of these augmented models improves performance: the Sharpe ratio remains between 1.030 and 1.038 across all variants, with identical returns and volatility. Even with interaction terms that directly allow the regime signal to modulate each momentum horizon's coefficient, the linear model cannot exploit $\pi_t^{\text{filter}}$. This confirms that the regime-momentum interaction captured by XGBoost is not a simple polynomial or pairwise effect, but a high-order conditional structure that requires the recursive partitioning of tree-based models to represent.
+
 \subsubsection{Step 3: Ablation Studies}
 
 The preceding analysis establishes that XGBoost relies heavily on the HMM-based regime signal while the logistic regression does not. Two natural questions follow: is the HMM signal superior to simpler alternatives, and which of the four HMM input features drives its value?
