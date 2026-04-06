@@ -1,0 +1,55 @@
+\documentclass[12pt, a4paper]{article}
+
+%% --Packages --
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath, amssymb, amsfonts}
+\usepackage{dsfont}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{setspace}
+\usepackage[round]{natbib}
+\usepackage{hyperref}
+\usepackage{cleveref}
+\usepackage{titlesec}
+
+\interfootnotelinepenalty=10000
+
+%% --Settings --
+\graphicspath{{./}}
+\onehalfspacing
+\hypersetup{
+    colorlinks = true,
+    linkcolor  = blue!60!black,
+    citecolor  = blue!60!black,
+    urlcolor   = blue!60!black
+}
+
+%% --Title --
+\title{Momentum Regime Shifts: A Bayesian Hidden Markov Model Approach to Cross-Sectional Stock Selection\\[1em]\large Methodology and Results}
+\author{Gilad Gang}
+\date{}
+
+%% ═══════════════════════════════════════════════════════════════
+\begin{document}
+
+\maketitle
+
+\setcounter{section}{3}
+\input{latex/methodology}
+\input{latex/main_results}
+
+%% --Bibliography --
+\newpage
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+%% --Appendix --
+\newpage
+\appendix
+\titleformat{\section}{\normalfont\Large\bfseries}{Appendix~\thesection:}{0.5em}{}
+\input{latex/appendix}
+
+\end{document}
