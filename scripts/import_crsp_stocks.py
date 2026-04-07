@@ -73,7 +73,9 @@ query = f"""
         a.prc,
         a.shrout,
         b.exchcd,
-        b.shrcd
+        b.shrcd,
+        b.ticker,
+        b.comnam
     FROM crsp.msf AS a
     INNER JOIN crsp.msenames AS b
         ON  a.permno  = b.permno

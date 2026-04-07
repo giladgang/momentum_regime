@@ -292,6 +292,11 @@ HMM_FEATURES = {
     'DISP only': ['DISP_z'],
     'REL_N only': ['REL_N_z'],
     'Full 4F (DD+VOL+DISP+REL_N)': ['DD_z', 'VOL_z', 'DISP_z', 'REL_N_z'],
+    # Leave-one-out
+    'Drop DD':    ['VOL_z', 'DISP_z', 'REL_N_z'],
+    'Drop VOL':   ['DD_z', 'DISP_z', 'REL_N_z'],
+    'Drop DISP':  ['DD_z', 'VOL_z', 'REL_N_z'],
+    'Drop REL_N': ['DD_z', 'VOL_z', 'DISP_z'],
 }
 
 # Also add the existing pi_filter as baseline (no re-estimation needed)
@@ -364,7 +369,8 @@ print(f"  {'':35s}  {'Sharpe':>10s}  {'Sharpe':>10s}")
 print("  " + "─" * 60)
 
 for name in ['Baseline (multi-seed 4F)', 'Full 4F (DD+VOL+DISP+REL_N)',
-             'DD only', 'VOL only', 'DISP only', 'REL_N only']:
+             'DD only', 'VOL only', 'DISP only', 'REL_N only',
+             'Drop DD', 'Drop VOL', 'Drop DISP', 'Drop REL_N']:
     if name in all_results:
         res = all_results[name]
         sr_lr = f"{res['M1_LR'][2]:.3f}" if 'M1_LR' in res else "  N/A"

@@ -125,13 +125,23 @@ r_tr = train['ret_fwd'].values.astype(float)
 var_tr = train['trail_var'].values.astype(float)
 std_tr = train['trail_std'].values.astype(float)
 
-TARGETS = {
-    'Baseline (raw return)':           r_tr,
-    'Mean-var utility (gamma=2)':      r_tr - (2 / 2) * var_tr,
-    'Log mean-var (gamma=2)':          np.log1p(r_tr.clip(min=-0.999)) - (2 / 2) * var_tr,
-    'Sharpe-like (r / sigma)':         r_tr / np.clip(std_tr, 0.01, None),
-    'Sharpe-like (r / sigma^2)':       r_tr / np.clip(var_tr, 0.0001, None),
-}
+TARGETS = {}
+
+# Baseline
+TARGETS['Baseline (raw return)'] = r_tr
+
+# Mean-variance utility: r - (gamma/2) * sigma^2
+for gamma in [0.5, 1, 2, 5, 10]:
+    TARGETS[f'Mean-var (gamma={gamma})'] = r_tr - (gamma / 2) * var_tr
+
+# Log mean-variance: log(1+r) - (gamma/2) * sigma^2
+for gamma in [0.5, 1, 2, 5, 10]:
+    TARGETS[f'Log mean-var (gamma={gamma})'] = np.log1p(r_tr.clip(min=-0.999)) - (gamma / 2) * var_tr
+
+# Sharpe-like: r / sigma^a
+for a in [0.5, 1, 1.5, 2]:
+    label = f'Sharpe-like (r / sigma^{a})'
+    TARGETS[label] = r_tr / np.clip(std_tr ** a, 1e-4, None)
 
 # ═══════════════════════════════════════════════════════════════════════════════
 #  RUN
