@@ -208,7 +208,7 @@ ESS
 \end{equation}
 where $\hat{\rho}(\ell)$ is the estimated autocorrelation at lag $\ell$,\footnote{$\hat{\rho}(\ell) = \frac{1}{(n-\ell)\,\hat{\sigma}^2}\sum_{i=1}^{n-\ell}(\theta_i - \bar{\theta})(\theta_{i+\ell} - \bar{\theta})$, where $\theta_i$ is the $i$-th post-burn-in draw, $\bar{\theta}$ its sample mean, and $\hat{\sigma}^2$ its sample variance.} and $L^\ast$ is the first lag at which the autocorrelation becomes negative. High ESS indicates that the chain provides many effectively independent posterior draws.\footnote{An ESS of at least 100 per parameter is a common minimum for reliable posterior inference \citep{Gelman2013}.}
 
-Trace plots of the regime means and persistence probabilities (Figure~\ref{fig:convergence_trace}, Appendix~\ref{app:convergence}) confirm that all chains converge to stable posterior values after the burn-in period.
+Trace plots of the regime means and persistence probabilities (Figure~\ref{fig:convergence_trace}, Appendix~\ref{app:convergence}) confirm that all chains converge to stable posterior values after the burn-in period.\footnote{The Gelman--Rubin $\hat{R}$ statistic, computed across all five chains, is below 1.01 for every parameter (Appendix~\ref{app:gelman_rubin}), confirming convergence to the same posterior distribution.}
 
 \subsubsection{Regime Identification and Trading Signal}\label{sec:regime_signal}
 

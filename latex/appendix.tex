@@ -259,3 +259,32 @@ Adding a random feature \emph{hurts} performance (mean Sharpe 0.75 vs.\ 0.85 wit
     \label{fig:convergence_trace}
 \end{figure}
 
+\subsection{Gelman--Rubin Diagnostic}\label{app:gelman_rubin}
+
+The Gelman--Rubin $\hat{R}$ statistic \citep{Gelman2013} assesses convergence by comparing within-chain and between-chain variance across the five independent Gibbs sampler chains. For each parameter $\theta$, $\hat{R} = \sqrt{\hat{V}/W}$, where $W$ is the mean within-chain variance and $\hat{V} = \frac{n-1}{n}W + \frac{B}{n}$ combines within-chain variance with the between-chain variance $B$. Values near 1.0 indicate that the chains have converged to the same posterior distribution; $\hat{R} < 1.1$ is the standard threshold.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{l r l}
+\toprule
+Parameter & $\hat{R}$ & Status \\
+\midrule
+$\mu_{\text{calm}}(\text{DD})$ & 1.000 & OK \\
+$\mu_{\text{calm}}(\text{VOL})$ & 1.000 & OK \\
+$\mu_{\text{calm}}(\text{DISP})$ & 1.000 & OK \\
+$\mu_{\text{calm}}(\text{REL\_N})$ & 1.000 & OK \\
+$\mu_{\text{panic}}(\text{DD})$ & 1.000 & OK \\
+$\mu_{\text{panic}}(\text{VOL})$ & 1.001 & OK \\
+$\mu_{\text{panic}}(\text{DISP})$ & 1.000 & OK \\
+$\mu_{\text{panic}}(\text{REL\_N})$ & 1.000 & OK \\
+$P_{00}$ (calm persistence) & 1.000 & OK \\
+$P_{01}$ (calm $\to$ panic) & 1.000 & OK \\
+$P_{10}$ (panic $\to$ calm) & 1.001 & OK \\
+$P_{11}$ (panic persistence) & 1.001 & OK \\
+\bottomrule
+\end{tabular}
+\caption{Gelman--Rubin $\hat{R}$ statistics for all HMM parameters, computed across 5 independent chains (1{,}500 post-burn-in draws each). All values are below 1.01, well within the convergence threshold of 1.1.}
+\label{tab:gelman_rubin}
+\end{table}
+
