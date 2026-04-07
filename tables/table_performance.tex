@@ -14,9 +14,7 @@ M1: LR & 14.8\% & 14.5\% & 1.03 & [0.55,\,1.61] & $-$25.2\% & 0.97 & 2.92$^{***}
 M2: XGB & 21.6\% & 21.8\% & 1.01 & [0.48,\,1.52] & $-$26.1\% & 1.24 & 2.78$^{***}$ & 14.7 \\
 \midrule
 \multicolumn{9}{l}{\emph{GHM benchmarks \citep{GHM2023}}} \\
-GHM SLOW & 12.4\% & 19.3\% & 0.70 & [0.19,\,1.24] & $-$33.5\% & 1.09 & 0.41 & 5.1 \\
 GHM MED & 12.4\% & 17.8\% & 0.75 & [0.26,\,1.31] & $-$32.8\% & 1.02 & 0.40 & 5.1 \\
-GHM FAST & 13.3\% & 20.1\% & 0.72 & [0.23,\,1.22] & $-$29.7\% & 1.12 & 0.63 & 5.7 \\
 GHM DYN & 13.7\% & 18.3\% & 0.80 & [0.33,\,1.30] & $-$27.5\% & 1.04 & 0.94 & 6.0 \\
 \bottomrule
 \end{tabular}
@@ -25,5 +23,5 @@ GHM DYN & 13.7\% & 18.3\% & 0.80 & [0.33,\,1.30] & $-$27.5\% & 1.04 & 0.94 & 6.0
 
 \medskip
 \small
-\textbf{Notes:} This table reports annualized return, annualized volatility, Sharpe ratio, 95\% block bootstrap confidence interval on the Sharpe ratio (block length = 12 months, 10{,}000 replications), maximum drawdown, CAPM beta (from regressing portfolio returns on market returns), Newey--West $t$-statistic for mean excess return over the market (HAC standard errors, 6 lags), and terminal wealth from \$1 invested. All strategies are long-only top-decile, value-weighted using NYSE breakpoints, and net of 10\,bps one-way transaction costs. The test period is January 2011 to November 2025 (167 months). The HMM regime signal is averaged over 5 independent Gibbs sampler seeds. $^{*}$\,$p<0.10$; $^{**}$\,$p<0.05$; $^{***}$\,$p<0.01$.
+\textbf{Notes:} This table reports annualized return, annualized volatility, Sharpe ratio, 95\% block bootstrap confidence interval on the Sharpe ratio (block length = 12 months, 10{,}000 replications), maximum drawdown, CAPM beta (from regressing portfolio returns on market returns), Newey--West $t$-statistic for mean excess return over the market (HAC standard errors, 6 lags), and terminal wealth from \$1 invested. All strategies are long-only top-decile, value-weighted using NYSE breakpoints, and net of 10\,bps one-way transaction costs. The test period is January 2011 to November 2025 (167 months). The HMM regime signal is averaged over 5 independent Gibbs sampler seeds. GHM SLOW ($a=0$, pure 12-month momentum) and GHM FAST ($a=1$, pure 1-month momentum) are omitted as they coincide with Fixed 12-mo and Fixed 1-mo above. $^{*}$\,$p<0.10$; $^{**}$\,$p<0.05$; $^{***}$\,$p<0.01$.
 \end{table}
