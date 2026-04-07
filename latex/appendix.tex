@@ -250,6 +250,38 @@ A further concern is that XGBoost's improvement from adding $\pi_t^{\text{filter
 
 Adding a random feature \emph{hurts} performance (mean Sharpe 0.75 vs.\ 0.85 without), while the real $\pi_t^{\text{filter}}$ improves it to 0.94. The regime signal's contribution is specific and economically meaningful, not an artefact of model flexibility.
 
+\subsection{Emission Distribution Robustness}\label{app:emission_robustness}
+
+The observation equation assumes multivariate Gaussian emissions (Equation~1). Shapiro--Wilk tests reject within-regime normality for seven of eight feature--regime pairs, primarily due to left skew in drawdown (skewness $-1.6$ in calm) and right skew in dispersion and relative participation. To assess whether this misspecification affects regime identification, the HMM is re-estimated with multivariate Student-$t$ emissions across a grid of degrees of freedom $\nu \in \{3, 5, 7, 10, 15, 20, 30, 50, 100\}$.
+
+The Student-$t$ model is estimated via data augmentation \citep{Geweke1993}: each observation receives a latent weight $w_t \sim \text{Gamma}(\nu/2, \nu/2)$, so that $\mathbf{z}_t \mid s_t{=}k,\, w_t \sim \mathcal{N}(\boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k / w_t)$. Marginalising over $w_t$ yields a multivariate $t$ with $\nu$ degrees of freedom. Crucially, conditional on $w_t$ the emission is Gaussian, so the Normal-Inverse-Wishart conjugate updates carry over with weighted sufficient statistics, preserving the efficiency of the Gibbs sampler.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{r r r r r r}
+\toprule
+$\nu$ & LL (train) & LL (test) & BIC & Agreement & Corr($\pi$) \\
+\midrule
+3   & $-$1085.0 & $-$834.0 & 2334.5 & 97.8\% & 0.980 \\
+5   & $-$1066.7 & $-$828.4 & 2297.9 & 98.3\% & 0.987 \\
+7   & $-$1059.1 & $-$829.4 & 2282.6 & 98.5\% & 0.990 \\
+10  & $-$1053.9 & $-$831.8 & 2272.4 & 98.5\% & 0.993 \\
+15  & $-$1050.3 & $-$836.8 & 2265.2 & 99.0\% & 0.996 \\
+20  & $-$1048.9 & $-$840.0 & 2262.4 & 98.8\% & 0.998 \\
+30  & $-$1047.8 & $-$845.0 & 2260.1 & 99.8\% & 0.999 \\
+50  & $-$1047.0 & $-$850.4 & 2258.5 & 100.0\% & 1.000 \\
+100 & $-$1046.5 & $-$855.6 & 2257.6 & 100.0\% & 1.000 \\
+\midrule
+Normal & $-$1046.4 & $-$862.6 & \textbf{2257.3} & --- & --- \\
+\bottomrule
+\end{tabular}
+\caption{Student-$t$ vs.\ Normal emission HMM comparison. LL = log-likelihood; Agreement = fraction of months with identical binary regime classification ($\pi > 0.5$) as the Normal HMM; Corr($\pi$) = Pearson correlation of filtered panic probabilities. The Normal model achieves the lowest BIC. Even the heaviest-tailed specification ($\nu = 3$) agrees with the Normal HMM on 97.8\% of months.}
+\label{tab:student_t_hmm}
+\end{table}
+
+The Normal model achieves the lowest BIC (2257.3 vs.\ 2257.6 for the best Student-$t$ at $\nu = 100$), indicating no meaningful improvement from heavier tails. The out-of-sample log-likelihood is marginally higher for low $\nu$ (e.g., $-828.4$ at $\nu = 5$ vs.\ $-862.6$ for Normal), but this is offset by worse in-sample fit, so BIC does not favour it. Regime classifications agree with the Normal HMM on at least 97.8\% of months across all $\nu$ values, and the correlation of filtered panic probabilities exceeds 0.98 everywhere. These results confirm that, while the Normal emission assumption is not exact, it does not distort regime identification in this application.
+
 \section{Convergence Diagnostics}\label{app:convergence}
 
 \begin{figure}[H]
