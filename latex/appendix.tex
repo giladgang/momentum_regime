@@ -107,7 +107,7 @@ To assess whether the regime signal adds value beyond unconditional stock select
 \begin{equation}
     SR_{\text{calm}} = \frac{\bar{r}_{\text{calm}}}{\sigma(r_{\text{calm}})} \cdot \sqrt{12}, \qquad SR_{\text{panic}} = \frac{\bar{r}_{\text{panic}}}{\sigma(r_{\text{panic}})} \cdot \sqrt{12}.
 \end{equation}
-This decomposition reveals whether the strategy's alpha originates primarily from calm-period stock selection, panic-period risk avoidance, or both.
+This decomposition helps assess whether the strategy's alpha originates primarily from calm-period stock selection, panic-period risk avoidance, or both.
 
 \section{Feature Importance Methods}\label{app:feature_importance}
 
@@ -204,7 +204,7 @@ The XGBoost model uses hyperparameters selected via cross-validation on the trai
 
 \input{tables/table_xgb_hyperparams}
 
-The Sharpe ratio ranges from 0.93 to 1.12 across all configurations tested. The baseline (depth=4, lr=0.05, $n$=500) is not the single best configuration -- a lower learning rate (0.01) achieves a Sharpe of 1.12 -- but all variants substantially outperform unconditional momentum (Sharpe $\approx$ 0.70). The results are robust to reasonable hyperparameter perturbations.
+The Sharpe ratio ranges from 0.93 to 1.12 across all configurations tested. The baseline (depth=4, lr=0.05, $n$=500) is not the single best configuration -- a lower learning rate (0.01) achieves a Sharpe of 1.12 -- but all variants meaningfully exceed unconditional momentum (Sharpe $\approx$ 0.70). The results are robust to reasonable hyperparameter perturbations.
 
 \subsection{Regime Threshold Sensitivity}\label{app:threshold}
 
