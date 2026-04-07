@@ -1,0 +1,15 @@
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{l r}
+\toprule
+Configuration & M2 Sharpe \\
+\midrule
+XGB with real $\pi_t^{\text{filter}}$ & 0.94 \\
+XGB without extra feature (baseline) & 0.85 \\
+XGB + random walk feature (mean $\pm$ std, 10 runs) & $0.75 \pm 0.13$ \\
+\bottomrule
+\end{tabular}
+\caption{Kitchen-sink test: does \emph{any} additional feature improve XGBoost equally? Adding a random walk feature to XGBoost \emph{hurts} performance (0.75 vs.\ 0.85 without), while the real $\pi_t^{\text{filter}}$ improves it (0.94). The regime signal's contribution is specific, not an artefact of model flexibility.}
+\label{tab:kitchen_sink}
+\end{table}

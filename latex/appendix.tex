@@ -224,6 +224,32 @@ M1 is completely insensitive to $K$, consistent with its near-zero loading on $\
 
 The intermediate states that emerge for $K \geq 3$ are interpretable -- they typically capture periods of elevated volatility without deep drawdowns -- but they lack the persistence needed to provide a stable conditioning signal. In the $K = 3$ model, the intermediate state has a self-transition probability of only 0.83 compared to 0.94 for stressed and 0.94 for calm, meaning the model frequently reclassifies months between intermediate and the other states across seeds. With only 241 training months, the data cannot reliably separate more than two regimes for the purpose of downstream cross-sectional stock selection.
 
+\section{External Validity}\label{app:external_validity}
+
+\subsection{Alternative Train/Test Splits}\label{app:alt_splits}
+
+To assess sensitivity to the choice of training period, the full pipeline (HMM estimation, feature construction, and ML model training) is re-run under four alternative train/test splits.
+
+\input{tables/table_alt_splits}
+
+Both M1 and M2 produce positive Sharpe ratios across all splits (0.78--1.04 for M1, 0.83--1.00 for M2). Returns are remarkably stable at 20--22\% annualised for M2; what varies is volatility, which is higher when the test period includes the 2008 crisis.
+
+\subsection{Placebo Regime Signals}\label{app:placebo}
+
+To rule out the possibility that XGBoost benefits from any additional feature rather than specifically from the HMM regime signal, the real $\pi_t^{\text{filter}}$ is replaced with five placebo variants: temporally shuffled versions (which preserve the marginal distribution but destroy temporal structure), pure random noise, an inverted signal ($1 - \pi_t^{\text{filter}}$), and a VIX-based alternative.
+
+\input{tables/table_placebo}
+
+M1 is completely invariant to the regime signal, achieving a Sharpe of approximately 1.03 regardless of input. M2 achieves its highest Sharpe (0.94) with the real HMM signal; all placebo variants produce lower performance. The inverted signal (0.92) comes closest, which is consistent with XGBoost learning to reverse the interpretation of the flipped input.
+
+\subsection{Kitchen-Sink Test}\label{app:kitchen_sink}
+
+A further concern is that XGBoost's improvement from adding $\pi_t^{\text{filter}}$ reflects the model's ability to extract spurious patterns from any additional feature. To test this, XGBoost is augmented with a single random walk feature (cumulative sum of standard normal draws) in place of $\pi_t^{\text{filter}}$, repeated 10 times with different seeds.
+
+\input{tables/table_kitchen_sink}
+
+Adding a random feature \emph{hurts} performance (mean Sharpe 0.75 vs.\ 0.85 without), while the real $\pi_t^{\text{filter}}$ improves it to 0.94. The regime signal's contribution is specific and economically meaningful, not an artefact of model flexibility.
+
 \section{Convergence Diagnostics}\label{app:convergence}
 
 \begin{figure}[H]

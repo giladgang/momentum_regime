@@ -1,0 +1,18 @@
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{l r r}
+\toprule
+Regime signal & M1 Sharpe & M2 Sharpe \\
+\midrule
+Real $\pi_t^{\text{filter}}$ (baseline) & 1.04 & 0.94 \\
+No regime signal & 1.03 & 0.85 \\
+Shuffled $\pi$ (mean $\pm$ std, 5 runs) & -- & $0.88 \pm 0.11$ \\
+Random noise (mean $\pm$ std, 5 runs) & -- & $0.83 \pm 0.04$ \\
+Inverted $\pi$ ($1 - \pi_t^{\text{filter}}$) & 1.04 & 0.92 \\
+VIX-based regime & 1.03 & 0.76 \\
+\bottomrule
+\end{tabular}
+\caption{Placebo regime signal test. M1 is invariant to the regime signal ($\approx$1.03 regardless of input), confirming its reliance on fundamentals. M2 achieves its highest Sharpe with the real HMM signal; all placebo variants produce lower performance. The inverted signal (0.92) comes closest, consistent with XGBoost learning to reverse the interpretation.}
+\label{tab:placebo}
+\end{table}

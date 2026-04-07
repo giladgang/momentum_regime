@@ -1,0 +1,16 @@
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{l r r r r r}
+\toprule
+Train / Test split & $N_{\text{test}}$ & M1 Sharpe & M2 Sharpe & M2 Ann.\ Ret & M2 Ann.\ Vol \\
+\midrule
+1990--2004 / 2005--2025 & 239 & 0.78 & 0.85 & 21.3\% & 27.0\% \\
+1990--2007 / 2008--2025 & 203 & 0.78 & 0.83 & 22.4\% & 29.4\% \\
+1990--2010 / 2011--2025 (baseline) & 167 & 1.04 & 0.94 & 20.6\% & 22.7\% \\
+1990--2014 / 2015--2025 & 119 & 0.97 & 1.00 & 20.5\% & 21.0\% \\
+\bottomrule
+\end{tabular}
+\caption{Out-of-sample Sharpe ratios under alternative train/test splits. Both M1 and M2 produce positive Sharpe ratios across all splits. The baseline split yields the highest M1 Sharpe; earlier splits that include the 2008 crisis in the test set show lower but still meaningful risk-adjusted performance.}
+\label{tab:alt_splits}
+\end{table}
