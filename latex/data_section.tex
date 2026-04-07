@@ -94,7 +94,7 @@ Standardisation ensures that all features contribute equally to the HMM's Gaussi
 
 \subsection{HMM Feature Selection}\label{sec:feature_selection}
 
-The choice of HMM input features has a substantial impact on regime classification quality and, ultimately, on portfolio performance. Rather than selecting features based solely on economic intuition, this thesis employs a systematic search over a broad candidate pool, followed by rigorous validation to guard against data mining.
+The choice of HMM input features has a substantial impact on regime classification quality and, ultimately, on portfolio performance. This thesis selects features through a systematic procedure that balances economic interpretability with statistical discipline: an exhaustive search over a broad candidate pool, followed by multiple-testing correction, seed stability analysis, and ablation testing.
 
 \paragraph{Candidate pool}
 Eleven monthly macrofinancial indicators are considered as candidate inputs for the HMM. These span three broad categories of market stress:
@@ -111,7 +111,7 @@ All $\binom{11}{4} = 330$ four-feature combinations are evaluated. For each comb
 Of the 330 combinations, 222 pass this quality screen. For each passing combination, the full cross-sectional portfolio pipeline is run: the HMM's filtered panic probability is merged with stock-level data, and the M0 (formula), M1 (logistic regression), and M2 (XGBoost) strategies are evaluated on the out-of-sample test period (2011--2025).
 
 \paragraph{Step 2: Multiple testing correction}
-Testing 222 combinations and selecting the best raises the concern that the highest-performing combination may simply be the luckiest. To address this, a block bootstrap procedure \citep[see][for an introduction to bootstrap methods]{ISLR2021} (block size 12 months, 10{,}000 replications) is used to construct the null distribution of the maximum Sharpe ratio across all 222 combinations under the hypothesis that all combinations have the same expected performance. The observed best Sharpe ratio of the top combination exceeds the 95th percentile of this null distribution ($p = 0.0002$), confirming that the result is not an artefact of multiple testing.
+With 222 combinations passing the quality screen, a multiple-testing correction ensures that the selected combination reflects genuine regime quality rather than sampling variation. A block bootstrap procedure \citep[see][for an introduction to bootstrap methods]{ISLR2021} (block size 12 months, 10{,}000 replications) is used to construct the null distribution of the maximum Sharpe ratio across all 222 combinations under the hypothesis that all combinations have the same expected performance. The observed best Sharpe ratio of the top combination exceeds the 95th percentile of this null distribution ($p = 0.0002$), confirming that the result is not an artefact of multiple testing.
 
 \paragraph{Step 3: Seed stability}
 Because Gibbs sampling is stochastic, a robust feature combination should produce consistent results regardless of the random seed. The top eight combinations with full training data (available from 1990) are each run five times with different random seeds. DD+VOL+DISP+REL\_N achieves the highest mean XGBoost Sharpe ratio (1.12) with low standard deviation (0.06) across seeds, and its minimum Sharpe ratio across all seeds (1.03) exceeds the baseline's mean (0.84). Table~\ref{tab:seed_stability} reports these results.
@@ -144,11 +144,11 @@ To understand why certain feature combinations outperform others, principal comp
 Single-feature and leave-one-out experiments isolate each feature's marginal contribution. When each of the four selected features is used alone as the sole HMM input, DD produces the highest Sharpe ratio (0.98), followed by DISP (0.97), VOL (0.90), and REL\_N (0.81). In the leave-one-out analysis, removing DISP from the four-feature combination causes the largest performance drop ($-0.26$), followed by DD ($-0.20$) and REL\_N ($-0.15$), while removing VOL has a smaller effect ($-0.07$). DISP is therefore the single most valuable feature in the combination: it is strong on its own and contributes substantial incremental information beyond what the other three provide. REL\_N, while the weakest in isolation, has the third-largest leave-one-out impact, indicating that it captures information not present in DD, VOL, or DISP.
 
 \paragraph{Summary}
-The selected feature set, DD+VOL+DISP+REL\_N, is the product of an exhaustive search over 330 candidate combinations, validated through multiple testing correction, seed stability analysis, PCA-based structural analysis, and ablation testing. It captures market stress through four complementary equity-based channels: the depth of market declines (DD), realised market turbulence (VOL), cross-sectional stock disagreement (DISP), and structural market attrition (REL\_N). All four features are available from January 1990, providing 252 training months that include two full crisis episodes.
+The selected feature set, DD+VOL+DISP+REL\_N, emerges consistently across all five validation stages. It captures market stress through four complementary equity-based channels: the depth of market declines (DD), realised market turbulence (VOL), cross-sectional stock disagreement (DISP), and structural market attrition (REL\_N). All four features are available from January 1990, providing 252 training months that include two full crisis episodes.
 
 \subsection{Cross-Sectional Features}\label{sec:cs_features}
 
-The cross-sectional models use three groups of features to rank stocks each month: momentum signals, the HMM regime probability, and fundamental characteristics.
+The cross-sectional models use three groups of features to rank stocks each month: momentum signals, the filtered panic probability $\pi_t^{\text{filter}}$, and fundamental characteristics.
 
 \paragraph{Momentum lookbacks}
 Twelve trailing momentum signals are computed for each stock, corresponding to lookback horizons of 1 to 12 months:
