@@ -2,7 +2,7 @@
 
 Before presenting the results, it is worth reiterating the thesis's primary objective: the goal is not to construct a strategy that maximises out-of-sample returns, but to understand how the regime signal interacts with momentum and what this interaction reveals about the structure of the anomaly. Portfolio performance is reported as a vehicle for this analysis, not as an end in itself. As described in Section~\ref{sec:stage2}, the three methods serve distinct analytical roles of increasing complexity, with the comparison between M1 (linear) and M2 (nonlinear) as the key diagnostic for the thesis's central claim.
 
-All strategies are evaluated out-of-sample on the test period (January 2011 to November 2025, 167 months). Each method produces a long-only, value-weighted, top-decile portfolio rebalanced monthly with one-way transaction costs of 10 basis points (i.e., 10 basis points charged on each buy or sell trade). Portfolio construction details and performance metric definitions are provided in Appendix~\ref{app:portfolio}. Feature importance is assessed via SHAP values \citep{Lundberg2017} for XGBoost and coefficient analysis for logistic regression; the methodological details are in Appendix~\ref{app:feature_importance}.
+All strategies are evaluated out-of-sample on the test period (January 2011 to November 2025, 167 months). Each method produces a long-only, value-weighted, top-decile portfolio rebalanced monthly with one-way transaction costs of 10 basis points (i.e., 10 basis points charged on each buy or sell trade). 
 
 The analysis proceeds in four stages:
 \begin{enumerate}
