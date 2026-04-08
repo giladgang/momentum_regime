@@ -82,7 +82,7 @@ print(f"  Train: {len(train):,}  |  Test: {len(test):,}")
 #  HELPERS
 # ═══════════════════════════════════════════════════════════════════════════════
 
-def long_only_port(df_test, score_col, fee=TRADING_FEE, return_turnover=False):
+def long_short_port(df_test, score_col, fee=TRADING_FEE, return_turnover=False):
     monthly, prev_weights = [], {}
     turnovers = []
     for date, grp in df_test.groupby('date'):
@@ -110,6 +110,38 @@ def long_only_port(df_test, score_col, fee=TRADING_FEE, return_turnover=False):
     return result['ret']
 
 
+def long_short_port(df_test, score_col, fee=TRADING_FEE, return_turnover=False):
+    monthly, prev_lw, prev_sw = [], {}, {}
+    turnovers = []
+    for date, grp in df_test.groupby('date'):
+        nyse = grp[grp['exchcd'] == 1][score_col].dropna()
+        if len(nyse) < 10:
+            continue
+        lo, hi = nyse.quantile(0.10), nyse.quantile(0.90)
+        longs  = grp[grp[score_col] >= hi]
+        shorts = grp[grp[score_col] <= lo]
+        if longs['me'].sum() == 0 or shorts['me'].sum() == 0:
+            continue
+        lme = longs['me'].sum()
+        new_lw = (longs.set_index('permno')['me'] / lme).to_dict()
+        r_long = (longs['ret_fwd'] * longs['me']).sum() / lme
+        sme = shorts['me'].sum()
+        new_sw = (shorts.set_index('permno')['me'] / sme).to_dict()
+        r_short = (shorts['ret_fwd'] * shorts['me']).sum() / sme
+        tl = sum(abs(new_lw.get(p, 0) - prev_lw.get(p, 0)) for p in set(new_lw) | set(prev_lw)) / 2
+        ts = sum(abs(new_sw.get(p, 0) - prev_sw.get(p, 0)) for p in set(new_sw) | set(prev_sw)) / 2
+        monthly.append({'date': date, 'ret': r_long - r_short - fee * (tl + ts), 'ret_gross': r_long - r_short})
+        turnovers.append(tl + ts)
+        prev_lw, prev_sw = new_lw, new_sw
+    if not monthly:
+        return (pd.Series(dtype=float), 0.0) if return_turnover else pd.Series(dtype=float)
+    result = pd.DataFrame(monthly).set_index('date')
+    avg_turnover = np.mean(turnovers)
+    if return_turnover:
+        return result['ret'], avg_turnover
+    return result['ret']
+
+
 def metrics(r):
     r = pd.Series(r).dropna()
     if len(r) < 6:
@@ -130,11 +162,13 @@ print("\n" + "=" * 80)
 print("  CHECK 1: SUB-PERIOD ANALYSIS")
 print("=" * 80)
 
+# Recompute strategies as long-short from test scores
+test_art = artefacts['test'].copy()
 all_strats = {
     'Market':          r_mkt,
-    'Fixed 12-mo':     strats_lo['Fixed 12-mo mom'],
-    'M1: LR':          strats_lo['Method 1: LR'],
-    'M2: XGB':         strats_lo['Method 2: XGB'],
+    'Fixed 12-mo':     long_short_port(test_art, 'score_mom12'),
+    'M1: LR':          long_short_port(test_art, 'score_lr'),
+    'M2: XGB':         long_short_port(test_art, 'score_xgb'),
 }
 
 periods = [
@@ -213,7 +247,7 @@ turnover_strats = {
 print(f"\n  {'Strategy':<15s}  {'Avg Monthly TO':>15s}  {'Ann. TO':>10s}")
 print("  " + "-" * 45)
 for name, col in turnover_strats.items():
-    _, avg_to = long_only_port(test_c, col, return_turnover=True)
+    _, avg_to = long_short_port(test_c, col, return_turnover=True)
     print(f"  {name:<15s}  {avg_to:>14.1%}  {avg_to*12:>9.1%}")
 
 
@@ -236,7 +270,7 @@ print("  " + "-" * 70)
 for name, col in turnover_strats.items():
     print(f"  {name:<15s}", end='')
     for c in cost_levels:
-        r, _ = long_only_port(test_c, col, fee=c/10000, return_turnover=True)
+        r, _ = long_short_port(test_c, col, fee=c/10000, return_turnover=True)
         _, _, sh, _ = metrics(r)
         print(f"  {sh:>9.3f}", end='')
     print()
@@ -277,7 +311,7 @@ for config_name, params in configs:
     model.fit(X_tr_raw, y_tr_raw)
     test_hp = test.copy()
     test_hp['score'] = model.predict(X_te_raw)
-    r = long_only_port(test_hp, 'score')
+    r = long_short_port(test_hp, 'score')
     ar, av, sh, _ = metrics(r)
     marker = " <-- baseline" if "depth=4, lr=0.05, n=500" in config_name else ""
     print(f"  {config_name:<30s}  {sh:>8.3f}  {ar:>7.1%}  {av:>7.1%}{marker}")
@@ -291,10 +325,9 @@ print("\n" + "=" * 80)
 print("  CHECK 5: REGIME THRESHOLD SENSITIVITY")
 print("=" * 80)
 
-# Get the test returns with pi_filter dates
-r_m1 = strats_lo['Method 1: LR']
-r_m2 = strats_lo['Method 2: XGB']
-r_mom = strats_lo['Fixed 12-mo mom']
+r_m1 = long_short_port(test_art, 'score_lr')
+r_m2 = long_short_port(test_art, 'score_xgb')
+r_mom = long_short_port(test_art, 'score_mom12')
 
 pi_monthly = panel[['date', 'pi_filter']].dropna().drop_duplicates('date').set_index('date')
 
@@ -408,7 +441,7 @@ for name, col, base_sh in [
     ('M1: LR', 'score_lr', 1.038),
     ('M2: XGB', 'score_xgb', 1.007),
 ]:
-    r = long_only_port(test2, col)
+    r = long_short_port(test2, col)
     _, _, sh, _ = metrics(r)
     print(f"  {name:<20s}  {sh:>14.3f}  {base_sh:>14.3f}")
 
@@ -576,7 +609,7 @@ train3['above_med'] = train3.groupby('date')['ret_fwd'].transform(
 lr3 = LogisticRegression(C=1.0, max_iter=1000, random_state=42)
 lr3.fit(X_tr3_s, train3['above_med'].values)
 test3['score_lr'] = lr3.predict_proba(X_te3_s)[:, 1]
-r_lr3 = long_only_port(test3, 'score_lr')
+r_lr3 = long_short_port(test3, 'score_lr')
 
 # XGB
 xgb3 = XGBRegressor(n_estimators=500, max_depth=4, learning_rate=0.05,
@@ -584,7 +617,7 @@ xgb3 = XGBRegressor(n_estimators=500, max_depth=4, learning_rate=0.05,
                      tree_method='hist', random_state=42, verbosity=0)
 xgb3.fit(X_tr3, y_tr3)
 test3['score_xgb'] = xgb3.predict(X_te3)
-r_xgb3 = long_only_port(test3, 'score_xgb')
+r_xgb3 = long_short_port(test3, 'score_xgb')
 
 print(f"\n  {'Model':<10s}  {'K=2 Sharpe':>12s}  {'K=3 Sharpe':>12s}")
 print("  " + "-" * 40)

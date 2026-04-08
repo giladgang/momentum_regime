@@ -1,32 +1,32 @@
-\begin{table}[H]
+\begin{table}[htbp]
 \centering
-\footnotesize
-\begin{tabular}{l r r}
+\caption{Logistic regression (Method~1) coefficient estimates. Features are standardized prior to fitting. The model is estimated without regularization to obtain valid standard errors. Dependent variable: $\mathbb{1}[r_{t+1}^s > \text{median}]$.}
+\label{tab:lr_coef}
+\small
+\begin{tabular}{l r r r r}
 \toprule
-Feature & $\hat{\beta}$ & $z$ \\
+Feature & $\hat{\beta}$ & Std.\ Err. & $z$ & Sig. \\
 \midrule
-Log market equity & 0.0718 & 35.65 \\
-mom\_11 & 0.0528 & 7.36 \\
-Book-to-market & 0.0461 & 21.98 \\
-mom\_12 & $-$0.0413 & $-$7.68 \\
-Asset growth & $-$0.0358 & $-$18.72 \\
-Gross profitability & 0.0322 & 16.64 \\
-mom\_8 & 0.0313 & 4.86 \\
-mom\_4 & $-$0.0284 & $-$5.71 \\
-Return on equity & 0.0205 & 10.56 \\
-Earnings growth & 0.0177 & 9.38 \\
-mom\_2 & 0.0161 & 4.51 \\
-mom\_1 & $-$0.0161 & $-$6.24 \\
-mom\_7 & $-$0.0104 & $-$1.68 \\
-mom\_5 & 0.0092 & 1.67 \\
-Leverage & $-$0.0087 & $-$4.60 \\
-mom\_3 & $-$0.0062 & $-$1.43 \\
-$\pi^{\text{filter}}$ & $-$0.0050 & $-$2.60 \\
-mom\_9 & $-$0.0034 & $-$0.52 \\
-mom\_10 & $-$0.0031 & $-$0.44 \\
-mom\_6 & 0.0008 & 0.13 \\
+Log market equity & 0.0707 & 0.0020 & 35.12 & *** \\
+mom\_11 & 0.0530 & 0.0072 & 7.38 & *** \\
+Book-to-market & 0.0451 & 0.0021 & 21.51 & *** \\
+mom\_12 & -0.0415 & 0.0054 & -7.71 & *** \\
+Asset growth & -0.0363 & 0.0019 & -18.98 & *** \\
+mom\_8 & 0.0313 & 0.0064 & 4.87 & *** \\
+Gross profitability & 0.0313 & 0.0019 & 16.10 & *** \\
+mom\_4 & -0.0284 & 0.0050 & -5.71 & *** \\
+Return on equity & 0.0227 & 0.0020 & 11.62 & *** \\
+Earnings growth & 0.0175 & 0.0019 & 9.31 & *** \\
+mom\_2 & 0.0162 & 0.0036 & 4.53 & *** \\
+mom\_1 & -0.0160 & 0.0026 & -6.22 & *** \\
+mom\_7 & -0.0104 & 0.0062 & -1.68 & * \\
+mom\_5 & 0.0091 & 0.0055 & 1.65 & * \\
+Leverage & -0.0085 & 0.0019 & -4.51 & *** \\
+mom\_3 & -0.0061 & 0.0043 & -1.41 &  \\
+mom\_9 & -0.0034 & 0.0067 & -0.50 &  \\
+mom\_10 & -0.0030 & 0.0069 & -0.43 &  \\
+$\pi^{\text{filter}}$ & -0.0012 & 0.0019 & -0.62 &  \\
+mom\_6 & 0.0007 & 0.0059 & 0.12 &  \\
 \bottomrule
 \end{tabular}
-\caption{Logistic regression (Method~1) coefficient estimates. Features are standardized prior to fitting. Coefficients with $|z| > 1.96$ are significant at the 5\% level.}
-\label{tab:lr_coef}
 \end{table}

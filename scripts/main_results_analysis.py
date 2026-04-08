@@ -91,6 +91,32 @@ def long_only_port(df_data, score_col, fee=TRADING_FEE):
     return pd.DataFrame(monthly).set_index('date')['ret']
 
 
+def long_short_port(df_data, score_col, fee=TRADING_FEE):
+    """Top-decile long, bottom-decile short, value-weighted, NYSE breakpoints."""
+    monthly = []
+    prev_lw, prev_sw = {}, {}
+    for date, grp in df_data.groupby('date'):
+        nyse = grp[grp['exchcd'] == 1][score_col].dropna()
+        if len(nyse) < 10:
+            continue
+        lo, hi = nyse.quantile(0.10), nyse.quantile(0.90)
+        longs  = grp[grp[score_col] >= hi]
+        shorts = grp[grp[score_col] <= lo]
+        if longs['me'].sum() == 0 or shorts['me'].sum() == 0:
+            continue
+        lme = longs['me'].sum()
+        new_lw = (longs.set_index('permno')['me'] / lme).to_dict()
+        r_long = (longs['ret_fwd'] * longs['me']).sum() / lme
+        sme = shorts['me'].sum()
+        new_sw = (shorts.set_index('permno')['me'] / sme).to_dict()
+        r_short = (shorts['ret_fwd'] * shorts['me']).sum() / sme
+        tl = sum(abs(new_lw.get(p, 0) - prev_lw.get(p, 0)) for p in set(new_lw) | set(prev_lw)) / 2
+        ts = sum(abs(new_sw.get(p, 0) - prev_sw.get(p, 0)) for p in set(new_sw) | set(prev_sw)) / 2
+        monthly.append({'date': date, 'ret': r_long - r_short - fee * (tl + ts)})
+        prev_lw, prev_sw = new_lw, new_sw
+    return pd.DataFrame(monthly).set_index('date')['ret']
+
+
 def block_bootstrap_sharpe(r, n_boot=10000, block_len=12):
     """Block bootstrap 95% CI on annualized Sharpe ratio."""
     r = np.array(r)
@@ -186,7 +212,7 @@ def compute_dyn_score(data, a_bu, a_co, a_be, a_re):
 ghm_returns = {}
 for name, a in [('GHM SLOW (a=0)', 0.0), ('GHM MED (a=0.5)', 0.5), ('GHM FAST (a=1)', 1.0)]:
     test[f'score_{name}'] = compute_blended_score(test, a).values
-    ghm_returns[name] = long_only_port(test, f'score_{name}')
+    ghm_returns[name] = long_short_port(test, f'score_{name}')
 
 # DYN: grid search on training
 best_sharpe, best_pair = -999, (0.5, 0.5)
@@ -194,7 +220,7 @@ grid = np.arange(0.0, 1.05, 0.1)
 for a_co in grid:
     for a_re in grid:
         train['_dyn'] = compute_dyn_score(train, 0.5, a_co, 0.5, a_re).values
-        r = long_only_port(train, '_dyn')
+        r = long_short_port(train, '_dyn')
         if len(r) < 12:
             continue
         sh = r.mean() / r.std() * np.sqrt(12) if r.std() > 0 else 0
@@ -206,7 +232,7 @@ a_co_hat, a_re_hat = best_pair
 print(f"  DYN speeds: a_Co={a_co_hat:.2f}, a_Re={a_re_hat:.2f}")
 
 test['score_dyn'] = compute_dyn_score(test, 0.5, a_co_hat, 0.5, a_re_hat).values
-ghm_returns['GHM DYN'] = long_only_port(test, 'score_dyn')
+ghm_returns['GHM DYN'] = long_short_port(test, 'score_dyn')
 
 if '_dyn' in train.columns:
     train.drop(columns=['_dyn'], inplace=True)
@@ -244,7 +270,7 @@ if 'above_med' not in train.columns:
 lr_red = LogisticRegression(max_iter=1000, C=1.0)
 lr_red.fit(X_tr_red_s, train['above_med'].values)
 test['score_lr_red'] = lr_red.predict_proba(X_te_red_s)[:, 1]
-r_lr_red = long_only_port(test, 'score_lr_red')
+r_lr_red = long_short_port(test, 'score_lr_red')
 print(f"  M1: LR (mom+pi) — {len(r_lr_red)} monthly obs")
 
 # XGB: fit on reduced features (XGB handles NaN natively)
@@ -254,7 +280,7 @@ xgb_red = XGBRegressor(n_estimators=500, max_depth=4, learning_rate=0.05,
                         tree_method='hist', random_state=42, verbosity=0)
 xgb_red.fit(X_train_red, y_train_vals)
 test['score_xgb_red'] = xgb_red.predict(X_test_red)
-r_xgb_red = long_only_port(test, 'score_xgb_red')
+r_xgb_red = long_short_port(test, 'score_xgb_red')
 print(f"  M2: XGB (mom+pi) — {len(r_xgb_red)} monthly obs")
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -263,15 +289,27 @@ print(f"  M2: XGB (mom+pi) — {len(r_xgb_red)} monthly obs")
 
 print("[ 3/8 ] Table 1: Performance comparison ...")
 
+# Recompute all baseline strategies as long-short
+strats_ls = {}
+score_map = {
+    'Fixed 12-mo mom': 'score_mom12',
+    'Fixed 1-mo mom':  'score_mom1',
+    'Method 0: Formula': 'score_formula',
+    'Method 1: LR':    'score_lr',
+    'Method 2: XGB':   'score_xgb',
+}
+for sname, scol in score_map.items():
+    strats_ls[sname] = long_short_port(test, scol)
+
 all_strats = {
     'Market':               r_mkt,
-    'Fixed 12-mo mom':      strats_lo['Fixed 12-mo mom'],
-    'Fixed 1-mo mom':       strats_lo['Fixed 1-mo mom'],
-    'M0: Formula':          strats_lo['Method 0: Formula'],
+    'Fixed 12-mo mom':      strats_ls['Fixed 12-mo mom'],
+    'Fixed 1-mo mom':       strats_ls['Fixed 1-mo mom'],
+    'M0: Formula':          strats_ls['Method 0: Formula'],
     'M1: LR (mom+$\\pi$)':  r_lr_red,
-    'M1: LR':               strats_lo['Method 1: LR'],
+    'M1: LR':               strats_ls['Method 1: LR'],
     'M2: XGB (mom+$\\pi$)': r_xgb_red,
-    'M2: XGB':              strats_lo['Method 2: XGB'],
+    'M2: XGB':              strats_ls['Method 2: XGB'],
     'GHM SLOW':             ghm_returns['GHM SLOW (a=0)'],
     'GHM MED':              ghm_returns['GHM MED (a=0.5)'],
     'GHM FAST':             ghm_returns['GHM FAST (a=1)'],
@@ -331,7 +369,7 @@ tex_lines.append(r"\end{tabular}")
 tex_lines.append("")
 tex_lines.append(r"\medskip")
 tex_lines.append(r"\small")
-tex_lines.append(r"\textbf{Notes:} This table reports annualized return, annualized volatility, Sharpe ratio, 95\% block bootstrap confidence interval on the Sharpe ratio (block length = 12 months, 10{,}000 replications), maximum drawdown, Newey--West $t$-statistic for mean excess return over the market (HAC standard errors, 6 lags), and terminal wealth from \$1 invested. All strategies are long-only top-decile, value-weighted using NYSE breakpoints, and net of 10\,bps one-way transaction costs. The test period is January 2011 to November 2025 (167 months). ``mom+$\pi$'' denotes models trained on the 12 momentum lookbacks and the regime signal only, excluding fundamental features. $^{*}$\,$p<0.10$; $^{**}$\,$p<0.05$; $^{***}$\,$p<0.01$.")
+tex_lines.append(r"\textbf{Notes:} This table reports annualized return, annualized volatility, Sharpe ratio, 95\% block bootstrap confidence interval on the Sharpe ratio (block length = 12 months, 10{,}000 replications), maximum drawdown, Newey--West $t$-statistic for mean excess return over the market (HAC standard errors, 6 lags), and terminal wealth from \$1 invested. All strategies are long-short (top-decile long, bottom-decile short), value-weighted using NYSE breakpoints, and net of 10\,bps one-way transaction costs applied to both legs. The test period is January 2011 to November 2025 (167 months). ``mom+$\pi$'' denotes models trained on the 12 momentum lookbacks and the regime signal only, excluding fundamental features. $^{*}$\,$p<0.10$; $^{**}$\,$p<0.05$; $^{***}$\,$p<0.01$.")
 tex_lines.append(r"\end{table}")
 
 write_tex('table_performance.tex', '\n'.join(tex_lines))
@@ -389,7 +427,7 @@ tex_lines.append(r"\end{tabular}")
 tex_lines.append("")
 tex_lines.append(r"\medskip")
 tex_lines.append(r"\small")
-tex_lines.append(r"\textbf{Notes:} This table reports annualized Sharpe ratios computed over all test-period months (Full) and separately for months classified as calm ($\pi_t^{\text{filter}} < 0.5$) or panic ($\pi_t^{\text{filter}} \geq 0.5$). $N$ denotes the number of months in each regime. The Sharpe ratio is computed as $\bar{r}/\sigma(r) \times \sqrt{12}$ within each subset. Portfolio construction and transaction costs are as described in Table~\ref{tab:performance}.")
+tex_lines.append(r"\textbf{Notes:} This table reports annualized Sharpe ratios computed over all test-period months (Full) and separately for months classified as calm ($\pi_t^{\text{filter}} < 0.5$) or panic ($\pi_t^{\text{filter}} \geq 0.5$). $N$ denotes the number of months in each regime. The Sharpe ratio is computed as $\bar{r}/\sigma(r) \times \sqrt{12}$ within each subset. Portfolio construction (long-short, top vs.\ bottom decile) and transaction costs are as described in Table~\ref{tab:performance}.")
 tex_lines.append(r"\end{table}")
 
 write_tex('table_regime_sharpe.tex', '\n'.join(tex_lines))

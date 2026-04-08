@@ -134,6 +134,32 @@ def long_only_port(df_test, score_col, fee=TRADING_FEE):
         return pd.Series(dtype=float)
     return pd.DataFrame(monthly).set_index('date')['ret']
 
+def long_short_port(df_test, score_col, fee=TRADING_FEE):
+    monthly = []
+    prev_lw, prev_sw = {}, {}
+    for date, grp in df_test.groupby('date'):
+        nyse = grp[grp['exchcd'] == 1][score_col].dropna()
+        if len(nyse) < 10:
+            continue
+        lo, hi = nyse.quantile(0.10), nyse.quantile(0.90)
+        longs  = grp[grp[score_col] >= hi]
+        shorts = grp[grp[score_col] <= lo]
+        if longs['me'].sum() == 0 or shorts['me'].sum() == 0:
+            continue
+        lme = longs['me'].sum()
+        new_lw = (longs.set_index('permno')['me'] / lme).to_dict()
+        r_long = (longs['ret_fwd'] * longs['me']).sum() / lme
+        sme = shorts['me'].sum()
+        new_sw = (shorts.set_index('permno')['me'] / sme).to_dict()
+        r_short = (shorts['ret_fwd'] * shorts['me']).sum() / sme
+        tl = sum(abs(new_lw.get(p, 0) - prev_lw.get(p, 0)) for p in set(new_lw) | set(prev_lw)) / 2
+        ts = sum(abs(new_sw.get(p, 0) - prev_sw.get(p, 0)) for p in set(new_sw) | set(prev_sw)) / 2
+        monthly.append({'date': date, 'ret': r_long - r_short - fee * (tl + ts)})
+        prev_lw, prev_sw = new_lw, new_sw
+    if not monthly:
+        return pd.Series(dtype=float)
+    return pd.DataFrame(monthly).set_index('date')['ret']
+
 
 def metrics(r):
     r = pd.Series(r).dropna()
@@ -176,7 +202,7 @@ for name, features in variants.items():
     xgb.fit(X_train, y_train)
 
     test[f'score_{name}'] = xgb.predict(X_test)
-    r = long_only_port(test, f'score_{name}')
+    r = long_short_port(test, f'score_{name}')
     m = metrics(r)
     results[name] = m
 

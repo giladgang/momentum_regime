@@ -1,27 +1,30 @@
-\begin{table}[H]
+\begin{table}[htbp]
 \centering
-\small
-\begin{tabular}{l r r r r r r r r}
-\toprule
- & Ann.\ Ret & Ann.\ Vol & Sharpe & 95\% CI & Max DD & $\beta$ & NW $t$ & Final \$ \\
-\midrule
-Market & 11.9\% & 14.6\% & 0.84 & [0.40,\,1.44] & $-$24.7\% & 1.00 & -- & 4.8 \\
-\midrule
-Fixed 12-mo mom & 12.4\% & 19.2\% & 0.70 & [0.18,\,1.23] & $-$33.5\% & 1.09 & 0.41 & 5.1 \\
-Fixed 1-mo mom & 13.3\% & 20.1\% & 0.72 & [0.23,\,1.24] & $-$29.7\% & 1.12 & 0.64 & 5.7 \\
-M0: Formula & 12.9\% & 19.3\% & 0.73 & [0.19,\,1.31] & $-$36.5\% & 1.04 & 0.59 & 5.4 \\
-M1: LR & 14.8\% & 14.5\% & 1.03 & [0.55,\,1.61] & $-$25.2\% & 0.97 & 2.92$^{***}$ & 6.8 \\
-M2: XGB & 21.6\% & 21.8\% & 1.01 & [0.48,\,1.52] & $-$26.1\% & 1.24 & 2.78$^{***}$ & 14.7 \\
-\midrule
-\multicolumn{9}{l}{\emph{GHM benchmarks \citep{GHM2023}}} \\
-GHM MED & 12.4\% & 17.8\% & 0.75 & [0.26,\,1.31] & $-$32.8\% & 1.02 & 0.40 & 5.1 \\
-GHM DYN & 13.7\% & 18.3\% & 0.80 & [0.33,\,1.30] & $-$27.5\% & 1.04 & 0.94 & 6.0 \\
-\bottomrule
-\end{tabular}
 \caption{Out-of-sample portfolio performance.}
 \label{tab:performance}
+\small
+\begin{tabular}{l r r r r r r r}
+\toprule
+ & Ann.\ Ret & Ann.\ Vol & Sharpe & 95\% CI & Max DD & NW $t$ & Final \$ \\
+\midrule
+Market & 11.9% & 14.6% & 0.84 & [0.40,\,1.44] & -24.7% & -- & 4.8 \\
+\midrule
+Fixed 12-mo mom & -1.9% & 26.1% & 0.06 & [-0.48,\,0.51] & -72.3% & -1.22 & 0.8 \\
+Fixed 1-mo mom & 3.1% & 17.6% & 0.26 & [-0.24,\,0.67] & -30.2% & -1.35 & 1.5 \\
+M0: Formula & 2.4% & 23.4% & 0.22 & [-0.28,\,0.61] & -56.9% & -0.94 & 1.4 \\
+M1: LR (mom+$\pi$) & -1.6% & 15.1% & -0.03 & [-0.38,\,0.45] & -43.1% & -2.48** & 0.8 \\
+M1: LR & -0.6% & 15.7% & 0.04 & [-0.52,\,0.62] & -54.4% & -1.79* & 0.9 \\
+M2: XGB (mom+$\pi$) & 9.4% & 20.3% & 0.54 & [0.14,\,0.96] & -30.6% & -0.26 & 3.5 \\
+M2: XGB & 10.3% & 15.1% & 0.73 & [0.41,\,1.10] & -17.1% & -0.32 & 3.9 \\
+\midrule
+GHM SLOW & -1.8% & 26.1% & 0.07 & [-0.46,\,0.51] & -72.3% & -1.22 & 0.8 \\
+GHM MED & 0.2% & 21.7% & 0.12 & [-0.39,\,0.55] & -62.5% & -1.40 & 1.0 \\
+GHM FAST & 3.1% & 17.6% & 0.26 & [-0.24,\,0.69] & -30.3% & -1.35 & 1.5 \\
+GHM DYN & -2.1% & 22.8% & 0.03 & [-0.47,\,0.51] & -69.5% & -1.54 & 0.7 \\
+\bottomrule
+\end{tabular}
 
 \medskip
 \small
-\textbf{Notes:} This table reports annualized return, annualized volatility, Sharpe ratio, 95\% block bootstrap confidence interval on the Sharpe ratio (block length = 12 months, 10{,}000 replications), maximum drawdown, CAPM beta (from regressing portfolio returns on market returns), Newey--West $t$-statistic for mean excess return over the market (HAC standard errors, 6 lags), and terminal wealth from \$1 invested. All strategies are long-only top-decile, value-weighted using NYSE breakpoints, and net of 10\,bps one-way transaction costs. The test period is January 2011 to November 2025 (167 months). The HMM regime signal is averaged over 5 independent Gibbs sampler seeds. GHM SLOW ($a=0$, pure 12-month momentum) and GHM FAST ($a=1$, pure 1-month momentum) are omitted as they coincide with Fixed 12-mo and Fixed 1-mo above. $^{*}$\,$p<0.10$; $^{**}$\,$p<0.05$; $^{***}$\,$p<0.01$.
+\textbf{Notes:} This table reports annualized return, annualized volatility, Sharpe ratio, 95\% block bootstrap confidence interval on the Sharpe ratio (block length = 12 months, 10{,}000 replications), maximum drawdown, Newey--West $t$-statistic for mean excess return over the market (HAC standard errors, 6 lags), and terminal wealth from \$1 invested. All strategies are long-short (top-decile long, bottom-decile short), value-weighted using NYSE breakpoints, and net of 10\,bps one-way transaction costs applied to both legs. The test period is January 2011 to November 2025 (167 months). ``mom+$\pi$'' denotes models trained on the 12 momentum lookbacks and the regime signal only, excluding fundamental features. $^{*}$\,$p<0.10$; $^{**}$\,$p<0.05$; $^{***}$\,$p<0.01$.
 \end{table}

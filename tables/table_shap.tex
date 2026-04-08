@@ -1,20 +1,20 @@
-\begin{table}[H]
+\begin{table}[htbp]
 \centering
+\caption{SHAP feature importance for the XGBoost model (Method~2). Mean absolute SHAP values computed on the test set. The 12 momentum lookbacks are aggregated into a single entry. Columns show importance overall and split by regime.}
+\label{tab:shap}
 \begin{tabular}{c l r r r}
 \toprule
 Rank & Feature & Overall & Calm & Panic \\
 \midrule
-1 & Momentum (aggregate) & 0.0172 & 0.0156 & 0.0209 \\
-2 & $\pi^{\text{filter}}$ & 0.0166 & 0.0151 & 0.0199 \\
-3 & Book-to-market & 0.0053 & 0.0048 & 0.0067 \\
-4 & Log market equity & 0.0049 & 0.0047 & 0.0053 \\
-5 & Return on equity & 0.0033 & 0.0029 & 0.0042 \\
-6 & Asset growth & 0.0026 & 0.0026 & 0.0027 \\
-7 & Gross profitability & 0.0025 & 0.0022 & 0.0031 \\
-8 & Leverage & 0.0008 & 0.0008 & 0.0008 \\
-9 & Earnings growth & 0.0006 & 0.0006 & 0.0007 \\
+1 & Momentum (aggregate) & 0.0181 & 0.0150 & 0.0251 \\
+2 & $\pi^{\text{filter}}$ & 0.0161 & 0.0132 & 0.0223 \\
+3 & Log market equity & 0.0055 & 0.0049 & 0.0066 \\
+4 & Book-to-market & 0.0051 & 0.0048 & 0.0060 \\
+5 & Return on equity & 0.0033 & 0.0029 & 0.0040 \\
+6 & Asset growth & 0.0025 & 0.0021 & 0.0034 \\
+7 & Gross profitability & 0.0024 & 0.0020 & 0.0032 \\
+8 & Leverage & 0.0007 & 0.0006 & 0.0010 \\
+9 & Earnings growth & 0.0007 & 0.0006 & 0.0008 \\
 \bottomrule
 \end{tabular}
-\caption{SHAP feature importance for the XGBoost model (Method~2). Mean absolute SHAP values computed on the test set. The 12 momentum lookbacks are aggregated into a single entry. Columns show importance overall and split by regime.}
-\label{tab:shap}
 \end{table}

@@ -1,27 +1,29 @@
-\begin{table}[H]
+\begin{table}[htbp]
 \centering
-\begin{tabular}{l r r r}
-\toprule
- & Full & Calm & Panic \\
-\midrule
-Market & 0.84 & 0.67 & 1.15 \\
-\midrule
-Fixed 12-mo mom & 0.70 & 0.38 & 1.25 \\
-Fixed 1-mo mom & 0.72 & 0.42 & 1.24 \\
-M0: Formula & 0.73 & 0.41 & 1.27 \\
-M1: LR & 1.03 & 0.80 & 1.45 \\
-M2: XGB & 1.01 & 0.77 & 1.43 \\
-\midrule
-GHM SLOW & 0.70 & 0.38 & 1.25 \\
-GHM MED & 0.75 & 0.44 & 1.28 \\
-GHM FAST & 0.72 & 0.42 & 1.24 \\
-GHM DYN & 0.80 & 0.50 & 1.30 \\
-\bottomrule
-\end{tabular}
 \caption{Regime-conditional Sharpe ratios.}
 \label{tab:regime_sharpe}
+\begin{tabular}{l r r r r r}
+\toprule
+ & Full & Calm & Panic & $N_{\text{calm}}$ & $N_{\text{panic}}$ \\
+\midrule
+Market & 0.84 & 0.67 & 1.15 & 116 & 51 \\
+\midrule
+Fixed 12-mo mom & 0.06 & 0.30 & -0.29 & 116 & 51 \\
+Fixed 1-mo mom & 0.26 & 0.45 & 0.07 & 116 & 51 \\
+M0: Formula & 0.22 & 0.30 & 0.07 & 116 & 51 \\
+M1: LR (mom+$\pi$) & -0.03 & 0.03 & -0.11 & 116 & 51 \\
+M1: LR & 0.04 & 0.03 & 0.05 & 116 & 51 \\
+M2: XGB (mom+$\pi$) & 0.54 & 0.26 & 0.96 & 116 & 51 \\
+M2: XGB & 0.73 & 0.67 & 0.88 & 116 & 51 \\
+\midrule
+GHM SLOW & 0.07 & 0.30 & -0.29 & 116 & 51 \\
+GHM MED & 0.12 & 0.30 & -0.12 & 116 & 51 \\
+GHM FAST & 0.26 & 0.45 & 0.07 & 116 & 51 \\
+GHM DYN & 0.03 & 0.13 & -0.16 & 116 & 51 \\
+\bottomrule
+\end{tabular}
 
 \medskip
 \small
-\textbf{Notes:} Annualized Sharpe ratios computed over all test-period months (Full) and separately for months classified as calm ($\pi_t^{\text{filter}} < 0.5$, 112 months) or panic ($\pi_t^{\text{filter}} \geq 0.5$, 55 months). Portfolio construction and transaction costs are as described in Table~\ref{tab:performance}.
+\textbf{Notes:} This table reports annualized Sharpe ratios computed over all test-period months (Full) and separately for months classified as calm ($\pi_t^{\text{filter}} < 0.5$) or panic ($\pi_t^{\text{filter}} \geq 0.5$). $N$ denotes the number of months in each regime. The Sharpe ratio is computed as $\bar{r}/\sigma(r) \times \sqrt{12}$ within each subset. Portfolio construction (long-short, top vs.\ bottom decile) and transaction costs are as described in Table~\ref{tab:performance}.
 \end{table}
