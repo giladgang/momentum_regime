@@ -70,37 +70,38 @@ In panic months, the profile inverts. The long side holds beaten-down stocks wit
 
 The reversal mechanism has a clear time structure. At the 1-month horizon, panic reversal bets are profitable: the long-short spread is +0.60\%. However, at 3 months the spread turns sharply negative ($-$4.85\%), and at 6 months it is $-$5.70\%. The 1-month time scale is consistent with the institutional mechanics of forced selling: margin calls are typically settled within days to weeks, mutual fund redemptions are processed within 30 days, and portfolio rebalancing by risk-managed funds occurs at month-end. Once this selling pressure subsides, prices revert. If the reversal instead reflected fundamental mispricing, it would persist over longer horizons. Monthly rebalancing is therefore essential: holding the panic portfolio for longer than one month would transform a profitable strategy into a losing one.
 
-\subsubsection{Stress Test: What If Reversal Stops Working?}\label{sec:stress_test}
+\subsubsection{Stress Test: Prolonged Bear Market}\label{sec:stress_test}
 
-M2's panic-period performance depends on a specific bet: that stocks which recently fell will bounce back within one month, while ``safe'' stocks that held up will lag. This bet is profitable when the decline is driven by temporary selling pressure -- margin calls, fund redemptions, panic -- that pushes prices below their fair value. Once the pressure subsides, prices revert, and M2 profits from the spread between the recovery of beaten-down stocks and the stagnation of defensive ones. In the test period, this produces a panic-month long-short spread of 3.09\% per month.
+M2's panic-period performance depends on a specific bet: that stocks which recently fell will bounce back within one month, while ``safe'' stocks that held up will lag. This bet is profitable when the decline is driven by temporary selling pressure -- margin calls, fund redemptions, panic -- that pushes prices below their fair value. Once the pressure subsides, prices revert, and M2 profits from the spread. In the test period, this produces a panic-month long-short spread of 3.09\% per month.
 
-But what happens when the decline is not temporary? In a genuine economic deterioration -- a depression, a banking crisis, or a structural decline -- beaten-down stocks fall because their businesses are failing, not because of temporary mispricing. In this scenario, M2's reversal bets become losses: the beaten-down stocks it buys keep falling, while the defensive stocks it shorts hold their value or recover. This is what we call \emph{reversal failure}.
+But what happens when the decline is not temporary? In a genuine economic deterioration -- a depression, a banking crisis, or a structural decline -- beaten-down stocks fall because their businesses are failing, not because of temporary mispricing. M2's reversal bets become losses: the stocks it buys keep falling, while the defensive stocks it shorts hold their value. This is what we call \emph{reversal failure} -- and the natural question is how long a recession the strategy can survive.
 
-To understand how vulnerable the strategy is to this risk, we simulate four progressively worse scenarios. In each scenario, we take the actual panic-month returns and replace them: in the mildest case, the reversal premium is set to zero (the beaten-down stocks neither recover nor fall further); in the worst case, the returns are fully inverted (every reversal bet produces a loss of equal magnitude).
+To answer this, we simulate recessions of increasing duration. In each simulation, a block of consecutive months is replaced with the average return M2 earns during its actual losing panic months ($-$3.51\% per month), while all other months retain their observed returns. The simulation is repeated at every possible insertion point to capture the worst-case timing.
 
 \begin{table}[H]
 \centering
 \small
-\begin{tabular}{l r r r}
+\begin{tabular}{l r r r r}
 \toprule
-Scenario & Sharpe & Max DD & Cumulative \\
+Recession Duration & Recession Loss & Sharpe (median) & Sharpe (worst) & MDD (worst) \\
 \midrule
-Baseline (reversal works as observed) & 1.08 & $-$22.5\% & +1{,}250\% \\
-Reversal premium disappears (zero spread) & 0.65 & $-$22.5\% & +220\% \\
-Reversal partially fails (50\% loss) & 0.19 & $-$41.3\% & +30\% \\
-Reversal mostly fails (75\% loss) & 0.00 & $-$51.2\% & $-$20\% \\
-Reversal fully inverts (100\% loss) & $-$0.15 & $-$68.2\% & $-$52\% \\
+Baseline (no recession) & --- & 1.11 & 1.11 & $-$22.5\% \\
+3 months & $-$10.2\% & 1.05 & 0.99 & $-$39.6\% \\
+6 months & $-$19.3\% & 1.00 & 0.90 & $-$43.2\% \\
+12 months & $-$34.9\% & 0.88 & 0.75 & $-$51.0\% \\
+18 months & $-$47.4\% & 0.77 & 0.58 & $-$62.3\% \\
+24 months & $-$57.6\% & 0.67 & 0.44 & $-$70.1\% \\
 \bottomrule
 \end{tabular}
-\caption{Stress test: progressive reversal failure. Each row degrades the panic-month reversal premium from its observed value to full inversion. ``50\% loss'' means each panic-month return is replaced by half its negative (e.g., a +4\% reversal gain becomes a $-$2\% loss). The strategy degrades gradually because calm-period continuation (Sharpe 0.82) provides a floor independent of the reversal premium.}
+\caption{Prolonged bear market simulation. Each row injects a recession of the specified duration into the test period, during which M2 loses 3.51\% per month (the average of its actual losing panic months). ``Median'' and ``worst'' reflect variation across all possible insertion points. The Sharpe ratio is computed over all 167 test months.}
 \label{tab:stress_scenarios}
 \end{table}
 
-Two findings emerge. First, the degradation is gradual, not catastrophic. The Sharpe ratios in the table are computed over \emph{all} 167 test months, not just panic months. If the reversal premium disappears (row 2), the 59 panic months contribute zero return, but the 108 calm months still earn from momentum continuation -- producing a combined Sharpe of 0.65. The calm regime acts as a floor: even if panic-period bets break entirely, two-thirds of the strategy's months remain unaffected. Even if half of reversal bets actively lose money (row 3), the calm-period gains partially offset these losses and the strategy remains marginally profitable. Only when reversal bets \emph{consistently produce losses} (rows 4--5) does the overall strategy break. This means the strategy can tolerate a weakened or unreliable reversal premium; it breaks only under sustained, systematic reversal failure.
+The strategy is resilient to short recessions: a 6-month downturn reduces the worst-case Sharpe to 0.90, still a strong result. A 12-month recession -- roughly the length of the 2008--2009 crisis -- brings the worst-case Sharpe to 0.75 with a maximum drawdown of $-$51\%. The strategy remains profitable because the 108 calm months (two-thirds of the sample) continue to earn from momentum continuation regardless of what happens during the recession. Only a depression-length downturn of 24 months pushes the worst-case Sharpe to 0.44 with a drawdown of $-$70\%, which would be painful but still positive.
 
-Second, the historical stress periods in the 2011--2025 test sample actually \emph{confirm} the reversal mechanism: M2 earned +30.3\% during the COVID crash (February--April 2020) and +14.9\% during the 2022 bear market (January--October 2022). In both cases, the decline was liquidity-driven and reversed within months, exactly the pattern M2 exploits.
+The historical stress periods in the test sample confirm the reversal mechanism: M2 earned +30.3\% during the COVID crash (February--April 2020) and +14.9\% during the 2022 bear market (January--October 2022). In both cases, the decline was temporary and reversed within months.
 
-The scenario that would break the strategy -- a prolonged, fundamental-driven decline where beaten-down stocks never recover, as in the Great Depression or Japan's lost decades -- has not occurred in the test period. This mirrors the vulnerability identified by \citet{DanielMoskowitz2016} for traditional momentum, but on the opposite side: standard long-short momentum crashes when winners stop winning (the 2009 rebound); the regime-conditioned strategy would crash when losers stop reverting. The hybrid approach combining stock selection with exposure scaling (Section~\ref{sec:future_work}) is designed precisely for this contingency.
+The scenario that would truly break the strategy -- a sustained fundamental deterioration where beaten-down stocks never recover, as in the Great Depression or Japan's lost decades -- has not occurred in the 2011--2025 test period. This mirrors the vulnerability identified by \citet{DanielMoskowitz2016} for traditional momentum, but on the opposite side: standard momentum crashes when winners stop winning; the regime-conditioned strategy would struggle when losers stop reverting. The hybrid approach combining stock selection with exposure scaling (Section~\ref{sec:future_work}) is designed precisely for this contingency.
 
 \subsubsection{Model-Free Confirmation: Information Coefficient Rotation}\label{sec:ic_analysis}
 
