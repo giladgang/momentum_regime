@@ -251,6 +251,10 @@ A further concern is that XGBoost's improvement from adding $\pi_t^{\text{filter
 
 The real HMM signal roughly doubles the Sharpe ratio (0.97 vs.\ 0.48 without), confirming that the regime signal's contribution is specific and economically meaningful.
 
+\subsection{M1 Polynomial and Interaction Tests}\label{app:m1_poly}
+
+To rule out the possibility that M1's failure is due to insufficient flexibility rather than a fundamental limitation of linear models, the logistic regression is augmented with polynomial terms ($\pi^2$, $\pi^3$, $\pi^4$) and explicit interaction terms ($\pi \times mom_k$ for all 12 horizons). The polynomial terms leave the Sharpe near zero, while the interaction terms recover only a fraction of M2's performance. This confirms that the regime-momentum interaction involves higher-order conditional logic that tree-based models capture but linear models, even with augmented feature spaces, cannot.
+
 \subsection{Emission Distribution Robustness}\label{app:emission_robustness}
 
 The observation equation assumes multivariate Gaussian emissions (Equation~1). Shapiro--Wilk tests reject within-regime normality for seven of eight feature--regime pairs, primarily due to left skew in drawdown (skewness $-1.6$ in calm) and right skew in dispersion and relative participation. To assess whether this misspecification affects regime identification, the HMM is re-estimated with multivariate Student-$t$ emissions across a grid of degrees of freedom $\nu \in \{3, 5, 7, 10, 15, 20, 30, 50, 100\}$.
