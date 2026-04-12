@@ -1,7 +1,5 @@
 \begin{table}[htbp]
 \centering
-\caption{Regime-conditional Sharpe ratios.}
-\label{tab:regime_sharpe}
 \begin{tabular}{l r r r r r}
 \toprule
  & Full & Calm & Panic & $N_{\text{calm}}$ & $N_{\text{panic}}$ \\
@@ -26,4 +24,6 @@ GHM DYN & 0.03 & 0.11 & -0.11 & 108 & 59 \\
 \medskip
 \small
 \textbf{Notes:} This table reports annualized Sharpe ratios computed over all test-period months (Full) and separately for months classified as calm ($\pi_t^{\text{filter}} < 0.5$) or panic ($\pi_t^{\text{filter}} \geq 0.5$). $N$ denotes the number of months in each regime. The Sharpe ratio is computed as $\bar{r}/\sigma(r) \times \sqrt{12}$ within each subset. Portfolio construction (long-short, top vs.\ bottom decile) and transaction costs are as described in Table~\ref{tab:performance}.
+\caption{Regime-conditional Sharpe ratios.}
+\label{tab:regime_sharpe}
 \end{table}

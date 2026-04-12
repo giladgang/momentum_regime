@@ -1,7 +1,5 @@
 \begin{table}[htbp]
 \centering
-\caption{SHAP feature importance for the XGBoost model (Method~2). Mean absolute SHAP values computed on the test set. The 12 momentum lookbacks are aggregated into a single entry. Columns show importance overall and split by regime.}
-\label{tab:shap}
 \begin{tabular}{c l r r r}
 \toprule
 Rank & Feature & Overall & Calm & Panic \\
@@ -17,4 +15,6 @@ Rank & Feature & Overall & Calm & Panic \\
 9 & Earnings growth & 0.0007 & 0.0006 & 0.0008 \\
 \bottomrule
 \end{tabular}
+\caption{SHAP feature importance for the XGBoost model (Method~2). Mean absolute SHAP values computed on the test set. The 12 momentum lookbacks are aggregated into a single entry. Columns show importance overall and split by regime.}
+\label{tab:shap}
 \end{table}
