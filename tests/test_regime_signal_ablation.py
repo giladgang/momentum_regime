@@ -96,13 +96,11 @@ stocks['log_me'] = np.log(
 stocks['ret_fwd'] = stocks.groupby('permno')['ret_adj'].transform(lambda x: x.shift(-1))
 
 MOM_FEATURES = [f'mom_{lb}' for lb in MOM_LBS]
-FUND_FEATURES = ['bm', 'roe', 'earnings_growth', 'leverage', 'asset_growth',
-                 'gross_profit_a', 'log_me']
 
-# Three feature sets
-FEATURES_PI = MOM_FEATURES + ['pi_filter'] + FUND_FEATURES
-FEATURES_GHM = MOM_FEATURES + ['ghm_cycle'] + FUND_FEATURES
-FEATURES_NONE = MOM_FEATURES + FUND_FEATURES
+# Three feature sets (momentum + regime signal only, no fundamentals)
+FEATURES_PI = MOM_FEATURES + ['pi_filter']
+FEATURES_GHM = MOM_FEATURES + ['ghm_cycle']
+FEATURES_NONE = MOM_FEATURES
 
 CORE_DROP = MOM_FEATURES + ['log_me', 'ret_fwd']
 df = stocks.dropna(subset=CORE_DROP).copy().reset_index(drop=True)

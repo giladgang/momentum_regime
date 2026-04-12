@@ -5,17 +5,18 @@
 \toprule
 Configuration & Sharpe & Ann.\ Ret & Ann.\ Vol \\
 \midrule
-depth=3, lr=0.05, $n$=500          & 0.90 & 14.1\% & 15.5\% \\
-\textbf{depth=4, lr=0.05, $n$=500 (baseline)} & \textbf{0.94} & \textbf{16.5\%} & \textbf{17.6\%} \\
-depth=5, lr=0.05, $n$=500          & 0.95 & 17.3\% & 18.1\% \\
+depth=3, lr=0.05, $n$=500                & 1.06 & 20.7\% & 19.7\% \\
+depth=4, lr=0.05, $n$=500                & 1.08 & 20.6\% & 19.1\% \\
+depth=5, lr=0.05, $n$=500                & 0.95 & 17.9\% & 19.3\% \\
+depth=6, lr=0.05, $n$=500                & 0.91 & 17.1\% & 19.4\% \\
 \midrule
-depth=4, lr=0.01, $n$=500          & 0.94 & 14.2\% & 15.2\% \\
-depth=4, lr=0.10, $n$=500          & 0.76 & 12.9\% & 17.0\% \\
+depth=4, lr=0.01, $n$=500                & 0.89 & 16.8\% & 19.6\% \\
+depth=4, lr=0.10, $n$=500                & 1.00 & 18.5\% & 18.8\% \\
 \midrule
-depth=4, lr=0.05, $n$=200          & 0.90 & 15.6\% & 17.4\% \\
-depth=4, lr=0.05, $n$=1000         & 0.97 & 16.8\% & 17.3\% \\
+depth=4, lr=0.05, $n$=200                & 1.06 & 20.4\% & 19.3\% \\
+depth=4, lr=0.05, $n$=1000               & 0.93 & 17.1\% & 19.0\% \\
 \bottomrule
 \end{tabular}
-\caption{XGBoost hyperparameter sensitivity (long-short construction). Each row varies one hyperparameter from the baseline using a single XGBoost seed to isolate the parameter effect. The production model (Table~\ref{tab:performance}) averages 50 seeds for additional stability. The Sharpe ratio ranges from 0.76 to 0.97 across all configurations tested. Performance is robust to moderate perturbations in tree depth and ensemble size. Only the aggressive learning rate (0.10) degrades performance substantially.}
+\caption{XGBoost hyperparameter sensitivity (long-short). Each row varies one hyperparameter from the baseline. The baseline is not the single best configuration, but all variants outperform unconditional momentum.}
 \label{tab:xgb_hyperparams}
 \end{table}

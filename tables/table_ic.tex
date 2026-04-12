@@ -1,18 +1,18 @@
 \begin{table}[htbp]
 \centering
+\caption{Monthly information coefficients (Spearman rank correlation between stock scores and realised forward returns). $t$-statistics test $H_0\!: \text{IC} = 0$. Bottom panel reports paired $t$-tests for the difference in IC between combined models and momentum alone.}
+\label{tab:ic}
 \begin{tabular}{l r r r r r r}
 \toprule
 Signal & Mean IC & Std & $t$ & Calm IC & Panic IC & $N$ \\
 \midrule
 Momentum (mom\_12) & 0.0268 & 0.1099 & 3.15*** & 0.0274 & 0.0259 & 167 \\
-M1: LR & 0.0545 & 0.0889 & 7.90*** & 0.0563 & 0.0513 & 167 \\
-M2: XGB & 0.0091 & 0.0827 & 1.42 & 0.0142 & -0.0002 & 167 \\
+M1: LR & 0.0068 & 0.0665 & 1.32 & 0.0040 & 0.0119 & 167 \\
+M2: XGB & -0.0042 & 0.0752 & -0.72 & -0.0036 & -0.0054 & 167 \\
 \midrule
 \multicolumn{7}{l}{\textit{Paired differences (vs.\ momentum)}} \\
-M1: LR $-$ Mom & +0.0277 & & 2.81*** & & & \\
-M2: XGB $-$ Mom & -0.0177 & & -1.72* & & & \\
+M1: LR $-$ Mom & -0.0200 & & -2.34** & & & \\
+M2: XGB $-$ Mom & -0.0311 & & -2.93*** & & & \\
 \bottomrule
 \end{tabular}
-\caption{Monthly information coefficients (Spearman rank correlation between stock scores and realised forward returns). $t$-statistics test $H_0\!: \text{IC} = 0$. Bottom panel reports paired $t$-tests for the difference in IC between combined models and momentum alone.}
-\label{tab:ic}
 \end{table}

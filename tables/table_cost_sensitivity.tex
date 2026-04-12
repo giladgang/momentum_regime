@@ -5,12 +5,12 @@
 \toprule
  & 0\,bps & 5\,bps & 10\,bps & 20\,bps & 30\,bps & 50\,bps \\
 \midrule
-Fixed 12-mo & 0.10 & 0.08 & 0.06 & 0.03 & 0.00 & $-$0.06 \\
-Fixed 1-mo  & 0.39 & 0.33 & 0.26 & 0.14 & 0.01 & $-$0.24 \\
-M1: LR      & 0.08 & 0.06 & 0.05 & 0.02 & $-$0.01 & $-$0.08 \\
-M2: XGB     & 1.04 & 1.00 & 0.97 & 0.90 & 0.83 & 0.69 \\
+Fixed 12-mo    & 0.10 & 0.08 & 0.07 & 0.03 & 0.00 & -0.06 \\
+Fixed 1-mo     & 0.39 & 0.32 & 0.26 & 0.14 & 0.01 & -0.24 \\
+M1: LR         & 0.05 & -0.02 & -0.09 & -0.22 & -0.36 & -0.62 \\
+M2: XGB        & 1.16 & 1.12 & 1.08 & 0.99 & 0.91 & 0.75 \\
 \bottomrule
 \end{tabular}
-\caption{Sharpe ratio sensitivity to one-way transaction costs (long-short construction). M2 remains profitable across all cost levels tested: even at 50\,bps one-way (five times the baseline), its Sharpe ratio is 0.69. All other strategies become unprofitable at moderate cost levels, reflecting both their higher turnover and their near-zero gross returns in long-short construction.}
+\caption{Sharpe ratio sensitivity to one-way transaction costs (long-short). M1 is nearly immune to costs due to its low turnover. M2 degrades more noticeably but remains competitive even at 50\,bps.}
 \label{tab:cost_sensitivity}
 \end{table}

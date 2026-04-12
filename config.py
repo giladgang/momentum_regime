@@ -57,8 +57,8 @@ COLSAMPLE = 0.8
 # ═══════════════════════════════════════════════════════════════════════════════
 
 # Whether to include fundamental features in the cross-sectional model
-# Set to False for the D&M comparison (momentum + pi_filter only)
-USE_FUNDAMENTALS = True
+# Set to False for baseline (momentum + pi_filter only)
+USE_FUNDAMENTALS = False
 
 # Momentum lookback horizons (months)
 MOM_LOOKBACKS = list(range(1, 13))

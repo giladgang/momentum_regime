@@ -61,11 +61,9 @@ stocks = stocks.merge(panel[['date', 'pi_filter']], on='date', how='left')
 stocks['pi_filter'] = stocks['pi_filter'].ffill()
 
 MOM_FEATURES = [f'mom_{lb}' for lb in MOM_LBS]
-FUND_FEATURES = ['bm', 'roe', 'earnings_growth', 'leverage', 'asset_growth',
-                 'gross_profit_a', 'log_me']
-FEATURES = MOM_FEATURES + ['pi_filter'] + FUND_FEATURES
-FEATURES_NO_PI = MOM_FEATURES + FUND_FEATURES
-CORE_FEATURES = MOM_FEATURES + ['pi_filter', 'log_me']
+FEATURES = MOM_FEATURES + ['pi_filter']
+FEATURES_NO_PI = MOM_FEATURES
+CORE_FEATURES = MOM_FEATURES + ['pi_filter']
 
 TRADING_FEE = CFG_TRADING_FEE
 

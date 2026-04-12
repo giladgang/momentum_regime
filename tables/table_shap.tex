@@ -1,27 +1,13 @@
-\begin{table}[H]
+\begin{table}[htbp]
 \centering
-\small
+\caption{SHAP feature importance for the XGBoost model (Method~2). Mean absolute SHAP values computed on the test set. The 12 momentum lookbacks are aggregated into a single entry. Columns show importance overall and split by regime.}
+\label{tab:shap}
 \begin{tabular}{c l r r r}
 \toprule
 Rank & Feature & Overall & Calm & Panic \\
 \midrule
-1 & Momentum (aggregate) & 0.0211 & 0.0177 & 0.0272 \\
-2 & $\pi^{\text{filter}}$ & 0.0168 & 0.0162 & 0.0180 \\
-\midrule
-3 & $mom_{11}$ & 0.0042 & 0.0038 & 0.0049 \\
-4 & $mom_{12}$ & 0.0031 & 0.0025 & 0.0042 \\
-5 & $mom_{9}$ & 0.0027 & 0.0021 & 0.0038 \\
-6 & $mom_{8}$ & 0.0022 & 0.0020 & 0.0027 \\
-7 & $mom_{1}$ & 0.0015 & 0.0011 & 0.0023 \\
-8 & $mom_{10}$ & 0.0013 & 0.0011 & 0.0018 \\
-9 & $mom_{5}$ & 0.0013 & 0.0010 & 0.0018 \\
-10 & $mom_{4}$ & 0.0012 & 0.0011 & 0.0014 \\
-11 & $mom_{6}$ & 0.0010 & 0.0010 & 0.0011 \\
-12 & $mom_{2}$ & 0.0009 & 0.0007 & 0.0014 \\
-13 & $mom_{7}$ & 0.0009 & 0.0008 & 0.0010 \\
-14 & $mom_{3}$ & 0.0007 & 0.0006 & 0.0008 \\
+1 & Momentum (aggregate) & 0.0211 & 0.0174 & 0.0277 \\
+2 & $\pi^{\text{filter}}$ & 0.0172 & 0.0164 & 0.0187 \\
 \bottomrule
 \end{tabular}
-\caption{SHAP feature importance for the XGBoost model (M2, mom+$\pi$ specification). Mean absolute SHAP values computed on the test set. The first two rows show aggregate momentum (sum of all 12 horizons) and the regime signal; the remaining rows show individual momentum horizons. Columns report importance overall and split by regime. The regime signal's importance increases during panic, while momentum importance rises even more sharply, reflecting the model's regime-conditional reweighting of horizons.}
-\label{tab:shap}
 \end{table}

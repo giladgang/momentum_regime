@@ -67,12 +67,9 @@ stocks['trail_var'] = (
 
 # Features
 MOM_FEATURES = [f'mom_{lb}' for lb in MOM_LBS]
-FEATURES = MOM_FEATURES + [
-    'pi_filter', 'bm', 'roe', 'earnings_growth',
-    'leverage', 'asset_growth', 'gross_profit_a', 'log_me',
-]
+FEATURES = MOM_FEATURES + ['pi_filter']
 
-CORE_FEATURES = MOM_FEATURES + ['pi_filter', 'log_me']
+CORE_FEATURES = MOM_FEATURES + ['pi_filter']
 df = stocks.dropna(subset=['ret_fwd', 'trail_var'] + CORE_FEATURES).copy()
 df = df.reset_index(drop=True)
 
