@@ -68,7 +68,9 @@ Other strategies cannot adapt to this regime shift. Fixed momentum holds past wi
 
 \subsection{The Momentum-Regime Interaction}\label{sec:ic_analysis}
 
-The regime-dependent behaviour of M2 can be understood without reference to any model by examining the raw information coefficient (IC) of each momentum horizon. The IC measures the Spearman rank correlation between a momentum signal and subsequent stock returns, computed cross-sectionally each month. If momentum's predictive structure changes with the regime, the IC should differ systematically between calm and panic months.
+The preceding analysis shows that XGBoost exploits the regime signal to produce significant long-short returns. A natural concern is whether this reflects genuine economic structure or model-specific overfitting. This section provides \emph{model-free} evidence that the regime-momentum interaction exists in the raw data, independent of any machine learning model or hyperparameter choice.
+
+The information coefficient (IC) measures the Spearman rank correlation between a momentum signal and subsequent stock returns, computed cross-sectionally each month. By examining the average IC of each of the 12 momentum horizons separately in calm and panic months, we can test directly whether momentum's predictive structure changes with the regime -- without involving XGBoost, logistic regression, or any other model.
 
 Table~\ref{tab:ic_rotation} reports the average IC and its $t$-statistic for each of the 12 momentum lookback horizons, split by regime.
 
