@@ -4,11 +4,10 @@ The primary objective of this thesis is not to maximise out-of-sample returns bu
 
 All strategies are evaluated out-of-sample on the test period (January 2011 to November 2025, 167 months). Each method produces a long-short portfolio: the top decile of stocks (the \emph{long side}) is bought, and the bottom decile (the \emph{short side}) is sold. Both sides are value-weighted using NYSE breakpoints, rebalanced monthly with one-way transaction costs of 10 basis points. Long-short construction is the standard in the momentum literature \citep{JegadeeshTitman1993, DanielMoskowitz2016, BarrosoSantaClara2015} because it isolates the momentum anomaly from market beta, providing a cleaner test of stock selection skill.
 
-The analysis proceeds in seven stages:
+The analysis proceeds in six stages:
 \begin{enumerate}
     \item Section~\ref{sec:performance_results} compares the overall performance of all strategies, establishing that only the nonlinear model (M2) survives long-short construction.
-    \item Section~\ref{sec:regime_results} decomposes performance by market regime.
-    \item Section~\ref{sec:ic_analysis} examines the information coefficient of each momentum horizon in calm versus panic, providing model-free evidence for the regime-dependent term structure of momentum.
+    \item Section~\ref{sec:regime_results} decomposes performance by market regime, explains the economic mechanisms behind calm-period continuation and panic-period reversal, and provides model-free confirmation via information coefficient analysis.
     \item Section~\ref{sec:shap_results} analyses SHAP feature importance, including decompositions by regime and portfolio side.
     \item Section~\ref{sec:ablation_results} presents ablation studies and the comparison with \citet{DanielMoskowitz2016}.
     \item Section~\ref{sec:risk_aversion} examines how risk aversion affects the regime signal's importance.
@@ -65,24 +64,12 @@ The holding period analysis (Section~\ref{sec:economic_mechanism}) confirms that
 \paragraph{Why other strategies fail in panic}
 Other strategies cannot adapt to this regime shift. Fixed momentum holds past winners long and past losers short -- which is catastrophic when momentum reverses during market rebounds, precisely the ``momentum crash'' documented by \citet{DanielMoskowitz2016}. When the market recovers from a panic, past losers (high-beta beaten-down stocks) rally sharply while past winners (defensive low-beta stocks) lag. A fixed momentum strategy is short the stocks that rally most and long the stocks that lag, producing severe losses. M1 (logistic regression) assigns fixed linear weights to each momentum horizon, so it cannot switch from continuation to reversal signals as the regime changes. This failure confirms that the regime-momentum interaction is inherently nonlinear: exploiting it requires a model that can learn conditional rules such as ``in panic, buy recent losers and short recent winners; in calm, do the opposite.''
 
-
-\subsection{The Momentum-Regime Interaction}\label{sec:ic_analysis}
-
-The preceding analysis shows that XGBoost exploits the regime signal to produce significant long-short returns. A natural concern is whether this reflects genuine economic structure or model-specific overfitting. This section provides \emph{model-free} evidence that the regime-momentum interaction exists in the raw data, independent of any machine learning model or hyperparameter choice.
-
-The information coefficient (IC) measures the Spearman rank correlation between a momentum signal and subsequent stock returns, computed cross-sectionally each month. By examining the average IC of each of the 12 momentum horizons separately in calm and panic months, we can test directly whether momentum's predictive structure changes with the regime -- without involving XGBoost, logistic regression, or any other model.
-
-Table~\ref{tab:ic_rotation} reports the average IC and its $t$-statistic for each of the 12 momentum lookback horizons, split by regime.
+\paragraph{Model-free confirmation: information coefficient rotation}\label{sec:ic_analysis}
+A natural concern is whether the regime-dependent behaviour described above reflects genuine economic structure or model-specific overfitting. To rule this out, Table~\ref{tab:ic_rotation} examines the raw predictive power of each momentum horizon in calm versus panic months, without involving any model. The information coefficient (IC) -- the Spearman rank correlation between a momentum signal and subsequent stock returns, computed cross-sectionally each month -- directly measures whether ranking stocks by a given horizon correctly identifies future outperformers.
 
 \input{tables/table_ic_rotation}
 
-The results reveal a striking pattern. In calm months, all 12 horizons have positive, statistically significant ICs ($t > 2.5$), with the strongest predictive power at intermediate-to-long horizons ($mom_8$ through $mom_{10}$, IC $\approx 0.03$). This is the standard momentum continuation effect documented by \citet{JegadeeshTitman1993}: past winners continue to outperform.
-
-In panic months, the pattern inverts. Short-horizon signals ($mom_1$ through $mom_3$) develop \emph{negative} ICs ($-$0.012 to $-$0.010), indicating that recent losers \emph{outperform} recent winners, consistent with the short-term reversal effect and the liquidity spiral mechanism of \citet{BrunnermeierPedersen2009}. Longer horizons ($mom_{10}$ through $mom_{12}$) retain weakly positive ICs (0.020 to 0.026), but none is individually statistically significant ($t < 1.6$). The lack of significance in the panic column reflects the limited sample (59 panic months); the economically relevant finding is not the significance of any single panic IC but the systematic \emph{contrast} between the two regimes: all 12 horizons are significant in calm, none in panic, and the short horizons flip sign.
-
-In plain terms: in calm markets, a stock that has been rising over the past several months is likely to keep rising -- ranking stocks by intermediate-term momentum correctly identifies future outperformers (positive IC). In panic, the opposite holds at short horizons: a stock that dropped sharply last month is more likely to bounce back than to keep falling -- ranking by recent momentum points in the wrong direction (negative IC). This is precisely the regime-dependent behaviour that Section~\ref{sec:regime_results} documented at the portfolio level: M2's calm-period returns come from riding continuation trends, while its panic-period returns come from betting on short-term reversal. The IC analysis confirms that this pattern exists in the raw cross-sectional data, not just in XGBoost's predictions.
-
-This IC rotation is the model-free evidence for the thesis's central claim: momentum is not a single anomaly but a family of horizon-specific effects whose composition rotates with market conditions. A linear model cannot exploit this rotation because it assigns fixed coefficients to each horizon regardless of the regime. XGBoost's tree splits condition the use of each horizon on $\pi_t^{\text{filter}}$, effectively learning a different momentum strategy for each market state.
+The pattern is striking. In calm months, all 12 horizons have positive, significant ICs ($t > 2.5$), with the strongest power at intermediate horizons ($mom_8$ through $mom_{10}$, IC $\approx 0.03$): past winners keep winning. In panic months, the pattern inverts -- short-horizon signals ($mom_1$ through $mom_3$) develop \emph{negative} ICs ($-$0.012 to $-$0.010), meaning that stocks which dropped most recently are more likely to bounce back than to keep falling. Longer horizons retain weakly positive ICs but none is individually significant ($t < 1.6$), reflecting the limited sample of 59 panic months. The key finding is the systematic \emph{contrast}: all 12 horizons are significant in calm, none in panic, and the short horizons flip sign. This confirms that the continuation-to-reversal rotation M2 exploits is a real feature of the data, not an artefact of the model.
 
 
 \subsection{SHAP Decomposition}\label{sec:shap_results}
