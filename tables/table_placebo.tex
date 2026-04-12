@@ -5,10 +5,10 @@
 \toprule
 Regime signal & M2 Sharpe \\
 \midrule
-Real $\pi_t^{\text{filter}}$ (baseline) & 0.97 \\
+Real $\pi_t^{\text{filter}}$ (baseline) & 1.08 \\
 No regime signal & 0.48 \\
 \bottomrule
 \end{tabular}
-\caption{Placebo regime signal test (long-short construction, 50-seed ensemble). M2 achieves its highest Sharpe with the real HMM signal (0.97). Removing the regime signal entirely reduces the Sharpe to 0.48, a drop of 0.49. This confirms that the regime signal is essential for long-short momentum stock selection, not merely a marginal improvement.}
+\caption{Placebo regime signal test (long-short, mom+$\pi$). Removing the regime signal reduces M2's Sharpe from 1.08 to 0.48, confirming that the HMM signal is essential for long-short momentum stock selection.}
 \label{tab:placebo}
 \end{table}

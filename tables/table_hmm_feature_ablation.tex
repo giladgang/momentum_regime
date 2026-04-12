@@ -17,6 +17,6 @@ Drop REL\_N                            & 0.43 & $-$0.54 \\
 Drop CS                                & 0.96 & $-$0.01 \\
 \bottomrule
 \end{tabular}
-\caption{HMM input feature ablation (long-short construction). The top panel shows that DD alone nearly matches the full model. The leave-one-out panel shows that removing DD or REL\_N causes the largest performance drops ($-$0.46 and $-$0.54, respectively), while DISP and CS each contribute less than 0.01 marginally. Despite their small marginal contributions, DISP and CS improve the stability of the regime signal across seed combinations (see Section~\ref{sec:feature_selection}).}
+\caption{HMM input feature ablation (long-short, feature-selection seed counts). The absolute Sharpe levels differ from the production model (Table~\ref{tab:performance}) due to fewer seeds; the relative comparisons ($\Delta$) are the relevant quantities. DD alone nearly matches the full model. Removing DD or REL\_N causes the largest drops ($-$0.46 and $-$0.54), while DISP and CS contribute marginally but improve seed stability (Section~\ref{sec:feature_selection}).}
 \label{tab:hmm_feature_ablation}
 \end{table}

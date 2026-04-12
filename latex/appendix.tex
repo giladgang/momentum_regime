@@ -67,7 +67,7 @@ Value-weighting tilts each leg toward large, liquid stocks, reducing the influen
 
 \subsection{Rebalancing Frequency}\label{app:rebalancing}
 
-All portfolios are rebalanced monthly: both the long and short legs are reconstituted every month using updated scores. Monthly rebalancing is essential for the regime-conditional strategy, as the holding period analysis in Section~\ref{sec:economic_mechanism} shows that the reversal premium exploited during panic months dissipates within one month.
+All portfolios are rebalanced monthly: both the long and short legs are reconstituted every month using updated scores. Monthly rebalancing is essential for the regime-conditional strategy, as the holding period analysis in Section~\ref{sec:holding} shows that the reversal premium exploited during panic months dissipates within one month.
 
 \subsection{Transaction Costs}\label{app:transaction_costs}
 
@@ -211,7 +211,7 @@ The XGBoost model uses hyperparameters selected via cross-validation on the trai
 
 \input{tables/table_xgb_hyperparams}
 
-The Sharpe ratio ranges from 0.76 to 0.97 across all configurations tested. Performance is robust to moderate perturbations in tree depth (0.90--0.95) and ensemble size (0.90--0.97). Only the aggressive learning rate of 0.10 degrades performance substantially (Sharpe 0.76), consistent with overfitting to training-period patterns.
+The Sharpe ratio ranges from 0.89 to 1.08 across all configurations tested. Performance is robust to moderate perturbations in tree depth and ensemble size. The results confirm that M2's performance is not an artefact of a particular hyperparameter configuration.
 
 \subsection{Regime Threshold Sensitivity}\label{app:threshold}
 
@@ -237,7 +237,7 @@ To assess sensitivity to the choice of training period, the full pipeline (HMM e
 
 \input{tables/table_alt_splits}
 
-In the baseline split (1990--2010 training, 2011--2025 test), M2 achieves a Sharpe of 0.97 while M1 collapses (0.05), confirming the nonlinear regime-momentum interaction documented in Section~\ref{sec:performance_results}.
+In the baseline split (1990--2010 training, 2011--2025 test), M2 achieves a Sharpe of 1.08 while M1 collapses ($-$0.03), confirming the nonlinear regime-momentum interaction documented in Section~\ref{sec:performance_results}.
 
 \subsection{Placebo Regime Signals}\label{app:placebo}
 
@@ -245,7 +245,7 @@ To rule out the possibility that XGBoost benefits from any additional feature ra
 
 \input{tables/table_placebo}
 
-Removing the regime signal entirely reduces M2's Sharpe from 0.97 to 0.48, a drop of 0.49. The regime signal is essential for long-short momentum stock selection, not merely a marginal improvement.
+Removing the regime signal entirely reduces M2's Sharpe from 1.08 to 0.48, a drop of 0.60. The regime signal is essential for long-short momentum stock selection, not merely a marginal improvement.
 
 \subsection{Kitchen-Sink Test}\label{app:kitchen_sink}
 
@@ -253,7 +253,7 @@ A further concern is that XGBoost's improvement from adding $\pi_t^{\text{filter
 
 \input{tables/table_kitchen_sink}
 
-The real HMM signal roughly doubles the Sharpe ratio (0.97 vs.\ 0.48 without), confirming that the regime signal's contribution is specific and economically meaningful.
+The real HMM signal more than doubles the Sharpe ratio (1.08 vs.\ 0.48 without), confirming that the regime signal's contribution is specific and economically meaningful.
 
 \subsection{M1 Polynomial and Interaction Tests}\label{app:m1_poly}
 
