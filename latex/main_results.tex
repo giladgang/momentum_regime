@@ -147,11 +147,6 @@ Table~\ref{tab:regime_signal_ablation} compares XGBoost performance under three 
 
 \input{tables/table_regime_signal_ablation}
 
-\paragraph{HMM feature ablation}
-The include-one and leave-one-out experiments (Table~\ref{tab:hmm_feature_ablation}) isolate each HMM feature's contribution. Market drawdown (DD) alone achieves the highest standalone Sharpe, confirming its role as the dominant stress indicator. In the leave-one-out analysis, removing DD or REL\_N causes the largest performance drops, while DISP and CS each contribute marginally. Despite their small marginal contributions, DISP and CS reduce the standard deviation of the Sharpe ratio across independent seed partitions from 0.12 (DD alone) to 0.08 (full four-feature model), because they provide independent information from different market segments -- cross-sectional disagreement (DISP) and corporate credit conditions (CS) -- that smooths the regime classification and reduces sensitivity to MCMC initialization.
-
-\input{tables/table_hmm_feature_ablation}
-
 \paragraph{The role of fundamental features}
 Adding seven fundamental characteristics\footnote{Book-to-market, return on equity, gross profitability, leverage, asset growth, earnings growth, and log market equity. Full definitions are provided in Appendix~\ref{app:fundamental_features}.} to the mom+$\pi$ specification reduces the Sharpe from 1.08 to 0.98. Returns fall from 20.6\% to 18.6\%, and volatility compresses slightly from 19.1\% to 19.3\%. The CAPM alpha drops from 23.8\% to 20.1\% ($t = 3.38$), but remains highly significant. This pattern indicates that fundamentals act as a quality screen -- they steer M2 toward more stable stocks -- rather than providing an independent source of regime-conditional alpha. The regime-momentum interaction remains the primary driver of long-short performance regardless of whether fundamentals are included.
 

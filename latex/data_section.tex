@@ -47,6 +47,10 @@ The four-feature combination DD+DISP+REL\_N+CS achieves the highest stability (m
 
 \input{tables/table_feature_selection}
 
+Table~\ref{tab:hmm_feature_ablation} confirms the individual contribution of each feature. DD alone achieves the highest standalone Sharpe, but removing DD or REL\_N from the full model causes the largest drops ($-$0.46 and $-$0.54). DISP and CS contribute marginally in isolation but reduce the Sharpe ratio's standard deviation across seed partitions from 0.12 (DD alone) to 0.08 (full model), providing independent information from cross-sectional disagreement and corporate credit conditions that stabilises the regime classification.
+
+\input{tables/table_hmm_feature_ablation}
+
 Each feature captures a distinct dimension of market stress:
 \begin{enumerate}
     \item \textbf{DD (Drawdown):} The percentage decline of the cumulative market price index from its rolling 12-month peak:
