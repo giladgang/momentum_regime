@@ -93,9 +93,7 @@ This prior favors persistence in both regimes: absent data, the prior mean trans
 \end{equation}
 In other words, the prior expects each regime to continue with probability $0.9$, corresponding to an expected duration of roughly $10$ months. This prior is informative enough to discourage pathological solutions, but with hundreds of training observations its influence is dominated by the data.
 
-\paragraph{Gibbs Sampler}\label{sec:gibbs_sampler}
-
-\paragraph{Initialization}
+\paragraph{Gibbs Sampler: Initialization}\label{sec:gibbs_sampler}
 The Gibbs sampler requires starting values for the emission parameters and the transition matrix. A crude drawdown-based partition is used:\footnote{The choice of initialization has negligible impact on the posterior: the sampler is run for 2{,}000 iterations with 500 discarded as burn-in, and convergence diagnostics (Section~\ref{sec:convergence}) confirm that the chain mixes well regardless of the starting partition.} months with below-median drawdown $DD_t^z$ (i.e., deeper drawdowns) are initially assigned to the panic state ($s_t=1$), and the remaining months to the calm state ($s_t=0$). The initial emission parameters are then computed from each group:
 \[
 \boldsymbol{\mu}_k^{(0)} = \frac{1}{n_k}\sum_{t:\,s_t=k}\mathbf{z}_t,
@@ -244,7 +242,7 @@ This quantity represents the probability that the market is in the panic regime 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{regime_probabilities.png}
-    \caption{Filtered regime probability $\pi_t^{\text{filter}}$ over the full sample (1990--2025). The dashed vertical line separates the training period (left) from the out-of-sample test period (right). Shaded regions indicate periods where $\pi_t^{\text{filter}} > 0.5$ (panic classification). The signal correctly identifies all major stress episodes, including the dot-com bust, the global financial crisis, the COVID-19 crash, and the 2022 bear market, while remaining near zero during calm expansions.}
+    \caption{Filtered regime probability $\pi_t^{\text{filter}}$ (1990--2025). The dashed vertical line marks the train/test split (January 2011). Shaded regions indicate months where $\pi_t^{\text{filter}} \geq 0.5$ (panic classification). The signal correctly identifies all major stress episodes -- the dot-com bust, the global financial crisis, the COVID-19 crash, and the 2022 bear market -- while remaining near zero during calm expansions.}
     \label{fig:regime_probabilities}
 \end{figure}
 
