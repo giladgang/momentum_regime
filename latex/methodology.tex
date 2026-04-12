@@ -15,7 +15,7 @@ This thesis employs a two-state ($K = 2$) Bayesian Hidden Markov Model to classi
 \begin{equation}
     (\mathbf{z}_t \mid s_t = 0) \sim \mathcal{N}(\boldsymbol{\mu}_0, \boldsymbol{\Sigma}_0), \qquad (\mathbf{z}_t \mid s_t = 1) \sim \mathcal{N}(\boldsymbol{\mu}_1, \boldsymbol{\Sigma}_1).
 \end{equation}
-Each regime is characterized by its own mean vector $\boldsymbol{\mu}_k \in \mathbb{R}^D$ and covariance matrix $\boldsymbol{\Sigma}_k \in \mathbb{R}^{D \times D}$, where $k \in \{0\text{ (calm)},\, 1\text{ (panic)}\}$. The multivariate specification allows the model to capture not only level differences in individual features across regimes, but also changes in the correlation structure; for instance, stress features may become more correlated during panic periods. The Gaussian assumption is standard in the HMM literature but not exact for these features: Shapiro--Wilk tests reject within-regime normality for most feature--regime pairs, primarily due to skewness in drawdown and dispersion. Appendix~\ref{app:emission_robustness} shows that re-estimating the model with multivariate Student-$t$ emissions produces nearly identical regime classifications (agreement $\geq 97.8\%$, $\pi$-correlation $\geq 0.98$) and does not improve BIC, confirming that the Gaussian specification is adequate for this application.
+Each regime is characterized by its own mean vector $\boldsymbol{\mu}_k \in \mathbb{R}^D$ and covariance matrix $\boldsymbol{\Sigma}_k \in \mathbb{R}^{D \times D}$, where $k \in \{0\text{ (calm)},\, 1\text{ (panic)}\}$. The multivariate specification allows the model to capture not only level differences in individual features across regimes, but also changes in the correlation structure; for instance, stress features may become more correlated during panic periods. The Gaussian assumption is standard in the HMM literature but not exact for these features: Shapiro--Wilk tests reject within-regime normality for most feature--regime pairs, primarily due to skewness in drawdown and credit spreads. Appendix~\ref{app:emission_robustness} shows that re-estimating the model with multivariate Student-$t$ emissions produces nearly identical regime classifications (agreement $\geq 97.8\%$, $\pi$-correlation $\geq 0.98$) and does not improve BIC, confirming that the Gaussian specification is adequate for this application.
 
 \bigskip
 \textbf{Transition equation} The evolution of the hidden state follows a first-order Markov chain with a $2 \times 2$ transition matrix:
@@ -27,7 +27,7 @@ where $P_{ij} = P(s_t = j \mid s_{t-1} = i)$ and each row sums to one. The diago
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{markov_chain_diagram.png}
-    \caption{Architecture of the two-state Hidden Markov Model. The upper panel shows the three layers of the model. The hidden layer (dashed box) contains two latent regime states, Calm ($s_t = 0$) and Panic ($s_t = 1$), whose true identity is never directly observed by the investor. These states evolve over time according to a first-order Markov chain governed by transition probabilities $P_{ij}$, where the diagonal elements $P_{00}$ and $P_{11}$ capture regime persistence. Each hidden state generates (emits) a four-dimensional observation vector $\mathbf{z}_t$ consisting of measurable market stress indicators: drawdown, realised volatility, cross-sectional return dispersion, and relative market participation. The model inverts this generative process: given only the observed features $\mathbf{z}_{1:t}$, it infers the filtered probability $\pi_t^{\text{filter}} = P(s_t = 1 \mid \mathbf{z}_{1:t})$, a real-time estimate of whether the market is currently in a panic state. The lower panel illustrates an example hidden state sequence over 16 months, showing the characteristic persistence within each regime and the abrupt transitions between them.}
+    \caption{Architecture of the two-state Hidden Markov Model. The upper panel shows the three layers of the model. The hidden layer (dashed box) contains two latent regime states, Calm ($s_t = 0$) and Panic ($s_t = 1$), whose true identity is never directly observed by the investor. These states evolve over time according to a first-order Markov chain governed by transition probabilities $P_{ij}$, where the diagonal elements $P_{00}$ and $P_{11}$ capture regime persistence. Each hidden state generates (emits) a four-dimensional observation vector $\mathbf{z}_t$ consisting of measurable market stress indicators: drawdown, cross-sectional return dispersion, relative market participation, and credit spread. The model inverts this generative process: given only the observed features $\mathbf{z}_{1:t}$, it infers the filtered probability $\pi_t^{\text{filter}} = P(s_t = 1 \mid \mathbf{z}_{1:t})$, a real-time estimate of whether the market is currently in a panic state. The lower panel illustrates an example hidden state sequence over 16 months, showing the characteristic persistence within each regime and the abrupt transitions between them.}
     \label{fig:hmm_diagram}
 \end{figure}
 
@@ -96,7 +96,7 @@ In other words, the prior expects each regime to continue with probability $0.9$
 \paragraph{Gibbs Sampler}\label{sec:gibbs_sampler}
 
 \paragraph{Initialization}
-The Gibbs sampler requires starting values for the emission parameters and the transition matrix. A crude volatility-based partition is used:\footnote{The choice of initialization has negligible impact on the posterior: the sampler is run for 2{,}000 iterations with 500 discarded as burn-in, and convergence diagnostics (Section~\ref{sec:convergence}) confirm that the chain mixes well regardless of the starting partition.} months with above-median $VOL_t^z$ are initially assigned to the panic state ($s_t=1$), and the remaining months to the calm state ($s_t=0$). The initial emission parameters are then computed from each group:
+The Gibbs sampler requires starting values for the emission parameters and the transition matrix. A crude drawdown-based partition is used:\footnote{The choice of initialization has negligible impact on the posterior: the sampler is run for 2{,}000 iterations with 500 discarded as burn-in, and convergence diagnostics (Section~\ref{sec:convergence}) confirm that the chain mixes well regardless of the starting partition.} months with below-median drawdown $DD_t^z$ (i.e., deeper drawdowns) are initially assigned to the panic state ($s_t=1$), and the remaining months to the calm state ($s_t=0$). The initial emission parameters are then computed from each group:
 \[
 \boldsymbol{\mu}_k^{(0)} = \frac{1}{n_k}\sum_{t:\,s_t=k}\mathbf{z}_t,
 \qquad
@@ -190,13 +190,13 @@ With all three blocks updated, the sampler returns to Step~1 and repeats the cyc
 
 \paragraph{Implementation Details}\label{sec:implementation}
 
-The Gibbs sampler is estimated on the training sample only (1990--2010). To reduce sensitivity to MCMC initialization, the full sampler is run independently with $N_s = 5$ different random seeds. Each chain is run for $M=2{,}000$ iterations with the initialization described above. The first $B=500$ iterations are discarded as burn-in, leaving $1{,}500$ posterior draws per seed.
+The Gibbs sampler is estimated on the training sample only (1990--2010). To reduce sensitivity to MCMC initialization, the full sampler is run independently with $N_s = 200$ different random seeds. Each chain is run for $M=2{,}000$ iterations with the initialization described above. The first $B=500$ iterations are discarded as burn-in, leaving $1{,}500$ posterior draws per seed.
 
 For each seed, posterior mean parameters $\bar{\boldsymbol{\mu}}_k$, $\bar{\boldsymbol{\Sigma}}_k$, and $\bar{\mathbf{P}}$ are computed by averaging over the post-burn-in draws. A causal forward filter is then applied to the full sample using these parameters to obtain a seed-specific filtered probability $\pi_t^{\text{filter},(s)}$. The final trading signal is the average across seeds:
 \begin{equation}
 \pi_t^{\text{filter}} = \frac{1}{N_s} \sum_{s=1}^{N_s} \pi_t^{\text{filter},(s)}.
 \end{equation}
-This Bayesian model averaging reduces the variance of the regime signal and produces more stable downstream portfolio performance. No test-period data is used in estimation.
+This Bayesian model averaging over 200 seeds substantially reduces the variance of the regime signal and produces stable downstream portfolio performance. Heavy-variance tests confirm that the resulting Sharpe ratio has a standard deviation of only 0.082 across independent seed partitions. No test-period data is used in estimation.
 
 \paragraph{Convergence Diagnostics}\label{sec:convergence}
 
@@ -208,7 +208,7 @@ ESS
 \end{equation}
 where $\hat{\rho}(\ell)$ is the estimated autocorrelation at lag $\ell$,\footnote{$\hat{\rho}(\ell) = \frac{1}{(n-\ell)\,\hat{\sigma}^2}\sum_{i=1}^{n-\ell}(\theta_i - \bar{\theta})(\theta_{i+\ell} - \bar{\theta})$, where $\theta_i$ is the $i$-th post-burn-in draw, $\bar{\theta}$ its sample mean, and $\hat{\sigma}^2$ its sample variance.} and $L^\ast$ is the first lag at which the autocorrelation becomes negative. High ESS indicates that the chain provides many effectively independent posterior draws.\footnote{An ESS of at least 100 per parameter is a common minimum for reliable posterior inference \citep{Gelman2013}.}
 
-Trace plots of the regime means and persistence probabilities (Figure~\ref{fig:convergence_trace}, Appendix~\ref{app:convergence}) confirm that all chains converge to stable posterior values after the burn-in period.\footnote{The Gelman--Rubin $\hat{R}$ statistic, computed across all five chains, is below 1.01 for every parameter (Appendix~\ref{app:gelman_rubin}), confirming convergence to the same posterior distribution.}
+Trace plots of the regime means and persistence probabilities (Figure~\ref{fig:convergence_trace}, Appendix~\ref{app:convergence}) confirm that all chains converge to stable posterior values after the burn-in period.\footnote{The Gelman--Rubin $\hat{R}$ statistic, computed across five representative chains, is below 1.01 for every parameter (Appendix~\ref{app:gelman_rubin}), confirming convergence to the same posterior distribution.}
 
 \subsubsection{Regime Identification and Trading Signal}\label{sec:regime_signal}
 
@@ -216,7 +216,7 @@ Trace plots of the regime means and persistence probabilities (Figure~\ref{fig:c
 
 In a two-state HMM, the labels $0$ and $1$ are intrinsically arbitrary: relabeling the states leaves the likelihood unchanged. To attach an economically meaningful interpretation to the states, a \emph{crisis-calibrated sign correction} procedure is applied.
 
-Because the four HMM features respond to stress in different directions (VOL and DISP rise during crises, while DD and REL\_N fall), a single feature cannot reliably identify the panic state. Instead, the expected direction of each feature during stress is determined empirically. For each feature $j$, the 95th percentile is computed separately on training months falling within known crisis windows (the dot-com bust of 2000--2002 and the Global Financial Crisis of 2007--2009) and on all remaining training months:
+Because the four HMM features respond to stress in different directions (DISP and CS rise during crises, while DD and REL\_N fall), a single feature cannot reliably identify the panic state. Instead, the expected direction of each feature during stress is determined empirically. For each feature $j$, the 95th percentile is computed separately on training months falling within known crisis windows (the dot-com bust of 2000--2002 and the Global Financial Crisis of 2007--2009) and on all remaining training months:
 \begin{equation}
 \text{sign}_j =
 \begin{cases}
@@ -248,15 +248,15 @@ This quantity represents the probability that the market is in the panic regime 
     \label{fig:regime_probabilities}
 \end{figure}
 
-To verify that the two regimes are meaningfully distinct, Table~\ref{tab:hmm_separation} reports the posterior regime-mean separation for each of the four HMM input features. All four features exhibit statistically significant separation between the calm and panic regimes, with the 95\% posterior credible interval for the difference excluding zero in every case. The largest separations are observed for VOL ($\Delta = +1.65$) and DD ($\Delta = -1.45$), consistent with their dominant roles in the ablation analysis (Section~\ref{sec:ablation}).
+To verify that the two regimes are meaningfully distinct, Table~\ref{tab:hmm_separation} reports the posterior regime-mean separation for each of the four HMM input features. All four features exhibit statistically significant separation between the calm and panic regimes, with the 95\% posterior credible interval for the difference excluding zero in every case. The largest separations are observed for DD and REL\_N, consistent with their dominant roles in the ablation analysis (Section~\ref{sec:ablation_results}).
 
 \input{tables/table_hmm_separation}
 
 \subsection{Stage 2: Regime-Conditioned Portfolio Construction}\label{sec:stage2}
 
-The filtered regime probability $\pi_t^{\text{filter}}$ from Stage~1 provides a monthly measure of market stress, but on its own it does not select stocks. This stage translates the regime signal into cross-sectional portfolios. Three scoring methods of increasing complexity are developed: a deterministic regime-adaptive momentum formula (Method~0), a logistic regression classifier (Method~1), and an XGBoost gradient-boosted tree regressor (Method~2). Each method combines $\pi_t^{\text{filter}}$ with a set of momentum and fundamental stock characteristics to produce a monthly score for every stock, which is then used to rank stocks into a long-only top-decile value-weighted portfolio. A full description of the features used, including their construction and sources, is provided in Section~\ref{sec:data}.
+The filtered regime probability $\pi_t^{\text{filter}}$ from Stage~1 provides a monthly measure of market stress, but on its own it does not select stocks. This stage translates the regime signal into cross-sectional portfolios. Three scoring methods of increasing complexity are developed: a deterministic regime-adaptive momentum formula (Method~0), a logistic regression classifier (Method~1), and an XGBoost gradient-boosted tree regressor (Method~2). Each method combines $\pi_t^{\text{filter}}$ with a set of momentum and fundamental stock characteristics to produce a monthly score for every stock, which is then used to rank stocks into a long-short portfolio: the top decile (using NYSE breakpoints) forms the long leg, the bottom decile forms the short leg, and both legs are value-weighted. A full description of the features used, including their construction and sources, is provided in Section~\ref{sec:data}.
 
-The deterministic formula serves as a transparent baseline that tests whether simply varying the momentum lookback horizon with market conditions adds value. The two machine learning methods go further by jointly learning how all features (momentum at multiple horizons, fundamentals, and the regime signal) interact to predict forward returns. The results that follow (Section~\ref{sec:results}) not only compare the out-of-sample performance of the three portfolios but also use SHAP values and coefficient analysis to examine \emph{which} features drive the predictions and \emph{how} their importance shifts across calm and panic regimes. This feature-level analysis provides economic insight into the signals that distinguish regime-conditioned stock selection from standard momentum.
+The deterministic formula serves as a transparent baseline that tests whether simply varying the momentum lookback horizon with market conditions adds value. The two machine learning methods go further by jointly learning how all features (momentum at multiple horizons, fundamentals, and the regime signal) interact to predict forward returns. Long-short construction is the standard in the momentum literature \citep{JegadeeshTitman1993, DanielMoskowitz2016, BarrosoSantaClara2015} because it isolates momentum's cross-sectional stock selection from market beta, providing a cleaner test of whether the strategy can distinguish future winners from losers. The results that follow (Section~\ref{sec:results}) not only compare the out-of-sample performance of the three portfolios but also use SHAP values and coefficient analysis to examine \emph{which} features drive the predictions and \emph{how} their importance shifts across calm and panic regimes. This feature-level analysis provides economic insight into the signals that distinguish regime-conditioned stock selection from standard momentum.
 
 \subsubsection{Scoring Methods}\label{sec:methods}
 
@@ -272,7 +272,7 @@ and each stock's score is simply its momentum return at the selected horizon:
 \begin{equation}
     score_t^s = mom_{\ell_t, t}^s.
 \end{equation}
-Stocks are then ranked by this score, and the top decile forms the long portfolio as described in Appendix~\ref{app:portfolio_construction}.
+Stocks are then ranked by this score; the top decile forms the long leg and the bottom decile the short leg, as described in Appendix~\ref{app:portfolio_construction}.
 
 When $\pi_t^{\text{filter}} \approx 0$ (calm), $\ell_t = 12$, recovering the standard 12-month momentum signal that captures continuation in trending markets. When $\pi_t^{\text{filter}} \approx 1$ (panic), $\ell_t = 1$, switching to 1-month reversal to exploit the tendency of oversold stocks to snap back after panic selling. At intermediate values, the lookback smoothly interpolates between these extremes.
 
@@ -290,7 +290,7 @@ with regularization strength $C = 1.0$ (the scikit-learn default). The $\ell_2$ 
 \begin{equation}
     score_t^s = \sigma(\hat{\boldsymbol{\beta}}^\top \tilde{\mathbf{x}}_t^s) = P(y_t^s = 1 \mid \mathbf{x}_t^s;\, \hat{\boldsymbol{\beta}}).
 \end{equation}
-Stocks with higher predicted probability of beating the cross-sectional median receive higher scores and are more likely to enter the top-decile portfolio.
+Stocks with higher predicted probability of beating the cross-sectional median receive higher scores and are more likely to enter the long leg; those with the lowest scores enter the short leg.
 
 \paragraph{Method 2: XGBoost Regressor}\label{sec:method2}
 
@@ -300,10 +300,10 @@ XGBoost builds an additive ensemble of $M$ regression trees, where each successi
 \begin{equation}
     F(\mathbf{x}) = \sum_{m=1}^{M} \eta \cdot h_m(\mathbf{x}),
 \end{equation}
-where $h_m$ is the $m$-th decision tree and $\eta$ is the learning rate that shrinks each tree's contribution to prevent overfitting. Each tree $h_m$ is grown to minimize a regularized objective combining the squared-error loss on the current residuals with penalty terms on tree complexity (number of leaves and leaf weights). The predicted return $\hat{r}_{t+1}^s = F(\mathbf{x}_t^s)$ serves as the stock score. The model is trained with $M = 500$ trees, a learning rate of $\eta = 0.05$, maximum tree depth of 4, and row and column subsampling rates of 0.8.
+where $h_m$ is the $m$-th decision tree and $\eta$ is the learning rate that shrinks each tree's contribution to prevent overfitting. Each tree $h_m$ is grown to minimize a regularized objective combining the squared-error loss on the current residuals with penalty terms on tree complexity (number of leaves and leaf weights). The predicted return $\hat{r}_{t+1}^s = F(\mathbf{x}_t^s)$ serves as the stock score. The model is trained with $M = 500$ trees, a learning rate of $\eta = 0.05$, maximum tree depth of 4, and row and column subsampling rates of 0.8. To reduce sensitivity to random initialization, an ensemble of 50 independent XGBoost models (each with a different random seed) is trained; their predictions are averaged before ranking stocks into portfolio deciles.
 
 Row and column subsampling introduce stochasticity into each boosting round, reducing variance and improving generalization. A maximum depth of 4 allows the model to capture pairwise and higher-order interactions. Critically, this means XGBoost can learn splits that condition on $\pi_t^{\text{filter}}$ and then branch on momentum horizons differently within each regime, without requiring explicit interaction terms. XGBoost also natively handles missing values in the fundamental features by learning optimal split directions for missing entries during training, eliminating the need for imputation.
 
 \paragraph{The Role of $\pi_t^{\text{filter}}$}\label{sec:pi_context}
 
-A key distinction between Methods~1 and~2 lies in how each model uses the regime signal. Logistic regression assigns $\pi_t^{\text{filter}}$ a single linear coefficient, which is near zero because the regime signal is not a direct return predictor. XGBoost, by contrast, uses $\pi_t^{\text{filter}}$ as a \emph{context variable} through tree splits, conditioning its use of momentum horizons on the current market state. This interaction effect cannot be represented by a single linear coefficient. The empirical consequences of this distinction are analysed in Section~\ref{sec:context_results}.
+A key distinction between Methods~1 and~2 lies in how each model uses the regime signal. Logistic regression assigns $\pi_t^{\text{filter}}$ a single linear coefficient, which is near zero because the regime signal is not a direct return predictor. XGBoost, by contrast, uses $\pi_t^{\text{filter}}$ as a \emph{context variable} through tree splits, conditioning its use of momentum horizons on the current market state. This interaction effect cannot be represented by a single linear coefficient. The empirical consequences of this distinction are analysed in Section~\ref{sec:shap_results}.

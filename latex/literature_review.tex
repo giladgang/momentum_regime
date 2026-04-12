@@ -36,7 +36,7 @@ The most directly related work is \citet{GHM2023}, who condition cross-sectional
 
 This thesis extends \citet{GHM2023} in three directions. First, the regime classification uses a probabilistic model (the HMM) with real-time stress indicators rather than a deterministic rule based on trailing market returns. The HMM produces a continuous panic probability rather than a discrete four-state classification, allowing for smoother portfolio transitions. Second, the cross-sectional models use the full momentum term structure (12 lookback horizons) and fundamental characteristics, rather than blending only two momentum signals. Third, the use of machine learning models (logistic regression and XGBoost) allows the data to determine how the regime signal interacts with the other features, rather than imposing a parametric blending rule.
 
-In the empirical analysis (Section~\ref{sec:results}), all four \citet{GHM2023} strategies are implemented as benchmarks. The best GHM variant achieves a Sharpe ratio of 0.80, which is outperformed by both the logistic regression (1.03) and XGBoost (1.01) strategies developed in this thesis.
+In the empirical analysis (Section~\ref{sec:results}), all four \citet{GHM2023} strategies are implemented as benchmarks using the same long-short construction and transaction costs. In long-short construction, all GHM variants collapse (Sharpe ratios near zero), because their deterministic blending of two momentum horizons cannot adapt the short leg to changing regimes. Only the XGBoost model (M2), which learns nonlinear interactions between the regime signal and all 12 momentum horizons, survives long-short construction with a Sharpe ratio of 0.97.
 
 \subsection{Machine Learning in Cross-Sectional Asset Pricing}\label{sec:lit_ml}
 

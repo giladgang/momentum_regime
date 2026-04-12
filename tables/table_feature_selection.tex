@@ -1,0 +1,16 @@
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{l l r r r l}
+\toprule
+$D$ & Best Combination & Sharpe & Stability $\mu$ & Stability $\sigma$ & Status \\
+\midrule
+1 & DD & 0.66 & 0.66 & 0.12 & Moderate \\
+2 & DD+REL\_N & 0.72 & 0.72 & 0.11 & Moderate \\
+3 & DD+DISP+REL\_N & 0.78 & 0.78 & 0.09 & Stable \\
+4 & DD+DISP+REL\_N+CS & 0.80 & 0.80 & 0.08 & Stable \\
+\bottomrule
+\end{tabular}
+\caption{Feature count comparison from the three-pass selection pipeline (long-short, momentum + $\pi_t^{\text{filter}}$ only, 10 bps costs). The four-feature combination (DD+DISP+REL\_N+CS) achieves the highest stability mean (0.80) with the lowest standard deviation (0.08), confirmed by 10 independent heavy-variance runs with 20 HMM seeds and 50 XGBoost seeds each. Stability is classified as stable ($\sigma < 0.10$), moderate ($0.10 \leq \sigma < 0.15$), or unstable ($\sigma \geq 0.15$).}
+\label{tab:feature_selection}
+\end{table}

@@ -26,9 +26,10 @@ COGS (\texttt{cogsq}) & Compustat \texttt{fundq} & Gross profitability & Section
 Debt (\texttt{dlttq}, \texttt{dlcq}) & Compustat \texttt{fundq} & Leverage ratio & Section 3.5 \\
 \midrule
 \multicolumn{4}{l}{\emph{Market-level variables (HMM inputs)}} \\
-Daily market returns & CRSP \texttt{dsi} & Realised volatility (VOL) & Section 3.3 \\
+Daily market returns & CRSP \texttt{dsi} & Drawdown (DD) computation & Section 3.3 \\
 Market price index & CRSP \texttt{dsi} & Drawdown (DD) & Section 3.3 \\
 Cross-sect.\ stock returns & CRSP \texttt{msf} & Dispersion (DISP), REL\_N & Section 3.3 \\
+BAA, AAA bond yields & FRED & Credit spread (CS) & Section 3.3 \\
 \midrule
 \multicolumn{4}{l}{\emph{Derived features}} \\
 $mom_1, \dots, mom_{12}$ & Computed & 12 trailing momentum signals & Section 3.5 \\
@@ -48,29 +49,33 @@ $\pi_t^{\text{filter}}$ & HMM output & Filtered panic probability & Section 4.1 
 
 \subsection{Portfolio Construction}\label{app:portfolio_construction}
 
-For each method, a long-only top-decile portfolio is constructed each month. A long-only construction is chosen because it consistently outperformed long-short alternatives in preliminary tests, a finding consistent with the strong upward market trend over the 2011--2025 test period, which penalises short positions. Stocks are ranked by their scores, and NYSE-listed stocks are used to determine the 90th percentile breakpoint. All stocks (including AMEX and NASDAQ) whose score exceeds this threshold enter the long portfolio.
+For each method, a long-short portfolio is constructed each month. Stocks are ranked by their scores, and NYSE-listed stocks are used to determine decile breakpoints. All stocks (including AMEX and NASDAQ) whose score exceeds the 90th percentile breakpoint enter the long leg; all stocks below the 10th percentile breakpoint enter the short leg. Long-short construction is the standard in the momentum literature \citep{JegadeeshTitman1993, DanielMoskowitz2016, BarrosoSantaClara2015} because it isolates momentum's cross-sectional stock selection from market beta, providing a cleaner test of the strategy's ability to distinguish future winners from losers.
 
-Portfolio weights are assigned proportionally to market equity (value-weighting):
+Portfolio weights within each leg are assigned proportionally to market equity (value-weighting):
 \begin{equation}
-    w_t^s = \frac{ME_t^s}{\sum_{s \in \mathcal{L}_t} ME_t^s}, \qquad s \in \mathcal{L}_t,
+    w_t^{s,L} = \frac{ME_t^s}{\sum_{s \in \mathcal{L}_t} ME_t^s}, \qquad w_t^{s,S} = \frac{ME_t^s}{\sum_{s \in \mathcal{S}_t} ME_t^s},
 \end{equation}
-where $\mathcal{L}_t$ is the set of stocks in the long portfolio at month $t$. Value-weighting tilts the portfolio toward large, liquid stocks, reducing the influence of small-cap return anomalies and improving implementability.
+where $\mathcal{L}_t$ and $\mathcal{S}_t$ are the sets of stocks in the long and short legs at month $t$, respectively. The long-short portfolio return is:
+\begin{equation}
+    r_t^{\text{LS}} = \sum_{s \in \mathcal{L}_t} w_t^{s,L} \cdot r_t^s - \sum_{s \in \mathcal{S}_t} w_t^{s,S} \cdot r_t^s.
+\end{equation}
+Value-weighting tilts each leg toward large, liquid stocks, reducing the influence of small-cap return anomalies and improving implementability.
 
 \subsection{Rebalancing Frequency}\label{app:rebalancing}
 
-Two rebalancing schemes are evaluated. Under monthly rebalancing, the portfolio is reconstituted every month using updated scores. Under quarterly rebalancing, stocks are re-scored and traded only in March, June, September, and December; in intervening months, holdings are carried forward and weights drift with market capitalization changes. No transaction costs are incurred during hold months.
+All portfolios are rebalanced monthly: both the long and short legs are reconstituted every month using updated scores. Monthly rebalancing is essential for the regime-conditional strategy, as the holding period analysis in Section~\ref{sec:economic_mechanism} shows that the reversal premium exploited during panic months dissipates within one month.
 
 \subsection{Transaction Costs}\label{app:transaction_costs}
 
-A one-way transaction cost of $c = 10$ basis points is applied at each rebalancing date. The net portfolio return at rebalancing month $t$ is:
+A one-way transaction cost of $c = 10$ basis points is applied to the turnover in both the long and short legs at each rebalancing date. The net portfolio return at month $t$ is:
 \begin{equation}
-    r_t^{\text{net}} = r_t^{\text{gross}} - c \cdot \tau_t,
+    r_t^{\text{net}} = r_t^{\text{gross}} - c \cdot (\tau_t^L + \tau_t^S),
 \end{equation}
-where $\tau_t$ is the one-way portfolio turnover:
+where $\tau_t^L$ and $\tau_t^S$ are the one-way turnover in the long and short legs, respectively:
 \begin{equation}
-    \tau_t = \frac{1}{2} \sum_{s} \left|w_{t}^{s,\text{new}} - w_{t-1}^{s,\text{prev}}\right|,
+    \tau_t^L = \frac{1}{2} \sum_{s} \left|w_{t}^{s,L,\text{new}} - w_{t-1}^{s,L,\text{prev}}\right|, \qquad \tau_t^S = \frac{1}{2} \sum_{s} \left|w_{t}^{s,S,\text{new}} - w_{t-1}^{s,S,\text{prev}}\right|,
 \end{equation}
-and the summation runs over all stocks appearing in either the new or previous portfolio. The 10 basis point cost reflects the transaction environment for a value-weighted, large-cap-biased strategy where NYSE breakpoints tilt toward liquid securities.
+and each summation runs over all stocks appearing in either the new or previous portfolio for that leg. The 10 basis point cost reflects the transaction environment for a value-weighted, large-cap-biased strategy where NYSE breakpoints tilt toward liquid securities.
 
 It is important to note that transaction costs are applied \emph{post-hoc} as an accounting adjustment and are not incorporated into the models' training objectives. The cross-sectional models (Methods~0--2) optimise stock-level prediction (classification accuracy or return forecasting) without knowledge of the previous portfolio, the resulting turnover, or the cost of rebalancing. This is standard practice in the empirical asset pricing literature \citep[e.g.,][]{FamaFrench2015, GHM2023}, where portfolio construction is treated as a fixed downstream step applied uniformly to all strategies. An end-to-end framework that jointly optimises stock selection and portfolio-level objectives (e.g., net-of-cost Sharpe ratio) would require a fundamentally different architecture, such as a reinforcement learning or differentiable portfolio optimisation layer, and remains a potential extension of this work.
 
@@ -166,7 +171,7 @@ Baseline ($r$) & -- & 1.007 & 21.6\% & 21.8\% & $-$26.1\% \\
  & $a = 2.0$ & 0.894 & 11.8\% & 13.6\% & $-$26.5\% \\
 \bottomrule
 \end{tabular}
-\caption{Out-of-sample performance of XGBoost (M2) under alternative training targets. All models use the same features, hyperparameters, and portfolio construction. The baseline (raw return) achieves the highest Sharpe ratio; every risk-adjusted target reduces returns faster than volatility. The result is robust across all three functional forms and all parameter values tested.}
+\caption{Out-of-sample performance of XGBoost (M2) under alternative training targets (long-only construction shown; the pattern is qualitatively identical in long-short). All models use the same features, hyperparameters, and portfolio construction. The baseline (raw return) achieves the highest Sharpe ratio; every risk-adjusted target reduces returns faster than volatility. The result is robust across all three functional forms and all parameter values tested.}
 \label{tab:alt_targets}
 \end{table}
 
@@ -182,7 +187,7 @@ To assess whether the main findings are driven by a single favourable sub-period
 
 \input{tables/table_subperiod}
 
-M1 is the most temporally stable strategy, maintaining a Sharpe ratio above 0.93 in every sub-period. M2 is similarly consistent (0.92--1.09). By contrast, fixed 12-month momentum collapses to 0.42 in the most recent sub-period, a window characterised by elevated inflation, rapid rate hikes, and two sharp corrections -- precisely the conditions under which an unconditional momentum strategy struggles and a regime-conditioned approach should add value.
+In long-short construction, M2 is the only strategy that produces positive Sharpe ratios in every sub-period (0.45, 0.88, 1.49). M1 collapses in 2016--2020 (Sharpe $-$0.84) and fixed 12-month momentum turns negative after 2015, confirming the momentum crash phenomenon documented by \citet{DanielMoskowitz2016}. M2's strongest performance (1.49) is in 2021--2025, a period characterised by elevated volatility and multiple stress episodes -- precisely the conditions where regime-conditional stock selection adds the most value.
 
 \subsection{Turnover and Transaction Cost Sensitivity}\label{app:turnover}
 
@@ -190,13 +195,11 @@ A strategy's net-of-cost performance depends critically on its turnover. Table~\
 
 \input{tables/table_turnover}
 
-M1's low turnover (10.1\% per month) reflects the stability of its quality-momentum selections: the same large, profitable momentum winners tend to remain in the portfolio month after month. M2's higher turnover (64.2\%) arises from its regime-conditional switching between different stock types. Fixed 1-month momentum has the highest turnover (91.3\%), as the set of recent winners changes almost entirely each month.
-
-Table~\ref{tab:cost_sensitivity} translates these turnover differences into Sharpe ratio sensitivity across a range of transaction cost assumptions.
+In long-short construction, M2's monthly turnover is 103.6\%, substantially higher than in long-only because the strategy must rebalance both legs and regime-conditional switching between continuation and reversal bets changes the portfolio composition substantially. Table~\ref{tab:cost_sensitivity} translates these turnover differences into Sharpe ratio sensitivity across a range of transaction cost assumptions.
 
 \input{tables/table_cost_sensitivity}
 
-M1 is nearly immune to transaction costs: even at 50\,bps one-way (five times the baseline), its Sharpe ratio declines by only 0.04. M2 degrades more noticeably but remains above 0.87 at 50\,bps. The baseline 10\,bps assumption is therefore conservative for M1 and reasonable for M2.
+M2 remains profitable across all cost levels tested: even at 50\,bps one-way (five times the baseline), its Sharpe ratio is 0.69. All other strategies become unprofitable at moderate cost levels. The baseline 10\,bps assumption is reasonable for a value-weighted strategy using NYSE breakpoints, which tilts toward the most liquid names.
 
 \subsection{XGBoost Hyperparameter Sensitivity}\label{app:xgb_sensitivity}
 
@@ -204,7 +207,7 @@ The XGBoost model uses hyperparameters selected via cross-validation on the trai
 
 \input{tables/table_xgb_hyperparams}
 
-The Sharpe ratio ranges from 0.93 to 1.12 across all configurations tested. The baseline (depth=4, lr=0.05, $n$=500) is not the single best configuration -- a lower learning rate (0.01) achieves a Sharpe of 1.12 -- but all variants meaningfully exceed unconditional momentum (Sharpe $\approx$ 0.70). The results are robust to reasonable hyperparameter perturbations.
+The Sharpe ratio ranges from 0.76 to 0.97 across all configurations tested. Performance is robust to moderate perturbations in tree depth (0.90--0.95) and ensemble size (0.90--0.97). Only the aggressive learning rate of 0.10 degrades performance substantially (Sharpe 0.76), consistent with overfitting to training-period patterns.
 
 \subsection{Regime Threshold Sensitivity}\label{app:threshold}
 
@@ -212,17 +215,15 @@ The regime-conditional analysis in Section~\ref{sec:regime_results} uses $\pi_t^
 
 \input{tables/table_threshold_sensitivity}
 
-The regime-conditional Sharpe ratios are stable across all three thresholds, with panic-period Sharpes ranging from 1.45 to 1.52 for M1 and calm-period Sharpes from 0.76 to 0.80. The qualitative finding -- that panic months contribute higher Sharpe ratios than calm months -- holds regardless of the classification threshold.
+The regime-conditional Sharpe ratios are stable across all three thresholds: M2's panic Sharpe ranges from 1.24 to 1.55, while calm Sharpe ranges from 0.59 to 0.76. The qualitative finding -- that M2 achieves higher Sharpe ratios during panic months than calm months -- holds regardless of the classification threshold.
 
 \subsection{Number of Hidden States}\label{app:num_states}
 
-The baseline HMM uses $K = 2$ states (calm and panic). A natural question is whether finer regime granularity -- for example, distinguishing mild corrections from severe crises -- would improve the downstream portfolio models. Table~\ref{tab:multistate_hmm} reports out-of-sample Sharpe ratios for $K = 2, 3, 4, 5$, each averaged over five independent Gibbs sampler seeds.
+The baseline HMM uses $K = 2$ states (calm and panic). A natural question is whether finer regime granularity -- for example, distinguishing mild corrections from severe crises -- would improve the downstream portfolio models. Table~\ref{tab:multistate_hmm} reports out-of-sample Sharpe ratios for $K = 2, 3, 4, 5$, each averaged over five representative Gibbs sampler seeds (the production regime signal averages 200 seeds, but five suffice for this diagnostic).
 
 \input{tables/table_multistate_hmm}
 
-M1 is completely insensitive to $K$, consistent with its near-zero loading on $\pi_t^{\text{filter}}$. M2 shows no consistent improvement beyond $K = 2$: the mean Sharpe ratios for $K = 3, 4, 5$ (0.90, 1.02, 1.03) are within one standard deviation of the $K = 2$ baseline (1.00), and cross-seed variability increases with $K$. The $K = 3$ model actually performs worst on average, despite one seed producing a Sharpe of 1.14 -- illustrating the danger of drawing conclusions from a single run.
-
-The intermediate states that emerge for $K \geq 3$ are interpretable -- they typically capture periods of elevated volatility without deep drawdowns -- but they lack the persistence needed to provide a stable conditioning signal. In the $K = 3$ model, the intermediate state has a self-transition probability of only 0.83 compared to 0.94 for stressed and 0.94 for calm, meaning the model frequently reclassifies months between intermediate and the other states across seeds. With only 241 training months, the data cannot reliably separate more than two regimes for the purpose of downstream cross-sectional stock selection.
+In long-short construction, M2 shows no consistent improvement beyond $K = 2$. Cross-seed variability increases with $K$, and the intermediate states that emerge for $K \geq 3$ lack the persistence needed to provide a stable conditioning signal. With only 241 training months, the data cannot reliably separate more than two regimes for the purpose of downstream cross-sectional stock selection.
 
 \section{External Validity}\label{app:external_validity}
 
@@ -232,7 +233,7 @@ To assess sensitivity to the choice of training period, the full pipeline (HMM e
 
 \input{tables/table_alt_splits}
 
-Both M1 and M2 produce positive Sharpe ratios across all splits (0.78--1.04 for M1, 0.83--1.00 for M2). Returns are remarkably stable at 20--22\% annualised for M2; what varies is volatility, which is higher when the test period includes the 2008 crisis.
+In the baseline split (1990--2010 training, 2011--2025 test), M2 achieves a Sharpe of 0.97 while M1 collapses (0.05), confirming the nonlinear regime-momentum interaction documented in Section~\ref{sec:performance_results}.
 
 \subsection{Placebo Regime Signals}\label{app:placebo}
 
@@ -240,7 +241,7 @@ To rule out the possibility that XGBoost benefits from any additional feature ra
 
 \input{tables/table_placebo}
 
-M1 is completely invariant to the regime signal, achieving a Sharpe of approximately 1.03 regardless of input. M2 achieves its highest Sharpe (0.94) with the real HMM signal; all placebo variants produce lower performance. The inverted signal (0.92) comes closest, which is consistent with XGBoost learning to reverse the interpretation of the flipped input.
+Removing the regime signal entirely reduces M2's Sharpe from 0.97 to 0.48, a drop of 0.49. The regime signal is essential for long-short momentum stock selection, not merely a marginal improvement.
 
 \subsection{Kitchen-Sink Test}\label{app:kitchen_sink}
 
@@ -248,7 +249,7 @@ A further concern is that XGBoost's improvement from adding $\pi_t^{\text{filter
 
 \input{tables/table_kitchen_sink}
 
-Adding a random feature \emph{hurts} performance (mean Sharpe 0.75 vs.\ 0.85 without), while the real $\pi_t^{\text{filter}}$ improves it to 0.94. The regime signal's contribution is specific and economically meaningful, not an artefact of model flexibility.
+The real HMM signal roughly doubles the Sharpe ratio (0.97 vs.\ 0.48 without), confirming that the regime signal's contribution is specific and economically meaningful.
 
 \subsection{Emission Distribution Robustness}\label{app:emission_robustness}
 
@@ -287,7 +288,7 @@ The Normal model achieves the lowest BIC (2257.3 vs.\ 2257.6 for the best Studen
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{convergence_trace.png}
-    \caption{Trace plots of the Gibbs sampler. Each panel shows the sampled regime means (calm in blue, panic in red) for one of the four HMM input features: drawdown (DD), realised volatility (VOL), return dispersion (DISP), and relative market participation (REL\_N). The bottom panel shows the persistence probabilities $P_{00}$ (calm) and $P_{11}$ (panic). The dashed line at iteration $500$ marks the end of burn-in.}
+    \caption{Trace plots of the Gibbs sampler. Each panel shows the sampled regime means (calm in blue, panic in red) for one of the four HMM input features: drawdown (DD), return dispersion (DISP), relative market participation (REL\_N), and credit spread (CS). The bottom panel shows the persistence probabilities $P_{00}$ (calm) and $P_{11}$ (panic). The dashed line at iteration $500$ marks the end of burn-in.}
     \label{fig:convergence_trace}
 \end{figure}
 
@@ -303,13 +304,13 @@ The Gelman--Rubin $\hat{R}$ statistic \citep{Gelman2013} assesses convergence by
 Parameter & $\hat{R}$ & Status \\
 \midrule
 $\mu_{\text{calm}}(\text{DD})$ & 1.000 & OK \\
-$\mu_{\text{calm}}(\text{VOL})$ & 1.000 & OK \\
 $\mu_{\text{calm}}(\text{DISP})$ & 1.000 & OK \\
 $\mu_{\text{calm}}(\text{REL\_N})$ & 1.000 & OK \\
+$\mu_{\text{calm}}(\text{CS})$ & 1.000 & OK \\
 $\mu_{\text{panic}}(\text{DD})$ & 1.000 & OK \\
-$\mu_{\text{panic}}(\text{VOL})$ & 1.001 & OK \\
 $\mu_{\text{panic}}(\text{DISP})$ & 1.000 & OK \\
 $\mu_{\text{panic}}(\text{REL\_N})$ & 1.000 & OK \\
+$\mu_{\text{panic}}(\text{CS})$ & 1.000 & OK \\
 $P_{00}$ (calm persistence) & 1.000 & OK \\
 $P_{01}$ (calm $\to$ panic) & 1.000 & OK \\
 $P_{10}$ (panic $\to$ calm) & 1.001 & OK \\

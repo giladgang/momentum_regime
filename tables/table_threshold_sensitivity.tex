@@ -1,17 +1,17 @@
 \begin{table}[H]
 \centering
 \small
-\begin{tabular}{l r r r r r r}
+\begin{tabular}{l r r r r}
 \toprule
- & \multicolumn{2}{c}{Months} & \multicolumn{2}{c}{Market Sharpe} & \multicolumn{2}{c}{M1 Sharpe} \\
-\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7}
-Threshold & Calm & Panic & Calm & Panic & Calm & Panic \\
+ & \multicolumn{2}{c}{Months} & \multicolumn{2}{c}{M2 Sharpe} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5}
+Threshold & Calm & Panic & Calm & Panic \\
 \midrule
-$\pi > 0.25$ & 114 & 53 & 0.63 & 1.19 & 0.76 & 1.50 \\
-$\pi > 0.50$ & 116 & 51 & 0.67 & 1.15 & 0.80 & 1.45 \\
-$\pi > 0.75$ & 118 & 49 & 0.65 & 1.21 & 0.78 & 1.52 \\
+$\pi > 0.25$ & 103 & 64 & 0.76 & 1.24 \\
+$\pi > 0.50$ & 108 & 59 & 0.61 & 1.50 \\
+$\pi > 0.75$ & 110 & 57 & 0.59 & 1.55 \\
 \bottomrule
 \end{tabular}
-\caption{Regime threshold sensitivity. Regime-conditional Sharpe ratios for the market and M1 under alternative panic thresholds for $\pi_t^{\text{filter}}$. Results are stable across all three thresholds, indicating that the regime-conditional findings are not sensitive to the binary classification cutoff.}
+\caption{Regime threshold sensitivity (long-short construction). Regime-conditional Sharpe ratios for M2 under alternative panic thresholds for $\pi_t^{\text{filter}}$. M2 achieves higher Sharpe ratios during panic than calm at all thresholds. The pattern is stable, indicating that the regime-conditional finding is not sensitive to the binary classification cutoff.}
 \label{tab:threshold_sensitivity}
 \end{table}

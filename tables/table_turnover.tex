@@ -5,12 +5,12 @@
 \toprule
 Strategy & Avg.\ Monthly TO & Annualised TO \\
 \midrule
-Fixed 12-mo   & 33.1\% & 397\% \\
-Fixed 1-mo    & 91.3\% & 1{,}096\% \\
-M1: LR        & 10.1\% & 122\% \\
-M2: XGB       & 64.2\% & 770\% \\
+Fixed 12-mo   & 70.1\% & 842\% \\
+Fixed 1-mo    & 184.3\% & 2{,}211\% \\
+M1: LR        & 39.7\% & 477\% \\
+M2: XGB       & 103.6\% & 1{,}243\% \\
 \bottomrule
 \end{tabular}
-\caption{Portfolio turnover by strategy. Average monthly one-way turnover and annualised turnover (monthly $\times$ 12). M1's turnover is remarkably low (10.1\% per month), reflecting the stability of its quality-momentum selections. M2 and fixed 1-month momentum exhibit high turnover, making them more sensitive to transaction costs.}
+\caption{Portfolio turnover by strategy (long-short construction). Average monthly one-way turnover includes both the long and short legs. M2's turnover (103.6\% per month) is higher than in long-only construction because the regime-conditional switching between continuation and reversal bets changes both legs substantially. Despite this high turnover, M2 remains profitable at 50 basis points one-way costs (Table~\ref{tab:cost_sensitivity}).}
 \label{tab:turnover}
 \end{table}

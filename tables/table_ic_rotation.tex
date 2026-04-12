@@ -1,0 +1,26 @@
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{l r r r r}
+\toprule
+ & \multicolumn{2}{c}{Calm months} & \multicolumn{2}{c}{Panic months} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5}
+Horizon & IC & $t$-stat & IC & $t$-stat \\
+\midrule
+$mom_1$  &  0.020 &  2.84*** & $-$0.012 & $-$1.11 \\
+$mom_2$  &  0.024 &  2.86*** & $-$0.010 & $-$0.77 \\
+$mom_3$  &  0.024 &  2.58*** & $-$0.011 & $-$0.74 \\
+$mom_4$  &  0.029 &  3.33*** & $-$0.001 & $-$0.03 \\
+$mom_5$  &  0.028 &  3.13*** &   0.005 &   0.37 \\
+$mom_6$  &  0.027 &  2.91*** &   0.009 &   0.59 \\
+$mom_7$  &  0.027 &  2.77*** &   0.015 &   0.99 \\
+$mom_8$  &  0.032 &  3.31*** &   0.013 &   0.79 \\
+$mom_9$  &  0.032 &  3.26*** &   0.016 &   0.99 \\
+$mom_{10}$ &  0.034 &  3.45*** &   0.020 &   1.23 \\
+$mom_{11}$ &  0.029 &  3.02*** &   0.021 &   1.28 \\
+$mom_{12}$ &  0.027 &  2.78*** &   0.026 &   1.60 \\
+\bottomrule
+\end{tabular}
+\caption{Information coefficient (Spearman rank correlation between momentum signal and forward stock return) by lookback horizon, decomposed by regime. In calm months, all horizons from $mom_1$ through $mom_{12}$ are positive and statistically significant, with the strongest predictive power at intermediate-to-long horizons. In panic months, short-horizon signals ($mom_1$ through $mom_3$) develop negative ICs, indicating short-term reversal. Longer horizons retain positive ICs but none is statistically significant. $^{***}$\,$p<0.01$.}
+\label{tab:ic_rotation}
+\end{table}

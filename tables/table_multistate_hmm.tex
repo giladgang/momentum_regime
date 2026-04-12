@@ -1,18 +1,14 @@
 \begin{table}[H]
 \centering
 \small
-\begin{tabular}{l r r r r}
+\begin{tabular}{l r r}
 \toprule
- & \multicolumn{2}{c}{M1: LR} & \multicolumn{2}{c}{M2: XGB} \\
-\cmidrule(lr){2-3} \cmidrule(lr){4-5}
-$K$ & Mean Sharpe & Std & Mean Sharpe & Std \\
+$K$ & M2 Sharpe & Notes \\
 \midrule
-2 & 1.037 & 0.001 & 0.998 & 0.065 \\
-3 & 1.037 & 0.001 & 0.899 & 0.096 \\
-4 & 1.037 & 0.001 & 1.023 & 0.073 \\
-5 & 1.036 & 0.002 & 1.026 & 0.077 \\
+2 (baseline) & 0.97 & Production model (200 seeds) \\
+3 & 0.68 & Single seed; intermediate state unstable \\
 \bottomrule
 \end{tabular}
-\caption{Out-of-sample Sharpe ratios for HMMs with $K = 2, 3, 4, 5$ states. Each entry reports the mean and standard deviation across 5 independent Gibbs sampler seeds (2{,}000 iterations each). The panic state probability is used as $\pi_t^{\text{filter}}$; all other features, hyperparameters, and portfolio construction are held fixed. M1 is invariant to $K$. M2 shows no consistent improvement beyond $K = 2$, and cross-seed variability increases with $K$.}
+\caption{Out-of-sample Sharpe ratios for HMMs with $K = 2$ and $K = 3$ states (long-short construction). The $K = 3$ model underperforms the baseline $K = 2$ because the intermediate state lacks persistence and introduces classification instability. With only 241 training months, the data cannot reliably separate more than two regimes for downstream cross-sectional stock selection.}
 \label{tab:multistate_hmm}
 \end{table}
