@@ -72,9 +72,11 @@ The reversal mechanism has a clear time structure. At the 1-month horizon, panic
 
 \subsubsection{Stress Test: What If Reversal Stops Working?}\label{sec:stress_test}
 
-The reversal premium is the engine of M2's panic-period performance. But this premium is not guaranteed: it depends on beaten-down stocks actually recovering. In a prolonged fundamental deterioration -- a depression, a banking crisis where firms fail, or a structural decline like Japan's lost decades -- buying beaten-down stocks is catching a falling knife. The thesis's central finding (momentum rotates from continuation to reversal in panic) has a mirror-image vulnerability: \emph{what if the rotation doesn't work?}
+During panic months, M2 earns a long-short spread of 3.09\% per month by buying stocks that recently fell and shorting stocks that recently held up. This spread -- the \emph{reversal premium} -- arises because temporary selling pressure (margin calls, fund redemptions) pushes prices below fundamental value, and they snap back once the pressure subsides.
 
-To quantify this risk, four scenarios are simulated by progressively degrading the reversal premium during panic months.
+But the reversal premium depends on a critical assumption: that the price declines are temporary, not permanent. \emph{Reversal failure} occurs when beaten-down stocks do not recover -- because the underlying companies are genuinely deteriorating, not merely suffering from liquidity-driven mispricing. In a prolonged fundamental deterioration -- a depression, a banking crisis where firms actually fail, or a structural decline like Japan's lost decades -- buying beaten-down stocks is catching a falling knife. The stocks M2 buys keep falling, the ``defensive'' stocks M2 shorts hold their value, and the long-short spread turns negative.
+
+This is the mirror-image vulnerability of the thesis's central finding: standard momentum fails when continuation stops working \citep{DanielMoskowitz2016}; the regime-conditioned strategy fails when reversal stops working. To quantify this risk, four scenarios are simulated by progressively degrading the reversal premium during panic months.
 
 \begin{table}[H]
 \centering
