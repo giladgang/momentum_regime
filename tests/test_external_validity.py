@@ -11,13 +11,18 @@ Four validation batteries:
 
 import numpy as np
 import pandas as pd
-import pickle, warnings, time
+import pickle, warnings, time, sys, os
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 from xgboost import XGBRegressor
 from scipy.stats import multivariate_normal, invwishart
 from scipy.special import logsumexp
 warnings.filterwarnings('ignore')
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from config import (PORTFOLIO_TYPE, TRADING_FEE as CFG_TRADING_FEE, TRAIN_END,
+                    HMM_FEATURES, ALT_SPLITS, N_PLACEBO_RUNS,
+                    N_ESTIMATORS, MAX_DEPTH, LEARNING_RATE, SUBSAMPLE, COLSAMPLE)
 
 # ═══════════════════════════════════════════════════════════════════════════════
 #  DATA
@@ -62,7 +67,7 @@ FEATURES = MOM_FEATURES + ['pi_filter'] + FUND_FEATURES
 FEATURES_NO_PI = MOM_FEATURES + FUND_FEATURES
 CORE_FEATURES = MOM_FEATURES + ['pi_filter', 'log_me']
 
-TRADING_FEE = 0.001
+TRADING_FEE = CFG_TRADING_FEE
 
 df = stocks.dropna(subset=['ret_fwd'] + CORE_FEATURES).copy().reset_index(drop=True)
 print(f"  Total obs: {len(df):,}")
@@ -121,6 +126,13 @@ def long_short_port(df_test, score_col, fee=TRADING_FEE):
         return pd.Series(dtype=float)
     return pd.DataFrame(monthly).set_index('date')['ret']
 
+def build_port(df_test, score_col, fee=TRADING_FEE):
+    """Dispatcher: calls long_only_port or long_short_port based on config."""
+    if PORTFOLIO_TYPE == 'long_short':
+        return long_short_port(df_test, score_col, fee=fee)
+    else:
+        return long_only_port(df_test, score_col, fee=fee)
+
 def metrics(r):
     r = pd.Series(r).dropna()
     if len(r) < 6: return 0, 0, 0, 0
@@ -153,7 +165,7 @@ def run_pipeline(train_df, test_df, features, label=''):
     lr.fit(X_tr_s, train_df['above_med'].values)
     test_df = test_df.copy()
     test_df['score_lr'] = lr.predict_proba(X_te_s)[:, 1]
-    r_lr = long_short_port(test_df, 'score_lr')
+    r_lr = build_port(test_df, 'score_lr')
     _, _, sh_lr, _ = metrics(r_lr)
 
     # XGB
@@ -162,7 +174,7 @@ def run_pipeline(train_df, test_df, features, label=''):
                         tree_method='hist', random_state=42, verbosity=0)
     xgb.fit(X_tr, y_tr)
     test_df['score_xgb'] = xgb.predict(X_te)
-    r_xgb = long_short_port(test_df, 'score_xgb')
+    r_xgb = build_port(test_df, 'score_xgb')
     ret_xgb, vol_xgb, sh_xgb, mdd_xgb = metrics(r_xgb)
 
     return {'sh_lr': sh_lr, 'sh_xgb': sh_xgb, 'ret_xgb': ret_xgb,
@@ -338,8 +350,8 @@ print("\n" + "=" * 90)
 print("  TEST 3: PLACEBO REGIME SIGNALS")
 print("=" * 90)
 
-train_base = df[df['date'] < '2011-01-01'].copy()
-test_base = df[df['date'] >= '2011-01-01'].copy()
+train_base = df[df['date'] < TRAIN_END].copy()
+test_base = df[df['date'] >= TRAIN_END].copy()
 
 # 3a: Baseline (real pi_filter)
 res_base = run_pipeline(train_base, test_base, FEATURES)
@@ -368,8 +380,8 @@ for shuf_seed in range(5):
     df_shuf = df.copy()
     df_shuf = df_shuf.merge(pi_monthly[['date', f'pi_shuf_{shuf_seed}']], on='date', how='left')
     df_shuf['pi_filter'] = df_shuf[f'pi_shuf_{shuf_seed}'].ffill()
-    train_shuf = df_shuf[df_shuf['date'] < '2011-01-01'].copy()
-    test_shuf = df_shuf[df_shuf['date'] >= '2011-01-01'].copy()
+    train_shuf = df_shuf[df_shuf['date'] < TRAIN_END].copy()
+    test_shuf = df_shuf[df_shuf['date'] >= TRAIN_END].copy()
     res_shuf = run_pipeline(train_shuf, test_shuf, FEATURES)
     shuffle_results.append(res_shuf['sh_xgb'])
 
@@ -383,8 +395,8 @@ for noise_seed in range(5):
     df_noise = df.copy()
     df_noise = df_noise.merge(pi_monthly[['date', 'pi_noise']], on='date', how='left')
     df_noise['pi_filter'] = df_noise['pi_noise'].ffill()
-    train_noise = df_noise[df_noise['date'] < '2011-01-01'].copy()
-    test_noise = df_noise[df_noise['date'] >= '2011-01-01'].copy()
+    train_noise = df_noise[df_noise['date'] < TRAIN_END].copy()
+    test_noise = df_noise[df_noise['date'] >= TRAIN_END].copy()
     res_noise = run_pipeline(train_noise, test_noise, FEATURES)
     noise_results.append(res_noise['sh_xgb'])
 
@@ -393,8 +405,8 @@ print(f"  {'Random noise (mean +/- std, 5 runs)':<35s}  {'--':>10s}  {np.mean(no
 # 3e: Inverted pi_filter (1 - pi)
 df_inv = df.copy()
 df_inv['pi_filter'] = 1.0 - df_inv['pi_filter']
-train_inv = df_inv[df_inv['date'] < '2011-01-01'].copy()
-test_inv = df_inv[df_inv['date'] >= '2011-01-01'].copy()
+train_inv = df_inv[df_inv['date'] < TRAIN_END].copy()
+test_inv = df_inv[df_inv['date'] >= TRAIN_END].copy()
 res_inv = run_pipeline(train_inv, test_inv, FEATURES)
 print(f"  {'Inverted pi (1 - pi_filter)':<35s}  {res_inv['sh_lr']:>10.3f}  {res_inv['sh_xgb']:>10.3f}")
 

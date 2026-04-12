@@ -14,9 +14,14 @@ Same features, same XGBoost hyperparameters, same portfolio construction.
 
 import numpy as np
 import pandas as pd
+import sys, os
 from xgboost import XGBRegressor
 import warnings, time
 warnings.filterwarnings('ignore')
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from config import (PORTFOLIO_TYPE, TRADING_FEE as CFG_TRADING_FEE, TRAIN_END,
+                    N_ESTIMATORS, MAX_DEPTH, LEARNING_RATE, SUBSAMPLE, COLSAMPLE)
 
 print("=" * 80)
 print("  REGIME SIGNAL ABLATION: pi_filter vs GHM cycle vs None")
@@ -102,8 +107,8 @@ FEATURES_NONE = MOM_FEATURES + FUND_FEATURES
 CORE_DROP = MOM_FEATURES + ['log_me', 'ret_fwd']
 df = stocks.dropna(subset=CORE_DROP).copy().reset_index(drop=True)
 
-train = df[df['date'] < '2011-01-01'].copy()
-test  = df[df['date'] >= '2011-01-01'].copy()
+train = df[df['date'] < TRAIN_END].copy()
+test  = df[df['date'] >= TRAIN_END].copy()
 
 print(f"  Train: {len(train):,}  |  Test: {len(test):,}")
 
@@ -111,7 +116,7 @@ print(f"  Train: {len(train):,}  |  Test: {len(test):,}")
 #  PORTFOLIO CONSTRUCTION
 # ═══════════════════════════════════════════════════════════════════════════════
 
-TRADING_FEE = 0.001
+TRADING_FEE = CFG_TRADING_FEE
 
 def long_only_port(df_test, score_col, fee=TRADING_FEE):
     monthly, prev_weights = [], {}
@@ -161,6 +166,12 @@ def long_short_port(df_test, score_col, fee=TRADING_FEE):
     return pd.DataFrame(monthly).set_index('date')['ret']
 
 
+def build_port(df_test, score_col, fee=TRADING_FEE):
+    if PORTFOLIO_TYPE == 'long_short':
+        return long_short_port(df_test, score_col, fee=fee)
+    else:
+        return long_only_port(df_test, score_col, fee=fee)
+
 def metrics(r):
     r = pd.Series(r).dropna()
     if len(r) < 12:
@@ -202,7 +213,7 @@ for name, features in variants.items():
     xgb.fit(X_train, y_train)
 
     test[f'score_{name}'] = xgb.predict(X_test)
-    r = long_short_port(test, f'score_{name}')
+    r = build_port(test, f'score_{name}')
     m = metrics(r)
     results[name] = m
 

@@ -18,7 +18,7 @@ matplotlib.use('Agg')
 
 import numpy as np
 import pandas as pd
-import pickle, joblib, os, warnings
+import pickle, joblib, os, sys, warnings
 from scipy.stats import spearmanr, ttest_1samp, ttest_rel
 import statsmodels.api as sm
 from statsmodels.tsa.stattools import grangercausalitytests
@@ -26,7 +26,12 @@ from statsmodels.tsa.stattools import grangercausalitytests
 warnings.filterwarnings('ignore')
 np.random.seed(42)
 
-TABLES_DIR = 'tables'
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from config import (PORTFOLIO_TYPE, TRADING_FEE, TRAIN_END, TABLES_DIR,
+                    XGB_SEEDS, N_ESTIMATORS, MAX_DEPTH, LEARNING_RATE,
+                    SUBSAMPLE, COLSAMPLE, CS_FEATURES, MOM_FEATURES,
+                    USE_FUNDAMENTALS)
+
 os.makedirs(TABLES_DIR, exist_ok=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -53,7 +58,7 @@ panel['date'] = pd.to_datetime(panel['date'])
 
 MOM_LBS      = list(range(1, 13))
 MOM_FEATURES = [f'mom_{lb}' for lb in MOM_LBS]
-TRADING_FEE  = 0.001  # 10 bps one-way
+# TRADING_FEE imported from config.py
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -115,6 +120,14 @@ def long_short_port(df_data, score_col, fee=TRADING_FEE):
         monthly.append({'date': date, 'ret': r_long - r_short - fee * (tl + ts)})
         prev_lw, prev_sw = new_lw, new_sw
     return pd.DataFrame(monthly).set_index('date')['ret']
+
+
+def build_port(df_data, score_col, fee=TRADING_FEE):
+    """Dispatcher: calls long_only_port or long_short_port based on config."""
+    if PORTFOLIO_TYPE == 'long_short':
+        return long_short_port(df_data, score_col, fee=fee)
+    else:
+        return long_only_port(df_data, score_col, fee=fee)
 
 
 def block_bootstrap_sharpe(r, n_boot=10000, block_len=12):
@@ -212,7 +225,7 @@ def compute_dyn_score(data, a_bu, a_co, a_be, a_re):
 ghm_returns = {}
 for name, a in [('GHM SLOW (a=0)', 0.0), ('GHM MED (a=0.5)', 0.5), ('GHM FAST (a=1)', 1.0)]:
     test[f'score_{name}'] = compute_blended_score(test, a).values
-    ghm_returns[name] = long_short_port(test, f'score_{name}')
+    ghm_returns[name] = build_port(test, f'score_{name}')
 
 # DYN: grid search on training
 best_sharpe, best_pair = -999, (0.5, 0.5)
@@ -220,7 +233,7 @@ grid = np.arange(0.0, 1.05, 0.1)
 for a_co in grid:
     for a_re in grid:
         train['_dyn'] = compute_dyn_score(train, 0.5, a_co, 0.5, a_re).values
-        r = long_short_port(train, '_dyn')
+        r = build_port(train, '_dyn')
         if len(r) < 12:
             continue
         sh = r.mean() / r.std() * np.sqrt(12) if r.std() > 0 else 0
@@ -232,7 +245,7 @@ a_co_hat, a_re_hat = best_pair
 print(f"  DYN speeds: a_Co={a_co_hat:.2f}, a_Re={a_re_hat:.2f}")
 
 test['score_dyn'] = compute_dyn_score(test, 0.5, a_co_hat, 0.5, a_re_hat).values
-ghm_returns['GHM DYN'] = long_short_port(test, 'score_dyn')
+ghm_returns['GHM DYN'] = build_port(test, 'score_dyn')
 
 if '_dyn' in train.columns:
     train.drop(columns=['_dyn'], inplace=True)
@@ -270,7 +283,7 @@ if 'above_med' not in train.columns:
 lr_red = LogisticRegression(max_iter=1000, C=1.0)
 lr_red.fit(X_tr_red_s, train['above_med'].values)
 test['score_lr_red'] = lr_red.predict_proba(X_te_red_s)[:, 1]
-r_lr_red = long_short_port(test, 'score_lr_red')
+r_lr_red = build_port(test, 'score_lr_red')
 print(f"  M1: LR (mom+pi) — {len(r_lr_red)} monthly obs")
 
 # XGB: fit on reduced features (XGB handles NaN natively)
@@ -280,7 +293,7 @@ xgb_red = XGBRegressor(n_estimators=500, max_depth=4, learning_rate=0.05,
                         tree_method='hist', random_state=42, verbosity=0)
 xgb_red.fit(X_train_red, y_train_vals)
 test['score_xgb_red'] = xgb_red.predict(X_test_red)
-r_xgb_red = long_short_port(test, 'score_xgb_red')
+r_xgb_red = build_port(test, 'score_xgb_red')
 print(f"  M2: XGB (mom+pi) — {len(r_xgb_red)} monthly obs")
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -299,7 +312,7 @@ score_map = {
     'Method 2: XGB':   'score_xgb',
 }
 for sname, scol in score_map.items():
-    strats_ls[sname] = long_short_port(test, scol)
+    strats_ls[sname] = build_port(test, scol)
 
 all_strats = {
     'Market':               r_mkt,

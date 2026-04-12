@@ -11,7 +11,7 @@ Observation equation:
 Transition equation:
     P(s_t = j | s_{t-1} = i) = P[i, j]
 
-where z_t = [DD_z, VOL_z, DISP_z, REL_N_z] (standardized, pre-computed
+where z_t = [DD_z, CS_z, DISP_z, REL_N_z] (standardized, pre-computed
 in import_wrds.py). Sample starts 1990 (when stock-level data begins).
 
 The regime s_t in {0, 1} is latent.
@@ -58,16 +58,19 @@ import matplotlib.pyplot as plt
 
 # ── Section 1: Load data and split ───────────────────────────────────────────
 
-panel = pd.read_parquet('data/panel.parquet')
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from config import HMM_FEATURES, HMM_SEEDS, HMM_ITERATIONS, HMM_BURNIN, K_STATES, HMM_START, TRAIN_END, PANEL_PATH
 
-# Use 4 features selected via exhaustive search + validation (see data_section.tex).
-# Sample starts 1990 because DISP and REL_N require stock-level data from that year.
-features_z = ['DD_z', 'VOL_z', 'DISP_z', 'REL_N_z']
+panel = pd.read_parquet(PANEL_PATH)
+
+# Use features from config.py (selected via exhaustive search + validation)
+features_z = HMM_FEATURES
 panel = panel.dropna(subset=features_z).reset_index(drop=True)
 
-# Train/test split matching import_wrds.py convention
-train_panel = panel[panel['date'] <  '2011-01-01'].reset_index(drop=True)
-test_panel  = panel[panel['date'] >= '2011-01-01'].reset_index(drop=True)
+# Train/test split from config
+train_panel = panel[panel['date'] < TRAIN_END].reset_index(drop=True)
+test_panel  = panel[panel['date'] >= TRAIN_END].reset_index(drop=True)
 
 Z_train = train_panel[features_z].values.astype(float)
 Z_test  = test_panel[features_z].values.astype(float)
@@ -97,12 +100,13 @@ m_0  = np.zeros(D)          # prior mean: zero, since features are z-scored
 
 # ── Section 3: Initialization helper ─────────────────────────────────────────
 
-vol_idx = features_z.index('VOL_z')  # index of volatility feature, used for initial state assignment
+# Use first feature (DD) for initial state assignment -- below-median DD = panic
+vol_idx = 0  # DD_z is always first; below median = more stress
 
 def init_sampler(seed):
     """Initialize Gibbs sampler state for a given random seed."""
     np.random.seed(seed)
-    # crude initial state assignment: above-median VOL -> panic (1), below -> calm (0)
+    # crude initial state assignment: above-median first feature -> state 1, below -> state 0
     states = (Z_train[:, vol_idx] > np.median(Z_train[:, vol_idx])).astype(int)
     mu_init    = np.zeros((K, D))
     Sigma_init = np.array([np.eye(D)] * K)
@@ -243,11 +247,11 @@ def forward_filter(Z, mu, Sigma, P):
 RERUN_MCMC  = True
 MCMC_CACHE  = 'data/mcmc_draws.npz'
 
-SEEDS = [2201, 42, 1337, 7777, 31415]  # 5 seeds for averaging
+SEEDS = HMM_SEEDS  # from config.py
 N_SEEDS = len(SEEDS)
 
-n_iter   = 2000   # total Gibbs iterations per seed
-n_burnin = 500    # iterations discarded before collecting draws
+n_iter   = HMM_ITERATIONS   # total Gibbs iterations per seed (from config.py)
+n_burnin = HMM_BURNIN       # iterations discarded before collecting draws (from config.py)
 n_keep   = n_iter - n_burnin  # number of posterior draws saved per seed
 
 import os
@@ -453,7 +457,7 @@ def compute_ess(chain):
 regime_labels = ['Calm', 'Panic']
 feature_display_names = {
     'DD_z': 'DD (Drawdown)',
-    'VOL_z': 'VOL (Realised Volatility)',
+    'CS_z': 'CS (Credit Spread)',
     'DISP_z': 'DISP (Return Dispersion)',
     'REL_N_z': 'REL_N (Market Participation)',
 }
@@ -667,18 +671,18 @@ plt.close(fig)
 regime_label = (pi_smooth_full > 0.5).astype(int)
 colors = np.where(regime_label == 1, 'crimson', 'steelblue')
 
-# Chart B1: HMM features (DD, VOL, DISP, REL_N)
+# Chart B1: HMM features (DD, CS, DISP, REL_N)
 fig, axes = plt.subplots(4, 1, figsize=(14, 12), sharex=True)
 for ax, feat_z, feat_raw in zip(axes,
-    ['DD_z', 'VOL_z', 'DISP_z', 'REL_N_z'],
-    ['DD', 'VOL', 'DISP', 'REL_N']):
+    ['DD_z', 'CS_z', 'DISP_z', 'REL_N_z'],
+    ['DD', 'CS', 'DISP', 'REL_N']):
     ax.scatter(dates, panel[feat_raw], c=colors, s=4, alpha=0.7)
     ax.set_ylabel(feat_z, fontsize=9)
     ax.axhline(0, color='black', linewidth=0.4, linestyle='--')
     ax.axvline(pd.Timestamp('2011-01-01'), color='black', linewidth=1, linestyle='--')
     shade_crises(ax)
 axes[-1].set_xlabel('Date')
-fig.suptitle('HMM Features (DD, VOL, DISP, REL_N) coloured by regime (red=panic, blue=calm)', fontsize=11)
+fig.suptitle('HMM Features (DD, CS, DISP, REL_N) coloured by regime (red=panic, blue=calm)', fontsize=11)
 plt.tight_layout()
 fig.savefig('regime_features_1.png', dpi=150)
 plt.close(fig)

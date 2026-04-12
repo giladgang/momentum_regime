@@ -94,57 +94,41 @@ Standardisation ensures that all features contribute equally to the HMM's Gaussi
 
 \subsection{HMM Feature Selection}\label{sec:feature_selection}
 
-The choice of HMM input features has a substantial impact on regime classification quality and, ultimately, on portfolio performance. This thesis selects features through a systematic procedure that balances economic interpretability with statistical discipline: an exhaustive search over a broad candidate pool, followed by multiple-testing correction, seed stability analysis, and ablation testing.
+The choice of HMM input features has a substantial impact on regime classification quality and, ultimately, on portfolio performance. This thesis selects features through a systematic three-pass pipeline that progressively filters candidates and increases computational rigor at each stage.
 
 \paragraph{Candidate pool}
-Eleven monthly macrofinancial indicators are considered as candidate inputs for the HMM. These span three broad categories of market stress:
+Nine monthly macrofinancial indicators, all available from 1990 onward, are considered as HMM inputs. These span three broad categories of market stress:
 \begin{itemize}
-    \item \emph{Volatility:} realised volatility (VOL), log VIX (LVIX), and cross-sectional return dispersion (DISP).
-    \item \emph{Credit:} the BAA--AAA credit spread (CS), the ICE BofA high-yield option-adjusted spread (HY\_OAS), the 3-month commercial paper--Treasury bill spread (CPS), and the 10-year minus 2-year Treasury term spread (TERM).
-    \item \emph{Equity decline:} market drawdown (DD), the advance--decline ratio (ADR), cross-sectional return skewness (SKEW), and relative market participation (REL\_N).
+    \item \emph{Equity market:} market drawdown (DD), realised volatility (VOL), cross-sectional return dispersion (DISP), relative market participation (REL\_N), advance-decline ratio (ADR), and cross-sectional return skewness (SKEW).
+    \item \emph{Credit and macro:} BAA--AAA credit spread (CS), log VIX (LVIX), and the 10-year minus 2-year Treasury term spread (TERM).
 \end{itemize}
-All candidates are observable in real time at the end of each month. Three credit indicators (CPS, HY\_OAS, and TERM) have data beginning in the mid- to late 1990s rather than 1990, which reduces the available training sample for combinations that include them. These shorter-history features are included in the candidate pool for completeness, but the feature selection procedure (described below) ultimately selects a combination that uses only features available from 1990, providing the full 252 training months including both the dot-com crash and the global financial crisis.
+All candidates are observable in real time at the end of each month. Two additional credit indicators (the commercial paper spread and the high-yield option-adjusted spread) are excluded because their data begins in the mid-1990s, providing insufficient training coverage for the 1990--2010 estimation window. All features are standardised to $z$-scores using training-period means and standard deviations, applied unchanged to the test period.
 
-\paragraph{Step 1: Exhaustive search}
-All $\binom{11}{4} = 330$ four-feature combinations are evaluated. For each combination, the two-state Bayesian HMM is estimated on the training sample using the same Gibbs sampling procedure as the main model (2{,}000 iterations, 500 burn-in, identical priors; see Section~\ref{sec:gibbs}). A combination passes the quality screen if it satisfies four criteria: (i)~minimum effective sample size (ESS) across all posterior mean parameters exceeds 50, indicating adequate MCMC convergence; (ii)~at least two features exhibit statistically significant regime separation, defined as the 95\% posterior credible interval for the difference in regime means excluding zero; (iii)~the average filtered panic probability during the global financial crisis (October 2007 to June 2009) exceeds 0.5; and (iv)~the average panic probability during a non-crisis reference period (January 2003 to December 2006) is below 0.4.
+\paragraph{Pass~1: Quality screen}
+Because market drawdown (DD) is the most economically direct measure of equity stress and consistently emerges as the dominant regime-identifying feature, it is required in every combination. The remaining eight candidates are combined with DD in groups of 1 to 3 additional features, yielding $1 + \binom{8}{1} + \binom{8}{2} + \binom{8}{3} = 93$ combinations spanning 1- to 4-feature HMMs. Each combination is estimated with a single Gibbs sampler seed (2{,}000 iterations, 500 burn-in). A combination passes the quality screen if it satisfies five criteria: (i)~minimum effective sample size (ESS) across all posterior mean parameters exceeds 50; (ii)~at least $\min(2, D)$ features exhibit statistically significant regime separation (95\% credible interval excluding zero); (iii)~the average filtered panic probability during the GFC (October 2007 to June 2009) exceeds 0.5 and during COVID (February to May 2020) exceeds 0.5; (iv)~the average panic probability during non-crisis reference periods (January 2003 to December 2006, and January 2013 to December 2019) remains below 0.4; and (v)~the Dot-com crash (March 2000 to October 2002) average exceeds 0.3. Panic state identification uses the same sign-correction method as the main HMM (Section~\ref{sec:gibbs}): the direction of each feature during known crises is determined empirically, and the state with the higher sign-corrected posterior mean is labelled as panic.
 
-Of the 330 combinations, 222 pass this quality screen. For each passing combination, the full cross-sectional portfolio pipeline is run: the HMM's filtered panic probability is merged with stock-level data, and the M0 (formula), M1 (logistic regression), and M2 (XGBoost) strategies are evaluated on the out-of-sample test period (2011--2025).
+\paragraph{Pass~2: Portfolio ranking}
+Surviving combinations are evaluated through the full cross-sectional pipeline. The filtered probability $\pi_t^{\text{filter}}$ is averaged across 5 HMM seeds to reduce MCMC noise. XGBoost predictions are averaged across 10 seeds to stabilise stock rankings. To maintain a fair comparison with the exposure-scaling approach of \citet{DanielMoskowitz2016}, portfolios use momentum and $\pi_t^{\text{filter}}$ only (no fundamental features) and are constructed as long-short with 10 basis points one-way costs applied to both legs. Combinations are ranked by out-of-sample Sharpe ratio. The top 10 advance to Pass~3.
 
-\paragraph{Step 2: Multiple testing correction}
-With 222 combinations passing the quality screen, a multiple-testing correction ensures that the selected combination reflects genuine regime quality rather than sampling variation. A block bootstrap procedure \citep[see][for an introduction to bootstrap methods]{ISLR2021} (block size 12 months, 10{,}000 replications) is used to construct the null distribution of the maximum Sharpe ratio across all 222 combinations under the hypothesis that all combinations have the same expected performance. The observed best Sharpe ratio of the top combination exceeds the 95th percentile of this null distribution ($p = 0.0002$), confirming that the result is not an artefact of multiple testing.
+\paragraph{Pass~3: Definitive validation}
+The final pass increases seed counts to 10 HMM seeds and 20 XGBoost seeds. For each surviving combination, four tests are conducted:
+\begin{enumerate}
+    \item \emph{Ensemble Sharpe ratio} from the averaged predictions, representing the strategy's performance under heavy seed averaging.
+    \item \emph{Sub-period consistency}: Sharpe ratios for 2011--2015, 2016--2020, and 2021--2025, verifying that performance is not driven by a single sub-period.
+    \item \emph{Stability test}: 20 independent experiments, each using a random partition of 3 HMM seeds and 1 XGBoost seed drawn from a pool of 20, to assess sensitivity to the specific seed combination. Combinations are classified as stable ($\sigma < 0.10$), moderate ($0.10 \leq \sigma < 0.15$), or unstable ($\sigma \geq 0.15$).
+    \item \emph{Leave-one-year-out}: each test-period year is dropped in turn to verify that no single year drives the result.
+\end{enumerate}
 
-\paragraph{Step 3: Seed stability}
-Because Gibbs sampling is stochastic, a robust feature combination should produce consistent results regardless of the random seed. The top eight combinations with full training data (available from 1990) are each run five times with different random seeds. DD+VOL+DISP+REL\_N achieves the highest mean XGBoost Sharpe ratio (1.12) with low standard deviation (0.06) across seeds, and its minimum Sharpe ratio across all seeds (1.03) exceeds the baseline's mean (0.84). Table~\ref{tab:seed_stability} reports these results.
+\paragraph{Feature count comparison}
+The pipeline evaluates combinations of 1 to 4 features to determine the optimal model complexity. Table~\ref{tab:feature_selection} reports the top combination at each feature count. Four features (DD+DISP+REL\_N+CS) achieves the highest stability mean (0.804) with the lowest standard deviation (0.082), indicating that the additional features reduce seed sensitivity without introducing overfitting. This combination is confirmed by a heavy variance test: 10 independent runs, each using 20 fresh HMM seeds (seeds 1--200) and 50 XGBoost seeds, produce a mean Sharpe of 0.804 with standard deviation 0.082.
 
-\begin{table}[H]
-\centering
-\begin{tabular}{l r r r r}
-\toprule
-Combination & Mean SR & Std SR & Min SR & Max SR \\
-\midrule
-DD+VOL+DISP+REL\_N & 1.116 & 0.062 & 1.032 & 1.220 \\
-DD+DISP+SKEW+REL\_N & 1.077 & 0.075 & 0.951 & 1.152 \\
-DD+CS+DISP+REL\_N & 1.056 & 0.062 & 0.946 & 1.114 \\
-DD+VOL+LVIX+SKEW & 1.021 & 0.046 & 0.973 & 1.078 \\
-DD+VOL+CS+LVIX (baseline) & 0.843 & 0.070 & 0.760 & 0.938 \\
-\bottomrule
-\end{tabular}
-\caption{Seed stability of top feature combinations.}
-\label{tab:seed_stability}
+\input{tables/table_feature_selection}
 
-\medskip
-\small
-\textbf{Notes:} Each combination is estimated five times with different random seeds. SR denotes the annualised XGBoost (M2) Sharpe ratio on the out-of-sample test period (2011--2025). The baseline (DD+VOL+CS+LVIX) uses the features employed by the initial specification.
-\end{table}
-
-\paragraph{Step 4: PCA factor analysis}
-To understand why certain feature combinations outperform others, principal component analysis is applied within each of the three candidate categories. The first principal component of each group represents a composite stress factor: a volatility factor (VOL, LVIX, DISP), a credit factor (CS, HY\_OAS, CPS, TERM), and an equity decline factor (DD, ADR, SKEW, REL\_N). These three composite factors are then used as HMM inputs. The volatility factor exhibits the largest regime-mean separation ($\Delta = 1.54$), followed by the equity decline factor ($\Delta = 1.07$), while the credit factor contributes the least ($\Delta = 0.42$). This finding provides a structural explanation for the composition of the optimal feature set: DD+VOL+DISP+REL\_N spans the two dominant stress dimensions (volatility and equity decline) while excluding the weaker credit dimension, whose information is largely subsumed by the equity-based indicators.
-
-\paragraph{Step 5: Ablation analysis}
-Single-feature and leave-one-out experiments isolate each feature's marginal contribution. When each of the four selected features is used alone as the sole HMM input, DD produces the highest downstream portfolio Sharpe ratio, followed by DISP, VOL, and REL\_N. In the leave-one-out analysis, removing DD or DISP causes the largest performance drops, while removing VOL has a smaller effect. REL\_N, while the weakest in isolation, has a meaningful leave-one-out impact, indicating that it captures information not present in DD, VOL, or DISP. The full ablation results, averaged over multiple Gibbs sampler seeds, are reported in Section~\ref{sec:ablation}.
+\paragraph{Ablation analysis}
+Single-feature and leave-one-out experiments isolate each feature's marginal contribution to the selected combination. DD alone achieves a Sharpe of 0.66, confirming its role as the dominant stress indicator. In the leave-one-out analysis, removing DD or REL\_N causes the largest performance drops ($-0.46$ and $-0.54$, respectively), while DISP and CS each contribute less than 0.01 marginally. Despite their small marginal contributions, DISP and CS improve the stability of the regime signal by providing independent information from different market segments (cross-sectional disagreement and corporate credit stress, respectively). The full ablation results are reported in Section~\ref{sec:ablation}.
 
 \paragraph{Summary}
-The selected feature set, DD+VOL+DISP+REL\_N, emerges consistently across all five validation stages. It captures market stress through four complementary equity-based channels: the depth of market declines (DD), realised market turbulence (VOL), cross-sectional stock disagreement (DISP), and structural market attrition (REL\_N). All four features are available from January 1990, providing 252 training months that include two full crisis episodes.
+The selected feature set, DD+DISP+REL\_N+CS, captures market stress through three complementary dimensions: the depth of equity market declines (DD), cross-sectional stock disagreement (DISP) and structural market attrition (REL\_N), and corporate credit conditions (CS). All four features are available from January 1990, providing 241 training months that include both the dot-com crash and the global financial crisis. The final $\pi_t^{\text{filter}}$ used in all subsequent analyses is averaged across 200 HMM seeds and passes all three validation checks (regime separation, crisis alignment, and MCMC convergence).
 
 \subsection{Cross-Sectional Features}\label{sec:cs_features}
 

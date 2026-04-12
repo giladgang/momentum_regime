@@ -13,13 +13,20 @@ Run 7 robustness checks:
 
 import numpy as np
 import pandas as pd
-import pickle, warnings, time
+import pickle, warnings, time, sys, os
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 from xgboost import XGBRegressor
 from scipy.stats import multivariate_normal, invwishart
 from scipy.special import logsumexp
 warnings.filterwarnings('ignore')
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from config import (PORTFOLIO_TYPE, TRADING_FEE as CFG_TRADING_FEE, TRAIN_END,
+                    HMM_FEATURES, K_STATES_ROBUSTNESS, COST_LEVELS_BPS,
+                    PI_THRESHOLDS, XGB_CONFIGS, SUB_PERIODS,
+                    N_ESTIMATORS, MAX_DEPTH, LEARNING_RATE, SUBSAMPLE, COLSAMPLE,
+                    XGB_SEEDS)
 
 # ═══════════════════════════════════════════════════════════════════════════════
 #  DATA
@@ -69,11 +76,11 @@ FUND_FEATURES = ['bm', 'roe', 'earnings_growth', 'leverage', 'asset_growth',
 FEATURES = MOM_FEATURES + ['pi_filter'] + FUND_FEATURES
 CORE_FEATURES = MOM_FEATURES + ['pi_filter', 'log_me']
 
-TRADING_FEE = 0.001
+TRADING_FEE = CFG_TRADING_FEE
 
 df = stocks.dropna(subset=['ret_fwd'] + CORE_FEATURES).copy().reset_index(drop=True)
-train = df[df['date'] < '2011-01-01'].copy()
-test = df[df['date'] >= '2011-01-01'].copy()
+train = df[df['date'] < TRAIN_END].copy()
+test = df[df['date'] >= TRAIN_END].copy()
 
 print(f"  Train: {len(train):,}  |  Test: {len(test):,}")
 
@@ -172,9 +179,8 @@ all_strats = {
 }
 
 periods = [
-    ('2011-2015', '2011-01-01', '2016-01-01'),
-    ('2016-2020', '2016-01-01', '2021-01-01'),
-    ('2021-2025', '2021-01-01', '2026-01-01'),
+    # Sub-periods from config.py (excludes 'Full')
+    *[(n, s, e) for n, s, e in SUB_PERIODS if n != 'Full'],
     ('Full',      '2011-01-01', '2026-01-01'),
 ]
 
@@ -399,8 +405,8 @@ stocks2 = stocks2.merge(panel[['date', 'pi_filter']], on='date', how='left')
 stocks2['pi_filter'] = stocks2['pi_filter'].ffill()
 
 df2 = stocks2.dropna(subset=['ret_fwd'] + CORE_FEATURES).copy().reset_index(drop=True)
-train2 = df2[df2['date'] < '2011-01-01'].copy()
-test2 = df2[df2['date'] >= '2011-01-01'].copy()
+train2 = df2[df2['date'] < TRAIN_END].copy()
+test2 = df2[df2['date'] >= TRAIN_END].copy()
 
 X_tr2 = train2[FEATURES].values.astype(float)
 X_te2 = test2[FEATURES].values.astype(float)

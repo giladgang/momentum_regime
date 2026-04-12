@@ -37,6 +37,14 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 import shap
 
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from config import (PORTFOLIO_TYPE, TRADING_FEE as CFG_TRADING_FEE, TRAIN_END,
+                    XGB_SEEDS, N_ESTIMATORS, MAX_DEPTH, LEARNING_RATE,
+                    SUBSAMPLE, COLSAMPLE, USE_FUNDAMENTALS, MOM_FEATURES,
+                    FUND_FEATURES, CS_FEATURES, STOCK_DATA_PATH,
+                    PANEL_WITH_REGIMES_PATH, ARTEFACTS_PATH)
+
 # ── Section 1: Load & merge data ──────────────────────────────────────────────
 
 print("[ 1/6 ] Loading data ...")
@@ -92,16 +100,11 @@ stocks['log_me'] = np.log(
 stocks['ret_fwd'] = stocks.groupby('permno')['ret_adj'].transform(lambda x: x.shift(-1))
 
 MOM_FEATURES  = [f'mom_{lb}' for lb in MOM_LBS]   # mom_1 … mom_12
-FEATURES = MOM_FEATURES + [
-    'pi_filter',
-    'bm', 'roe', 'earnings_growth',
-    'leverage', 'asset_growth', 'gross_profit_a',
-    'log_me',
-]
+FEATURES = CS_FEATURES  # from config.py (respects USE_FUNDAMENTALS setting)
 
 # Drop rows missing target or core momentum/regime features only.
 # XGBoost handles NaN fundamentals natively — do NOT drop on those.
-CORE_FEATURES = MOM_FEATURES + ['pi_filter', 'log_me']
+CORE_FEATURES = MOM_FEATURES + ['pi_filter'] + (['log_me'] if USE_FUNDAMENTALS else [])
 df = stocks.dropna(subset=['ret_fwd'] + CORE_FEATURES).copy()
 df = df.reset_index(drop=True)
 
@@ -110,8 +113,8 @@ print(f"  Usable rows after dropna: {len(df):,}  "
 
 # ── Section 4: Train / test split ─────────────────────────────────────────────
 
-train_mask = df['date'] < '2011-01-01'
-test_mask  = df['date'] >= '2011-01-01'
+train_mask = df['date'] < TRAIN_END
+test_mask  = df['date'] >= TRAIN_END
 train = df[train_mask].copy()
 test  = df[test_mask].copy()
 
@@ -132,7 +135,7 @@ print(f"  Train: {len(train):,} rows  |  Test: {len(test):,} rows")
 # 10 bps is standard for a value-weighted, large-cap-biased strategy
 # (NYSE breakpoints tilt toward big liquid stocks).
 # Round-trip cost = 2 × 10 bps = 20 bps per full position change.
-TRADING_FEE = 0.001  # 10 bps one-way
+TRADING_FEE = CFG_TRADING_FEE  # from config.py
 
 QUARTERLY_MONTHS = {3, 6, 9, 12}   # end-of-quarter rebalancing dates
 
@@ -188,25 +191,36 @@ def long_only_port(df_test, score_col, fee=TRADING_FEE, rebal_months=None):
 
     return pd.DataFrame(monthly).set_index('date')['ret']
 
-def long_short_port(df_test, score_col):
+def long_short_port(df_test, score_col, fee=TRADING_FEE):
     """
     Each month: NYSE P10/P90 breakpoints on score_col.
     Long >= P90, Short <= P10, value-weighted by me.
+    Transaction costs applied to both legs.
     Returns pd.Series of monthly long-short returns indexed by date.
     """
     monthly = []
+    prev_lw, prev_sw = {}, {}
     for date, grp in df_test.groupby('date'):
-        nyse    = grp[grp['exchcd'] == 1][score_col].dropna()
+        nyse = grp[grp['exchcd'] == 1][score_col].dropna()
         if len(nyse) < 10:
             continue
-        lo, hi  = nyse.quantile(0.10), nyse.quantile(0.90)
-        longs   = grp[grp[score_col] >= hi]
-        shorts  = grp[grp[score_col] <= lo]
+        lo, hi = nyse.quantile(0.10), nyse.quantile(0.90)
+        longs  = grp[grp[score_col] >= hi]
+        shorts = grp[grp[score_col] <= lo]
         if longs['me'].sum() == 0 or shorts['me'].sum() == 0:
             continue
-        r_long  = (longs['ret_fwd']  * longs['me']).sum()  / longs['me'].sum()
-        r_short = (shorts['ret_fwd'] * shorts['me']).sum() / shorts['me'].sum()
-        monthly.append({'date': date, 'ret': r_long - r_short})
+        lme = longs['me'].sum()
+        new_lw = (longs.set_index('permno')['me'] / lme).to_dict()
+        r_long = (longs['ret_fwd'] * longs['me']).sum() / lme
+        sme = shorts['me'].sum()
+        new_sw = (shorts.set_index('permno')['me'] / sme).to_dict()
+        r_short = (shorts['ret_fwd'] * shorts['me']).sum() / sme
+        tl = sum(abs(new_lw.get(p, 0) - prev_lw.get(p, 0)) for p in set(new_lw) | set(prev_lw)) / 2
+        ts = sum(abs(new_sw.get(p, 0) - prev_sw.get(p, 0)) for p in set(new_sw) | set(prev_sw)) / 2
+        monthly.append({'date': date, 'ret': r_long - r_short - fee * (tl + ts)})
+        prev_lw, prev_sw = new_lw, new_sw
+    if not monthly:
+        return pd.Series(dtype=float)
     return pd.DataFrame(monthly).set_index('date')['ret']
 
 def metrics(r):
@@ -218,18 +232,26 @@ def metrics(r):
     mdd     = ((cum - cum.cummax()) / cum.cummax()).min()
     return ann_ret, ann_vol, sharpe, mdd
 
+
+def build_port(df_test, score_col, fee=TRADING_FEE, rebal_months=None):
+    """Dispatcher: calls long_only_port or long_short_port based on config."""
+    if PORTFOLIO_TYPE == 'long_short':
+        return long_short_port(df_test, score_col)
+    else:
+        return long_only_port(df_test, score_col, fee=fee, rebal_months=rebal_months)
+
 # ── Section 6: Benchmarks ─────────────────────────────────────────────────────
 
 print("[ 3/6 ] Computing benchmarks ...")
 test['score_mom12'] = test['mom_12']
 test['score_mom1']  = test['mom_1']
-r_mom12_lo    = long_only_port(test, 'score_mom12')
-r_mom1_lo     = long_only_port(test, 'score_mom1')
-r_mom12_lo_q  = long_only_port(test, 'score_mom12', rebal_months=QUARTERLY_MONTHS)
-r_mom1_lo_q   = long_only_port(test, 'score_mom1',  rebal_months=QUARTERLY_MONTHS)
+r_mom12_lo    = build_port(test, 'score_mom12')
+r_mom1_lo     = build_port(test, 'score_mom1')
+r_mom12_lo_q  = build_port(test, 'score_mom12', rebal_months=QUARTERLY_MONTHS)
+r_mom1_lo_q   = build_port(test, 'score_mom1',  rebal_months=QUARTERLY_MONTHS)
 
 # Market buy & hold
-mkt = regimes[(regimes['date'] >= '2011-01-01') & regimes['ret_next'].notna()].copy()
+mkt = regimes[(regimes['date'] >= TRAIN_END) & regimes['ret_next'].notna()].copy()
 r_mkt = mkt.set_index('date')['ret_next']
 
 # ── Section 7: Method 0 — Deterministic formula ───────────────────────────────
@@ -246,8 +268,8 @@ test['score_formula'] = np.nan
 for date, lb in date_to_lb.items():
     mask = test['date'] == date
     test.loc[mask, 'score_formula'] = test.loc[mask, f'mom_{lb}']
-r_formula_lo   = long_only_port(test, 'score_formula')
-r_formula_lo_q = long_only_port(test, 'score_formula', rebal_months=QUARTERLY_MONTHS)
+r_formula_lo   = build_port(test, 'score_formula')
+r_formula_lo_q = build_port(test, 'score_formula', rebal_months=QUARTERLY_MONTHS)
 print(f"    {len(r_formula_lo)} monthly observations")
 
 # ── Section 8: Method 1 — Logistic Regression ────────────────────────────────
@@ -266,8 +288,8 @@ lr = LogisticRegression(max_iter=1000, C=1.0)
 lr.fit(X_tr_s, train['above_med'].values)
 test = test.copy()
 test['score_lr'] = lr.predict_proba(X_te_s)[:, 1]
-r_lr_lo   = long_only_port(test, 'score_lr')
-r_lr_lo_q = long_only_port(test, 'score_lr', rebal_months=QUARTERLY_MONTHS)
+r_lr_lo   = build_port(test, 'score_lr')
+r_lr_lo_q = build_port(test, 'score_lr', rebal_months=QUARTERLY_MONTHS)
 
 # LR weights plot
 fig_lr, ax_lr = plt.subplots(figsize=(8, 6))
@@ -284,16 +306,25 @@ print("  LR weights saved: cs_lr_weights.png")
 
 # ── Section 9: Method 2 — XGBoost Regressor ──────────────────────────────────
 
-print("  Method 2: XGBoost ...")
-xgb = XGBRegressor(n_estimators=500, max_depth=4, learning_rate=0.05,
-                   subsample=0.8, colsample_bytree=0.8,
-                   tree_method='hist', random_state=42, verbosity=0)
-xgb.fit(X_train, y_train)
+print(f"  Method 2: XGBoost (ensemble of {len(XGB_SEEDS)} seeds) ...")
 
+# Ensemble: train multiple XGB models, average predictions for a stable ranking
+xgb_predictions = np.zeros(len(X_test))
+for xgb_seed in XGB_SEEDS:
+    xgb_i = XGBRegressor(n_estimators=N_ESTIMATORS, max_depth=MAX_DEPTH,
+                          learning_rate=LEARNING_RATE, subsample=SUBSAMPLE,
+                          colsample_bytree=COLSAMPLE, tree_method='hist',
+                          random_state=xgb_seed, verbosity=0)
+    xgb_i.fit(X_train, y_train)
+    xgb_predictions += xgb_i.predict(X_test)
+xgb_predictions /= len(XGB_SEEDS)
 
-test['score_xgb'] = xgb.predict(X_test)
-r_xgb_lo   = long_only_port(test, 'score_xgb')
-r_xgb_lo_q = long_only_port(test, 'score_xgb', rebal_months=QUARTERLY_MONTHS)
+# Keep last model for SHAP analysis
+xgb = xgb_i
+
+test['score_xgb'] = xgb_predictions
+r_xgb_lo   = build_port(test, 'score_xgb')
+r_xgb_lo_q = build_port(test, 'score_xgb', rebal_months=QUARTERLY_MONTHS)
 
 # ── Average tree: most common feature & threshold at each (depth, position) ──
 import re
