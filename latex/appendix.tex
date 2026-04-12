@@ -259,10 +259,6 @@ The real HMM signal more than doubles the Sharpe ratio (1.08 vs.\ 0.48 without),
 
 To rule out the possibility that M1's failure is due to insufficient flexibility rather than a fundamental limitation of linear models, the logistic regression is augmented with polynomial terms ($\pi^2$, $\pi^3$, $\pi^4$) and explicit interaction terms ($\pi \times mom_k$ for all 12 horizons). The polynomial terms leave the Sharpe near zero, while the interaction terms recover only a fraction of M2's performance. This confirms that the regime-momentum interaction involves higher-order conditional logic that tree-based models capture but linear models, even with augmented feature spaces, cannot.
 
-\subsection{Stress Test}\label{app:stress_test}
-
-M2's return distribution has positive skewness (+0.81), meaning the strategy is not crash-prone despite its use of reversal bets. The 95\% Value-at-Risk is $-$5.0\% per month, with a Conditional Value-at-Risk (expected shortfall) of $-$8.0\%. The longest losing streak is 6 months. A bootstrap simulation of prolonged bear markets (6 to 24 consecutive panic months) indicates potential cumulative losses, but the positive skewness and limited drawdown duration suggest that the strategy is more resilient than a static long-short momentum portfolio, which suffers from severe negative skewness \citep{DanielMoskowitz2016}.
-
 \subsection{Emission Distribution Robustness}\label{app:emission_robustness}
 
 The observation equation assumes multivariate Gaussian emissions (Equation~1). Shapiro--Wilk tests reject within-regime normality for seven of eight feature--regime pairs, primarily due to left skew in drawdown (skewness $-1.6$ in calm) and right skew in dispersion and relative participation. To assess whether this misspecification affects regime identification, the HMM is re-estimated with multivariate Student-$t$ emissions across a grid of degrees of freedom $\nu \in \{3, 5, 7, 10, 15, 20, 30, 50, 100\}$.
