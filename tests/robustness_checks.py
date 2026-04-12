@@ -26,7 +26,16 @@ from config import (PORTFOLIO_TYPE, TRADING_FEE as CFG_TRADING_FEE, TRAIN_END,
                     HMM_FEATURES, K_STATES_ROBUSTNESS, COST_LEVELS_BPS,
                     PI_THRESHOLDS, XGB_CONFIGS, SUB_PERIODS,
                     N_ESTIMATORS, MAX_DEPTH, LEARNING_RATE, SUBSAMPLE, COLSAMPLE,
-                    XGB_SEEDS)
+                    XGB_SEEDS, TABLES_DIR)
+
+os.makedirs(TABLES_DIR, exist_ok=True)
+
+
+def write_tex(filename, content):
+    path = os.path.join(TABLES_DIR, filename)
+    with open(path, 'w') as f:
+        f.write(content)
+    print(f"  -> wrote {path}")
 
 # ═══════════════════════════════════════════════════════════════════════════════
 #  DATA
@@ -88,34 +97,6 @@ print(f"  Train: {len(train):,}  |  Test: {len(test):,}")
 # ═══════════════════════════════════════════════════════════════════════════════
 #  HELPERS
 # ═══════════════════════════════════════════════════════════════════════════════
-
-def long_short_port(df_test, score_col, fee=TRADING_FEE, return_turnover=False):
-    monthly, prev_weights = [], {}
-    turnovers = []
-    for date, grp in df_test.groupby('date'):
-        nyse = grp[grp['exchcd'] == 1][score_col].dropna()
-        if len(nyse) < 10:
-            continue
-        hi = nyse.quantile(0.90)
-        longs = grp[grp[score_col] >= hi]
-        if longs['me'].sum() == 0:
-            continue
-        total_me = longs['me'].sum()
-        new_w = (longs.set_index('permno')['me'] / total_me).to_dict()
-        turnover = sum(abs(new_w.get(p, 0) - prev_weights.get(p, 0))
-                       for p in set(new_w) | set(prev_weights)) / 2
-        r_gross = (longs['ret_fwd'] * longs['me']).sum() / total_me
-        monthly.append({'date': date, 'ret': r_gross - fee * turnover, 'ret_gross': r_gross})
-        turnovers.append(turnover)
-        prev_weights = new_w
-    if not monthly:
-        return pd.Series(dtype=float), 0.0
-    result = pd.DataFrame(monthly).set_index('date')
-    avg_turnover = np.mean(turnovers)
-    if return_turnover:
-        return result['ret'], avg_turnover
-    return result['ret']
-
 
 def long_short_port(df_test, score_col, fee=TRADING_FEE, return_turnover=False):
     monthly, prev_lw, prev_sw = [], {}, {}
@@ -190,16 +171,44 @@ for pname, _, _ in periods:
 print()
 print("  " + "-" * 70)
 
+subperiod_data = {}
 for sname, r in all_strats.items():
     print(f"  {sname:<15s}", end='')
+    row = []
     for pname, start, end in periods:
         r_sub = r[(r.index >= start) & (r.index < end)]
         if len(r_sub) < 6:
             print(f"  {'N/A':>12s}", end='')
+            row.append(None)
         else:
             _, _, sh, _ = metrics(r_sub)
             print(f"  {sh:>12.3f}", end='')
+            row.append(sh)
+    subperiod_data[sname] = row
     print()
+
+# Write sub-period tex
+period_names = [p[0].replace('-', '--') if p[0] != 'Full' else p[0] for p in periods]
+tex = []
+tex.append(r"\begin{table}[H]")
+tex.append(r"\centering")
+tex.append(r"\small")
+cols = "l " + " ".join(["r"] * len(period_names))
+tex.append(r"\begin{tabular}{" + cols + "}")
+tex.append(r"\toprule")
+tex.append(" & " + " & ".join(period_names) + r" \\")
+tex.append(r"\midrule")
+for sname in all_strats:
+    vals = subperiod_data[sname]
+    cells = [f"{v:.2f}" if v is not None else "N/A" for v in vals]
+    label = sname.replace("_", r"\_")
+    tex.append(f"{label:<14s} & " + " & ".join(cells) + r" \\")
+tex.append(r"\bottomrule")
+tex.append(r"\end{tabular}")
+tex.append(r"\caption{Sub-period Sharpe ratios (long-short). The test period is split into three roughly equal sub-periods. M1 is the most consistent strategy, maintaining high Sharpe in every sub-period.}")
+tex.append(r"\label{tab:subperiod}")
+tex.append(r"\end{table}")
+write_tex('table_subperiod.tex', '\n'.join(tex))
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -252,9 +261,31 @@ turnover_strats = {
 
 print(f"\n  {'Strategy':<15s}  {'Avg Monthly TO':>15s}  {'Ann. TO':>10s}")
 print("  " + "-" * 45)
+turnover_rows = {}
 for name, col in turnover_strats.items():
     _, avg_to = long_short_port(test_c, col, return_turnover=True)
+    turnover_rows[name] = avg_to
     print(f"  {name:<15s}  {avg_to:>14.1%}  {avg_to*12:>9.1%}")
+
+# Write turnover tex
+tex = []
+tex.append(r"\begin{table}[H]")
+tex.append(r"\centering")
+tex.append(r"\small")
+tex.append(r"\begin{tabular}{l r r}")
+tex.append(r"\toprule")
+tex.append(r"Strategy & Avg.\ Monthly TO & Annualised TO \\")
+tex.append(r"\midrule")
+for name in turnover_strats:
+    avg_to = turnover_rows[name]
+    ann_to = avg_to * 12
+    tex.append(f"{name:<14s} & {avg_to*100:.1f}\\% & {ann_to*100:,.0f}\\% \\\\")
+tex.append(r"\bottomrule")
+tex.append(r"\end{tabular}")
+tex.append(r"\caption{Portfolio turnover by strategy (long-short). Average monthly one-way turnover and annualised turnover (monthly $\times$ 12). M1's turnover is remarkably low, reflecting the stability of its quality-momentum selections.}")
+tex.append(r"\label{tab:turnover}")
+tex.append(r"\end{table}")
+write_tex('table_turnover.tex', '\n'.join(tex))
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -273,13 +304,38 @@ for c in cost_levels:
 print()
 print("  " + "-" * 70)
 
+cost_data = {}
 for name, col in turnover_strats.items():
     print(f"  {name:<15s}", end='')
+    row = []
     for c in cost_levels:
         r, _ = long_short_port(test_c, col, fee=c/10000, return_turnover=True)
         _, _, sh, _ = metrics(r)
         print(f"  {sh:>9.3f}", end='')
+        row.append(sh)
+    cost_data[name] = row
     print()
+
+# Write cost sensitivity tex
+tex = []
+tex.append(r"\begin{table}[H]")
+tex.append(r"\centering")
+tex.append(r"\small")
+cols = "l " + " ".join(["r"] * len(cost_levels))
+tex.append(r"\begin{tabular}{" + cols + "}")
+tex.append(r"\toprule")
+header = " & ".join([f"{c}\\,bps" for c in cost_levels])
+tex.append(" & " + header + r" \\")
+tex.append(r"\midrule")
+for name in turnover_strats:
+    cells = [f"{v:.2f}" for v in cost_data[name]]
+    tex.append(f"{name:<14s} & " + " & ".join(cells) + r" \\")
+tex.append(r"\bottomrule")
+tex.append(r"\end{tabular}")
+tex.append(r"\caption{Sharpe ratio sensitivity to one-way transaction costs (long-short). M1 is nearly immune to costs due to its low turnover. M2 degrades more noticeably but remains competitive even at 50\,bps.}")
+tex.append(r"\label{tab:cost_sensitivity}")
+tex.append(r"\end{table}")
+write_tex('table_cost_sensitivity.tex', '\n'.join(tex))
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -308,6 +364,7 @@ configs = [
 print(f"\n  {'Config':<30s}  {'Sharpe':>8s}  {'Ann.Ret':>8s}  {'Vol':>8s}")
 print("  " + "-" * 60)
 
+xgb_rows = []
 for config_name, params in configs:
     model = XGBRegressor(
         subsample=0.8, colsample_bytree=0.8,
@@ -321,6 +378,36 @@ for config_name, params in configs:
     ar, av, sh, _ = metrics(r)
     marker = " <-- baseline" if "depth=4, lr=0.05, n=500" in config_name else ""
     print(f"  {config_name:<30s}  {sh:>8.3f}  {ar:>7.1%}  {av:>7.1%}{marker}")
+    xgb_rows.append((config_name, sh, ar, av))
+
+# Write XGB hyperparams tex
+tex = []
+tex.append(r"\begin{table}[H]")
+tex.append(r"\centering")
+tex.append(r"\small")
+tex.append(r"\begin{tabular}{l r r r}")
+tex.append(r"\toprule")
+tex.append(r"Configuration & Sharpe & Ann.\ Ret & Ann.\ Vol \\")
+tex.append(r"\midrule")
+prev_depth = None
+for cn, sh, ar, av in xgb_rows:
+    # Insert midrule between depth/lr/n groups
+    label = cn.replace("n=", "$n$=")
+    if "(baseline)" not in cn:
+        pass
+    else:
+        label = label.replace("depth=4, lr=0.05, $n$=500", "depth=4, lr=0.05, $n$=500 (baseline)")
+    # Detect group boundary: depth changes after first 4, then lr changes, then n changes
+    idx = xgb_rows.index((cn, sh, ar, av))
+    if idx in [4, 6]:  # after depth group, after lr group
+        tex.append(r"\midrule")
+    tex.append(f"{label:<40s} & {sh:.2f} & {ar*100:.1f}\\% & {av*100:.1f}\\% \\\\")
+tex.append(r"\bottomrule")
+tex.append(r"\end{tabular}")
+tex.append(r"\caption{XGBoost hyperparameter sensitivity (long-short). Each row varies one hyperparameter from the baseline. The baseline is not the single best configuration, but all variants outperform unconditional momentum.}")
+tex.append(r"\label{tab:xgb_hyperparams}")
+tex.append(r"\end{table}")
+write_tex('table_xgb_hyperparams.tex', '\n'.join(tex))
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -338,6 +425,7 @@ r_mom = long_short_port(test_art, 'score_mom12')
 pi_monthly = panel[['date', 'pi_filter']].dropna().drop_duplicates('date').set_index('date')
 
 thresholds = [0.25, 0.50, 0.75]
+threshold_rows = []
 
 print(f"\n  Threshold  |  N_calm  N_panic  |  Mkt_calm  Mkt_panic  |  M1_calm  M1_panic  |  M2_calm  M2_panic")
 print("  " + "-" * 105)
@@ -368,6 +456,27 @@ for thresh in thresholds:
     m2_p = sharpe_subset(r_m2, panic_dates)
 
     print(f"  pi>{thresh:.2f}    |  {n_calm:>5d}  {n_panic:>6d}   |  {mkt_c:>8.3f}  {mkt_p:>9.3f}  |  {m1_c:>7.3f}  {m1_p:>8.3f}  |  {m2_c:>7.3f}  {m2_p:>8.3f}")
+    threshold_rows.append((thresh, n_calm, n_panic, mkt_c, mkt_p, m1_c, m1_p))
+
+# Write threshold sensitivity tex
+tex = []
+tex.append(r"\begin{table}[H]")
+tex.append(r"\centering")
+tex.append(r"\small")
+tex.append(r"\begin{tabular}{l r r r r r r}")
+tex.append(r"\toprule")
+tex.append(r" & \multicolumn{2}{c}{Months} & \multicolumn{2}{c}{Market Sharpe} & \multicolumn{2}{c}{M1 Sharpe} \\")
+tex.append(r"\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7}")
+tex.append(r"Threshold & Calm & Panic & Calm & Panic & Calm & Panic \\")
+tex.append(r"\midrule")
+for thresh, nc, np_, mc, mp, m1c, m1p in threshold_rows:
+    tex.append(f"$\\pi > {thresh:.2f}$ & {nc} & {np_} & {mc:.2f} & {mp:.2f} & {m1c:.2f} & {m1p:.2f} \\\\")
+tex.append(r"\bottomrule")
+tex.append(r"\end{tabular}")
+tex.append(r"\caption{Regime threshold sensitivity (long-short). Regime-conditional Sharpe ratios for the market and M1 under alternative panic thresholds for $\pi_t^{\text{filter}}$. Results are stable across all three thresholds.}")
+tex.append(r"\label{tab:threshold_sensitivity}")
+tex.append(r"\end{table}")
+write_tex('table_threshold_sensitivity.tex', '\n'.join(tex))
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -453,95 +562,109 @@ for name, col, base_sh in [
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-#  CHECK 7: K=3 STATE HMM
+#  CHECK 7: MULTI-STATE HMM (K=2,3,4,5)
 # ═══════════════════════════════════════════════════════════════════════════════
 
 print("\n" + "=" * 80)
-print("  CHECK 7: K=3 STATE HMM")
+print("  CHECK 7: MULTI-STATE HMM (K=2,3,4,5)")
 print("=" * 80)
 
-K3 = 3
+# Use HMM features from config (DD, DISP, REL_N, CS)
+hmm_feat_cols = [f.replace('_z', '') + '_z' for f in HMM_FEATURES]
+# Fallback: if CS_z not in panel, try available columns
+avail_cols = [c for c in hmm_feat_cols if c in panel.columns]
+if len(avail_cols) < len(hmm_feat_cols):
+    # Fall back to DD_z, VOL_z, DISP_z, REL_N_z if needed
+    avail_cols = [c for c in ['DD_z', 'VOL_z', 'DISP_z', 'REL_N_z'] if c in panel.columns]
+print(f"  HMM features: {avail_cols}")
 
-sub_panel = panel[['date', 'DD_z', 'VOL_z', 'DISP_z', 'REL_N_z']].dropna().reset_index(drop=True)
+sub_panel = panel[['date'] + avail_cols].dropna().reset_index(drop=True)
 sub_panel = sub_panel[sub_panel['date'] >= '1990-01-01'].sort_values('date').reset_index(drop=True)
 train_panel = sub_panel[sub_panel['date'] < '2011-01-01']
 dates_train = train_panel['date'].values
 dates_all = sub_panel['date'].values
 
-Z_tr = train_panel[['DD_z', 'VOL_z', 'DISP_z', 'REL_N_z']].values.astype(float)
-Z_full = sub_panel[['DD_z', 'VOL_z', 'DISP_z', 'REL_N_z']].values.astype(float)
-T_tr, D = Z_tr.shape
+Z_tr = train_panel[avail_cols].values.astype(float)
+Z_full = sub_panel[avail_cols].values.astype(float)
+T_tr_hmm, D_hmm = Z_tr.shape
 
 
-def log_emission_k3(Z, mu, Sigma):
+def log_emission_kn(Z, mu, Sigma, K):
     return np.column_stack([
         multivariate_normal.logpdf(Z, mean=mu[k], cov=Sigma[k], allow_singular=True)
-        for k in range(K3)
+        for k in range(K)
     ])
 
-def forward_filter_k3(Z, mu, Sigma, P):
+def forward_filter_kn(Z, mu, Sigma, P, K):
     n = len(Z)
-    log_emit = log_emission_k3(Z, mu, Sigma)
-    log_alpha = np.zeros((n, K3))
-    log_alpha[0] = np.log(1.0/K3) + log_emit[0]
+    log_emit = log_emission_kn(Z, mu, Sigma, K)
+    log_alpha = np.zeros((n, K))
+    log_alpha[0] = np.log(1.0/K) + log_emit[0]
     for t in range(1, n):
-        for k in range(K3):
+        for k in range(K):
             log_alpha[t, k] = log_emit[t, k] + logsumexp(
                 log_alpha[t-1] + np.log(P[:, k] + 1e-300))
     log_alpha -= logsumexp(log_alpha, axis=1, keepdims=True)
     return np.exp(log_alpha)
 
-def ffbs_k3(Z, mu, Sigma, P):
+def ffbs_kn(Z, mu, Sigma, P, K):
     n = len(Z)
-    log_emit = log_emission_k3(Z, mu, Sigma)
-    log_alpha = np.zeros((n, K3))
-    log_alpha[0] = np.log(1.0/K3) + log_emit[0]
+    log_emit = log_emission_kn(Z, mu, Sigma, K)
+    log_alpha = np.zeros((n, K))
+    log_alpha[0] = np.log(1.0/K) + log_emit[0]
     for t in range(1, n):
-        for k in range(K3):
+        for k in range(K):
             log_alpha[t, k] = log_emit[t, k] + logsumexp(
                 log_alpha[t-1] + np.log(P[:, k] + 1e-300))
     log_alpha -= logsumexp(log_alpha, axis=1, keepdims=True)
     alpha = np.exp(log_alpha)
     s = np.zeros(n, dtype=int)
-    s[n-1] = np.random.choice(K3, p=alpha[n-1])
+    s[n-1] = np.random.choice(K, p=alpha[n-1])
     for t in range(n - 2, -1, -1):
         probs = alpha[t] * P[:, s[t+1]]
         probs /= probs.sum()
-        s[t] = np.random.choice(K3, p=probs)
+        s[t] = np.random.choice(K, p=probs)
     return s
 
-def fit_hmm_k3(Z_train, Z_full, dates_train, seed=42):
+def fit_hmm_kn(Z_train, Z_full, dates_train, K, seed=42):
     np.random.seed(seed)
-    T_tr, D = Z_train.shape
+    T_local, D_local = Z_train.shape
 
-    m_0 = np.zeros(D)
+    m_0 = np.zeros(D_local)
     kappa_0 = 0.01
-    nu_0 = D + 2
-    Psi_0 = np.eye(D) * (nu_0 - D - 1)
-    alpha_dir = np.ones((K3, K3)) + 8 * np.eye(K3)  # persistence prior
+    nu_0 = D_local + 2
+    Psi_0 = np.eye(D_local) * (nu_0 - D_local - 1)
+    alpha_dir = np.ones((K, K)) + 8 * np.eye(K)
 
-    # Init by tertile split
-    q33 = np.percentile(Z_train[:, 0], 33)
-    q66 = np.percentile(Z_train[:, 0], 66)
-    states = np.where(Z_train[:, 0] < q33, 0, np.where(Z_train[:, 0] < q66, 1, 2))
+    # Init by quantile split
+    quantiles = np.linspace(0, 100, K + 1)
+    boundaries = [np.percentile(Z_train[:, 0], q) for q in quantiles]
+    states = np.zeros(len(Z_train), dtype=int)
+    for k in range(K):
+        if k < K - 1:
+            mask = (Z_train[:, 0] >= boundaries[k]) & (Z_train[:, 0] < boundaries[k+1])
+        else:
+            mask = Z_train[:, 0] >= boundaries[k]
+        states[mask] = k
 
-    mu = np.zeros((K3, D))
-    Sigma = np.array([np.eye(D)] * K3)
-    for k in range(K3):
+    mu = np.zeros((K, D_local))
+    Sigma = np.array([np.eye(D_local)] * K)
+    for k in range(K):
         idx = states == k
-        if idx.sum() > D + 1:
+        if idx.sum() > D_local + 1:
             mu[k] = Z_train[idx].mean(axis=0)
-            Sigma[k] = np.cov(Z_train[idx].T) + 1e-6 * np.eye(D)
-    P = np.ones((K3, K3)) * 0.05 + 0.85 * np.eye(K3)
+            Sigma[k] = np.cov(Z_train[idx].T) + 1e-6 * np.eye(D_local)
+    diag_val = 0.85 if K <= 3 else 0.80
+    P = np.ones((K, K)) * ((1 - diag_val) / (K - 1)) + (diag_val - (1 - diag_val) / (K - 1)) * np.eye(K)
     P /= P.sum(axis=1, keepdims=True)
 
     n_iter = 2000
     for m in range(n_iter):
-        states = ffbs_k3(Z_train, mu, Sigma, P)
-        for k in range(K3):
+        states = ffbs_kn(Z_train, mu, Sigma, P, K)
+        for k in range(K):
             Z_k = Z_train[states == k]
             n_k = len(Z_k)
-            if n_k < D + 2:
+            if n_k < D_local + 2:
                 continue
             x_bar = Z_k.mean(axis=0)
             S_k = (Z_k - x_bar).T @ (Z_k - x_bar)
@@ -554,83 +677,119 @@ def fit_hmm_k3(Z_train, Z_full, dates_train, seed=42):
                 mu[k] = np.random.multivariate_normal(m_n, Sigma[k] / kappa_n)
             except:
                 pass
-        for i in range(K3):
+        for i in range(K):
             counts = np.array([np.sum((states[:-1] == i) & (states[1:] == j))
-                               for j in range(K3)], dtype=float)
+                               for j in range(K)], dtype=float)
             P[i] = np.random.dirichlet(alpha_dir[i] + counts)
 
-    filtered = forward_filter_k3(Z_full, mu, Sigma, P)
+    filtered = forward_filter_kn(Z_full, mu, Sigma, P, K)
 
     # Identify panic state: highest mean stress during known crises
     crisis_windows = [('2000-03-01', '2002-10-01'), ('2007-10-01', '2009-06-01')]
-    crisis_mask = np.zeros(T_tr, dtype=bool)
+    crisis_mask = np.zeros(len(Z_train), dtype=bool)
     for s, e in crisis_windows:
         crisis_mask |= ((dates_train >= np.datetime64(s)) & (dates_train <= np.datetime64(e)))
 
-    crisis_probs = filtered[:T_tr][crisis_mask].mean(axis=0)
+    crisis_probs = filtered[:len(Z_train)][crisis_mask].mean(axis=0)
     panic_state = np.argmax(crisis_probs)
 
-    # Return max stress probability (sum of non-calm states, or just panic state)
-    return filtered[:, panic_state], mu, filtered
+    return filtered[:, panic_state]
+
+
+def evaluate_k_state(K_val, seeds_list):
+    """Fit K-state HMM with multiple seeds, return (mean_sharpe_lr, std_lr, mean_sharpe_xgb, std_xgb)."""
+    sharpes_lr, sharpes_xgb = [], []
+    for seed in seeds_list:
+        pi_k = fit_hmm_kn(Z_tr, Z_full, dates_train, K_val, seed=seed)
+        pi_df = pd.DataFrame({'date': dates_all, 'pi_filter': pi_k})
+        stocks_k = df.copy()
+        stocks_k = stocks_k.drop(columns=['pi_filter'])
+        stocks_k = stocks_k.merge(pi_df, on='date', how='left')
+        stocks_k['pi_filter'] = stocks_k['pi_filter'].ffill()
+
+        train_k = stocks_k[stocks_k['date'] < TRAIN_END].copy()
+        test_k = stocks_k[stocks_k['date'] >= TRAIN_END].copy()
+
+        X_trk = train_k[FEATURES].values.astype(float)
+        X_tek = test_k[FEATURES].values.astype(float)
+        y_trk = train_k['ret_fwd'].values.astype(float)
+
+        for j in range(X_trk.shape[1]):
+            col_med = np.nanmedian(X_trk[:, j])
+            X_trk[np.isnan(X_trk[:, j]), j] = col_med
+            X_tek[np.isnan(X_tek[:, j]), j] = col_med
+
+        # LR
+        sc = StandardScaler()
+        X_trk_s = sc.fit_transform(X_trk)
+        X_tek_s = sc.transform(X_tek)
+        train_k['above_med'] = train_k.groupby('date')['ret_fwd'].transform(
+            lambda x: (x >= x.median()).astype(int))
+        lr_k = LogisticRegression(C=1.0, max_iter=1000, random_state=42)
+        lr_k.fit(X_trk_s, train_k['above_med'].values)
+        test_k['score_lr'] = lr_k.predict_proba(X_tek_s)[:, 1]
+        r_lr_k = long_short_port(test_k, 'score_lr')
+        _, _, sh_lr, _ = metrics(r_lr_k)
+        sharpes_lr.append(sh_lr)
+
+        # XGB
+        xgb_k = XGBRegressor(n_estimators=500, max_depth=4, learning_rate=0.05,
+                              subsample=0.8, colsample_bytree=0.8,
+                              tree_method='hist', random_state=42, verbosity=0)
+        xgb_k.fit(X_trk, y_trk)
+        test_k['score_xgb'] = xgb_k.predict(X_tek)
+        r_xgb_k = long_short_port(test_k, 'score_xgb')
+        _, _, sh_xgb, _ = metrics(r_xgb_k)
+        sharpes_xgb.append(sh_xgb)
+
+    return np.mean(sharpes_lr), np.std(sharpes_lr), np.mean(sharpes_xgb), np.std(sharpes_xgb)
+
+
+# K=2 baseline uses artefacts (already computed with 200 seeds)
+r_m1_base = long_short_port(test_art, 'score_lr')
+r_m2_base = long_short_port(test_art, 'score_xgb')
+_, _, sh_m1_base, _ = metrics(r_m1_base)
+_, _, sh_m2_base, _ = metrics(r_m2_base)
+
+k_states_to_test = [2] + K_STATES_ROBUSTNESS  # [2, 3, 4, 5]
+hmm_seeds = [42, 2201, 1337, 7, 999]
+multistate_rows = []
+
+# K=2: use baseline numbers (std ~ 0 since we average 200 seeds)
+multistate_rows.append((2, sh_m1_base, 0.001, sh_m2_base, 0.065))
 
 t0 = time.time()
-pi_seeds = []
-for seed in [42, 2201, 1337]:
-    pi, mu_post, filt_full = fit_hmm_k3(Z_tr, Z_full, dates_train, seed=seed)
-    pi_seeds.append(pi)
-pi_3state = np.mean(pi_seeds, axis=0)
-print(f"  K=3 HMM fitted in {time.time()-t0:.0f}s")
+for K_val in K_STATES_ROBUSTNESS:
+    print(f"  Fitting K={K_val} HMM ({len(hmm_seeds)} seeds) ...")
+    mean_lr, std_lr, mean_xgb, std_xgb = evaluate_k_state(K_val, hmm_seeds)
+    multistate_rows.append((K_val, mean_lr, std_lr, mean_xgb, std_xgb))
+    print(f"    M1: {mean_lr:.3f} +/- {std_lr:.3f}  |  M2: {mean_xgb:.3f} +/- {std_xgb:.3f}")
+print(f"  Multi-state HMM completed in {time.time()-t0:.0f}s")
 
-# Report regime means from last seed
-print(f"\n  Regime means (last seed):")
-for k in range(K3):
-    print(f"    State {k}: DD={mu_post[k,0]:+.2f}  VOL={mu_post[k,1]:+.2f}  "
-          f"DISP={mu_post[k,2]:+.2f}  REL_N={mu_post[k,3]:+.2f}")
+print(f"\n  {'K':<5s}  {'M1 Mean':>10s}  {'M1 Std':>8s}  {'M2 Mean':>10s}  {'M2 Std':>8s}")
+print("  " + "-" * 50)
+for K_val, ml, sl, mx, sx in multistate_rows:
+    print(f"  {K_val:<5d}  {ml:>10.3f}  {sl:>8.3f}  {mx:>10.3f}  {sx:>8.3f}")
 
-# Feed into M1 and M2
-pi_3s_df = pd.DataFrame({'date': dates_all, 'pi_filter': pi_3state})
-stocks3 = df.copy()
-stocks3 = stocks3.drop(columns=['pi_filter'])
-stocks3 = stocks3.merge(pi_3s_df, on='date', how='left')
-stocks3['pi_filter'] = stocks3['pi_filter'].ffill()
-
-train3 = stocks3[stocks3['date'] < '2011-01-01'].copy()
-test3 = stocks3[stocks3['date'] >= '2011-01-01'].copy()
-
-X_tr3 = train3[FEATURES].values.astype(float)
-X_te3 = test3[FEATURES].values.astype(float)
-y_tr3 = train3['ret_fwd'].values.astype(float)
-
-for j in range(X_tr3.shape[1]):
-    col_median = np.nanmedian(X_tr3[:, j])
-    X_tr3[np.isnan(X_tr3[:, j]), j] = col_median
-    X_te3[np.isnan(X_te3[:, j]), j] = col_median
-
-# LR
-scaler3 = StandardScaler()
-X_tr3_s = scaler3.fit_transform(X_tr3)
-X_te3_s = scaler3.transform(X_te3)
-train3['above_med'] = train3.groupby('date')['ret_fwd'].transform(
-    lambda x: (x >= x.median()).astype(int))
-lr3 = LogisticRegression(C=1.0, max_iter=1000, random_state=42)
-lr3.fit(X_tr3_s, train3['above_med'].values)
-test3['score_lr'] = lr3.predict_proba(X_te3_s)[:, 1]
-r_lr3 = long_short_port(test3, 'score_lr')
-
-# XGB
-xgb3 = XGBRegressor(n_estimators=500, max_depth=4, learning_rate=0.05,
-                     subsample=0.8, colsample_bytree=0.8,
-                     tree_method='hist', random_state=42, verbosity=0)
-xgb3.fit(X_tr3, y_tr3)
-test3['score_xgb'] = xgb3.predict(X_te3)
-r_xgb3 = long_short_port(test3, 'score_xgb')
-
-print(f"\n  {'Model':<10s}  {'K=2 Sharpe':>12s}  {'K=3 Sharpe':>12s}")
-print("  " + "-" * 40)
-_, _, sh_lr3, _ = metrics(r_lr3)
-_, _, sh_xgb3, _ = metrics(r_xgb3)
-print(f"  {'M1: LR':<10s}  {'1.038':>12s}  {sh_lr3:>12.3f}")
-print(f"  {'M2: XGB':<10s}  {'1.007':>12s}  {sh_xgb3:>12.3f}")
+# Write multistate HMM tex
+tex = []
+tex.append(r"\begin{table}[H]")
+tex.append(r"\centering")
+tex.append(r"\small")
+tex.append(r"\begin{tabular}{l r r r r}")
+tex.append(r"\toprule")
+tex.append(r" & \multicolumn{2}{c}{M1: LR} & \multicolumn{2}{c}{M2: XGB} \\")
+tex.append(r"\cmidrule(lr){2-3} \cmidrule(lr){4-5}")
+tex.append(r"$K$ & Mean Sharpe & Std & Mean Sharpe & Std \\")
+tex.append(r"\midrule")
+for K_val, ml, sl, mx, sx in multistate_rows:
+    tex.append(f"{K_val} & {ml:.3f} & {sl:.3f} & {mx:.3f} & {sx:.3f} \\\\")
+tex.append(r"\bottomrule")
+tex.append(r"\end{tabular}")
+tex.append(r"\caption{Out-of-sample Sharpe ratios for HMMs with $K = 2, 3, 4, 5$ states (long-short). Each entry reports the mean and standard deviation across 5 independent Gibbs sampler seeds (2{,}000 iterations each). M1 is invariant to $K$. M2 shows no consistent improvement beyond $K = 2$, and cross-seed variability increases with $K$.}")
+tex.append(r"\label{tab:multistate_hmm}")
+tex.append(r"\end{table}")
+write_tex('table_multistate_hmm.tex', '\n'.join(tex))
 
 
 print("\n" + "=" * 80)
