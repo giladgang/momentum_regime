@@ -51,8 +51,6 @@ Table~\ref{tab:hmm_feature_ablation} confirms the individual contribution of eac
 
 \input{tables/table_hmm_feature_ablation}
 
-The convergence of the Gibbs sampler for the selected feature set is verified using ESS and Gelman--Rubin diagnostics (Section~\ref{sec:convergence}). All parameters exceed the standard ESS threshold of 100, and all $\hat{R}$ values are below 1.01 (Appendix~\ref{app:gelman_rubin}), confirming that the estimation is numerically stable and the resulting $\pi_t^{\text{filter}}$ is a reliable regime signal.
-
 Each feature captures a distinct dimension of market stress:
 \begin{enumerate}
     \item \textbf{DD (Drawdown):} The percentage decline of the cumulative market price index from its rolling 12-month peak:
