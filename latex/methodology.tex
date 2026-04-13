@@ -33,13 +33,13 @@ where $P_{ij} = P(s_t = j \mid s_{t-1} = i)$ and each row sums to one. The diago
 
 \subsubsection{Bayesian Estimation via Gibbs Sampling}\label{sec:gibbs}
 
-The standard frequentist approach to HMM estimation is the Baum-Welch algorithm (a special case of Expectation-Maximisation), which finds maximum likelihood point estimates of the parameters and a single most-likely state path. This thesis instead adopts a fully Bayesian approach and draws from the joint posterior:
+The standard frequentist alternative is the Baum--Welch algorithm \citep{Baum1970}, a special case of Expectation-Maximisation \citep{Dempster1977}, which finds maximum likelihood point estimates. The Bayesian approach instead draws from the joint posterior:
 \[
 p\!\left(\{s_t\}_{t=1}^T,\; \{\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k\}_{k=0}^1,\; \mathbf{P} \,\middle|\, \mathbf{z}_{1:T}\right).
 \]
-This posterior is not available in closed form because the hidden states and model parameters depend on each other. Therefore we employ Gibbs sampling \citep{AlbertChib1993, Hoff2009}, a Markov chain Monte Carlo (MCMC) method, which resolves this by alternating between three conditional updates: (i) the full hidden state path $\{s_t\}_{t=1}^T$, (ii) the emission parameters $(\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k)$ for each regime, and (iii) the transition matrix $\mathbf{P}$. Because conjugate priors are used, each block can be sampled exactly from its conditional posterior. The Bayesian approach is preferred here for three reasons. First, the training sample contains approximately 250 monthly observations with four features, a setting where maximum likelihood estimates can be unstable and prone to overfitting; Bayesian priors provide natural regularisation. Second, the full posterior distribution over parameters means the filtered regime probability $\pi_t^{\text{filter}}$ used downstream reflects uncertainty about the parameters themselves, not just uncertainty about the current state. Third, the conjugate prior structure (Normal-Inverse-Wishart for emissions, Dirichlet for transitions) yields closed-form conditional posteriors, making Gibbs sampling both exact and computationally straightforward.
+This posterior is not available in closed form because the hidden states and model parameters depend on each other. Therefore we employ Gibbs sampling \citep{AlbertChib1993, Hoff2009}, a Markov chain Monte Carlo (MCMC) method, which resolves this by alternating between three conditional updates: (i) the full hidden state path $\{s_t\}_{t=1}^T$, (ii) the emission parameters $(\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k)$ for each regime, and (iii) the transition matrix $\mathbf{P}$. Conjugate priors ensure that each block can be sampled exactly from its conditional posterior.
 
-\paragraph{Prior Specification}\label{sec:priors}
+\subsubsection{Prior Specification}\label{sec:priors}
 
 The priors encode two economic beliefs. First, before seeing the data, neither regime should be forced to have extreme values in any feature; the model should learn the characteristics of calm and panic states from the data. Second, regimes should be persistent rather than switching every few months.
 
@@ -91,36 +91,33 @@ This prior favors persistence in both regimes: absent data, the prior mean trans
 0.10 & 0.90
 \end{array}\right).
 \end{equation}
-In other words, the prior expects each regime to continue with probability $0.9$, corresponding to an expected duration of roughly $10$ months. This prior is informative enough to discourage pathological solutions, but with hundreds of training observations its influence is dominated by the data.
+In other words, the prior expects each regime to continue with probability $0.9$, corresponding to an expected duration of roughly $10$ months. This prior is informative enough to discourage pathological solutions but weak enough to be overridden by the data.
 
-\paragraph{Gibbs Sampler: Initialization}\label{sec:gibbs_sampler}
+\subsubsection{Gibbs Sampling Algorithm}\label{sec:gibbs_sampler}
+
+\paragraph{Initialization}
 The Gibbs sampler requires starting values for the emission parameters and the transition matrix. A crude drawdown-based partition is used:\footnote{The choice of initialization has negligible impact on the posterior: the sampler is run for 2{,}000 iterations with 500 discarded as burn-in, and convergence diagnostics (Section~\ref{sec:convergence}) confirm that the chain mixes well regardless of the starting partition.} months with below-median drawdown $DD_t^z$ (i.e., deeper drawdowns) are initially assigned to the panic state ($s_t=1$), and the remaining months to the calm state ($s_t=0$). The initial emission parameters are then computed from each group:
 \[
 \boldsymbol{\mu}_k^{(0)} = \frac{1}{n_k}\sum_{t:\,s_t=k}\mathbf{z}_t,
 \qquad
 \boldsymbol{\Sigma}_k^{(0)} = \text{Cov}(\{\mathbf{z}_t : s_t=k\}),
 \]
-where $n_k$ is the number of months assigned to regime $k$. The initial transition matrix is set to the prior mean, $\mathbf{P}^{(0)} = \mathbb{E}[\mathbf{P}]$ (Equation~11). These initial parameters give the first FFBS forward pass emission densities that can distinguish the two states.
+where $n_k$ is the number of months assigned to regime $k$. The initial transition matrix is set to the prior mean, $\mathbf{P}^{(0)} = \mathbb{E}[\mathbf{P}]$ (Equation~11). These initial parameters give the first forward pass (described below) emission densities that can distinguish the two states.
 
 \paragraph{Iterative updates}
-One Gibbs iteration consists of three steps:
-\begin{enumerate}
-    \item sample a complete state path $\{s_t\}_{t=1}^T$ given the current emission parameters and transition matrix;
-    \item sample $(\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k)$ for each regime given the sampled state path, holding $\mathbf{P}$ fixed;
-    \item sample $\mathbf{P}$ given the sampled state path, holding the emission parameters fixed.
-\end{enumerate}
-In each step, all parameters not being updated are held at their most recently sampled values. These steps are repeated many times. Early draws depend strongly on the starting values, so the first part of the chain is discarded as burn-in. The remaining draws approximate the joint posterior. Figure~\ref{fig:gibbs_diagram} summarizes the three-step Gibbs iteration graphically.
+Each iteration cycles through the three conditional updates described in Section~\ref{sec:gibbs}. Figure~\ref{fig:gibbs_diagram} summarizes the cycle graphically.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.82\textwidth]{gibbs_sampling_diagram.pdf}
+    \vspace{-1cm}
+    \includegraphics[width=0.72\textwidth]{gibbs_sampling_diagram.pdf}
     \caption{Flowchart of the Gibbs sampler. Each iteration cycles through three conditional updates: (1)~sample the full hidden state path via FFBS, holding emission parameters and the transition matrix fixed; (2)~update the regime-specific means and covariances from a Normal-Inverse-Wishart posterior, holding the state path and transition matrix fixed; (3)~update each row of the transition matrix from a Dirichlet posterior, holding the state path and emission parameters fixed. The loop repeats for $M = 2{,}000$ iterations, with the first $B = 500$ discarded as burn-in.}
     \label{fig:gibbs_diagram}
 \end{figure}
 
 \paragraph{Step 1: Sampling the hidden state path via FFBS}
 
-Holding the emission parameters $(\boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k)$ and the transition matrix $\mathbf{P}$ fixed at their current values, the full latent regime sequence $(s_1,\dots,s_T)$ is sampled using Forward-Filtering Backward-Sampling (FFBS).
+The full latent regime sequence $(s_1,\dots,s_T)$ is sampled using Forward-Filtering Backward-Sampling (FFBS), holding the current emission parameters and transition matrix fixed.
 
 The forward pass computes the filtered probability $\alpha_t(k) = P(s_t=k \mid \mathbf{z}_{1:t})$, the probability of being in state $k$ at time $t$ given all observations so far. This quantity is built in two sub-steps. First, a \emph{prediction step} asks: before seeing this month's data, how likely is each state? Since the previous state is unknown, the algorithm sums over both possibilities, weighting each by its filtered probability from the previous month and the transition probability:
 \[
@@ -160,7 +157,7 @@ Importantly, the backward pass is performed only during model \emph{training} (t
 
 \paragraph{Step 2: Updating the emission parameters}
 
-Holding the sampled state path and the transition matrix $\mathbf{P}$ fixed, the emission parameters are updated. Each regime $k$ has $n_k$ observations assigned to it. From these, two summary statistics are computed: the sample mean $\bar{\mathbf{x}}_k = \frac{1}{n_k}\sum_{t:\,s_t=k}\mathbf{z}_t$ and the scatter matrix $\mathbf{S}_k = \sum_{t:\,s_t=k}(\mathbf{z}_t - \bar{\mathbf{x}}_k)(\mathbf{z}_t - \bar{\mathbf{x}}_k)^\top$. The Normal-Inverse-Wishart prior updates to a posterior with hyperparameters:
+Given the sampled state path, each regime $k$ has $n_k$ observations assigned to it. From these, two summary statistics are computed: the sample mean $\bar{\mathbf{x}}_k = \frac{1}{n_k}\sum_{t:\,s_t=k}\mathbf{z}_t$ and the scatter matrix $\mathbf{S}_k = \sum_{t:\,s_t=k}(\mathbf{z}_t - \bar{\mathbf{x}}_k)(\mathbf{z}_t - \bar{\mathbf{x}}_k)^\top$. The Normal-Inverse-Wishart prior updates to a posterior with hyperparameters:
 \begin{align}\label{eq:niw_update}
 \kappa_n &= \kappa_0 + n_k, \qquad
 \mathbf{m}_n = \frac{\kappa_0 \mathbf{m}_0 + n_k \bar{\mathbf{x}}_k}{\kappa_n}, \qquad
@@ -175,7 +172,7 @@ $\boldsymbol{\mu}_k \mid \boldsymbol{\Sigma}_k \sim \mathcal{N}(\mathbf{m}_n, \b
 
 \paragraph{Step 3: Updating the transition matrix}
 
-Holding the sampled state path and the emission parameters fixed, the transition matrix is updated. The sampled path is scanned to count transitions: $n_{ij} = \sum_{t=2}^T \mathds{1}(s_{t-1}=i,\, s_t=j)$ records how many times the path moved from state $i$ to state $j$. For example, if the sampled path contains 140 calm-to-calm transitions and 10 calm-to-panic transitions, then $n_{00} = 140$ and $n_{01} = 10$. These observed counts are added to the Dirichlet prior pseudo-counts to obtain the posterior:
+The sampled path is scanned to count transitions: $n_{ij} = \sum_{t=2}^T \mathds{1}(s_{t-1}=i,\, s_t=j)$ records how many times the path moved from state $i$ to state $j$. For example, if the sampled path contains 140 calm-to-calm transitions and 10 calm-to-panic transitions, then $n_{00} = 140$ and $n_{01} = 10$. These observed counts are added to the Dirichlet prior pseudo-counts to obtain the posterior:
 \begin{equation}
 \mathbf{P}_{i,\cdot} \mid \{s_t\}
 \sim
@@ -184,9 +181,9 @@ Holding the sampled state path and the emission parameters fixed, the transition
 \end{equation}
 For row 0 (calm), the prior pseudo-counts are $(\alpha_{00}, \alpha_{01}) = (9, 1)$ from Equation~(10), so the posterior becomes $\text{Dir}(9 + 140,\; 1 + 10) = \text{Dir}(149,\; 11)$. The expected persistence probability under this posterior is $149/160 = 0.93$, reflecting that the data reinforced the prior belief in regime persistence. A new transition matrix row is then drawn from this Dirichlet distribution, and the same procedure is applied independently to row 1 (panic).
 
-With all three blocks updated, the sampler returns to Step~1 and repeats the cycle using the newly drawn parameters. Each iteration refines the estimates, and after sufficient iterations the draws converge to samples from the joint posterior.
+With all three blocks updated, the sampler returns to Step~1. After sufficient iterations the draws converge to samples from the joint posterior.
 
-\paragraph{Implementation Details}\label{sec:implementation}
+\subsubsection{Implementation and Convergence}\label{sec:implementation}
 
 The Gibbs sampler is estimated on the training sample only (1990--2010). To reduce sensitivity to MCMC initialization, the full sampler is run independently with $N_s = 200$ different random seeds. Each chain is run for $M=2{,}000$ iterations with the initialization described above. The first $B=500$ iterations are discarded as burn-in, leaving $1{,}500$ posterior draws per seed.
 
@@ -194,7 +191,7 @@ For each seed, posterior mean parameters $\bar{\boldsymbol{\mu}}_k$, $\bar{\bold
 \begin{equation}
 \pi_t^{\text{filter}} = \frac{1}{N_s} \sum_{s=1}^{N_s} \pi_t^{\text{filter},(s)}.
 \end{equation}
-This Bayesian model averaging over 200 seeds substantially reduces the variance of the regime signal and produces stable downstream portfolio performance. Heavy-variance tests confirm that the resulting Sharpe ratio has a standard deviation of only 0.082 across independent seed partitions (a relative standard deviation of 7.6\% around a mean of 1.08). No test-period data is used in estimation.
+This Bayesian model averaging over 200 seeds substantially reduces the variance of the regime signal and produces stable downstream portfolio performance. Heavy-variance tests confirm that the resulting Sharpe ratio has a standard deviation of only 0.082 across independent seed partitions (a relative standard deviation of 7.6\% around a mean of 1.08).
 
 \paragraph{Convergence Diagnostics}\label{sec:convergence}
 
