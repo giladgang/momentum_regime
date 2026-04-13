@@ -59,11 +59,12 @@ def shade_nber(ax):
 
 # ── Crisis labels for the regime plot ─────────────────────────────────────────
 
+# (start, end, label, y_position, va_alignment)
 crisis_labels = [
-    ('2000-03-01', '2002-10-01', 'Dot-com'),
-    ('2007-10-01', '2009-06-01', 'GFC'),
-    ('2020-02-01', '2020-05-01', 'COVID'),
-    ('2022-01-01', '2022-10-01', '2022'),
+    ('2000-03-01', '2002-10-01', 'Dot-com', 1.08, 'bottom'),
+    ('2007-10-01', '2009-06-01', 'GFC',     0.20, 'top'),
+    ('2020-02-01', '2020-05-01', 'COVID',   1.08, 'bottom'),
+    ('2022-01-01', '2022-10-01', '2022',    1.08, 'bottom'),
 ]
 
 # ── Figure 1: regime_probabilities.png (single panel) ───────────────────────
@@ -77,15 +78,15 @@ ax.axvline(pd.Timestamp('2011-01-01'), color='black', linewidth=1.2,
 ax.axhline(0.5, color='black', linewidth=0.5, linestyle=':', alpha=0.5)
 ax.set_ylabel(r'$\pi_t^{\mathrm{filter}}$', fontsize=11)
 ax.set_xlabel('Date', fontsize=10)
-ax.set_ylim(0, 1.05)
+ax.set_ylim(0, 1.15)
 ax.set_xlim(dates.min(), dates.max())
 shade_nber(ax)
 
-# Add crisis labels centered above the shaded regions
-for start, end, lbl in crisis_labels:
+# Add crisis labels
+for start, end, lbl, y_pos, va in crisis_labels:
     mid = pd.Timestamp(start) + (pd.Timestamp(end) - pd.Timestamp(start)) / 2
-    ax.annotate(lbl, xy=(mid, 1.02), fontsize=10, fontweight='bold',
-                ha='center', va='bottom', color='#333333',
+    ax.annotate(lbl, xy=(mid, y_pos), fontsize=10, fontweight='bold',
+                ha='center', va=va, color='#333333',
                 annotation_clip=False)
 
 ax.legend(fontsize=9, loc='upper left')

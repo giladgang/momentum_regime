@@ -19,6 +19,9 @@ The fixed training split (1990--2010) ensures strict out-of-sample discipline bu
 
 Several directions could extend this framework.
 
+\paragraph{Predictive regime signal}
+The current regime signal $\pi_t^{\text{filter}}$ estimates the probability that the market is in panic \emph{now}. A natural extension is to predict the regime one step ahead: $P(s_{t+1} = 1 \mid \mathbf{z}_{1:t})$, which can be obtained directly from the transition matrix as $\sum_k \pi_t^{\text{filter}}(k) \cdot P_{k,1}$. A predictive signal would allow the portfolio to reposition \emph{before} a regime shift rather than reacting to it, potentially reducing turnover and improving timing around transition months.
+
 \paragraph{Adaptive regime estimation}
 The current HMM is trained on 1990--2010 data and its parameters are held fixed during the test period. This assumes that the statistical properties of calm and panic regimes remain stationary over time. If the market undergoes structural change, for instance a permanent increase in baseline volatility due to algorithmic trading, higher-frequency information flow, or shifting monetary policy regimes, the trained thresholds may become miscalibrated. Concretely, features that were one standard deviation above the training mean may become the new normal, causing the model to classify structurally calm periods as panic. This concern is not hypothetical: the sustained elevation of $\pi_t^{\text{filter}}$ in the most recent years of the sample may partly reflect such drift rather than genuine prolonged stress. Rolling or expanding-window re-estimation of the HMM, or an online Bayesian updating scheme that allows the emission parameters to evolve over time, would address this limitation and likely improve the reliability of the regime signal in extended out-of-sample periods.
 

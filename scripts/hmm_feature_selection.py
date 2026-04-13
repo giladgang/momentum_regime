@@ -81,7 +81,7 @@ FEATURE_POOL = ['DD_z', 'VOL_z', 'DISP_z', 'REL_N_z', 'CS_z', 'LVIX_z',
 REQUIRED_FEATURE = 'DD_z'
 
 # Feature counts to test
-FEATURE_COUNTS = [1, 2, 3]  # DD alone, DD+1, DD+2 (4-feature results already available)
+FEATURE_COUNTS = [1, 2, 3, 4]  # DD alone, DD+1, DD+2, DD+3
 
 # Seed counts increase with each pass
 PASS1_HMM_SEEDS = [42]                                          # 1 seed (fast screening)
