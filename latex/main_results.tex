@@ -1,17 +1,6 @@
 \section{Results}\label{sec:results}
 
-The primary objective of this thesis is not to maximise out-of-sample returns but to understand how regime information interacts with cross-sectional momentum. Specifically, it asks whether regime information can be used for \emph{stock selection} (changing which stocks are held) rather than \emph{exposure scaling} (changing how much of a fixed portfolio to hold), and whether this alternative mechanism requires nonlinear modelling. Portfolio performance is the vehicle for this analysis, not an end in itself.
-
-All strategies are evaluated out-of-sample on the test period (January 2011 to November 2025, 167 months). Each method produces a long-short portfolio: the top decile of stocks (the \emph{long side}) is bought, and the bottom decile (the \emph{short side}) is sold. Both sides are value-weighted using NYSE breakpoints, rebalanced monthly with one-way transaction costs of 10 basis points. Long-short construction is the standard in the momentum literature \citep{JegadeeshTitman1993, DanielMoskowitz2016, BarrosoSantaClara2015} because it isolates the momentum anomaly from market beta, providing a cleaner test of stock selection skill.
-
-The analysis proceeds in five stages:
-\begin{enumerate}
-    \item Section~\ref{sec:performance_results} compares the overall performance of all strategies, establishing that only the nonlinear model (M2) survives long-short construction.
-    \item Section~\ref{sec:regime_results} decomposes performance by market regime, explains the economic mechanisms at work, examines portfolio characteristics, stress-tests the strategy's vulnerability, and provides model-free confirmation via information coefficient analysis.
-    \item Section~\ref{sec:shap_results} analyses SHAP feature importance and the partial dependence structure of the regime signal.
-    \item Section~\ref{sec:ablation_results} presents ablation studies, including the role of fundamentals and the comparison with \citet{DanielMoskowitz2016}.
-    \item Section~\ref{sec:risk_aversion} examines how risk aversion affects the regime signal's importance.
-\end{enumerate}
+All strategies are evaluated out-of-sample on 2011--2025 (167 months), using the long-short construction described in Section~\ref{sec:stage2}. The central question is whether regime information improves cross-sectional stock selection, and whether this requires nonlinear modelling. The analysis proceeds from aggregate performance (Section~\ref{sec:performance_results}), to regime-conditional decomposition and model-free confirmation (Section~\ref{sec:regime_results}), to feature importance analysis (Section~\ref{sec:shap_results}), ablation studies and benchmarking against \citet{DanielMoskowitz2016} (Section~\ref{sec:ablation_results}), and finally the effect of risk aversion on the regime signal (Section~\ref{sec:risk_aversion}).
 
 
 \subsection{Portfolio Performance}\label{sec:performance_results}
@@ -106,18 +95,18 @@ The historical stress periods in the test sample confirm the reversal mechanism:
 
 The scenario that would truly break the strategy -- a sustained fundamental deterioration where beaten-down stocks never recover, as in the Great Depression or Japan's lost decades -- has not occurred in the 2011--2025 test period. This mirrors the vulnerability identified by \citet{DanielMoskowitz2016} for traditional momentum, but on the opposite side: standard momentum crashes when winners stop winning; the regime-conditioned strategy would struggle when losers stop reverting. The hybrid approach combining stock selection with exposure scaling (Section~\ref{sec:future_work}) is designed precisely for this contingency.
 
-\subsubsection{Model-Free Confirmation: Information Coefficient Rotation}\label{sec:ic_analysis}
+\subsubsection{Model-Free Confirmation: Information Coefficient Analysis}\label{sec:ic_analysis}
 
 A natural concern is whether the regime-dependent behaviour described above reflects genuine economic structure or model-specific overfitting. To rule this out, Table~\ref{tab:ic_rotation} examines the raw predictive power of each momentum horizon in calm versus panic months, without involving any model. The information coefficient (IC) -- the Spearman rank correlation between a momentum signal and subsequent stock returns, computed cross-sectionally each month -- directly measures whether ranking stocks by a given horizon correctly identifies future outperformers.
 
 \input{tables/table_ic_rotation}
 
-The pattern is striking. In calm months, all 12 horizons have positive, significant ICs ($t > 2.5$), with the strongest power at intermediate horizons ($mom_8$ through $mom_{10}$, IC $\approx 0.03$): past winners keep winning. In panic months, the pattern inverts -- short-horizon signals ($mom_1$ through $mom_3$) develop \emph{negative} ICs ($-$0.012 to $-$0.010), meaning that stocks which dropped most recently are more likely to bounce back than to keep falling. Longer horizons retain weakly positive ICs but none is individually significant ($t < 1.6$), reflecting the limited sample of 59 panic months. The key finding is the systematic \emph{contrast}: all 12 horizons are significant in calm, none in panic, and the short horizons flip sign. This confirms that the continuation-to-reversal rotation M2 exploits is a real feature of the data, not an artefact of the model. It also explains why fixed momentum and M1 collapse in long-short construction: they assign static weights to each horizon, making them unable to adapt when the cross-sectional structure inverts.
+The pattern is striking. In calm months, all 12 horizons have positive, significant ICs ($t > 2.5$), with the strongest power at intermediate horizons ($mom_8$ through $mom_{10}$, IC $\approx 0.03$): past winners keep winning. In panic months, the pattern inverts -- short-horizon signals ($mom_1$ through $mom_3$) develop \emph{negative} ICs ($-$0.012 to $-$0.010), meaning that stocks which dropped most recently are more likely to bounce back than to keep falling. Longer horizons retain weakly positive ICs but none is individually significant ($t < 1.6$), reflecting the limited sample of 59 panic months. The key finding is the systematic \emph{contrast}: all 12 horizons are significant in calm, none in panic, and the short horizons flip sign. This confirms that the continuation-to-reversal shift M2 exploits is a real feature of the data, not an artefact of the model. It also explains why fixed momentum and M1 collapse in long-short construction: they assign static weights to each horizon, making them unable to adapt when the cross-sectional structure inverts.
 
 
-\subsection{SHAP Decomposition}\label{sec:shap_results}
+\subsection{Feature Importance Decomposition}\label{sec:shap_results}
 
-The SHAP (SHapley Additive exPlanations) analysis quantifies how XGBoost uses each feature to make predictions (Table~\ref{tab:shap} and Figure~\ref{fig:shap_importance}).
+To understand how XGBoost uses each feature, we apply SHAP \citep[SHapley Additive exPlanations;][]{Lundberg2017}, a method that assigns each feature a contribution to every individual prediction based on cooperative game theory. The mean absolute SHAP value measures a feature's overall importance: a higher value means the feature has a larger average effect on the model's output (Table~\ref{tab:shap} and Figure~\ref{fig:shap_importance}).
 
 \input{tables/table_shap}
 
@@ -128,7 +117,7 @@ The SHAP (SHapley Additive exPlanations) analysis quantifies how XGBoost uses ea
     \label{fig:shap_importance}
 \end{figure}
 
-The regime signal $\pi_t^{\text{filter}}$ is the second most important feature after aggregate momentum, with SHAP importance that increases from calm to panic months. This confirms that XGBoost relies more heavily on the regime signal precisely when markets are stressed, consistent with the IC rotation documented above.
+The regime signal $\pi_t^{\text{filter}}$ is the second most important feature after aggregate momentum, with importance that increases from calm to panic months. This confirms that XGBoost relies more heavily on the regime signal precisely when markets are stressed, consistent with the IC analysis documented above.
 
 The partial dependence plot (Figure~\ref{fig:pdp_pi}) reveals the non-monotonic relationship between $\pi_t^{\text{filter}}$ and predicted returns. If $\pi_t^{\text{filter}}$ were a conventional return predictor, the plot would show a monotonic relationship. Instead, it displays a staircase pattern, with predicted returns rising in some ranges and falling in others. Each step corresponds to a tree-split threshold where XGBoost switches which momentum horizons it emphasises. This non-monotonic structure is precisely why the logistic regression assigns $\pi_t^{\text{filter}}$ a near-zero coefficient: a single linear slope through this staircase averages to approximately zero.
 
@@ -180,14 +169,14 @@ Baseline ($r$) & --- & 1.07 & 45\% \\
  & --- & 0.47 & 49\% \\
 \bottomrule
 \end{tabular}
-\caption{Risk-adjusted training targets and regime signal importance. ``$\pi$ share'' is the regime signal's fraction of total SHAP importance (remainder is momentum). Sharpe ratios use 10 XGB seeds.}
+\caption{Risk-adjusted training targets and regime signal importance. ``$\pi$ share'' is the regime signal's fraction of total feature importance (remainder is momentum). Sharpe ratios use 10 XGB seeds.}
 \label{tab:risk_aversion}
 \end{table}
 
-Two findings emerge. First, under mild risk adjustment ($r/\sigma^{0.5}$ or small $\gamma$), the regime signal's share of SHAP importance actually \emph{increases} (from 45\% to 56\%), while the Sharpe ratio barely changes. Mild risk penalisation removes the noisiest bets but preserves the regime-conditional structure -- the model still switches between continuation and reversal horizons, just with less exposure to extreme outcomes.
+Two findings emerge. First, under mild risk adjustment ($r/\sigma^{0.5}$ or small $\gamma$), the regime signal's share of feature importance actually \emph{increases} (from 45\% to 56\%), while the Sharpe ratio barely changes. Mild risk penalisation removes the noisiest bets but preserves the regime-conditional structure -- the model still switches between continuation and reversal horizons, just with less exposure to extreme outcomes.
 
 Second, aggressive risk adjustment breaks the strategy. At $\gamma = 0.5$ the Sharpe drops to 0.71 and the regime signal's share falls to 37\%; at $\gamma \geq 1$ or $a \geq 1$ the strategy collapses entirely. The variance penalty overwhelms the long-short spread, steering the model toward low-volatility stocks regardless of regime and effectively abandoning the mechanism that makes M2 successful.
 
-The implication is that detecting the regime-dependent structure of momentum requires the model to be free to learn flexible, regime-conditional feature interactions. Conservative risk objectives constrain this flexibility, forcing the model toward static low-volatility selections that obscure the very rotation the regime signal is designed to capture.
+The implication is that detecting the regime-dependent structure of momentum requires the model to be free to learn flexible, regime-conditional feature interactions. Conservative risk objectives constrain this flexibility, forcing the model toward static low-volatility selections that obscure the very regime-dependent structure the regime signal is designed to capture.
 
-Taken together, the results establish that momentum is a regime-dependent phenomenon whose cross-sectional structure rotates between continuation and reversal, that this rotation requires nonlinear modelling to exploit, and that the regime signal is essential for distinguishing which momentum horizons are informative in a given market state. The next section summarises these findings and discusses their implications.
+Taken together, the results establish that momentum is a regime-dependent phenomenon whose cross-sectional structure shifts between continuation and reversal, that this shift requires nonlinear modelling to exploit, and that the regime signal is essential for distinguishing which momentum horizons are informative in a given market state. The next section summarises these findings and discusses their implications.

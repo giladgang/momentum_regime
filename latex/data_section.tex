@@ -23,43 +23,15 @@ Market-level months & 252 & 167 & 419 \\
 \end{table}
 
 
-\subsection{HMM Feature Selection}\label{sec:feature_selection}
+\subsection{HMM Input Features}\label{sec:hmm_features}
 
-The regime signal's ability to capture the shift in momentum's cross-sectional structure depends critically on which stress indicators the HMM observes. The selection problem has two constraints. First, market drawdown (DD) must be included: it is the most economically direct measure of the mechanism identified by \citet{DanielMoskowitz2016} -- momentum crashes follow market declines -- and consistently emerges as the dominant regime-identifying feature. Second, the number of features is capped at four. With 241 training months split roughly 150/90 between calm and panic regimes, each regime has sufficient observations to estimate a 4-dimensional mean vector and covariance matrix (10 free covariance parameters per state). Increasing beyond four features risks estimation instability.
-
-\paragraph{Candidate pool}
-Nine monthly macrofinancial indicators, all available from 1990 onward, are considered:
-\begin{itemize}
-    \item \emph{Equity market:} market drawdown (DD), realised volatility (VOL), cross-sectional return dispersion (DISP), relative market participation (REL\_N), advance-decline ratio (ADR), and cross-sectional return skewness (SKEW).
-    \item \emph{Credit and macro:} BAA--AAA credit spread (CS), log VIX (LVIX), and the 10-year minus 2-year Treasury term spread (TERM).
-\end{itemize}
-All candidates are observable in real time at the end of each month and standardised to $z$-scores using training-period statistics.
-
-\paragraph{How we selected}
-The selection proceeds through three passes of increasing rigour. In the first pass (\emph{quality screen}), all DD-inclusive combinations of up to four features are considered. With 8 remaining candidates, this gives $\binom{8}{0} + \binom{8}{1} + \binom{8}{2} + \binom{8}{3} = 1 + 8 + 28 + 56 = 93$ combinations (DD alone, DD paired with one other, DD with two others, DD with three others). Each is estimated with a single Gibbs sampler seed, and combinations are eliminated if the HMM fails basic sanity checks: the two states must separate meaningfully, and the model must correctly classify known crises (the dot-com bust, the GFC, and COVID) as panic while keeping non-crisis periods calm.\footnote{Specific thresholds: ESS $> 50$, regime separation significant for at least $\min(2,D)$ features, average $\pi_t^{\text{filter}} > 0.5$ during GFC and COVID, $< 0.4$ during 2003--2006 and 2013--2019, $> 0.3$ during the dot-com crash.}
-
-In the second pass (\emph{portfolio ranking}), surviving combinations are evaluated through the full cross-sectional pipeline: HMM to XGBoost to long-short portfolio. This answers the question that matters most -- does a better regime signal translate into better stock selection? Combinations are ranked by out-of-sample Sharpe ratio. The top 10 advance.
-
-In the third pass (\emph{stability validation}), the finalists are tested for robustness across random seed partitions. A combination that achieves a high Sharpe on one lucky seed combination but collapses on another is unreliable. We run 20 independent experiments with different seed draws and classify combinations as stable ($\sigma < 0.10$), moderate ($0.10 \leq \sigma < 0.15$), or unstable ($\sigma \geq 0.15$).
-
-\paragraph{Selected features}
-The four-feature combination DD+DISP+REL\_N+CS is selected as the most stable. With the production configuration (200 HMM seeds), it achieves a long-short Sharpe of 1.08 ($\sigma = 0.08$ across independent seed partitions; Section~\ref{sec:results}).
-
-\input{tables/table_feature_selection}
-
-Table~\ref{tab:hmm_feature_ablation} confirms the individual contribution of each feature. DD alone achieves the highest standalone Sharpe, but removing DD or REL\_N from the full model causes the largest drops ($-$0.46 and $-$0.54). DISP and CS contribute marginally in isolation but reduce the Sharpe ratio's standard deviation across seed partitions from 0.12 (DD alone) to 0.08 (full model), providing independent information from cross-sectional disagreement and corporate credit conditions that stabilises the regime classification.
-
-\input{tables/table_hmm_feature_ablation}
-
-The convergence diagnostics described in Section~\ref{sec:convergence} confirm that the Gibbs sampler with the selected features has converged. All posterior parameters exceed an ESS of 100, meaning the post-burn-in draws contain at least 100 effectively independent samples per parameter. The Gelman--Rubin $\hat{R}$ statistic is below 1.01 for every parameter across five independent chains (Appendix~\ref{app:gelman_rubin}), indicating that chains started from different initializations have converged to the same posterior distribution.
-
-Each feature captures a distinct dimension of market stress:
+The HMM classifies market regimes using four monthly macrofinancial stress indicators. Each captures a distinct dimension of market stress:
 \begin{enumerate}
     \item \textbf{DD (Drawdown):} The percentage decline of the cumulative market price index from its rolling 12-month peak:
     \begin{equation}
         DD_t = \frac{P_t - \max(P_{t-11}, \dots, P_t)}{\max(P_{t-11}, \dots, P_t)}.
     \end{equation}
-    DD directly measures the depth of ongoing market declines and is the single most informative HMM input (standalone Sharpe 0.66). \citet{DanielMoskowitz2016} show that momentum crashes are predictable from past market declines, making DD the natural anchor for regime identification.
+    DD directly measures the depth of ongoing market declines. \citet{DanielMoskowitz2016} show that momentum crashes are predictable from past market declines, making DD the natural anchor for regime identification.
 
     \item \textbf{DISP (Return Dispersion):} The log cross-sectional standard deviation of individual stock returns:
     \begin{equation}
@@ -90,6 +62,39 @@ All four features are winsorised at the 1st and 99th percentiles (i.e., values b
 \end{figure}
 
 
+\subsection{Feature Selection}\label{sec:feature_selection}
+
+The regime signal's ability to capture the shift in momentum's cross-sectional structure depends critically on which stress indicators the HMM observes. The selection problem has two constraints. First, market drawdown (DD) must be included: it is the most economically direct measure of the mechanism identified by \citet{DanielMoskowitz2016} -- momentum crashes follow market declines -- and consistently emerges as the dominant regime-identifying feature. Second, the number of features is capped at four. With 241 training months split roughly 150/90 between calm and panic regimes, each regime has sufficient observations to estimate a 4-dimensional mean vector and covariance matrix (10 free covariance parameters per state). Increasing beyond four features risks estimation instability.
+
+\paragraph{Candidate pool}
+Nine monthly macrofinancial indicators, all available from 1990 onward, are considered:
+\begin{itemize}
+    \item \emph{Equity market:} market drawdown (DD), realised volatility (VOL), cross-sectional return dispersion (DISP), relative market participation (REL\_N), advance-decline ratio (ADR), and cross-sectional return skewness (SKEW).
+    \item \emph{Credit and macro:} BAA--AAA credit spread (CS), log VIX (LVIX), and the 10-year minus 2-year Treasury term spread (TERM).
+\end{itemize}
+All candidates are observable in real time at the end of each month and standardised to $z$-scores using training-period statistics.
+
+\paragraph{Selection procedure}
+The selection proceeds through three passes of increasing rigour. In the first pass (\emph{quality screen}), all DD-inclusive combinations of up to four features are considered. With 8 remaining candidates, this gives $\binom{8}{0} + \binom{8}{1} + \binom{8}{2} + \binom{8}{3} = 1 + 8 + 28 + 56 = 93$ combinations (DD alone, DD paired with one other, DD with two others, DD with three others). Each is estimated with a single Gibbs sampler seed, and combinations are eliminated if the HMM fails basic sanity checks: the two states must separate meaningfully, and the model must correctly classify known crises (the dot-com bust, the GFC, and COVID) as panic while keeping non-crisis periods calm.\footnote{Specific thresholds: ESS $> 50$, regime separation significant for at least $\min(2,D)$ features, average $\pi_t^{\text{filter}} > 0.5$ during GFC and COVID, $< 0.4$ during 2003--2006 and 2013--2019, $> 0.3$ during the dot-com crash.}
+
+In the second pass (\emph{portfolio ranking}), surviving combinations are evaluated through the full cross-sectional pipeline: HMM to XGBoost to long-short portfolio. This answers the question that matters most -- does a better regime signal translate into better stock selection? Combinations are ranked by out-of-sample Sharpe ratio. The top 10 advance.
+
+In the third pass (\emph{stability validation}), the finalists are tested for robustness across random seed partitions. A combination that achieves a high Sharpe on one lucky seed combination but collapses on another is unreliable. We run 20 independent experiments with different seed draws and classify combinations as stable ($\sigma < 0.10$), moderate ($0.10 \leq \sigma < 0.15$), or unstable ($\sigma \geq 0.15$).
+
+\paragraph{Selected features}
+The four-feature combination DD+DISP+REL\_N+CS is selected as the most stable. With the production configuration (200 HMM seeds), it achieves a long-short Sharpe of 1.08 ($\sigma = 0.08$ across independent seed partitions; Section~\ref{sec:results}).
+
+\input{tables/table_feature_selection}
+
+Table~\ref{tab:hmm_feature_ablation} confirms the individual contribution of each feature. DD alone achieves the highest standalone Sharpe, but removing DD or REL\_N from the full model causes the largest drops ($-$0.46 and $-$0.54). DISP and CS contribute marginally in isolation but reduce the Sharpe ratio's standard deviation across seed partitions from 0.12 (DD alone) to 0.08 (full model), providing independent information from cross-sectional disagreement and corporate credit conditions that stabilises the regime classification.
+
+\input{tables/table_hmm_feature_ablation}
+
+
+\subsection{HMM Output}\label{sec:hmm_output}
+
+The convergence diagnostics described in Section~\ref{sec:convergence} confirm that the Gibbs sampler with the selected features has converged. All posterior parameters exceed an ESS of 100, meaning the post-burn-in draws contain at least 100 effectively independent samples per parameter. The Gelman--Rubin $\hat{R}$ statistic is below 1.01 for every parameter across five independent chains (Appendix~\ref{app:gelman_rubin}), indicating that chains started from different initializations have converged to the same posterior distribution.
+
 Table~\ref{tab:hmm_separation} and Figure~\ref{fig:regime_probabilities} summarize the HMM output. All four features exhibit statistically significant separation between calm and panic regimes (95\% credible intervals excluding zero), and the resulting signal correctly identifies all major stress episodes while remaining near zero during calm expansions.
 
 \input{tables/table_hmm_separation}
@@ -100,6 +105,7 @@ Table~\ref{tab:hmm_separation} and Figure~\ref{fig:regime_probabilities} summari
     \caption{Filtered regime probability $\pi_t^{\text{filter}}$ (1990--2025). The dashed vertical line marks the train/test split (January 2011). Shaded regions indicate months where $\pi_t^{\text{filter}} \geq 0.5$ (panic classification).}
     \label{fig:regime_probabilities}
 \end{figure}
+
 
 \subsection{Cross-Sectional Features}\label{sec:cs_features}
 
