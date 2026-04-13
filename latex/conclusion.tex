@@ -35,6 +35,9 @@ The ablation analysis (Section~\ref{sec:ablation_results}) shows that adding fun
 \paragraph{Alternative nonlinear models}
 This thesis uses XGBoost as the nonlinear model, but the central finding -- that the regime-momentum interaction requires nonlinear modelling -- should hold for other flexible model classes. Comparing XGBoost against alternative architectures such as Random Forests, LightGBM, and neural networks (including attention-based models) would clarify whether the regime-conditional rotation is captured equally well by all nonlinear methods or whether tree-based models have a specific advantage due to their discrete splitting structure. If neural networks capture the same rotation, it would strengthen the conclusion that the finding is about the data, not the model.
 
+\paragraph{Alternative emission distributions}
+The current HMM uses Gaussian emissions, which are robust in practice (Appendix~\ref{app:emission_robustness}). Exploring alternative emission distributions, such as multivariate Student-$t$ or skew-normal specifications, may better accommodate the heavy tails and asymmetry present in financial stress indicators and could improve regime identification in samples with more extreme tail events.
+
 \paragraph{Transaction costs and implementation}
 The analysis applies a uniform 10 basis point one-way transaction cost, but does not model the higher costs that may affect smaller or less liquid stocks. In long-short construction, M2's turnover is higher than in long-only due to regime-conditional switching between continuation and reversal bets. Incorporating more realistic, stock-specific transaction cost estimates would provide a more accurate picture of implementability.
 
