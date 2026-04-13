@@ -305,3 +305,5 @@ Row and column subsampling introduce stochasticity into each boosting round, red
 \paragraph{The Role of $\pi_t^{\text{filter}}$}\label{sec:pi_context}
 
 A key distinction between Methods~1 and~2 lies in how each model uses the regime signal. Logistic regression assigns $\pi_t^{\text{filter}}$ a single linear coefficient, which is near zero because the regime signal is not a direct return predictor. XGBoost, by contrast, uses $\pi_t^{\text{filter}}$ as a \emph{context variable} through tree splits, conditioning its use of momentum horizons on the current market state. This interaction effect cannot be represented by a single linear coefficient. The empirical consequences of this distinction are analysed in Section~\ref{sec:shap_results}.
+
+With the two-stage framework in place, the next section describes the data, sample construction, and the feature selection procedure used to choose the HMM's input features.
