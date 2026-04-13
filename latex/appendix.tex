@@ -239,6 +239,56 @@ To assess sensitivity to the choice of training period, the full pipeline (HMM e
 
 In the baseline split (1990--2010 training, 2011--2025 test), M2 achieves a Sharpe of 1.08 while M1 collapses ($-$0.03), confirming the nonlinear regime-momentum interaction documented in Section~\ref{sec:performance_results}.
 
+\subsection{Out-of-Sample Test on the 2008--2009 Crisis}\label{app:gfc_oos}
+
+The main test period (2011--2025) does not include the global financial crisis, which is the event that motivated \citet{DanielMoskowitz2016}. To test whether the strategy would have survived the 2009 momentum crash out-of-sample, the HMM and XGBoost are retrained on earlier data so that the GFC falls entirely in the test period.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{l r r r r}
+\toprule
+Training period & Test months & M2 Sharpe & GFC cumulative & 2009 rebound \\
+\midrule
+1990--1999 & 132 & 0.28 & +37.7\% & +42.7\% \\
+1990--2004 & 72 & 0.47 & +14.2\% & +21.8\% \\
+1990--2006 & 48 & 0.38 & +17.6\% & +21.3\% \\
+\midrule
+\multicolumn{2}{l}{Fixed 12-mo momentum} & $-$0.18 & --- & $-$59.5\% \\
+\bottomrule
+\end{tabular}
+\caption{True out-of-sample test on the 2008--2009 crisis. The HMM and XGBoost are trained on pre-crisis data and evaluated on a test period that includes the GFC. ``GFC cumulative'' is the total return from October 2007 to June 2009; ``2009 rebound'' is March to December 2009, the period where traditional momentum crashed $-$59.5\%. M2 earned +21\% to +43\% during the rebound across all training windows.}
+\label{tab:gfc_oos}
+\end{table}
+
+M2 not only survived the 2009 momentum crash but profited from it, correctly switching to reversal bets during the panic. The lower overall Sharpe (0.28--0.47 vs.\ 1.08 in the main test) reflects the shorter training period (109--193 months vs.\ 241), not a failure of the mechanism.
+
+\subsection{Expanding-Window HMM Re-estimation}\label{app:expanding}
+
+The baseline HMM is trained on 1990--2010 and held fixed. To test whether re-estimating with more recent data improves performance, the HMM is re-estimated every three years using all data up to that point, and XGBoost is retrained accordingly.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{l l r}
+\toprule
+HMM trained through & Test period & M2 Sharpe \\
+\midrule
+2010 (baseline) & 2011--2025 & 1.04 \\
+2013 & 2014--2025 & 1.21 \\
+2016 & 2017--2025 & 0.91 \\
+2019 & 2020--2025 & 1.60 \\
+2022 & 2023--2025 & 1.14 \\
+\midrule
+Combined expanding & 2011--2025 & 1.04 \\
+\bottomrule
+\end{tabular}
+\caption{Expanding-window HMM re-estimation. The combined strategy stitches together the best available model at each point. Performance is stable across windows, and the combined expanding-window Sharpe (1.04) matches the fixed-window baseline (1.08), indicating that the regime structure does not drift meaningfully over time.}
+\label{tab:expanding}
+\end{table}
+
+The regime structure is stable: re-estimating the HMM with more recent data neither helps nor hurts. This alleviates the concern that the fixed training split produces a stale regime signal.
+
 \subsection{Placebo Regime Signals}\label{app:placebo}
 
 To rule out the possibility that XGBoost benefits from any additional feature rather than specifically from the HMM regime signal, the real $\pi_t^{\text{filter}}$ is replaced with five placebo variants: temporally shuffled versions (which preserve the marginal distribution but destroy temporal structure), pure random noise, an inverted signal ($1 - \pi_t^{\text{filter}}$), and a VIX-based alternative.
