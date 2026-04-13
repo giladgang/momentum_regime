@@ -8,8 +8,8 @@ from scipy.stats import multivariate_normal, invwishart
 from scipy.special import logsumexp
 from xgboost import XGBRegressor
 import sys, os
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) if '__file__' in dir() else '.')
-os.chdir('/Users/giladgang/momentum_regime_shifts')
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import (HMM_FEATURES, HMM_ITERATIONS, HMM_BURNIN, N_ESTIMATORS,
                     MAX_DEPTH, LEARNING_RATE, SUBSAMPLE, COLSAMPLE, MOM_FEATURES)
 warnings.filterwarnings('ignore')

@@ -3,7 +3,9 @@ True out-of-sample test on the 2008-2009 crash.
 Train HMM on 1990-1999, train XGB on 1990-1999, test on 2000-2010.
 This puts the dot-com bust AND the GFC in the test period.
 """
-import numpy as np, pandas as pd, pickle, warnings, time
+import numpy as np, pandas as pd, pickle, warnings, time, sys, os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from scipy.stats import multivariate_normal, invwishart
 from scipy.special import logsumexp
 from xgboost import XGBRegressor

@@ -87,25 +87,26 @@ print(f"  Train: {len(train):,}  |  Test: {len(test):,}")
 
 TRADING_FEE = 0.001
 
-def long_only_port(df_test, score_col, fee=TRADING_FEE):
+def long_short_port(df_test, score_col, fee=TRADING_FEE):
     monthly = []
-    prev_weights = {}
+    prev_lw, prev_sw = {}, {}
     for date, grp in df_test.groupby('date'):
         nyse = grp[grp['exchcd'] == 1][score_col].dropna()
         if len(nyse) < 10:
             continue
-        hi = nyse.quantile(0.90)
+        lo, hi = nyse.quantile(0.10), nyse.quantile(0.90)
         longs = grp[grp[score_col] >= hi]
-        if longs['me'].sum() == 0:
+        shorts = grp[grp[score_col] <= lo]
+        if longs['me'].sum() == 0 or shorts['me'].sum() == 0:
             continue
-        total_me = longs['me'].sum()
-        new_weights = (longs.set_index('permno')['me'] / total_me).to_dict()
-        all_permnos = set(new_weights) | set(prev_weights)
-        turnover = sum(abs(new_weights.get(p, 0) - prev_weights.get(p, 0))
-                       for p in all_permnos) / 2
-        r_gross = (longs['ret_fwd'] * longs['me']).sum() / total_me
-        monthly.append({'date': date, 'ret': r_gross - fee * turnover})
-        prev_weights = new_weights
+        lw = (longs.set_index('permno')['me'] / longs['me'].sum()).to_dict()
+        sw = (shorts.set_index('permno')['me'] / shorts['me'].sum()).to_dict()
+        tl = sum(abs(lw.get(p,0)-prev_lw.get(p,0)) for p in set(lw)|set(prev_lw)) / 2
+        ts = sum(abs(sw.get(p,0)-prev_sw.get(p,0)) for p in set(sw)|set(prev_sw)) / 2
+        r_l = (longs['ret_fwd'] * longs['me']).sum() / longs['me'].sum()
+        r_s = (shorts['ret_fwd'] * shorts['me']).sum() / shorts['me'].sum()
+        monthly.append({'date': date, 'ret': r_l - r_s - fee*(tl+ts)})
+        prev_lw, prev_sw = lw, sw
     return pd.DataFrame(monthly).set_index('date')['ret']
 
 def metrics(r):
@@ -133,20 +134,28 @@ for gamma in GAMMAS:
     # Compute risk-adjusted target
     y_train_g = train['ret_fwd'].values - (gamma / 2) * train['trail_var'].values
 
-    # Train XGBoost
-    model = XGBRegressor(
-        n_estimators=500, max_depth=4, learning_rate=0.05,
-        subsample=0.8, colsample_bytree=0.8,
-        tree_method='hist', random_state=42, verbosity=0
-    )
-    model.fit(X_train, y_train_g)
+    # Train XGBoost ensemble (50 seeds)
+    XGB_SEEDS = list(range(1, 51))
+    preds = np.zeros(len(X_test))
+    last_model = None
+    for xs in XGB_SEEDS:
+        model = XGBRegressor(
+            n_estimators=500, max_depth=4, learning_rate=0.05,
+            subsample=0.8, colsample_bytree=0.8,
+            tree_method='hist', random_state=xs, verbosity=0
+        )
+        model.fit(X_train, y_train_g)
+        preds += model.predict(X_test)
+        last_model = model
+    preds /= len(XGB_SEEDS)
 
     # Score test set
     score_col = f'score_g{gamma}'
-    test[score_col] = model.predict(X_test)
+    test[score_col] = preds
+    model = last_model  # for SHAP below
 
     # Portfolio performance
-    r = long_only_port(test, score_col)
+    r = long_short_port(test, score_col)
     ann_ret, ann_vol, sharpe, mdd = metrics(r)
     results.append({
         'gamma': gamma, 'ann_ret': ann_ret, 'ann_vol': ann_vol,
