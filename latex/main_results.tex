@@ -188,4 +188,4 @@ Two findings emerge. First, under mild risk adjustment ($r/\sigma^{0.5}$ or smal
 
 Second, aggressive risk adjustment breaks the strategy. At $\gamma = 0.5$ the Sharpe drops to 0.71 and the regime signal's share falls to 37\%; at $\gamma \geq 1$ or $a \geq 1$ the strategy collapses entirely. The variance penalty overwhelms the long-short spread, steering the model toward low-volatility stocks regardless of regime and effectively abandoning the mechanism that makes M2 successful.
 
-The implication is that the regime-momentum interaction is inherently a high-conviction mechanism: it works best when the model is free to make aggressive, regime-conditional bets. Conservative risk objectives suppress exactly the volatility that makes these bets profitable.
+The implication is that detecting the regime-dependent structure of momentum requires the model to be free to learn flexible, regime-conditional feature interactions. Conservative risk objectives constrain this flexibility, forcing the model toward static low-volatility selections that obscure the very rotation the regime signal is designed to capture.

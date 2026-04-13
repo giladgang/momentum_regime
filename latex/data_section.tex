@@ -25,7 +25,7 @@ Market-level months & 252 & 167 & 419 \\
 
 \subsection{HMM Feature Selection}\label{sec:feature_selection}
 
-The HMM's regime classification depends critically on which stress indicators it observes. The selection problem has two constraints. First, market drawdown (DD) must be included: it is the most economically direct measure of the mechanism identified by \citet{DanielMoskowitz2016} -- momentum crashes follow market declines -- and consistently emerges as the dominant regime-identifying feature. Second, the number of features is capped at four. With 241 training months split roughly 150/90 between calm and panic regimes, each regime has sufficient observations to estimate a 4-dimensional mean vector and covariance matrix (10 free covariance parameters per state). Increasing beyond four features risks estimation instability.
+The regime signal's ability to capture the rotation in momentum's cross-sectional structure depends critically on which stress indicators the HMM observes. The selection problem has two constraints. First, market drawdown (DD) must be included: it is the most economically direct measure of the mechanism identified by \citet{DanielMoskowitz2016} -- momentum crashes follow market declines -- and consistently emerges as the dominant regime-identifying feature. Second, the number of features is capped at four. With 241 training months split roughly 150/90 between calm and panic regimes, each regime has sufficient observations to estimate a 4-dimensional mean vector and covariance matrix (10 free covariance parameters per state). Increasing beyond four features risks estimation instability.
 
 \paragraph{Candidate pool}
 Nine monthly macrofinancial indicators, all available from 1990 onward, are considered:
