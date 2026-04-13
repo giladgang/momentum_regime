@@ -63,7 +63,9 @@ Cross-sectional momentum is one of the most robust return anomalies in empirical
 %% --Appendix --
 \newpage
 \appendix
+\renewcommand{\thesection}{\Alph{section}}
 \titleformat{\section}{\normalfont\Large\bfseries}{Appendix~\thesection:}{0.5em}{}
+\addtocontents{toc}{\bigskip\noindent\textbf{Appendices}\par\medskip}
 \input{latex/appendix}
 
 \end{document}
