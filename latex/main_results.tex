@@ -143,7 +143,7 @@ The partial dependence plot (Figure~\ref{fig:pdp_pi}) reveals the non-monotonic 
 \subsection{Ablation Studies}\label{sec:ablation_results}
 
 \paragraph{Regime signal alternatives}
-Table~\ref{tab:regime_signal_ablation} compares XGBoost performance under three regime signal specifications: the baseline HMM $\pi_t^{\text{filter}}$, the GHM market-cycle variable \citep{GHM2023}, and no regime signal. The HMM signal produces the highest Sharpe ratio, substantially exceeding both the GHM cycle and the no-signal baseline. The GHM cycle, constructed from the same underlying market returns as the momentum features, provides no incremental information for a nonlinear model.
+Table~\ref{tab:regime_signal_ablation} compares XGBoost performance under three regime signal specifications: the baseline HMM $\pi_t^{\text{filter}}$, the GHM market-cycle variable \citep{GHM2023}, and no regime signal. The HMM signal produces the highest Sharpe ratio, substantially exceeding both the GHM cycle and the no-signal baseline. The GHM cycle, constructed from the same underlying market returns as the momentum features, provides no incremental information for a nonlinear model. All four GHM market-state strategies also collapse in long-short construction (Appendix~\ref{app:ghm}), because their deterministic blending of two horizons cannot adapt the short side to changing regimes.
 
 \input{tables/table_regime_signal_ablation}
 

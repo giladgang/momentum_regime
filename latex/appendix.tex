@@ -289,6 +289,12 @@ Combined expanding & 2011--2025 & 1.04 \\
 
 The regime structure is stable: re-estimating the HMM with more recent data neither helps nor hurts. This alleviates the concern that the fixed training split produces a stale regime signal.
 
+\subsection{Comparison with GHM Market-State Momentum}\label{app:ghm}
+
+Table~\ref{tab:ghm_comparison} reports the performance of all four \citet{GHM2023} market-state momentum strategies using the same long-short construction and transaction costs as the main analysis. All GHM variants collapse in long-short construction, because their deterministic blending of two momentum horizons cannot adapt the short side to changing regimes.
+
+\input{tables/table_ghm_comparison}
+
 \subsection{Placebo Regime Signals}\label{app:placebo}
 
 To rule out the possibility that XGBoost benefits from any additional feature rather than specifically from the HMM regime signal, the real $\pi_t^{\text{filter}}$ is replaced with five placebo variants: temporally shuffled versions (which preserve the marginal distribution but destroy temporal structure), pure random noise, an inverted signal ($1 - \pi_t^{\text{filter}}$), and a VIX-based alternative.
