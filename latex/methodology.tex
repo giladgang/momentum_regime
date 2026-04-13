@@ -198,15 +198,47 @@ This Bayesian model averaging over 200 seeds substantially reduces the variance 
 
 \paragraph{Convergence Diagnostics}\label{sec:convergence}
 
-Convergence is assessed in two ways. First, trace plots of the regime means and persistence probabilities are visually inspected to verify that the chain mixes around a stable posterior region after burn-in. Second, effective sample sizes (ESS) are computed for key parameters. Because successive MCMC draws are autocorrelated, $n$ draws from the chain contain less information than $n$ independent samples. The ESS quantifies the number of truly independent draws the chain is equivalent to. For a post-burn-in chain of length $n$,
-\begin{equation}
-ESS
-=
-\frac{n}{1 + 2\sum_{\ell=1}^{L^\ast}\hat{\rho}(\ell)},
-\end{equation}
-where $\hat{\rho}(\ell)$ is the estimated autocorrelation at lag $\ell$,\footnote{$\hat{\rho}(\ell) = \frac{1}{(n-\ell)\,\hat{\sigma}^2}\sum_{i=1}^{n-\ell}(\theta_i - \bar{\theta})(\theta_{i+\ell} - \bar{\theta})$, where $\theta_i$ is the $i$-th post-burn-in draw, $\bar{\theta}$ its sample mean, and $\hat{\sigma}^2$ its sample variance.} and $L^\ast$ is the first lag at which the autocorrelation becomes negative. High ESS indicates that the chain provides many effectively independent posterior draws.\footnote{An ESS of at least 100 per parameter is a common minimum for reliable posterior inference \citep{Gelman2013}.}
+Because the Gibbs sampler produces correlated draws, convergence must be verified before the posterior estimates can be trusted. Two complementary diagnostics are used: the effective sample size (ESS), which measures within-chain efficiency, and the Gelman--Rubin $\hat{R}$ statistic, which measures between-chain agreement.
 
-Trace plots of the regime means and persistence probabilities (Figure~\ref{fig:convergence_trace}, Appendix~\ref{app:convergence}) confirm that all chains converge to stable posterior values after the burn-in period.\footnote{The Gelman--Rubin $\hat{R}$ statistic, computed across five representative chains, is below 1.01 for every parameter (Appendix~\ref{app:gelman_rubin}), confirming convergence to the same posterior distribution.}
+\paragraph{Effective sample size}
+Successive MCMC draws are autocorrelated, so $n$ draws contain less information than $n$ independent samples. The ESS quantifies the number of truly independent draws the chain is equivalent to. Let $\theta_1, \dots, \theta_n$ denote the post-burn-in draws of a scalar parameter $\theta$, with sample mean $\bar{\theta}$. The sample autocovariance at lag $\ell$ is:
+\begin{equation}
+    \hat{\gamma}(\ell) = \frac{1}{n} \sum_{i=1}^{n-\ell} (\theta_i - \bar{\theta})(\theta_{i+\ell} - \bar{\theta}),
+\end{equation}
+and the sample autocorrelation is:
+\begin{equation}
+    \hat{\rho}(\ell) = \frac{\hat{\gamma}(\ell)}{\hat{\gamma}(0)}.
+\end{equation}
+The integrated autocorrelation time, which measures how many draws are needed for one effectively independent sample, is:
+\begin{equation}
+    \hat{\tau} = 1 + 2 \sum_{\ell=1}^{L^*} \hat{\rho}(\ell),
+\end{equation}
+where $L^*  = \min\{\ell : \hat{\rho}(\ell) < 0\}$ truncates the sum at the first negative autocorrelation to prevent noise from inflating the estimate. The effective sample size is then:
+\begin{equation}
+    \text{ESS} = \frac{n}{\hat{\tau}}.
+\end{equation}
+An ESS above 100 per parameter is the standard minimum for reliable posterior inference \citep{Gelman2013}. All parameters of the selected HMM exceed this threshold.
+
+\paragraph{Gelman--Rubin diagnostic}
+The ESS measures efficiency within a single chain but cannot detect whether different chains have converged to different modes. The Gelman--Rubin $\hat{R}$ statistic \citep{Gelman2013} addresses this by comparing within-chain and between-chain variance across $M$ independent chains, each of length $n$. Let $\bar{\theta}_m$ denote the mean of chain $m$ and $s_m^2$ its variance. The within-chain variance is the average of the individual chain variances:
+\begin{equation}
+    W = \frac{1}{M} \sum_{m=1}^{M} s_m^2,
+\end{equation}
+and the between-chain variance is the variance of the chain means, scaled by $n$:
+\begin{equation}
+    B = \frac{n}{M-1} \sum_{m=1}^{M} (\bar{\theta}_m - \bar{\theta})^2,
+\end{equation}
+where $\bar{\theta} = \frac{1}{M}\sum_m \bar{\theta}_m$ is the grand mean. The pooled variance estimate combines both sources:
+\begin{equation}
+    \hat{V} = \frac{n-1}{n}\,W + \frac{B}{n},
+\end{equation}
+and the convergence diagnostic is:
+\begin{equation}
+    \hat{R} = \sqrt{\frac{\hat{V}}{W}}.
+\end{equation}
+If all chains have converged to the same posterior, $B$ is small relative to $W$ and $\hat{R} \approx 1$. Values above 1.1 indicate that the chains have not yet mixed. For the selected feature set (DD+DISP+REL\_N+CS), all parameters have $\hat{R} < 1.01$ across five independent chains (Appendix~\ref{app:gelman_rubin}).
+
+Trace plots of the regime means and persistence probabilities (Figure~\ref{fig:convergence_trace}, Appendix~\ref{app:convergence}) provide visual confirmation that all chains converge to stable posterior values after the burn-in period.
 
 \subsubsection{Regime Identification and Trading Signal}\label{sec:regime_signal}
 
