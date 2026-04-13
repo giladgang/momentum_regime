@@ -24,11 +24,19 @@ The central finding is stark: in long-short construction, only M2 (XGBoost) prod
 
 The collapse of M1 is the first piece of evidence for the thesis's central claim: the regime-momentum interaction is inherently nonlinear. A linear model assigns $\pi_t^{\text{filter}}$ a single coefficient that cannot capture the conditional logic required to adapt both the long and short sides across regimes. XGBoost's tree splits learn regime-conditional rules that are invisible to a linear specification (even with polynomial and interaction augmentations; see Appendix~\ref{app:m1_poly}).
 
-Factor model regressions confirm that M2's returns are not explained by known risk factors. The CAPM alpha is 23.8\% annualised ($t = 4.08$), and the alpha remains significant across all standard specifications: Fama--French three-factor (23.7\%, $t = 4.46$), Carhart four-factor (24.9\%, $t = 4.74$), Fama--French five-factor (23.4\%, $t = 4.56$), and the six-factor model including momentum (24.7\%, $t = 4.78$). The alpha \emph{increases} as more factors are added, because M2 has near-zero loadings on all factors: the strategy is approximately market-neutral and its returns are not repackaged exposure to value, size, profitability, investment, or momentum factors.
+Factor model regressions confirm that M2's returns are not explained by known risk factors. The regression specification is:
+\begin{equation}
+    r_{M2,t} = \alpha + \beta_1 (\text{MKT-RF})_t + \beta_2 \text{SMB}_t + \beta_3 \text{HML}_t + \cdots + \varepsilon_t,
+\end{equation}
+where $r_{M2,t}$ is M2's monthly long-short return, the right-hand-side variables are the standard Fama--French factors \citep{FamaFrench2015}, and $\alpha$ is the unexplained excess return. All $t$-statistics use Newey--West HAC standard errors with 6 lags to account for potential serial correlation. The CAPM alpha is 23.8\% annualised ($t = 4.08$), and the alpha remains significant across all standard specifications: Fama--French three-factor (23.7\%, $t = 4.46$), Carhart four-factor (24.9\%, $t = 4.74$), Fama--French five-factor (23.4\%, $t = 4.56$), and the six-factor model including momentum (24.7\%, $t = 4.78$). The alpha \emph{increases} as more factors are added, because M2 has near-zero loadings on all factors: the strategy is approximately market-neutral and its returns are not repackaged exposure to value, size, profitability, investment, or momentum factors.
 
 Removing the regime signal drops M2's Sharpe from 1.08 to 0.48 (Section~\ref{sec:ablation_results}), confirming that the HMM captures decision-relevant information not spanned by the momentum features themselves.
 
-A spanning test formalises the comparison between M1 and M2. Regressing M2's monthly returns on M1's returns yields an alpha of 21.8\% ($t = 4.27$, $p < 0.001$), confirming that M2 captures information that M1 cannot. The reverse regression yields an insignificant alpha ($t = -0.32$), indicating that M1 adds nothing beyond what M2 already provides.
+A spanning test formalises the comparison between M1 and M2 by estimating:
+\begin{equation}
+    r_{M2,t} = \alpha + \beta \, r_{M1,t} + \varepsilon_t.
+\end{equation}
+If M2 captures information that M1 does not, $\alpha$ should be positive and significant. The estimated $\alpha$ is 21.8\% annualised ($t = 4.27$, $p < 0.001$), confirming this. The reverse regression (M1 on M2) yields an insignificant $\alpha$ ($t = -0.32$), indicating that M1 adds nothing beyond what M2 already provides.
 
 \begin{figure}[H]
     \centering
@@ -108,7 +116,11 @@ The scenario that would truly break the strategy -- a sustained fundamental dete
 
 \subsubsection{Model-Free Confirmation: Information Coefficient Rotation}\label{sec:ic_analysis}
 
-A natural concern is whether the regime-dependent behaviour described above reflects genuine economic structure or model-specific overfitting. To rule this out, Table~\ref{tab:ic_rotation} examines the raw predictive power of each momentum horizon in calm versus panic months, without involving any model. The information coefficient (IC) -- the Spearman rank correlation between a momentum signal and subsequent stock returns, computed cross-sectionally each month -- directly measures whether ranking stocks by a given horizon correctly identifies future outperformers.
+A natural concern is whether the regime-dependent behaviour described above reflects genuine economic structure or model-specific overfitting. To rule this out, Table~\ref{tab:ic_rotation} examines the raw predictive power of each momentum horizon in calm versus panic months, without involving any model. For each horizon $k$ and month $t$, the information coefficient is the Spearman rank correlation computed cross-sectionally:
+\begin{equation}
+    IC_{k,t} = \rho_{\text{Spearman}}\!\left(\{mom_{k,t}^s\}_{s=1}^{N_t},\; \{r_{t+1}^s\}_{s=1}^{N_t}\right),
+\end{equation}
+where $N_t$ is the number of stocks in month $t$. The regime-conditional IC is the average of $IC_{k,t}$ over calm months ($\pi_t^{\text{filter}} < 0.5$) and panic months ($\pi_t^{\text{filter}} \geq 0.5$) separately. A positive IC means that ranking stocks by horizon $k$ correctly identifies future outperformers; a negative IC means the ranking points in the wrong direction.
 
 \input{tables/table_ic_rotation}
 

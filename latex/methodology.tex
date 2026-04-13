@@ -284,7 +284,11 @@ where $y_t^s = \mathds{1}(r_{t+1}^s > \text{median}_s\{r_{t+1}^s\})$ is a binary
 \begin{equation}
     \hat{\boldsymbol{\beta}} = \arg\max_{\boldsymbol{\beta}} \left[\sum_{i} \Big(y_i \log \sigma(\boldsymbol{\beta}^\top \tilde{\mathbf{x}}_i) + (1 - y_i) \log(1 - \sigma(\boldsymbol{\beta}^\top \tilde{\mathbf{x}}_i))\Big) - \frac{1}{2C} \|\boldsymbol{\beta}\|_2^2\right],
 \end{equation}
-with regularization strength $C = 1.0$ (the scikit-learn default). The $\ell_2$ penalty shrinks coefficients toward zero to guard against overfitting given the large number of correlated momentum features; the default value was retained because preliminary experiments showed that performance was insensitive to moderate changes in $C$. Once $\hat{\boldsymbol{\beta}}$ is estimated on the training sample, the stock score for any observation is obtained by plugging $\hat{\boldsymbol{\beta}}$ back into the prediction equation:
+with regularization strength $C = 1.0$. The optimisation is convex in $\boldsymbol{\beta}$, so the solution is unique and is found via iteratively reweighted least squares (IRLS). Geometrically, the $\ell_2$ penalty constrains $\boldsymbol{\beta}$ to lie within a ball of radius proportional to $C$, shrinking correlated coefficients (such as the 12 momentum horizons) toward zero. The default $C = 1.0$ was retained because preliminary experiments showed that performance was insensitive to moderate changes.
+
+A structural limitation of this optimisation is that each feature receives a single coefficient regardless of the values of other features. In particular, the coefficient on $\pi_t^{\text{filter}}$ is a scalar $\beta_\pi$ that applies identically in calm and panic. If the true relationship between $\pi_t^{\text{filter}}$ and returns is non-monotonic (as the partial dependence analysis in Section~\ref{sec:shap_results} confirms), a single linear slope through this pattern averages to approximately zero, rendering $\pi_t^{\text{filter}}$ uninformative to the model.
+
+Once $\hat{\boldsymbol{\beta}}$ is estimated on the training sample, the stock score for any observation is obtained by plugging $\hat{\boldsymbol{\beta}}$ back into the prediction equation:
 \begin{equation}
     score_t^s = \sigma(\hat{\boldsymbol{\beta}}^\top \tilde{\mathbf{x}}_t^s) = P(y_t^s = 1 \mid \mathbf{x}_t^s;\, \hat{\boldsymbol{\beta}}).
 \end{equation}
@@ -294,13 +298,23 @@ Stocks with higher predicted probability of beating the cross-sectional median r
 
 An XGBoost gradient-boosted tree regressor \citep{Chen2016} is trained to predict the forward monthly return directly. Unlike Method~1, regression rather than classification is used here because XGBoost's nonlinear tree structure is flexible enough to learn from noisy continuous returns, and predicting returns directly preserves magnitude information -- the model can distinguish a stock expected to gain 10\% from one expected to gain 2\%, whereas classification discards this signal. The feature vector for each stock-month observation comprises the 13 features described in Section~\ref{sec:cs_features}: the 12 momentum lookbacks ($mom_1, \dots, mom_{12}$) and the regime signal ($\pi_t^{\text{filter}}$). By including all horizons jointly, XGBoost can learn which momentum horizons matter most in each regime. For example, it may rely on long-horizon momentum when $\pi_t^{\text{filter}}$ is low but shift toward short-term reversal when $\pi_t^{\text{filter}}$ is high.
 
-XGBoost builds an additive ensemble of $M$ regression trees, where each successive tree fits the residuals of the current ensemble:
+XGBoost builds an additive ensemble of $M$ regression trees sequentially. After $m-1$ trees, the current prediction for observation $i$ is $\hat{y}_i^{(m-1)}$. The $m$-th tree $h_m$ is trained to correct the residuals by minimising a regularised second-order approximation of the loss:
 \begin{equation}
-    F(\mathbf{x}) = \sum_{m=1}^{M} \eta \cdot h_m(\mathbf{x}),
+    \mathcal{L}^{(m)} = \sum_{i=1}^{n} \left[ g_i \, h_m(\mathbf{x}_i) + \tfrac{1}{2} \, h_i \, h_m(\mathbf{x}_i)^2 \right] + \gamma \, T_m + \tfrac{1}{2}\lambda \sum_{j=1}^{T_m} w_j^2,
 \end{equation}
-where $h_m$ is the $m$-th decision tree and $\eta$ is the learning rate that shrinks each tree's contribution to prevent overfitting. Each tree $h_m$ is grown to minimize a regularized objective combining the squared-error loss on the current residuals with penalty terms on tree complexity (number of leaves and leaf weights). The predicted return $\hat{r}_{t+1}^s = F(\mathbf{x}_t^s)$ serves as the stock score. The model is trained with $M = 500$ trees, a learning rate of $\eta = 0.05$, maximum tree depth of 4, and row and column subsampling rates of 0.8. To reduce sensitivity to random initialization, an ensemble of 50 independent XGBoost models (each with a different random seed) is trained; their predictions are averaged before ranking stocks into portfolio deciles.
+where $g_i = \partial \ell / \partial \hat{y}_i^{(m-1)}$ and $h_i = \partial^2 \ell / \partial (\hat{y}_i^{(m-1)})^2$ are the first and second derivatives of the squared-error loss $\ell(y_i, \hat{y}_i) = (y_i - \hat{y}_i)^2$ evaluated at the current prediction. The regularisation terms penalise tree complexity: $\gamma$ penalises the number of leaves $T_m$, and $\lambda$ penalises the magnitude of leaf weights $w_j$. Each tree partitions the feature space into $T_m$ disjoint regions (leaves), assigning a constant prediction $w_j$ to all observations falling in leaf $j$.
 
-Row and column subsampling introduce stochasticity into each boosting round, reducing variance and improving generalization. A maximum depth of 4 allows the model to capture pairwise and higher-order interactions. Critically, this means XGBoost can learn splits that condition on $\pi_t^{\text{filter}}$ and then branch on momentum horizons differently within each regime, without requiring explicit interaction terms. XGBoost also natively handles missing values in the fundamental features by learning optimal split directions for missing entries during training, eliminating the need for imputation.
+The tree is grown greedily by evaluating candidate splits. For a candidate split of a node into left ($L$) and right ($R$) children, the reduction in loss (the \emph{gain}) is:
+\begin{equation}\label{eq:gain}
+    \text{Gain} = \frac{1}{2}\left[\frac{G_L^2}{H_L + \lambda} + \frac{G_R^2}{H_R + \lambda} - \frac{(G_L + G_R)^2}{H_L + H_R + \lambda}\right] - \gamma,
+\end{equation}
+where $G_L = \sum_{i \in L} g_i$, $H_L = \sum_{i \in L} h_i$, and similarly for $R$. The tree selects the feature and threshold that maximise this gain at each node. This is the mechanism through which XGBoost discovers the regime-momentum interaction: if splitting on $\pi_t^{\text{filter}}$ at some threshold produces a larger gain than splitting on any momentum horizon, the tree conditions on the regime first. Within each child node, it then selects the best momentum horizon to split on, which may differ between the calm and panic branches. The cascade of splits produces regime-conditional stock selection rules without any explicit interaction terms.
+
+The final prediction after $M$ trees is:
+\begin{equation}
+    \hat{r}_{t+1}^s = \sum_{m=1}^{M} \eta \cdot h_m(\mathbf{x}_t^s),
+\end{equation}
+where $\eta = 0.05$ is the learning rate that shrinks each tree's contribution. The model is trained with $M = 500$ trees, maximum tree depth of 4, and row and column subsampling rates of 0.8. At each boosting round, a random 80\% of training observations and 80\% of features are sampled, reducing variance and preventing any single tree from overfitting to the full dataset. To further reduce sensitivity to random initialisation, an ensemble of 50 independent XGBoost models (each with a different random seed) is trained; their predictions are averaged before ranking stocks into portfolio deciles.
 
 \paragraph{The Role of $\pi_t^{\text{filter}}$}\label{sec:pi_context}
 
