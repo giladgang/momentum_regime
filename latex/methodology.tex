@@ -161,12 +161,12 @@ Importantly, the backward pass is performed only during model \emph{training} (t
 \paragraph{Step 2: Updating the emission parameters}
 
 Holding the sampled state path and the transition matrix $\mathbf{P}$ fixed, the emission parameters are updated. Each regime $k$ has $n_k$ observations assigned to it. From these, two summary statistics are computed: the sample mean $\bar{\mathbf{x}}_k = \frac{1}{n_k}\sum_{t:\,s_t=k}\mathbf{z}_t$ and the scatter matrix $\mathbf{S}_k = \sum_{t:\,s_t=k}(\mathbf{z}_t - \bar{\mathbf{x}}_k)(\mathbf{z}_t - \bar{\mathbf{x}}_k)^\top$. The Normal-Inverse-Wishart prior updates to a posterior with hyperparameters:
-\begin{alignat}{2}
-\kappa_n &= \kappa_0 + n_k, &\qquad& \text{(total confidence: prior + data)} \label{eq:niw_kappa} \\[6pt]
-\mathbf{m}_n &= \frac{\kappa_0 \mathbf{m}_0 + n_k \bar{\mathbf{x}}_k}{\kappa_n}, &\qquad& \text{(weighted average of prior and sample mean)} \label{eq:niw_mean} \\[6pt]
-\nu_n &= \nu_0 + n_k, &\qquad& \text{(degrees of freedom for covariance)} \label{eq:niw_nu} \\[6pt]
-\boldsymbol{\Psi}_n &= \boldsymbol{\Psi}_0 + \mathbf{S}_k + \frac{\kappa_0 n_k}{\kappa_n}(\bar{\mathbf{x}}_k-\mathbf{m}_0)(\bar{\mathbf{x}}_k-\mathbf{m}_0)^\top &\qquad& \text{(prior scale + scatter + mean-disagreement)} \label{eq:niw_psi}
-\end{alignat}
+\begin{align}\label{eq:niw_update}
+\kappa_n &= \kappa_0 + n_k, \qquad
+\mathbf{m}_n = \frac{\kappa_0 \mathbf{m}_0 + n_k \bar{\mathbf{x}}_k}{\kappa_n}, \qquad
+\nu_n = \nu_0 + n_k, \notag \\[6pt]
+\boldsymbol{\Psi}_n &= \boldsymbol{\Psi}_0 + \mathbf{S}_k + \frac{\kappa_0 n_k}{\kappa_n}(\bar{\mathbf{x}}_k-\mathbf{m}_0)(\bar{\mathbf{x}}_k-\mathbf{m}_0)^\top.
+\end{align}
 Since $\kappa_0 = 0.01 \ll n_k$, the posterior is driven almost entirely by the data.
 
 New regime parameters are then drawn from the updated posterior:
