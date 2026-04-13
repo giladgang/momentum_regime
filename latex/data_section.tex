@@ -51,6 +51,21 @@ Table~\ref{tab:hmm_feature_ablation} confirms the individual contribution of eac
 
 \input{tables/table_hmm_feature_ablation}
 
+\paragraph{Convergence diagnostics for the selected features}
+The Gibbs sampler produces a Markov chain whose draws must converge to the target posterior before the estimates can be trusted. Two diagnostics are used to verify this.
+
+First, the effective sample size (ESS) quantifies how many independent draws the chain is equivalent to, accounting for autocorrelation between successive MCMC samples. For a post-burn-in chain of $n$ draws of parameter $\theta$,
+\begin{equation}
+    \text{ESS} = \frac{n}{1 + 2\sum_{\ell=1}^{L^*} \hat{\rho}(\ell)},
+\end{equation}
+where $\hat{\rho}(\ell)$ is the estimated autocorrelation at lag $\ell$ and $L^*$ is the first lag at which the autocorrelation becomes negative. An ESS above 100 per parameter is the standard minimum for reliable posterior inference \citep{Gelman2013}. All parameters of the selected HMM (DD+DISP+REL\_N+CS) exceed this threshold.
+
+Second, the Gelman--Rubin $\hat{R}$ statistic \citep{Gelman2013} compares within-chain and between-chain variance across five independent chains. For each parameter,
+\begin{equation}
+    \hat{R} = \sqrt{\frac{\hat{V}}{W}}, \qquad \hat{V} = \frac{n-1}{n}\,W + \frac{B}{n},
+\end{equation}
+where $W$ is the mean within-chain variance and $B$ is the between-chain variance. Values near 1.0 indicate convergence to the same posterior; the standard threshold is $\hat{R} < 1.1$. For the selected feature set, all parameters have $\hat{R} < 1.01$ (Appendix~\ref{app:gelman_rubin}), confirming that the five chains have converged to the same posterior distribution. These diagnostics validate that the HMM estimation with the selected features is numerically stable and that the resulting $\pi_t^{\text{filter}}$ is a reliable regime signal.
+
 Each feature captures a distinct dimension of market stress:
 \begin{enumerate}
     \item \textbf{DD (Drawdown):} The percentage decline of the cumulative market price index from its rolling 12-month peak:
