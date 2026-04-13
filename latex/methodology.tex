@@ -206,7 +206,21 @@ ESS
 \end{equation}
 where $\hat{\rho}(\ell)$ is the estimated autocorrelation at lag $\ell$,\footnote{$\hat{\rho}(\ell) = \frac{1}{(n-\ell)\,\hat{\sigma}^2}\sum_{i=1}^{n-\ell}(\theta_i - \bar{\theta})(\theta_{i+\ell} - \bar{\theta})$, where $\theta_i$ is the $i$-th post-burn-in draw, $\bar{\theta}$ its sample mean, and $\hat{\sigma}^2$ its sample variance.} and $L^\ast$ is the first lag at which the autocorrelation becomes negative. High ESS indicates that the chain provides many effectively independent posterior draws.\footnote{An ESS of at least 100 per parameter is a common minimum for reliable posterior inference \citep{Gelman2013}.}
 
-Trace plots of the regime means and persistence probabilities (Figure~\ref{fig:convergence_trace}, Appendix~\ref{app:convergence}) confirm that all chains converge to stable posterior values after the burn-in period.\footnote{The Gelman--Rubin $\hat{R}$ statistic, computed across five representative chains, is below 1.01 for every parameter (Appendix~\ref{app:gelman_rubin}), confirming convergence to the same posterior distribution.}
+While ESS measures efficiency within a single chain, it cannot detect whether different chains have converged to different modes. The Gelman--Rubin $\hat{R}$ statistic \citep{Gelman2013} addresses this by comparing within-chain and between-chain variance across $M$ independent chains, each of length $n$. Let $s_m^2$ denote the variance of chain $m$ and $\bar{\theta}_m$ its mean. The within-chain variance is:
+\begin{equation}
+    W = \frac{1}{M} \sum_{m=1}^{M} s_m^2,
+\end{equation}
+and the between-chain variance is:
+\begin{equation}
+    B = \frac{n}{M-1} \sum_{m=1}^{M} (\bar{\theta}_m - \bar{\theta})^2,
+\end{equation}
+where $\bar{\theta} = \frac{1}{M}\sum_m \bar{\theta}_m$. If all chains have converged to the same posterior, $B$ should be small relative to $W$. The diagnostic is:
+\begin{equation}
+    \hat{R} = \sqrt{\frac{\hat{V}}{W}}, \qquad \hat{V} = \frac{n-1}{n}\,W + \frac{B}{n}.
+\end{equation}
+Values of $\hat{R}$ near 1.0 indicate convergence; the standard threshold is $\hat{R} < 1.1$. For the selected feature set (DD+DISP+REL\_N+CS), all parameters have $\hat{R} < 1.01$ across five independent chains (Appendix~\ref{app:gelman_rubin}).
+
+Trace plots of the regime means and persistence probabilities (Figure~\ref{fig:convergence_trace}, Appendix~\ref{app:convergence}) provide visual confirmation that all chains converge to stable posterior values after the burn-in period.
 
 \subsubsection{Regime Identification and Trading Signal}\label{sec:regime_signal}
 

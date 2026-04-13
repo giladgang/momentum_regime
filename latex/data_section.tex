@@ -51,6 +51,8 @@ Table~\ref{tab:hmm_feature_ablation} confirms the individual contribution of eac
 
 \input{tables/table_hmm_feature_ablation}
 
+The convergence diagnostics described in Section~\ref{sec:convergence} confirm that the Gibbs sampler with the selected features is well-behaved. All posterior parameters exceed an ESS of 100, indicating efficient mixing, and the Gelman--Rubin $\hat{R}$ statistic is below 1.01 for every parameter across five independent chains (Appendix~\ref{app:gelman_rubin}). The regime-mean separation (Table~\ref{tab:hmm_separation}) shows that all four features exhibit statistically significant differences between calm and panic, with 95\% posterior credible intervals excluding zero.
+
 Each feature captures a distinct dimension of market stress:
 \begin{enumerate}
     \item \textbf{DD (Drawdown):} The percentage decline of the cumulative market price index from its rolling 12-month peak:
