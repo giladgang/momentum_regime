@@ -165,7 +165,7 @@ ax.add_patch(obs_box)
 ax.text(5, obs_y + 0.3, r'Observed: $\mathbf{z}_t$', fontsize=12, fontweight='bold',
         ha='center', va='center', color=OBS_GREEN, zorder=4)
 ax.text(5, obs_y - 0.25,
-        'Drawdown     Volatility     Dispersion     Participation',
+        'Drawdown     Credit Spread     Dispersion     Participation',
         fontsize=10.5, ha='center', va='center', color=TEXT_DARK, zorder=4)
 
 # Emission arrows from states down to observation box
