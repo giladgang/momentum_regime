@@ -27,7 +27,7 @@ where $P_{ij} = P(s_t = j \mid s_{t-1} = i)$ and each row sums to one. The diago
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{markov_chain_diagram.png}
-    \caption{Architecture of the two-state Hidden Markov Model. The upper panel shows the three layers of the model. The hidden layer (dashed box) contains two latent regime states, Calm ($s_t = 0$) and Panic ($s_t = 1$), whose true identity is never directly observed by the investor. These states evolve over time according to a first-order Markov chain governed by transition probabilities $P_{ij}$, where the diagonal elements $P_{00}$ and $P_{11}$ capture regime persistence. Each hidden state generates (emits) a four-dimensional observation vector $\mathbf{z}_t$ consisting of measurable market stress indicators: drawdown, cross-sectional return dispersion, relative market participation, and credit spread. The model inverts this generative process: given only the observed features $\mathbf{z}_{1:t}$, it infers the filtered probability $\pi_t^{\text{filter}} = P(s_t = 1 \mid \mathbf{z}_{1:t})$, a real-time estimate of whether the market is currently in a panic state. The lower panel illustrates an example hidden state sequence over 16 months, showing the characteristic persistence within each regime and the abrupt transitions between them.}
+    \caption{Architecture of the two-state Hidden Markov Model. Hidden states (Calm/Panic) evolve via transition probabilities $P_{ij}$ and emit the four-dimensional observation vector $\mathbf{z}_t$. The forward filter inverts this process to produce $\pi_t^{\text{filter}} = P(s_t = 1 \mid \mathbf{z}_{1:t})$. The lower panel shows an example state sequence illustrating regime persistence and abrupt transitions.}
     \label{fig:hmm_diagram}
 \end{figure}
 
@@ -53,13 +53,13 @@ For each regime $k$, the mean vector and covariance matrix are given a conjugate
 \mathcal{N}\!\left(\mathbf{m}_0,\frac{\boldsymbol{\Sigma}_k}{\kappa_0}\right).
 \end{equation}
 The hyperparameters are chosen as
-\[
+\begin{equation}\label{eq:niw_hyperparams}
 \mathbf{m}_0 = \mathbf{0},\qquad
 \kappa_0 = 0.01,\qquad
 \nu_0 = D+2,\qquad
 \boldsymbol{\Psi}_0 = \mathbf{I}_D(\nu_0-D-1),
-\]
-where $D=4$ is the number of features. Each hyperparameter controls a different aspect of the prior belief:
+\end{equation}
+where $D=4$ is the number of features. After observing data, these prior hyperparameters update to posterior counterparts $\kappa_n$, $\mathbf{m}_n$, $\nu_n$, and $\boldsymbol{\Psi}_n$ (Equation~\ref{eq:niw_update}). Each hyperparameter controls a different aspect of the prior belief:
 \begin{itemize}
     \item $\mathbf{m}_0$ is the prior guess for each regime's mean vector. Setting $\mathbf{m}_0 = \mathbf{0}$ reflects that, since all features are standardized, there is no reason to expect either regime to be centered away from zero before seeing the data.
     \item $\kappa_0$ controls how strongly the prior mean $\mathbf{m}_0$ is trusted relative to the data. The very small value $\kappa_0 = 0.01$ makes this prior nearly uninformative, so the posterior mean is driven overwhelmingly by the observed data.
@@ -73,6 +73,7 @@ Each row of the transition matrix is assigned an independent Dirichlet prior:
 \mathbf{P}_{0,\cdot} \sim \text{Dir}(9,1),
 \qquad
 \mathbf{P}_{1,\cdot} \sim \text{Dir}(1,9).
+\label{eq:dirichlet_prior}
 \end{equation}
 Equivalently, in matrix form,
 \[
@@ -90,6 +91,7 @@ This prior favors persistence in both regimes: absent data, the prior mean trans
 0.90 & 0.10 \\
 0.10 & 0.90
 \end{array}\right).
+\label{eq:prior_mean_P}
 \end{equation}
 In other words, the prior expects each regime to continue with probability $0.9$, corresponding to an expected duration of roughly $10$ months. This prior is informative enough to discourage pathological solutions but weak enough to be overridden by the data.
 
@@ -102,22 +104,23 @@ The Gibbs sampler requires starting values for the emission parameters and the t
 \qquad
 \boldsymbol{\Sigma}_k^{(0)} = \text{Cov}(\{\mathbf{z}_t : s_t=k\}),
 \]
-where $n_k$ is the number of months assigned to regime $k$. The initial transition matrix is set to the prior mean, $\mathbf{P}^{(0)} = \mathbb{E}[\mathbf{P}]$ (Equation~11). These initial parameters give the first forward pass (described below) emission densities that can distinguish the two states.
+where $n_k$ is the number of months assigned to regime $k$. The initial transition matrix is set to the prior mean, $\mathbf{P}^{(0)} = \mathbb{E}[\mathbf{P}]$ (Equation~\ref{eq:prior_mean_P}). These initial parameters give the first forward pass (described below) emission densities that can distinguish the two states.
 
 \paragraph{Iterative updates}
 Each iteration cycles through the three conditional updates described in Section~\ref{sec:gibbs}. Figure~\ref{fig:gibbs_diagram} summarizes the cycle graphically.
 
 \begin{figure}[H]
     \centering
-    \vspace{-1cm}
-    \includegraphics[width=0.72\textwidth]{gibbs_sampling_diagram.pdf}
-    \caption{Flowchart of the Gibbs sampler. Each iteration cycles through three conditional updates: (1)~sample the full hidden state path via FFBS, holding emission parameters and the transition matrix fixed; (2)~update the regime-specific means and covariances from a Normal-Inverse-Wishart posterior, holding the state path and transition matrix fixed; (3)~update each row of the transition matrix from a Dirichlet posterior, holding the state path and emission parameters fixed. The loop repeats for $M = 2{,}000$ iterations, with the first $B = 500$ discarded as burn-in.}
+    \vspace{-0.5cm}
+    \includegraphics[width=0.88\textwidth]{gibbs_sampling_diagram.pdf}
+    \vspace{-0.3cm}
+    \caption{Flowchart of the Gibbs sampler. The dashed loop repeats for $M = 2{,}000$ iterations ($B = 500$ burn-in). Each box shows the conditional posterior being sampled and which parameters are held fixed.}
     \label{fig:gibbs_diagram}
 \end{figure}
 
 \paragraph{Step 1: Sampling the hidden state path via FFBS}
 
-The full latent regime sequence $(s_1,\dots,s_T)$ is sampled using Forward-Filtering Backward-Sampling (FFBS), holding the current emission parameters and transition matrix fixed.
+The full latent regime sequence $(s_1,\dots,s_T)$ is sampled using Forward-Filtering Backward-Sampling \citep[FFBS; see][ch.~11]{FruhwirthSchnatter2006}, holding the current emission parameters and transition matrix fixed.
 
 The forward pass computes the filtered probability $\alpha_t(k) = P(s_t=k \mid \mathbf{z}_{1:t})$, the probability of being in state $k$ at time $t$ given all observations so far. This quantity is built in two sub-steps. First, a \emph{prediction step} asks: before seeing this month's data, how likely is each state? Since the previous state is unknown, the algorithm sums over both possibilities, weighting each by its filtered probability from the previous month and the transition probability:
 \[
@@ -131,7 +134,7 @@ Second, an \emph{update step} revises this prediction once the current observati
      {f(\mathbf{z}_t \mid s_t=0)\;\alpha_{t|t-1}(0) + f(\mathbf{z}_t \mid s_t=1)\;\alpha_{t|t-1}(1)},
 \label{eq:forward_plain}
 \end{equation}
-where $f(\mathbf{z}_t \mid s_t=k) = \mathcal{N}(\mathbf{z}_t;\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k)$ is the Gaussian emission density.\footnote{In practice, these densities can be extremely small (or large) for four-dimensional observations, leading to numerical underflow. The implementation avoids this by working in log-space: log-likelihoods $\log f(\mathbf{z}_t \mid s_t = k)$ are computed directly, and the log-sum-exp identity $\log(e^a + e^b) = \max(a,b) + \log(1 + e^{-|a-b|})$ is used whenever probabilities must be normalised.} In the numerator, the likelihood $f(\mathbf{z}_t \mid s_t=k)$ measures how well the observed features fit state $k$, multiplied by the predicted probability $\alpha_{t|t-1}(k)$ from the prediction step. The denominator computes the same quantity for both calm and panic, ensuring the probabilities sum to one. The recursion is initialized with $\alpha_0(k) = 1/2$, reflecting no prior preference for either regime.
+where $f(\mathbf{z}_t \mid s_t=k) = \mathcal{N}(\mathbf{z}_t;\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k)$ is the Gaussian emission density.\footnote{In practice, these densities can be extremely small (or large) for four-dimensional observations, leading to numerical underflow. The implementation avoids this by working in log-space: log-likelihoods $\log f(\mathbf{z}_t \mid s_t = k)$ are computed directly, and the log-sum-exp identity $\log(e^a + e^b) = \max(a,b) + \log(1 + e^{-|a-b|})$ is used whenever probabilities must be normalised.} The recursion is initialized with $\alpha_0(k) = 1/2$, reflecting no prior preference for either regime.
 
 The forward pass tells us how likely each regime is at every month, but if we simply flipped a weighted coin independently at each $t$ we could produce implausible paths -- for example, rapid calm-panic-calm-panic switching even though the transition matrix says regimes persist for roughly ten months. The backward pass prevents this by sampling states in reverse: once a future state has been drawn, the current state is sampled conditional on it, so the entire path respects the Markov transition dynamics.
 
@@ -153,11 +156,11 @@ For example, if the forward filter assigns high probability to calm at time $t$ 
 
 The output of the full FFBS procedure is one draw from the posterior over state paths. Across Gibbs iterations, different paths are sampled, exploring the full posterior uncertainty.
 
-Importantly, the backward pass is performed only during model \emph{training} (the Gibbs sampler on 1990--2010 data). It is not used to construct the trading signal: the real-time filtered probability $\pi_t^{\text{filter}}$ used for portfolio construction relies solely on the causal forward filter, which conditions only on past and current observations $\mathbf{z}_{1:t}$. The backward pass improves the quality of posterior parameter estimates by providing the Gibbs sampler with more accurate state assignments, but it does not introduce any future information into the regime signal applied during the test period.
+Importantly, the backward pass is used only during training (the Gibbs sampler on 1990--2010 data) to improve posterior parameter estimates. The trading signal $\pi_t^{\text{filter}}$ relies solely on the causal forward filter.
 
 \paragraph{Step 2: Updating the emission parameters}
 
-Given the sampled state path, each regime $k$ has $n_k$ observations assigned to it. From these, two summary statistics are computed: the sample mean $\bar{\mathbf{x}}_k = \frac{1}{n_k}\sum_{t:\,s_t=k}\mathbf{z}_t$ and the scatter matrix $\mathbf{S}_k = \sum_{t:\,s_t=k}(\mathbf{z}_t - \bar{\mathbf{x}}_k)(\mathbf{z}_t - \bar{\mathbf{x}}_k)^\top$. The Normal-Inverse-Wishart prior updates to a posterior with hyperparameters:
+Given the sampled state path, each regime $k$ has $n_k$ observations assigned to it. From these, two summary statistics are computed: the sample mean $\bar{\mathbf{x}}_k = \frac{1}{n_k}\sum_{t:\,s_t=k}\mathbf{z}_t$ and the scatter matrix $\mathbf{S}_k = \sum_{t:\,s_t=k}(\mathbf{z}_t - \bar{\mathbf{x}}_k)(\mathbf{z}_t - \bar{\mathbf{x}}_k)^\top$. The posterior hyperparameters are:
 \begin{align}\label{eq:niw_update}
 \kappa_n &= \kappa_0 + n_k, \qquad
 \mathbf{m}_n = \frac{\kappa_0 \mathbf{m}_0 + n_k \bar{\mathbf{x}}_k}{\kappa_n}, \qquad
@@ -179,7 +182,7 @@ The sampled path is scanned to count transitions: $n_{ij} = \sum_{t=2}^T \mathds
 \text{Dir}\!\big(\alpha_{i0} + n_{i0},\; \alpha_{i1} + n_{i1}\big).
 \label{eq:dirichlet_update}
 \end{equation}
-For row 0 (calm), the prior pseudo-counts are $(\alpha_{00}, \alpha_{01}) = (9, 1)$ from Equation~(10), so the posterior becomes $\text{Dir}(9 + 140,\; 1 + 10) = \text{Dir}(149,\; 11)$. The expected persistence probability under this posterior is $149/160 = 0.93$, reflecting that the data reinforced the prior belief in regime persistence. A new transition matrix row is then drawn from this Dirichlet distribution, and the same procedure is applied independently to row 1 (panic).
+For row 0 (calm), the prior pseudo-counts are $(\alpha_{00}, \alpha_{01}) = (9, 1)$ from Equation~\eqref{eq:dirichlet_prior}, so the posterior becomes $\text{Dir}(9 + 140,\; 1 + 10) = \text{Dir}(149,\; 11)$. The expected persistence probability under this posterior is $149/160 = 0.93$, reflecting that the data reinforced the prior belief in regime persistence. A new transition matrix row is then drawn from this Dirichlet distribution, and the same procedure is applied independently to row 1 (panic).
 
 With all three blocks updated, the sampler returns to Step~1. After sufficient iterations the draws converge to samples from the joint posterior.
 
@@ -215,7 +218,7 @@ where $\bar{\theta} = \frac{1}{M}\sum_m \bar{\theta}_m$. If all chains have conv
 \begin{equation}
     \hat{R} = \sqrt{\frac{\hat{V}}{W}}, \qquad \hat{V} = \frac{n-1}{n}\,W + \frac{B}{n}.
 \end{equation}
-Values of $\hat{R}$ near 1.0 indicate convergence; the standard threshold is $\hat{R} < 1.1$. For the selected feature set (DD+DISP+REL\_N+CS), all parameters have $\hat{R} < 1.01$ across five independent chains (Appendix~\ref{app:gelman_rubin}).
+Values of $\hat{R}$ near 1.0 indicate convergence; the standard threshold is $\hat{R} < 1.1$. To evaluate convergence, five of the 200 chains are selected at random. For the selected feature set (DD+DISP+REL\_N+CS), all parameters have $\hat{R} < 1.01$ (Appendix~\ref{app:gelman_rubin}).
 
 Trace plots of the regime means and persistence probabilities (Figure~\ref{fig:convergence_trace}, Appendix~\ref{app:convergence}) provide visual confirmation that all chains converge to stable posterior values after the burn-in period.
 
@@ -223,43 +226,17 @@ Trace plots of the regime means and persistence probabilities (Figure~\ref{fig:c
 
 \paragraph{Label Switching and Regime Naming}\label{sec:label_switching}
 
-In a two-state HMM, the labels $0$ and $1$ are intrinsically arbitrary: relabeling the states leaves the likelihood unchanged. To attach an economically meaningful interpretation to the states, a \emph{crisis-calibrated sign correction} procedure is applied.
-
-Because the four HMM features respond to stress in different directions (DISP and CS rise during crises, while DD and REL\_N fall), a single feature cannot reliably identify the panic state. Instead, the expected direction of each feature during stress is determined empirically. For each feature $j$, the 95th percentile is computed separately on training months falling within known crisis windows (the dot-com bust of 2000--2002 and the Global Financial Crisis of 2007--2009) and on all remaining training months:
-\begin{equation}
-\text{sign}_j =
-\begin{cases}
-+1 & \text{if } q_{0.95}^{\text{crisis}}(z_j) \geq q_{0.95}^{\text{normal}}(z_j), \\
--1 & \text{otherwise}.
-\end{cases}
-\end{equation}
-Features that spike upward during crises receive $\text{sign}_j = +1$; features that decline receive $\text{sign}_j = -1$. The panic state is then identified as the regime $k \in \{0, 1\}$ whose posterior mean vector $\hat{\boldsymbol{\mu}}_k$ best aligns with the crisis direction:
-\begin{equation}
-k^\ast = \arg\max_{k \in \{0,1\}} \sum_{j=1}^{D} \text{sign}_j \cdot \hat{\mu}_{k,j}.
-\end{equation}
-The state labelled $k^\ast$ is designated as ``panic'' and the other as ``calm.'' If the Gibbs sampler happens to assign the panic characteristics to state~0 rather than state~1, the labels are swapped so that $\pi_t^{\text{filter}}$ always represents the probability of the panic state. This procedure is robust to the heterogeneous directional responses of the four features and yields consistent panic identification across all random seeds used in estimation.
+In a two-state HMM, the labels $0$ and $1$ are intrinsically arbitrary: relabeling the states leaves the likelihood unchanged. To identify which state corresponds to panic, the known crisis-period behavior of each feature is used.\footnote{The sign directions are determined by a data-driven procedure comparing crisis and non-crisis 95th percentiles; see Appendix~\ref{app:label_switching} for details.} Two features rise during crises (DISP: $+1$, CS: $+1$) and two fall (DD: $-1$, REL\_N: $-1$). The regime whose posterior mean best aligns with these crisis directions is designated as ``panic''; if the Gibbs sampler assigns the panic characteristics to state~0 rather than state~1, the labels are swapped so that $\pi_t^{\text{filter}}$ always represents the probability of the panic state.
 
 \paragraph{Filtered Regime Probability}\label{sec:trading_signal}
 
-The output of the HMM estimation is a time series of filtered regime probabilities. Using the posterior mean parameters $\bar{\boldsymbol{\mu}}_k$, $\bar{\boldsymbol{\Sigma}}_k$, and $\bar{\mathbf{P}}$ (estimated on the training sample only), the forward recursion from Equation~(\ref{eq:forward_plain}) is applied to the full sample to obtain the probability of being in each state at time $t$,
+Using the posterior mean parameters $\bar{\boldsymbol{\mu}}_k$, $\bar{\boldsymbol{\Sigma}}_k$, and $\bar{\mathbf{P}}$ from Section~\ref{sec:implementation}, the forward recursion (Equation~\ref{eq:forward_plain}) is applied to the full sample to obtain:
 \begin{equation}
 \pi_t^{\text{filter}}
 =
 P(s_t=\text{panic} \mid \mathbf{z}_{1:t};\,\bar{\boldsymbol{\mu}},\bar{\boldsymbol{\Sigma}},\bar{\mathbf{P}}).
 \end{equation}
-This quantity represents the probability that the market is in the panic regime at month $t$, conditional on all observed features up to and including $t$. It is strictly causal (no future information is used) and is computed for both the training and test periods. A value near $0$ indicates high confidence in the calm regime, a value near $1$ indicates high confidence in panic, and intermediate values reflect genuine ambiguity between the two states. This filtered probability serves as the regime signal passed to the portfolio construction methods described in Section~\ref{sec:methods}.
-
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{regime_probabilities.png}
-    \caption{Filtered regime probability $\pi_t^{\text{filter}}$ (1990--2025). The dashed vertical line marks the train/test split (January 2011). Shaded regions indicate months where $\pi_t^{\text{filter}} \geq 0.5$ (panic classification). The signal correctly identifies all major stress episodes -- the dot-com bust, the global financial crisis, the COVID-19 crash, and the 2022 bear market -- while remaining near zero during calm expansions.}
-    \label{fig:regime_probabilities}
-\end{figure}
-
-To verify that the two regimes are meaningfully distinct, Table~\ref{tab:hmm_separation} reports the posterior regime-mean separation for each of the four HMM input features. All four features exhibit statistically significant separation between the calm and panic regimes, with the 95\% posterior credible interval for the difference excluding zero in every case. The largest separations are observed for DD and REL\_N, consistent with their dominant roles in the ablation analysis (Section~\ref{sec:ablation_results}).
-
-\input{tables/table_hmm_separation}
+A value near $0$ indicates high confidence in calm, near $1$ indicates panic, and intermediate values reflect genuine ambiguity. This filtered probability serves as the regime signal passed to the portfolio construction methods in Section~\ref{sec:methods}. Figure~\ref{fig:regime_probabilities} and Table~\ref{tab:hmm_separation} in Section~\ref{sec:data} visualise the resulting signal and confirm that the two regimes are meaningfully distinct.
 
 \subsection{Stage 2: Regime-Conditioned Portfolio Construction}\label{sec:stage2}
 

@@ -57,21 +57,39 @@ def shade_nber(ax):
         ax.axvspan(pd.Timestamp(start), pd.Timestamp(end),
                    alpha=0.15, color='grey', zorder=0)
 
+# ── Crisis labels for the regime plot ─────────────────────────────────────────
+
+crisis_labels = [
+    ('2000-03-01', '2002-10-01', 'Dot-com'),
+    ('2007-10-01', '2009-06-01', 'GFC'),
+    ('2020-02-01', '2020-05-01', 'COVID'),
+    ('2022-01-01', '2022-10-01', '2022'),
+]
+
 # ── Figure 1: regime_probabilities.png (single panel) ───────────────────────
 
 fig, ax = plt.subplots(figsize=(14, 4))
 
-ax.fill_between(dates, pi_filter_full, alpha=0.5, color='crimson', label=r'$\pi_t^{\mathrm{filter}}$')
+ax.fill_between(dates, pi_filter_full, alpha=0.4, color='crimson',
+                label=r'Panic ($\pi \geq 0.5$)')
 ax.axvline(pd.Timestamp('2011-01-01'), color='black', linewidth=1.2,
            linestyle='--', label='Train/test split')
 ax.axhline(0.5, color='black', linewidth=0.5, linestyle=':', alpha=0.5)
-ax.set_ylabel(r'Filtered panic probability $\pi_t^{\mathrm{filter}}$', fontsize=10)
+ax.set_ylabel(r'$\pi_t^{\mathrm{filter}}$', fontsize=11)
 ax.set_xlabel('Date', fontsize=10)
-ax.set_ylim(0, 1)
+ax.set_ylim(0, 1.05)
 ax.set_xlim(dates.min(), dates.max())
 shade_nber(ax)
+
+# Add crisis labels centered above the shaded regions
+for start, end, lbl in crisis_labels:
+    mid = pd.Timestamp(start) + (pd.Timestamp(end) - pd.Timestamp(start)) / 2
+    ax.annotate(lbl, xy=(mid, 1.02), fontsize=10, fontweight='bold',
+                ha='center', va='bottom', color='#333333',
+                annotation_clip=False)
+
 ax.legend(fontsize=9, loc='upper left')
-ax.set_title('Filtered Regime Probability', fontsize=12)
+ax.set_title(r'Filtered Regime Probability $\pi_t^{\mathrm{filter}}$', fontsize=12)
 
 plt.tight_layout()
 fig.savefig('regime_probabilities.png', dpi=150, bbox_inches='tight')

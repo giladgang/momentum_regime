@@ -43,7 +43,7 @@ In the second pass (\emph{portfolio ranking}), surviving combinations are evalua
 In the third pass (\emph{stability validation}), the finalists are tested for robustness across random seed partitions. A combination that achieves a high Sharpe on one lucky seed combination but collapses on another is unreliable. We run 20 independent experiments with different seed draws and classify combinations as stable ($\sigma < 0.10$), moderate ($0.10 \leq \sigma < 0.15$), or unstable ($\sigma \geq 0.15$).
 
 \paragraph{What we selected and why}
-The four-feature combination DD+DISP+REL\_N+CS achieves the highest stability (mean Sharpe 0.804, $\sigma = 0.082$), confirmed by 10 independent heavy-variance runs with 20 HMM and 50 XGBoost seeds each.
+The four-feature combination DD+DISP+REL\_N+CS is selected as the most stable. With the production configuration (200 HMM seeds), it achieves a long-short Sharpe of 1.08 ($\sigma = 0.08$ across independent seed partitions; Section~\ref{sec:results}).
 
 \input{tables/table_feature_selection}
 
@@ -51,7 +51,20 @@ Table~\ref{tab:hmm_feature_ablation} confirms the individual contribution of eac
 
 \input{tables/table_hmm_feature_ablation}
 
-The convergence diagnostics described in Section~\ref{sec:convergence} confirm that the Gibbs sampler with the selected features is well-behaved. All posterior parameters exceed an ESS of 100, indicating efficient mixing, and the Gelman--Rubin $\hat{R}$ statistic is below 1.01 for every parameter across five independent chains (Appendix~\ref{app:gelman_rubin}). The regime-mean separation (Table~\ref{tab:hmm_separation}) shows that all four features exhibit statistically significant differences between calm and panic, with 95\% posterior credible intervals excluding zero.
+The convergence diagnostics described in Section~\ref{sec:convergence} confirm that the Gibbs sampler with the selected features is well-behaved. All posterior parameters exceed an ESS of 100, indicating efficient mixing, and the Gelman--Rubin $\hat{R}$ statistic is below 1.01 for every parameter across five independent chains (Appendix~\ref{app:gelman_rubin}).
+
+Figure~\ref{fig:regime_probabilities} plots the resulting filtered regime probability over the full sample. The signal correctly identifies all major stress episodes while remaining near zero during calm expansions.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{regime_probabilities.png}
+    \caption{Filtered regime probability $\pi_t^{\text{filter}}$ (1990--2025). The dashed vertical line marks the train/test split (January 2011). Shaded regions indicate months where $\pi_t^{\text{filter}} \geq 0.5$ (panic classification).}
+    \label{fig:regime_probabilities}
+\end{figure}
+
+Table~\ref{tab:hmm_separation} confirms that the two regimes are meaningfully distinct: all four features exhibit statistically significant separation between calm and panic, with 95\% posterior credible intervals excluding zero. The largest separations are observed for DD and REL\_N, consistent with their dominant roles in the ablation analysis (Section~\ref{sec:ablation_results}).
+
+\input{tables/table_hmm_separation}
 
 Each feature captures a distinct dimension of market stress:
 \begin{enumerate}
