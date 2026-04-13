@@ -156,17 +156,36 @@ On the same data and with the same transaction costs, M2 (Sharpe 1.08, alpha 23.
 
 \subsection{Risk Aversion and the Value of the Regime Signal}\label{sec:risk_aversion}
 
-The preceding analysis established that the regime signal is essential for long-short momentum. A natural question is whether this finding depends on the investor's risk preferences. XGBoost is retrained with a mean-variance utility target that penalises stock-level variance:
-\begin{equation}
-    y_t^s = r_{t+1}^s - \frac{\gamma}{2}\,\sigma_s^2,
-\end{equation}
-where $\gamma \in \{0, 1, 2, \dots, 10\}$ is the risk-aversion parameter. At $\gamma = 0$ this recovers the baseline model; as $\gamma$ increases, the model favours lower-volatility stocks.
+The preceding analysis established that the regime signal is essential for long-short momentum. A natural question is whether this finding depends on how the model's training objective balances return against risk. To test this, XGBoost is retrained under three families of risk-adjusted targets, each with varying intensity:
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{risk_aversion_analysis.png}
-    \caption{Effect of risk aversion on portfolio performance and feature importance. As $\gamma$ increases, annualised returns and volatility decline, and the regime signal's relative SHAP importance decreases. The Sharpe ratio falls from 1.14 at $\gamma = 0$ to 0.95 at $\gamma = 10$.}
-    \label{fig:risk_aversion}
-\end{figure}
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{l l r r}
+\toprule
+Target family & Parameter & Sharpe & $\pi$ share \\
+\midrule
+Baseline ($r$) & --- & 1.07 & 45\% \\
+\midrule
+\multicolumn{4}{l}{\textit{Sharpe-like: $r\,/\,\sigma^a$}} \\[2pt]
+ & $a = 0.5$ & 1.04 & 56\% \\
+ & $a = 1.0$ & 0.41 & 57\% \\
+\midrule
+\multicolumn{4}{l}{\textit{Mean-variance: $r - \frac{\gamma}{2}\sigma^2$}} \\[2pt]
+ & $\gamma = 0.1$ & 1.05 & 48\% \\
+ & $\gamma = 0.2$ & 1.06 & 47\% \\
+ & $\gamma = 0.5$ & 0.71 & 37\% \\
+\midrule
+\multicolumn{4}{l}{\textit{Log return: $\log(1+r)$}} \\[2pt]
+ & --- & 0.47 & 49\% \\
+\bottomrule
+\end{tabular}
+\caption{Risk-adjusted training targets and regime signal importance. ``$\pi$ share'' is the regime signal's fraction of total SHAP importance (remainder is momentum). Sharpe ratios use 10 XGB seeds.}
+\label{tab:risk_aversion}
+\end{table}
 
-The results show that the regime signal's relative SHAP importance declines with risk aversion. At $\gamma = 0$, $\pi_t^{\text{filter}}$ is among the most important features. At high $\gamma$, the model defaults to a momentum-dominated strategy that relies less on regime-conditional reweighting. The Sharpe ratio declines from 1.14 at $\gamma = 0$ to 0.95 at $\gamma = 10$, confirming that the regime signal is most valuable when the investor is willing to bear risk, because it enables the aggressive, regime-conditional switching between momentum horizons that drives M2's performance.
+Two findings emerge. First, under mild risk adjustment ($r/\sigma^{0.5}$ or small $\gamma$), the regime signal's share of SHAP importance actually \emph{increases} (from 45\% to 56\%), while the Sharpe ratio barely changes. Mild risk penalisation removes the noisiest bets but preserves the regime-conditional structure -- the model still switches between continuation and reversal horizons, just with less exposure to extreme outcomes.
+
+Second, aggressive risk adjustment breaks the strategy. At $\gamma = 0.5$ the Sharpe drops to 0.71 and the regime signal's share falls to 37\%; at $\gamma \geq 1$ or $a \geq 1$ the strategy collapses entirely. The variance penalty overwhelms the long-short spread, steering the model toward low-volatility stocks regardless of regime and effectively abandoning the mechanism that makes M2 successful.
+
+The implication is that the regime-momentum interaction is inherently a high-conviction mechanism: it works best when the model is free to make aggressive, regime-conditional bets. Conservative risk objectives suppress exactly the volatility that makes these bets profitable.
