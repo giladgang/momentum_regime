@@ -40,8 +40,29 @@
 \maketitle
 
 \begin{abstract}
-This thesis investigates how a real-time regime signal interacts with cross-sectional momentum. A Bayesian Hidden Markov Model produces a filtered probability of market panic, which is combined with momentum at 12 lookback horizons in machine learning models to rank stocks. Out-of-sample on 2011--2025 U.S. equities, only a nonlinear model (XGBoost) produces meaningful long-short returns (Sharpe 1.08, six-factor alpha 24.7\%, $t = 4.78$); a linear model with identical features collapses (Sharpe $-$0.03). Model-free evidence confirms the mechanism: momentum is not a single anomaly but a family of horizon-specific effects that rotates with market conditions -- continuation in calm, reversal in panic. The regime signal is essential (removing it halves performance) and most valuable during stress: M2's ability to distinguish winners from losers more than doubles in panic months, with the long-short spread widening from 1.3\% to 3.1\% per month. The regime signal functions as a context variable governing this rotation, complementing the exposure-scaling approach of Daniel and Moskowitz (2016) with a stock-selection channel. These findings suggest that momentum is best understood not as a single stable anomaly but as a regime-dependent phenomenon whose cross-sectional structure requires nonlinear modelling to exploit.
+This thesis investigates how a real-time regime signal interacts with cross-sectional momentum. A Bayesian Hidden Markov Model produces a filtered probability of market panic, which is combined with momentum at 12 lookback horizons in machine learning models to rank stocks. Out-of-sample on 2011--2025 U.S. equities, only a nonlinear model (XGBoost) produces meaningful long-short returns (Sharpe 1.08, six-factor alpha 24.7\%, $t = 4.78$); a linear model with identical features collapses (Sharpe $-$0.03). Model-free evidence confirms the mechanism: momentum is not a single anomaly but a family of horizon-specific effects that rotates with market conditions -- continuation in calm, reversal in panic. The regime signal is essential (removing it halves performance) and most valuable during stress, with the long-short spread widening from 1.3\% to 3.1\% per month. These findings suggest that momentum is best understood not as a single stable anomaly but as a regime-dependent phenomenon whose cross-sectional structure requires nonlinear modelling to exploit.
 \end{abstract}
+
+\newpage
+
+\section*{Acknowledgements}
+I would like to thank my supervisor, Denis Kojevnikov, for his guidance and feedback throughout this project. I am also grateful to Tilburg University's School of Economics and Management for providing access to WRDS data. Any remaining errors are my own.
+
+\newpage
+
+\section*{Management Summary}
+
+This thesis investigates the interaction between a real-time regime signal and cross-sectional momentum in U.S. equity markets, asking whether momentum's cross-sectional structure changes with market conditions and whether exploiting this change requires nonlinear modelling.
+
+The literature review (Section~2) surveys four strands of research: the momentum anomaly, momentum crashes and risk management, regime-switching models in finance, and machine learning in asset pricing. The thesis is positioned relative to the exposure-scaling approach of Daniel and Moskowitz (2016) and the market-state momentum of Goulding, Harvey, and Mazzoleni (2023), proposing a stock-selection channel as an alternative to exposure scaling.
+
+The methodology (Section~3) develops a two-stage framework. In the first stage, a Bayesian two-state Hidden Markov Model is estimated via Gibbs sampling on four macrofinancial stress indicators (drawdown, dispersion, relative market participation, and credit spread), producing a filtered probability of market panic. In the second stage, this regime signal is combined with momentum at 12 lookback horizons in three models of increasing complexity: a deterministic formula, logistic regression, and XGBoost.
+
+The data section (Section~4) describes the stock-level sample (1990--2025, NYSE/AMEX/NASDAQ) and the systematic three-pass feature selection procedure used to choose the HMM's input features from nine candidates.
+
+The results (Section~5) show that only the nonlinear model (XGBoost) survives long-short construction (Sharpe 1.08 vs.\ $-$0.03 for logistic regression). The regime signal is essential: removing it halves performance. Model-free information coefficient analysis confirms that momentum's predictive structure rotates with market conditions -- continuation in calm, reversal in panic -- and that this rotation requires nonlinear modelling to exploit. Stress tests show the strategy can absorb a 12-month recession but is vulnerable to prolonged fundamental deterioration.
+
+The conclusion (Section~6) summarises the central finding: momentum is best understood as a regime-dependent phenomenon whose cross-sectional structure requires nonlinear modelling to exploit. The regime signal functions as a context variable governing which momentum horizons are informative, complementing the exposure-scaling approach with a stock-selection channel. Limitations include the single test period (2011--2025), US-only sample, and untested resilience to depression-style downturns. Future work includes international replication, regime-conditional feature sets, and a hybrid approach combining stock selection with exposure scaling.
 
 \newpage
 \tableofcontents
