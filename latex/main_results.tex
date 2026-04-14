@@ -123,6 +123,15 @@ The partial dependence plot (Figure~\ref{fig:pdp_pi}) reveals the non-monotonic 
 
 An important implication is that the regime-momentum interaction cannot be decomposed into per-horizon changes. SHAP dependence analysis (examining each momentum horizon's SHAP contribution as a function of its value, separately for calm and panic) shows that individual horizons do not exhibit a clean slope reversal between regimes. Instead, the model achieves the continuation-to-reversal shift documented in the IC analysis and the portfolio characteristics through multi-dimensional conditioning: the regime signal changes how all 12 horizons jointly determine the stock ranking, an interaction distributed across the full feature space. This is consistent with the context-variable interpretation and explains why the interaction requires tree-based modelling -- it is not a collection of 12 per-feature slope changes but a single high-dimensional conditioning that only nonlinear models can represent.
 
+The tree depth analysis provides direct evidence for this interpretation (Figure~\ref{fig:depth_sharpe}). Performance increases monotonically from depth~1 (Sharpe~0.46, no feature interactions) through depth~4 (Sharpe~1.08), with the largest gains at depths~2 and~3 where the model first gains access to multi-way conditioning. A depth-2 model, which can only condition on $\pi_t^{\text{filter}}$ and one momentum horizon per tree, achieves a Sharpe of only~0.82 -- meaningful, but 24\% below the full model. Performance peaks at depth~4 and declines beyond, as overfitting to higher-order noise offsets any additional signal.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{depth_vs_sharpe.png}
+    \caption{Out-of-sample Sharpe ratio as a function of maximum tree depth. Depth controls the order of feature interactions the model can learn: depth~1 permits no interactions, depth~2 permits pairwise conditioning, and depth~$\geq 3$ permits higher-order multi-dimensional conditioning. Performance peaks at depth~4, confirming that the regime-momentum interaction requires conditioning across multiple horizons simultaneously.}
+    \label{fig:depth_sharpe}
+\end{figure}
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\textwidth]{cs_pdp_pi_filter.png}
