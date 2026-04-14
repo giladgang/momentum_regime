@@ -186,4 +186,89 @@ plt.close(fig)
 
 print("Saved: chart2_rank_by_horizon_v2.png")
 print("Saved: chart_ls_rank_yearly.png")
+
+# ── Chart 3: Z-score + |SHAP| (4-panel figure for thesis) ──
+print("Computing z-scores and SHAP for term structure figure ...")
+
+shap_values = art['shap_values']
+FEATURES = art['FEATURES']
+mom_indices = [FEATURES.index(f'mom_{h}') for h in horizons]
+regime_arr = test_pi['regime'].values
+leg_arr = test_pi['leg'].values
+
+# Z-scores
+z_data = {}
+for regime_val in ['Calm', 'Panic']:
+    for leg_val in ['long', 'short']:
+        zs = []
+        for h in horizons:
+            col = f'mom_{h}'
+            mask = test_pi['regime'] == regime_val
+            monthly_z = []
+            for date, grp in test_pi[mask].groupby('date'):
+                leg_mask = grp['leg'] == leg_val
+                if leg_mask.sum() == 0: continue
+                mean = grp[col].mean()
+                std = grp[col].std()
+                if std > 0:
+                    monthly_z.append((grp.loc[leg_mask, col].mean() - mean) / std)
+            zs.append(np.mean(monthly_z))
+        z_data[(regime_val, leg_val)] = zs
+
+# |SHAP|
+abs_shap_data = {}
+for regime_val in ['Calm', 'Panic']:
+    for leg_val in ['long', 'short']:
+        mask = (regime_arr == regime_val) & (leg_arr == leg_val)
+        abs_shap_data[(regime_val, leg_val)] = np.abs(shap_values[mask][:, mom_indices]).mean(axis=0) * 10000
+
+w = 0.35
+fig, axes = plt.subplots(2, 2, figsize=(16, 10), sharex=True)
+
+# Top row: Z-scores (shared y-axis)
+axes[0, 0].sharey(axes[0, 1])
+for i, regime_val in enumerate(['Calm', 'Panic']):
+    ax = axes[0, i]
+    ax.plot(x, z_data[(regime_val, 'long')], 'o-', color='#2196F3', linewidth=2.5,
+            markersize=8, label='Long leg', zorder=5)
+    ax.plot(x, z_data[(regime_val, 'short')], 's-', color='#E53935', linewidth=2.5,
+            markersize=8, label='Short leg', zorder=5)
+    ax.axhline(0, color='black', linewidth=0.8, linestyle='--', alpha=0.5)
+    ax.fill_between(x, z_data[(regime_val, 'long')], 0, alpha=0.08, color='#2196F3')
+    ax.fill_between(x, z_data[(regime_val, 'short')], 0, alpha=0.08, color='#E53935')
+    n = 108 if regime_val == 'Calm' else 59
+    ax.set_title(f'{regime_val} ({n} months): which stocks are selected\n'
+                 f'(momentum z-score vs cross-section)',
+                 fontsize=12, fontweight='bold')
+    ax.legend(fontsize=9)
+    ax.grid(alpha=0.3)
+    if i == 0:
+        ax.set_ylabel('Z-score vs cross-section', fontsize=11)
+
+# Bottom row: |SHAP| (shared y-axis)
+axes[1, 0].sharey(axes[1, 1])
+for i, regime_val in enumerate(['Calm', 'Panic']):
+    ax = axes[1, i]
+    ax.bar(x - w/2, abs_shap_data[(regime_val, 'long')], w, label='Long leg',
+           color='#2196F3', alpha=0.85, edgecolor='white')
+    ax.bar(x + w/2, abs_shap_data[(regime_val, 'short')], w, label='Short leg',
+           color='#E53935', alpha=0.85, edgecolor='white')
+    ax.set_title(f'{regime_val}: feature importance by horizon\n'
+                 f'(mean |SHAP| contribution)',
+                 fontsize=12, fontweight='bold')
+    ax.set_xticks(x)
+    ax.set_xticklabels([f'{h}' for h in horizons], fontsize=10)
+    ax.set_xlabel('Momentum lookback horizon (months)', fontsize=11)
+    ax.legend(fontsize=9)
+    ax.grid(axis='y', alpha=0.3)
+    if i == 0:
+        ax.set_ylabel('Mean |SHAP| (bps)', fontsize=11)
+
+plt.suptitle('Momentum term structure: stock selection (top) and feature importance (bottom)',
+             fontsize=14, fontweight='bold', y=1.02)
+plt.tight_layout()
+fig.savefig('zscore_and_absshap_v3.png', dpi=150, bbox_inches='tight')
+plt.close(fig)
+print("Saved: zscore_and_absshap_v3.png")
+
 print("Done.")
