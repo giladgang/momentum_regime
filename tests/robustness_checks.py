@@ -240,11 +240,8 @@ lr.fit(X_tr_s, train['above_med'].values)
 test_c = test.copy()
 test_c['score_lr'] = lr.predict_proba(X_te_s)[:, 1]
 
-xgb = XGBRegressor(n_estimators=500, max_depth=4, learning_rate=0.05,
-                    subsample=0.8, colsample_bytree=0.8,
-                    tree_method='hist', random_state=42, verbosity=0)
-xgb.fit(train[FEATURES].values.astype(float), y_train)
-test_c['score_xgb'] = xgb.predict(test[FEATURES].values.astype(float))
+# Use production 50-seed ensemble scores from artefacts (no retraining)
+test_c['score_xgb'] = test['score_xgb']
 
 # Fixed momentum scores
 test_c['score_mom12'] = test_c.groupby('date')['mom_12'].rank(pct=True)
