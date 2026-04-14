@@ -65,11 +65,9 @@ where $\mathcal{L}_t$ and $\mathcal{S}_t$ are the sets of stocks in the long and
 \end{equation}
 Value-weighting tilts each leg toward large, liquid stocks, reducing the influence of small-cap return anomalies and improving implementability.
 
-\subsection{Rebalancing Frequency}\label{app:rebalancing}
-
-All portfolios are rebalanced monthly: both the long and short sides are reconstituted every month using updated scores. Monthly rebalancing ensures the strategy captures fresh cross-sectional dislocations each month rather than holding stale positions.
-
 \subsection{Transaction Costs}\label{app:transaction_costs}
+
+All portfolios are rebalanced monthly.
 
 A one-way transaction cost of $c = 10$ basis points is applied to the turnover in both the long and short legs at each rebalancing date. The net portfolio return at month $t$ is:
 \begin{equation}
@@ -132,14 +130,6 @@ where $N$ is the full feature set, $p = |N|$, and $f_S(\mathbf{x})$ is the expec
 \end{equation}
 
 Two additional analyses are performed. First, the mean absolute SHAP value of $\pi_t^{\text{filter}}$ is computed separately for calm and panic months to assess whether the regime signal's influence varies across market states. Second, regime-specific XGBoost models are trained on calm-only and panic-only subsets of the training data, and their SHAP feature importances are compared to identify which features the model relies on differentially across regimes.
-
-\subsection{Logistic Regression Coefficient Analysis}\label{app:lr_analysis}
-
-For the logistic regression model (Method~1), feature importance is assessed directly through the estimated coefficient vector $\boldsymbol{\beta}$. Since all features are standardised prior to fitting, the coefficients are comparable in magnitude. The predicted log-odds of an above-median return decompose as:
-\begin{equation}
-    \log \frac{P(y_t^s = 1 \mid \mathbf{x}_t^s)}{1 - P(y_t^s = 1 \mid \mathbf{x}_t^s)} = \beta_0 + \sum_{j=1}^{p} \beta_j \tilde{x}_{t,j}^s,
-\end{equation}
-where $\tilde{x}_{t,j}^s$ is the standardised value of feature $j$. The absolute magnitude $|\beta_j|$ reflects the feature's marginal contribution to the log-odds per standard deviation change, providing a linear analogue to the nonlinear SHAP importance from XGBoost.
 
 \section{Alternative Training Targets for XGBoost}\label{app:alt_targets}
 
@@ -212,14 +202,6 @@ The XGBoost model uses hyperparameters selected via cross-validation on the trai
 \input{tables/table_xgb_hyperparams}
 
 The Sharpe ratio ranges from 0.89 to 1.08 across all configurations tested. Performance is robust to moderate perturbations in tree depth and ensemble size. The results confirm that M2's performance is not an artefact of a particular hyperparameter configuration.
-
-\subsection{Regime Threshold Sensitivity}\label{app:threshold}
-
-The regime-conditional analysis in Section~\ref{sec:regime_results} uses $\pi_t^{\text{filter}} = 0.50$ to classify months as calm or panic. Table~\ref{tab:threshold_sensitivity} checks whether the findings are sensitive to this cutoff.
-
-\input{tables/table_threshold_sensitivity}
-
-The regime-conditional Sharpe ratios are stable across all three thresholds: M2's panic Sharpe ranges from 1.24 to 1.55, while calm Sharpe ranges from 0.59 to 0.76. The qualitative finding -- that M2 achieves higher Sharpe ratios during panic months than calm months -- holds regardless of the classification threshold.
 
 \subsection{Number of Hidden States}\label{app:num_states}
 
@@ -303,14 +285,6 @@ To rule out the possibility that XGBoost benefits from any additional feature ra
 
 Removing the regime signal entirely reduces M2's Sharpe from 1.08 to 0.48, a drop of 0.60. The regime signal is essential for long-short momentum stock selection, not merely a marginal improvement.
 
-\subsection{Kitchen-Sink Test}\label{app:kitchen_sink}
-
-A further concern is that XGBoost's improvement from adding $\pi_t^{\text{filter}}$ reflects the model's ability to extract spurious patterns from any additional feature. To test this, XGBoost is augmented with a single random walk feature (cumulative sum of standard normal draws) in place of $\pi_t^{\text{filter}}$, repeated 10 times with different seeds.
-
-\input{tables/table_kitchen_sink}
-
-The real HMM signal more than doubles the Sharpe ratio (1.08 vs.\ 0.48 without), confirming that the regime signal's contribution is specific and economically meaningful.
-
 \subsection{Ridge Regression Baseline}\label{app:ridge}
 
 To isolate the effect of linearity from the choice of training target, a Ridge regression is estimated on the same 13 standardised features as M1 and M2, predicting continuous forward returns (the same target as XGBoost). Table~\ref{tab:ridge} reports results across a range of regularisation strengths.
@@ -338,10 +312,6 @@ M2 (XGBoost) & --- & 1.08 & 20.6\% & 19.1\% & $-$22.5\% & 0.80 / 1.50 \\
 \end{table}
 
 The Ridge regression assigns $\pi_t^{\text{filter}}$ a coefficient of $+0.003$, which is positive but economically negligible: a one-standard-deviation increase in the panic probability shifts the predicted return by only 0.3 basis points. The linear model cannot use the regime signal to condition how the momentum horizons jointly determine the stock ranking, regardless of the training target.
-
-\subsection{M1 Polynomial and Interaction Tests}\label{app:m1_poly}
-
-To rule out the possibility that M1's failure is due to insufficient flexibility rather than a fundamental limitation of linear models, the logistic regression is augmented with polynomial terms ($\pi^2$, $\pi^3$, $\pi^4$) and explicit interaction terms ($\pi \times mom_k$ for all 12 horizons). The polynomial terms leave the Sharpe near zero, while the interaction terms recover only a fraction of M2's performance. This confirms that the regime-momentum interaction involves higher-order conditional logic that tree-based models capture but linear models, even with augmented feature spaces, cannot.
 
 \subsection{Emission Distribution Robustness}\label{app:emission_robustness}
 
