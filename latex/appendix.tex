@@ -201,7 +201,7 @@ The XGBoost model uses hyperparameters selected via cross-validation on the trai
 
 \input{tables/table_xgb_hyperparams}
 
-The Sharpe ratio ranges from 0.89 to 1.08 across all configurations tested. Performance is robust to moderate perturbations in tree depth and ensemble size. The results confirm that M2's performance is not an artefact of a particular hyperparameter configuration.
+The Sharpe ratio ranges from 0.89 to 1.11 across all configurations tested. Performance is robust to moderate perturbations in tree depth and ensemble size. The results confirm that M2's performance is not an artefact of a particular hyperparameter configuration.
 
 \subsection{Number of Hidden States}\label{app:num_states}
 
@@ -219,7 +219,7 @@ To assess sensitivity to the choice of training period, the full pipeline (HMM e
 
 \input{tables/table_alt_splits}
 
-In the baseline split (1990--2010 training, 2011--2025 test), M2 achieves a Sharpe of 1.08 while M1 collapses ($-$0.03), confirming the nonlinear regime-momentum interaction documented in Section~\ref{sec:performance_results}.
+In the baseline split (1990--2010 training, 2011--2025 test), M2 achieves a Sharpe of 1.11 while M1 collapses ($-$0.03), confirming the nonlinear regime-momentum interaction documented in Section~\ref{sec:performance_results}.
 
 \subsection{Out-of-Sample Test on the 2008--2009 Crisis}\label{app:gfc_oos}
 
@@ -243,7 +243,7 @@ Training period & Test months & M2 Sharpe & GFC cumulative & 2009 rebound \\
 \label{tab:gfc_oos}
 \end{table}
 
-M2 not only survived the 2009 momentum crash but profited from it, correctly switching to reversal bets during the panic. The lower overall Sharpe (0.28--0.47 vs.\ 1.08 in the main test) reflects the shorter training period (109--193 months vs.\ 241), not a failure of the mechanism.
+M2 not only survived the 2009 momentum crash but profited from it, correctly switching to reversal bets during the panic. The lower overall Sharpe (0.28--0.47 vs.\ 1.11 in the main test) reflects the shorter training period (109--193 months vs.\ 241), not a failure of the mechanism.
 
 \subsection{Expanding-Window HMM Re-estimation}\label{app:expanding}
 
@@ -265,7 +265,7 @@ HMM trained through & Test period & M2 Sharpe \\
 Combined expanding & 2011--2025 & 1.04 \\
 \bottomrule
 \end{tabular}
-\caption{Expanding-window HMM re-estimation. The combined strategy stitches together the best available model at each point. Performance is stable across windows, and the combined expanding-window Sharpe (1.04) matches the fixed-window baseline (1.08), indicating that the regime structure does not drift meaningfully over time.}
+\caption{Expanding-window HMM re-estimation. The combined strategy stitches together the best available model at each point. Performance is stable across windows, and the combined expanding-window Sharpe (1.04) matches the fixed-window baseline (1.11), indicating that the regime structure does not drift meaningfully over time.}
 \label{tab:expanding}
 \end{table}
 
@@ -283,7 +283,7 @@ To rule out the possibility that XGBoost benefits from any additional feature ra
 
 \input{tables/table_placebo}
 
-Removing the regime signal entirely reduces M2's Sharpe from 1.08 to 0.48, a drop of 0.60. The regime signal is essential for long-short momentum stock selection, not merely a marginal improvement.
+Removing the regime signal entirely reduces M2's Sharpe from 1.11 to 0.48, a drop of 0.60. The regime signal is essential for long-short momentum stock selection, not merely a marginal improvement.
 
 \subsection{Ridge Regression Baseline}\label{app:ridge}
 
@@ -304,7 +304,7 @@ Ridge & 100 & $-$0.57 & $-$10.9\% & 17.4\% & $-$81.6\% & $-$0.60 / $-$0.55 \\
 Ridge & 1{,}000 & $-$0.54 & $-$10.5\% & 17.5\% & $-$80.1\% & $-$0.60 / $-$0.47 \\
 \midrule
 M1 (LR, classification) & --- & $-$0.03 & $-$1.6\% & 15.1\% & $-$44.1\% & $-$0.30 / 0.35 \\
-M2 (XGBoost) & --- & 1.08 & 20.6\% & 19.1\% & $-$22.5\% & 0.80 / 1.50 \\
+M2 (XGBoost) & --- & 1.11 & 21.9\% & 19.7\% & $-$24.8\% & 0.82 / 1.56 \\
 \bottomrule
 \end{tabular}
 \caption{Ridge regression baseline: a linear model predicting continuous forward returns (same target as M2). The Sharpe ratio of $-$0.57 is robust across all regularisation strengths and is worse than M1's $-$0.03, confirming that M1's failure is driven by linearity, not the classification target. The classification target actually limits the damage by compressing scores into a narrow probability band.}

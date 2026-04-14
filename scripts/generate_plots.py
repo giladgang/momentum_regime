@@ -89,8 +89,12 @@ print("\n[ 1 ] Using production XGB scores from artefacts ...")
 test['score_m2_red'] = test['score_xgb']
 
 if USE_FUNDAMENTALS:
-    # Full-feature model not available from artefacts; skip if needed
     test['score_m2_full'] = test['score_xgb']
+
+# Prepare features for M1
+X_tr_red = train[REDUCED].values.astype(float)
+X_te_red = test[REDUCED].values.astype(float)
+y_tr = train['ret_fwd'].values.astype(float)
 
 # M1
 imp = SimpleImputer(strategy='median')
@@ -159,6 +163,9 @@ print("  Saved: cs_performance_regime_shaded.png")
 # ═══════════════════════════════════════════════════════════════════
 
 print("[ 3 ] PDP plot ...")
+
+import joblib
+xgb = joblib.load('cs_artefacts_xgb.pkl')
 
 X_te = test[REDUCED].values.astype(float)
 pi_grid = np.linspace(0, 1, 100)

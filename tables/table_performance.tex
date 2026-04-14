@@ -1,23 +1,30 @@
 \begin{table}[htbp]
 \centering
+\caption{Out-of-sample portfolio performance.}
+\label{tab:performance}
 \small
 \begin{tabular}{l r r r r r r r}
 \toprule
  & Ann.\ Ret & Ann.\ Vol & Sharpe & 95\% CI & Max DD & NW $t$ & Final \$ \\
 \midrule
-Market & 11.9\% & 14.6\% & 0.84 & [0.40,\,1.44] & $-$24.7\% & {--} & 4.8 \\
+Market & 11.9% & 14.6% & 0.84 & [0.40,\,1.44] & -24.7% & -- & 4.8 \\
 \midrule
-Fixed 12-mo mom & $-$1.9\% & 26.1\% & 0.06 & [$-$0.48,\,0.51] & $-$72.3\% & $-$1.22 & 0.8 \\
-Fixed 1-mo mom & 3.1\% & 17.6\% & 0.26 & [$-$0.24,\,0.67] & $-$30.2\% & $-$1.35 & 1.5 \\
-M0: Formula & $-$0.2\% & 23.6\% & 0.11 & [$-$0.41,\,0.51] & $-$63.8\% & $-$1.24 & 1.0 \\
-M1: LR & $-$1.6\% & 15.1\% & $-$0.03 & [$-$0.39,\,0.45] & $-$44.1\% & $-$2.50** & 0.8 \\
-M2: XGB & 20.6\% & 19.1\% & 1.08 & [0.63,\,1.52] & $-$22.5\% & 1.57 & 13.5 \\
+Fixed 12-mo mom & -1.9% & 26.1% & 0.06 & [-0.48,\,0.51] & -72.3% & -1.22 & 0.8 \\
+Fixed 1-mo mom & 3.1% & 17.6% & 0.26 & [-0.24,\,0.67] & -30.2% & -1.35 & 1.5 \\
+M0: Formula & -0.2% & 23.6% & 0.11 & [-0.41,\,0.51] & -63.8% & -1.24 & 1.0 \\
+M1: LR (mom+$\pi$) & -1.6% & 15.1% & -0.03 & [-0.39,\,0.45] & -44.1% & -2.50** & 0.8 \\
+M1: LR & -1.6% & 15.1% & -0.03 & [-0.39,\,0.45] & -44.1% & -2.50** & 0.8 \\
+M2: XGB (mom+$\pi$) & 21.9% & 19.7% & 1.11 & [0.67,\,1.55] & -24.8% & 1.83* & 15.7 \\
+M2: XGB & 21.9% & 19.7% & 1.11 & [0.66,\,1.56] & -24.8% & 1.83* & 15.7 \\
+\midrule
+GHM SLOW & -1.8% & 26.1% & 0.07 & [-0.46,\,0.51] & -72.3% & -1.22 & 0.8 \\
+GHM MED & 0.2% & 21.7% & 0.12 & [-0.39,\,0.55] & -62.5% & -1.40 & 1.0 \\
+GHM FAST & 3.1% & 17.6% & 0.26 & [-0.24,\,0.69] & -30.3% & -1.35 & 1.5 \\
+GHM DYN & -2.1% & 22.8% & 0.03 & [-0.47,\,0.51] & -69.5% & -1.54 & 0.7 \\
 \bottomrule
 \end{tabular}
 
 \medskip
 \small
 \textbf{Notes:} This table reports annualized return, annualized volatility, Sharpe ratio, 95\% block bootstrap confidence interval on the Sharpe ratio (block length = 12 months, 10{,}000 replications), maximum drawdown, Newey--West $t$-statistic for mean excess return over the market (HAC standard errors, 6 lags), and terminal wealth from \$1 invested. All strategies are long-short (top-decile long, bottom-decile short), value-weighted using NYSE breakpoints, and net of 10\,bps one-way transaction costs applied to both legs. The test period is January 2011 to November 2025 (167 months). ``mom+$\pi$'' denotes models trained on the 12 momentum lookbacks and the regime signal only, excluding fundamental features. $^{*}$\,$p<0.10$; $^{**}$\,$p<0.05$; $^{***}$\,$p<0.01$.
-\caption{Out-of-sample portfolio performance.}
-\label{tab:performance}
 \end{table}

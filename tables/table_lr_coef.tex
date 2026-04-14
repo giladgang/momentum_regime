@@ -1,25 +1,25 @@
 \begin{table}[htbp]
 \centering
+\caption{Logistic regression (Method~1) coefficient estimates. Features are standardized prior to fitting. The model is estimated without regularization to obtain valid standard errors. Dependent variable: $\mathbb{1}[r_{t+1}^s > \text{median}]$.}
+\label{tab:lr_coef}
 \small
 \begin{tabular}{l r r r r}
 \toprule
 Feature & $\hat{\beta}$ & Std.\ Err. & $z$ & Sig. \\
 \midrule
 mom\_11 & 0.0536 & 0.0072 & 7.47 & *** \\
-mom\_12 & $-$0.0443 & 0.0054 & $-$8.26 & *** \\
+mom\_12 & -0.0443 & 0.0054 & -8.26 & *** \\
 mom\_8 & 0.0321 & 0.0064 & 4.99 & *** \\
-mom\_4 & $-$0.0289 & 0.0050 & $-$5.81 & *** \\
-mom\_1 & $-$0.0171 & 0.0026 & $-$6.64 & *** \\
+mom\_4 & -0.0289 & 0.0050 & -5.81 & *** \\
+mom\_1 & -0.0171 & 0.0026 & -6.64 & *** \\
 mom\_2 & 0.0151 & 0.0036 & 4.24 & *** \\
-mom\_7 & $-$0.0099 & 0.0062 & $-$1.60 &  \\
+mom\_7 & -0.0099 & 0.0062 & -1.60 &  \\
 mom\_5 & 0.0090 & 0.0055 & 1.64 &  \\
 $\pi^{\text{filter}}$ & 0.0072 & 0.0019 & 3.84 & *** \\
-mom\_3 & $-$0.0070 & 0.0043 & $-$1.63 &  \\
-mom\_9 & $-$0.0026 & 0.0067 & $-$0.39 &  \\
-mom\_10 & $-$0.0022 & 0.0069 & $-$0.32 &  \\
+mom\_3 & -0.0070 & 0.0043 & -1.63 &  \\
+mom\_9 & -0.0026 & 0.0067 & -0.39 &  \\
+mom\_10 & -0.0022 & 0.0069 & -0.32 &  \\
 mom\_6 & 0.0012 & 0.0059 & 0.21 &  \\
 \bottomrule
 \end{tabular}
-\caption{Logistic regression (Method~1) coefficient estimates. Features are standardized prior to fitting. The model is estimated without regularization to obtain valid standard errors. Dependent variable: $\mathbb{1}[r_{t+1}^s > \text{median}]$.}
-\label{tab:lr_coef}
 \end{table}
