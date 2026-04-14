@@ -154,7 +154,7 @@ The partial dependence plot (Figure~\ref{fig:pdp_pi}) completes the picture by s
 \subsection{Ablation Studies}\label{sec:ablation_results}
 
 \paragraph{Regime signal removal}
-Removing the regime signal drops M2's Sharpe from 1.11 to 0.48, confirming that the HMM captures decision-relevant information not spanned by the momentum features themselves.
+Removing the regime signal drops M2's Sharpe from 1.11 to 0.41, confirming that the HMM captures decision-relevant information not spanned by the momentum features themselves.
 
 \paragraph{Linear model confound test}\label{sec:target_confound}
 Because M1 uses a classification target while M2 uses continuous returns, a natural concern is whether M1's failure reflects the choice of training target rather than linearity. A Ridge regression predicting continuous forward returns -- the same target as M2 -- achieves a Sharpe of $-$0.57, even worse than M1's $-$0.03 (Appendix~\ref{app:ridge}). Both linear models fail because they assign $\pi_t^{\text{filter}}$ a single coefficient that cannot capture the conditional logic required to adapt stock selection across regimes.
@@ -182,25 +182,25 @@ Target family & Parameter & Sharpe & $\pi$ share \\
 Baseline ($r$) & --- & 1.11 & 45\% \\
 \midrule
 \multicolumn{4}{l}{\textit{Sharpe-like: $r\,/\,\sigma^a$}} \\[2pt]
- & $a = 0.5$ & 1.04 & 56\% \\
- & $a = 1.0$ & 0.41 & 57\% \\
+ & $a = 0.5$ & 1.02 & 57\% \\
+ & $a = 1.0$ & 0.36 & 57\% \\
 \midrule
 \multicolumn{4}{l}{\textit{Mean-variance: $r - \frac{\gamma}{2}\sigma^2$}} \\[2pt]
- & $\gamma = 0.1$ & 1.05 & 48\% \\
- & $\gamma = 0.2$ & 1.06 & 47\% \\
- & $\gamma = 0.5$ & 0.71 & 37\% \\
+ & $\gamma = 0.1$ & 1.07 & 47\% \\
+ & $\gamma = 0.2$ & 1.06 & 44\% \\
+ & $\gamma = 0.5$ & 0.75 & 35\% \\
 \midrule
 \multicolumn{4}{l}{\textit{Log return: $\log(1+r)$}} \\[2pt]
- & --- & 0.47 & 49\% \\
+ & --- & 0.57 & 48\% \\
 \bottomrule
 \end{tabular}
-\caption{Risk-adjusted training targets and regime signal importance. ``$\pi$ share'' is the regime signal's fraction of total feature importance (remainder is momentum). The baseline uses the production 50-seed ensemble (Table~\ref{tab:performance}); risk-adjusted variants use 10 seeds.}
+\caption{Risk-adjusted training targets and regime signal importance. ``$\pi$ share'' is the regime signal's fraction of total feature importance (remainder is momentum). All variants use 50 XGB seeds on the same sample as the main results.}
 \label{tab:risk_aversion}
 \end{table}
 
-Two findings emerge. First, under mild risk adjustment ($r/\sigma^{0.5}$ or small $\gamma$), the regime signal's share of feature importance actually \emph{increases} (from 45\% to 56\%), while the Sharpe ratio barely changes. Mild risk penalisation removes the noisiest bets but preserves the regime-conditional structure -- the model still adapts its joint use of momentum horizons across regimes, just with less exposure to extreme outcomes.
+Two findings emerge. First, under mild risk adjustment ($r/\sigma^{0.5}$ or small $\gamma$), the regime signal's share of feature importance actually \emph{increases} (from 45\% to 57\%), while the Sharpe ratio barely changes. Mild risk penalisation removes the noisiest bets but preserves the regime-conditional structure -- the model still adapts its joint use of momentum horizons across regimes, just with less exposure to extreme outcomes.
 
-Second, aggressive risk adjustment breaks the strategy. At $\gamma = 0.5$ the Sharpe drops to 0.71 and the regime signal's share falls to 37\%; at $\gamma \geq 1$ or $a \geq 1$ the strategy collapses entirely. The variance penalty overwhelms the long-short spread, steering the model toward low-volatility stocks regardless of regime and effectively abandoning the mechanism that makes M2 successful.
+Second, aggressive risk adjustment breaks the strategy. At $\gamma = 0.5$ the Sharpe drops to 0.75 and the regime signal's share falls to 35\%; at $a \geq 1$ the strategy collapses (Sharpe 0.36). The variance penalty overwhelms the long-short spread, steering the model toward low-volatility stocks regardless of regime and effectively abandoning the mechanism that makes M2 successful.
 
 The implication is that detecting the regime-dependent structure of momentum requires the model to be free to learn flexible, regime-conditional feature interactions. Conservative risk objectives constrain this flexibility, forcing the model toward static low-volatility selections that obscure the very regime-dependent structure the regime signal is designed to capture.
 
