@@ -116,6 +116,9 @@ def main():
 
         10: ('scripts/economic_mechanism.py',
              'STEP 10: Analyze economic mechanism (portfolio characteristics, forward returns, sector rotation)'),
+
+        11: ('scripts/selection_rank_analysis.py',
+             'STEP 11: Selection rank analysis (percentile rank of selected stocks by horizon and regime)'),
     }
 
     if args.step > 0:
