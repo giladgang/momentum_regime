@@ -39,7 +39,9 @@ M2 achieves a Sharpe ratio of 1.50 during panic months compared to 0.80 during c
 
 \subsubsection{Calm Months: Momentum Continuation}\label{sec:calm}
 
-In calm markets, the standard momentum continuation effect documented by \citet{JegadeeshTitman1993} dominates: past winners continue to outperform past losers. The economic mechanism is well understood: firm-specific good news -- strong earnings, positive analyst revisions, improving fundamentals -- diffuses gradually through the market as investors update their beliefs with a delay \citep{Hong1999, Barberis1998}. A stock that has risen over the past 6--12 months is likely still in the process of being re-priced upward, and the reverse holds for declining stocks. M2 exploits this by buying stocks riding established upward trends and shorting stocks in sustained decline. The resulting long-short spread of 1.33\% per month is modest but consistent. Because the portfolio is approximately market-neutral ($\beta \approx 0$), this spread is not driven by broad market movements -- it reflects M2's ability to rank stocks correctly within each cross-section.
+In calm markets, the standard momentum continuation effect documented by \citet{JegadeeshTitman1993} dominates: past winners continue to outperform past losers. The economic mechanism is well understood: firm-specific good news -- strong earnings, positive analyst revisions, improving fundamentals -- diffuses gradually through the market as investors update their beliefs with a delay \citep{Hong1999, Barberis1998}. A stock that has risen over the past 6--12 months is likely still in the process of being re-priced upward, and the reverse holds for declining stocks.
+
+M2 exploits this by buying stocks riding established upward trends and shorting stocks whose trends have stalled. The portfolio characteristics confirm this: M2's long side holds stocks with positive trailing momentum (+23.7\% over 12 months), moderate size (median market cap \$327M), and relatively low book-to-market ratios (0.43). The short side holds stocks with weaker positive momentum (+8.3\% over 12 months) and larger size (median \$601M). The resulting long-short spread of 1.33\% per month is modest but consistent. Because the portfolio is approximately market-neutral ($\beta \approx 0$), this spread is not driven by broad market movements -- it reflects M2's ability to rank stocks correctly within each cross-section.
 
 \subsubsection{Panic Months: Short-Term Reversal}\label{sec:panic}
 
@@ -49,6 +51,8 @@ The economic basis for this inversion rests on three reinforcing mechanisms, eac
 
 On the other side, stocks that held up during the decline -- typically large, low-beta, ``defensive'' names -- become temporarily overvalued as investors crowd into perceived safe havens. When risk appetite returns, capital rotates back into beaten-down names.
 
+The portfolio characteristics confirm this inversion. In panic months, M2's long side holds beaten-down stocks with negative 12-month momentum ($-$19.5\%) and negative 1-month momentum ($-$5.2\%), smaller size (median \$238M), and higher book-to-market (0.62). The short side holds larger stocks (median \$855M) that have held up during the decline, with positive 1-month momentum (+3.7\%) -- the ``defensive'' names that the strategy bets against during recoveries.
+
 M2 learns this regime-specific cross-sectional structure through its tree splits, conditioned on $\pi_t^{\text{filter}}$. Figure~\ref{fig:regime_decomp} shows the decomposition: during panic, M2's long side earns 4.46\% per month while its short side earns only 1.38\%, producing a spread of 3.09\% -- more than double the calm-period spread of 1.33\%. This widening reflects the model's improved ability to distinguish future outperformers from underperformers when the regime signal indicates stress. The spread comes entirely from cross-sectional stock selection (the portfolio has near-zero market beta), confirming that the regime signal adds information about the \emph{relative} prospects of individual stocks, not about the market's direction.
 
 \begin{figure}[H]
@@ -57,12 +61,6 @@ M2 learns this regime-specific cross-sectional structure through its tree splits
     \caption{Average monthly returns of M2's long and short sides, decomposed by regime. The long-short spread widens from 1.3\% in calm months to 3.1\% in panic months, reflecting the model's regime-conditional adaptation of stock selection.}
     \label{fig:regime_decomp}
 \end{figure}
-
-\subsubsection{Portfolio Characteristics by Regime}\label{sec:port_chars}
-
-The stock-level characteristics of M2's portfolio confirm the continuation-vs-reversal mechanism. In calm months, M2's long side holds stocks with positive trailing momentum (+23.7\% over 12 months), moderate size (median market cap \$327M), and relatively low book-to-market ratios (0.43). These are momentum continuation candidates riding established trends. The short side holds stocks with weaker positive momentum (+8.3\% over 12 months) and larger size (median \$601M), reflecting stocks whose trends have stalled or reversed.
-
-In panic months, the profile inverts. The long side holds beaten-down stocks with negative 12-month momentum ($-$19.5\%) and negative 1-month momentum ($-$5.2\%), smaller size (median \$238M), and higher book-to-market (0.62). The short side holds larger stocks (median \$855M) that have held up during the decline, with positive 1-month momentum (+3.7\%). These are the ``defensive'' names that the strategy bets against during recoveries.
 
 \subsubsection{Stress Test: Prolonged Bear Market}\label{sec:stress_test}
 
