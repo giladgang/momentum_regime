@@ -119,6 +119,15 @@ def main():
 
         11: ('scripts/selection_rank_analysis.py',
              'STEP 11: Selection rank analysis (percentile rank of selected stocks by horizon and regime)'),
+
+        12: ('scripts/risk_aversion_analysis.py',
+             'STEP 12: Risk aversion analysis (risk-adjusted training targets)'),
+
+        13: ('scripts/ridge_baseline_test.py',
+             'STEP 13: Ridge regression baseline (linearity vs target confound)'),
+
+        14: ('scripts/depth_vs_sharpe.py',
+             'STEP 14: Tree depth analysis (interaction order requirements)'),
     }
 
     if args.step > 0:

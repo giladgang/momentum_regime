@@ -18,66 +18,46 @@ import pickle, warnings
 warnings.filterwarnings('ignore')
 
 # ══════════════════════════════════════════════════════════════════════════════
-# 1. Load data (same pipeline as cross_sectional_model.py)
+# 1. Load artefacts (same sample as main results)
 # ══════════════════════════════════════════════════════════════════════════════
 
-print("Loading data ...")
-stocks = pd.read_parquet('data/crsp_msf_raw.parquet')
-stocks['date'] = pd.to_datetime(stocks['date'])
-stocks = stocks.sort_values(['permno', 'date']).reset_index(drop=True)
+print("Loading artefacts ...")
+with open('cs_artefacts_data.pkl', 'rb') as f:
+    artefacts = pickle.load(f)
 
-# Eligibility filters
-stocks = stocks[stocks['shrcd'].isin([10, 11])]
-stocks = stocks[stocks['exchcd'].isin([1, 2, 3])]
-stocks = stocks[stocks['prc'].abs() > 1.0]
-stocks = stocks.reset_index(drop=True)
+train = artefacts['train'].copy()
+test  = artefacts['test'].copy()
+X_train = artefacts['X_train']
+X_test  = artefacts['X_test']
+y_train = artefacts['y_train']
+FEATURES = artefacts['FEATURES']
 
-# Merge regime signal
-regimes = pd.read_parquet('data/panel_with_regimes.parquet')[['date', 'pi_filter']]
-regimes['date'] = pd.to_datetime(regimes['date'])
-stocks = stocks.merge(regimes, on='date', how='left')
-stocks['pi_filter'] = stocks['pi_filter'].ffill()
-
-# Momentum signals
 MOM_LBS = list(range(1, 13))
-stocks['_log_ret'] = np.log1p(stocks['ret_adj'].clip(lower=-0.999))
-stocks['_log_ret_s1'] = stocks.groupby('permno')['_log_ret'].shift(1)
-for lb in MOM_LBS:
-    roll_sum = (
-        stocks.groupby('permno', sort=False)['_log_ret_s1']
-        .rolling(lb, min_periods=lb).sum()
-        .reset_index(level='permno', drop=True).sort_index()
-    )
-    stocks[f'mom_{lb}'] = np.expm1(roll_sum)
-stocks.drop(columns=['_log_ret', '_log_ret_s1'], inplace=True)
+MOM_FEATURES = [f'mom_{lb}' for lb in MOM_LBS]
 
-# Size
-stocks['log_me'] = np.log(
-    stocks.groupby('permno')['me'].transform(lambda x: x.shift(1)).replace(0, np.nan)
-)
-
-# Forward return
-stocks['ret_fwd'] = stocks.groupby('permno')['ret_adj'].transform(lambda x: x.shift(-1))
-
-# Trailing realized variance (12-month rolling variance of monthly returns)
-stocks['trail_var'] = (
-    stocks.groupby('permno')['ret_adj']
+# Compute trailing realized variance on the artefact sample
+# (needed for risk-adjusted targets, but NaN rows are kept -- we fill with median)
+stocks_raw = pd.read_parquet('data/crsp_msf_raw.parquet')
+stocks_raw['date'] = pd.to_datetime(stocks_raw['date'])
+stocks_raw = stocks_raw.sort_values(['permno', 'date'])
+stocks_raw['trail_var'] = (
+    stocks_raw.groupby('permno')['ret_adj']
     .transform(lambda x: x.shift(1).rolling(12, min_periods=6).var())
 )
+trail_var_map = stocks_raw.set_index(['permno', 'date'])['trail_var']
 
-# Features
-MOM_FEATURES = [f'mom_{lb}' for lb in MOM_LBS]
-FEATURES = MOM_FEATURES + ['pi_filter']
+train['trail_var'] = train.set_index(['permno', 'date']).index.map(
+    lambda idx: trail_var_map.get(idx, np.nan))
+test['trail_var'] = test.set_index(['permno', 'date']).index.map(
+    lambda idx: trail_var_map.get(idx, np.nan))
 
-CORE_FEATURES = MOM_FEATURES + ['pi_filter']
-df = stocks.dropna(subset=['ret_fwd', 'trail_var'] + CORE_FEATURES).copy()
-df = df.reset_index(drop=True)
+# Fill missing trail_var with median (don't drop rows -- keep same sample)
+train_var_median = train['trail_var'].median()
+train['trail_var'] = train['trail_var'].fillna(train_var_median)
+test['trail_var'] = test['trail_var'].fillna(train_var_median)
 
-train = df[df['date'] < '2011-01-01'].copy()
-test  = df[df['date'] >= '2011-01-01'].copy()
-
-X_train = train[FEATURES].values.astype(float)
-X_test  = test[FEATURES].values.astype(float)
+print(f"  Train: {len(train):,}  |  Test: {len(test):,}")
+print(f"  Trail var coverage: train={train['trail_var'].notna().mean():.1%}  test={test['trail_var'].notna().mean():.1%}")
 
 print(f"  Train: {len(train):,}  |  Test: {len(test):,}")
 
@@ -131,28 +111,33 @@ for gamma in GAMMAS:
     print(f"  gamma = {gamma}")
     print(f"{'='*60}")
 
-    # Compute risk-adjusted target
-    y_train_g = train['ret_fwd'].values - (gamma / 2) * train['trail_var'].values
-
-    # Train XGBoost ensemble (50 seeds)
-    XGB_SEEDS = list(range(1, 51))
-    preds = np.zeros(len(X_test))
-    last_model = None
-    for xs in XGB_SEEDS:
-        model = XGBRegressor(
-            n_estimators=500, max_depth=4, learning_rate=0.05,
-            subsample=0.8, colsample_bytree=0.8,
-            tree_method='hist', random_state=xs, verbosity=0
-        )
-        model.fit(X_train, y_train_g)
-        preds += model.predict(X_test)
-        last_model = model
-    preds /= len(XGB_SEEDS)
-
-    # Score test set
     score_col = f'score_g{gamma}'
-    test[score_col] = preds
-    model = last_model  # for SHAP below
+
+    if gamma == 0:
+        # Use production artefact scores for baseline (same as main results)
+        test[score_col] = test['score_xgb']
+        import joblib
+        model = joblib.load('cs_artefacts_xgb.pkl')
+        print("  Using production artefact scores for baseline")
+    else:
+        # Compute risk-adjusted target and retrain
+        y_train_g = train['ret_fwd'].values - (gamma / 2) * train['trail_var'].values
+
+        XGB_SEEDS = list(range(1, 51))
+        preds = np.zeros(len(X_test))
+        last_model = None
+        for xs in XGB_SEEDS:
+            model = XGBRegressor(
+                n_estimators=500, max_depth=4, learning_rate=0.05,
+                subsample=0.8, colsample_bytree=0.8,
+                tree_method='hist', random_state=xs, verbosity=0
+            )
+            model.fit(X_train, y_train_g)
+            preds += model.predict(X_test)
+            last_model = model
+        preds /= len(XGB_SEEDS)
+        test[score_col] = preds
+        model = last_model
 
     # Portfolio performance
     r = long_short_port(test, score_col)
