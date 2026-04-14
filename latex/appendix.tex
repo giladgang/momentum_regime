@@ -19,26 +19,26 @@ Variable & Source & Description & Used in \\
 \midrule
 \multicolumn{4}{l}{\emph{Stock-level variables}} \\
 Monthly returns & CRSP \texttt{msf} & Adjusted holding-period returns & Sections 3, 5 \\
-Price, shares out. & CRSP \texttt{msf} & For market equity computation & Section 3.5 \\
-Exchange, share codes & CRSP \texttt{msf} & Universe filtering (codes 10, 11) & Section 3.2 \\
-Delisting returns & CRSP \texttt{msedelist} & Survivorship bias correction & Section 3.2 \\
-Book equity (\texttt{ceqq}) & Compustat \texttt{fundq} & Book-to-market, ROE & Section 3.5 \\
-Total assets (\texttt{atq}) & Compustat \texttt{fundq} & Asset growth, gross profit & Section 3.5 \\
-Income (\texttt{ibq}) & Compustat \texttt{fundq} & ROE, earnings growth & Section 3.5 \\
-Revenue (\texttt{revtq}) & Compustat \texttt{fundq} & Gross profitability & Section 3.5 \\
-COGS (\texttt{cogsq}) & Compustat \texttt{fundq} & Gross profitability & Section 3.5 \\
-Debt (\texttt{dlttq}, \texttt{dlcq}) & Compustat \texttt{fundq} & Leverage ratio & Section 3.5 \\
+Price, shares out. & CRSP \texttt{msf} & For market equity computation & Section~\ref{sec:data} \\
+Exchange, share codes & CRSP \texttt{msf} & Universe filtering (codes 10, 11) & Section~\ref{sec:stage2} \\
+Delisting returns & CRSP \texttt{msedelist} & Survivorship bias correction & Section~\ref{sec:stage2} \\
+Book equity (\texttt{ceqq}) & Compustat \texttt{fundq} & Book-to-market, ROE & Appendix~\ref{app:fundamental_features} \\
+Total assets (\texttt{atq}) & Compustat \texttt{fundq} & Asset growth, gross profit & Appendix~\ref{app:fundamental_features} \\
+Income (\texttt{ibq}) & Compustat \texttt{fundq} & ROE, earnings growth & Appendix~\ref{app:fundamental_features} \\
+Revenue (\texttt{revtq}) & Compustat \texttt{fundq} & Gross profitability & Appendix~\ref{app:fundamental_features} \\
+COGS (\texttt{cogsq}) & Compustat \texttt{fundq} & Gross profitability & Appendix~\ref{app:fundamental_features} \\
+Debt (\texttt{dlttq}, \texttt{dlcq}) & Compustat \texttt{fundq} & Leverage ratio & Appendix~\ref{app:fundamental_features} \\
 \midrule
 \multicolumn{4}{l}{\emph{Market-level variables (HMM inputs)}} \\
-Daily market returns & CRSP \texttt{dsi} & Drawdown (DD) computation & Section 3.3 \\
-Market price index & CRSP \texttt{dsi} & Drawdown (DD) & Section 3.3 \\
-Cross-sect.\ stock returns & CRSP \texttt{msf} & Dispersion (DISP), REL\_N & Section 3.3 \\
-BAA, AAA bond yields & FRED & Credit spread (CS) & Section 3.3 \\
+Daily market returns & CRSP \texttt{dsi} & Drawdown (DD) computation & Section~\ref{sec:hmm_features} \\
+Market price index & CRSP \texttt{dsi} & Drawdown (DD) & Section~\ref{sec:hmm_features} \\
+Cross-sect.\ stock returns & CRSP \texttt{msf} & Dispersion (DISP), REL\_N & Section~\ref{sec:hmm_features} \\
+BAA, AAA bond yields & FRED & Credit spread (CS) & Section~\ref{sec:hmm_features} \\
 \midrule
 \multicolumn{4}{l}{\emph{Derived features}} \\
-$mom_1, \dots, mom_{12}$ & Computed & 12 trailing momentum signals & Section 3.5 \\
-$\pi_t^{\text{filter}}$ & HMM output & Filtered panic probability & Section 4.1 \\
-7 fundamentals & Computed & bm, roe, gross profit, etc. & Section 3.5 \\
+$mom_1, \dots, mom_{12}$ & Computed & 12 trailing momentum signals & Section~\ref{sec:cs_features} \\
+$\pi_t^{\text{filter}}$ & HMM output & Filtered panic probability & Section~\ref{sec:hmm_output} \\
+7 fundamentals (ablation only) & Computed & bm, roe, gross profit, etc. & Appendix~\ref{app:fundamental_features} \\
 \bottomrule
 \end{tabular}
 \caption{Summary of all data variables used in the analysis.}
