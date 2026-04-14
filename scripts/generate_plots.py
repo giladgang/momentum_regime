@@ -84,39 +84,13 @@ def long_only_port(df_data, score_col, fee=FEE):
 
 build_port = long_short_port if PORTFOLIO_TYPE == 'long_short' else long_only_port
 
-# ── Train models ──
-print("\n[ 1 ] Training models ...")
+# ── Use production scores from artefacts (no retraining) ──
+print("\n[ 1 ] Using production XGB scores from artefacts ...")
+test['score_m2_red'] = test['score_xgb']
 
-# XGB ensemble (mom+pi)
-xgb_preds = np.zeros(len(test))
-X_tr_red = train[REDUCED].values.astype(float)
-X_te_red = test[REDUCED].values.astype(float)
-y_tr = train['ret_fwd'].values.astype(float)
-
-for xgb_seed in XGB_SEEDS:
-    xgb = XGBRegressor(n_estimators=N_ESTIMATORS, max_depth=MAX_DEPTH,
-                        learning_rate=LEARNING_RATE, subsample=SUBSAMPLE,
-                        colsample_bytree=COLSAMPLE, tree_method='hist',
-                        random_state=xgb_seed, verbosity=0)
-    xgb.fit(X_tr_red, y_tr)
-    xgb_preds += xgb.predict(X_te_red)
-xgb_preds /= len(XGB_SEEDS)
-test['score_m2_red'] = xgb_preds
-
-# XGB with full features
 if USE_FUNDAMENTALS:
-    X_tr_full = train[FEATURES].values.astype(float)
-    X_te_full = test[FEATURES].values.astype(float)
-    xgb_preds_full = np.zeros(len(test))
-    for xgb_seed in XGB_SEEDS:
-        xgb_f = XGBRegressor(n_estimators=N_ESTIMATORS, max_depth=MAX_DEPTH,
-                              learning_rate=LEARNING_RATE, subsample=SUBSAMPLE,
-                              colsample_bytree=COLSAMPLE, tree_method='hist',
-                              random_state=xgb_seed, verbosity=0)
-        xgb_f.fit(X_tr_full, y_tr)
-        xgb_preds_full += xgb_f.predict(X_te_full)
-    xgb_preds_full /= len(XGB_SEEDS)
-    test['score_m2_full'] = xgb_preds_full
+    # Full-feature model not available from artefacts; skip if needed
+    test['score_m2_full'] = test['score_xgb']
 
 # M1
 imp = SimpleImputer(strategy='median')

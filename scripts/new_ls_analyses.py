@@ -70,22 +70,12 @@ def long_short_port(df_test, score_col, fee=FEE):
     if not monthly: return pd.Series(dtype=float)
     return pd.DataFrame(monthly).set_index('date')['ret']
 
-# Train XGB ensemble
-print("\n[ 1 ] Training XGB ensemble ...")
+# Use production 50-seed ensemble scores from artefacts (no retraining)
+print("\n[ 1 ] Using production XGB scores from artefacts ...")
 X_tr = train[REDUCED].values.astype(float)
 X_te = test[REDUCED].values.astype(float)
 y_tr = train['ret_fwd'].values.astype(float)
-
-xgb_preds = np.zeros(len(X_te))
-for xgb_seed in XGB_SEEDS:
-    xgb = XGBRegressor(n_estimators=N_ESTIMATORS, max_depth=MAX_DEPTH,
-                        learning_rate=LEARNING_RATE, subsample=SUBSAMPLE,
-                        colsample_bytree=COLSAMPLE, tree_method='hist',
-                        random_state=xgb_seed, verbosity=0)
-    xgb.fit(X_tr, y_tr)
-    xgb_preds += xgb.predict(X_te)
-xgb_preds /= len(XGB_SEEDS)
-test['score_m2'] = xgb_preds
+test['score_m2'] = test['score_xgb']
 r_m2 = long_short_port(test, 'score_m2')
 
 # M1

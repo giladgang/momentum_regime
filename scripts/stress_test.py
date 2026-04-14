@@ -47,60 +47,32 @@ panel['date'] = pd.to_datetime(panel['date'])
 # We need the L/S returns -- load or recompute
 pi_monthly = panel[['date', 'pi_filter']].dropna().drop_duplicates('date').set_index('date')
 
-# Use pre-computed returns if available, otherwise use market as placeholder
-try:
-    # Try to load from artefacts
-    strats = art.get('strategies_lo', {})
-    # We need L/S returns -- check if saved
-    r_strat = pd.read_pickle('data/ls_strategy_returns.pkl')
-    print("  Loaded L/S strategy returns from data/ls_strategy_returns.pkl")
-except:
-    print("  L/S returns not found. Computing from scratch...")
-    from xgboost import XGBRegressor
-    from config import (N_ESTIMATORS, MAX_DEPTH, LEARNING_RATE, SUBSAMPLE,
-                        COLSAMPLE, XGB_SEEDS, HMM_FEATURES)
+# Use production scores from artefacts to compute L/S returns
+print("  Using production XGB scores from artefacts ...")
+from config import TRADING_FEE as FEE
+REDUCED = MOM_FEATURES + ['pi_filter']
 
-    REDUCED = MOM_FEATURES + ['pi_filter']
-    FEE = TRADING_FEE
+def long_short_port(df_test, score_col, fee=FEE):
+    monthly, plw, psw = [], {}, {}
+    for date, grp in df_test.groupby('date'):
+        nyse = grp[grp['exchcd'] == 1][score_col].dropna()
+        if len(nyse) < 10: continue
+        lo, hi = nyse.quantile(0.10), nyse.quantile(0.90)
+        L = grp[grp[score_col] >= hi]; S = grp[grp[score_col] <= lo]
+        if L['me'].sum() == 0 or S['me'].sum() == 0: continue
+        lme = L['me'].sum(); nlw = (L.set_index('permno')['me'] / lme).to_dict()
+        rl = (L['ret_fwd'] * L['me']).sum() / lme
+        sme = S['me'].sum(); nsw = (S.set_index('permno')['me'] / sme).to_dict()
+        rs = (S['ret_fwd'] * S['me']).sum() / sme
+        tl = sum(abs(nlw.get(p, 0) - plw.get(p, 0)) for p in set(nlw) | set(plw)) / 2
+        ts = sum(abs(nsw.get(p, 0) - psw.get(p, 0)) for p in set(nsw) | set(psw)) / 2
+        monthly.append({'date': date, 'ret': rl - rs - fee * (tl + ts)})
+        plw, psw = nlw, nsw
+    if not monthly: return pd.Series(dtype=float)
+    return pd.DataFrame(monthly).set_index('date')['ret']
 
-    def long_short_port(df_test, score_col, fee=FEE):
-        monthly, plw, psw = [], {}, {}
-        for date, grp in df_test.groupby('date'):
-            nyse = grp[grp['exchcd'] == 1][score_col].dropna()
-            if len(nyse) < 10: continue
-            lo, hi = nyse.quantile(0.10), nyse.quantile(0.90)
-            L = grp[grp[score_col] >= hi]; S = grp[grp[score_col] <= lo]
-            if L['me'].sum() == 0 or S['me'].sum() == 0: continue
-            lme = L['me'].sum(); nlw = (L.set_index('permno')['me'] / lme).to_dict()
-            rl = (L['ret_fwd'] * L['me']).sum() / lme
-            sme = S['me'].sum(); nsw = (S.set_index('permno')['me'] / sme).to_dict()
-            rs = (S['ret_fwd'] * S['me']).sum() / sme
-            tl = sum(abs(nlw.get(p, 0) - plw.get(p, 0)) for p in set(nlw) | set(plw)) / 2
-            ts = sum(abs(nsw.get(p, 0) - psw.get(p, 0)) for p in set(nsw) | set(psw)) / 2
-            monthly.append({'date': date, 'ret': rl - rs - fee * (tl + ts)})
-            plw, psw = nlw, nsw
-        if not monthly: return pd.Series(dtype=float)
-        return pd.DataFrame(monthly).set_index('date')['ret']
-
-    train = art['train'].copy()
-    X_tr = train[REDUCED].values.astype(float)
-    X_te = test[REDUCED].values.astype(float)
-    y_tr = train['ret_fwd'].values.astype(float)
-
-    # Ensemble XGB
-    preds = np.zeros(len(X_te))
-    for xs in XGB_SEEDS[:5]:
-        xgb = XGBRegressor(n_estimators=N_ESTIMATORS, max_depth=MAX_DEPTH,
-                           learning_rate=LEARNING_RATE, subsample=SUBSAMPLE,
-                           colsample_bytree=COLSAMPLE, tree_method='hist',
-                           random_state=xs, verbosity=0)
-        xgb.fit(X_tr, y_tr)
-        preds += xgb.predict(X_te)
-    preds /= 5
-    test['score'] = preds
-    r_strat = long_short_port(test, 'score')
-    r_strat.to_pickle('data/ls_strategy_returns.pkl')
-    print("  Computed and saved L/S strategy returns")
+test['score'] = test['score_xgb']
+r_strat = long_short_port(test, 'score')
 
 # Align returns with regime data
 pi_aligned = pi_monthly.reindex(r_strat.index)['pi_filter'].fillna(0.5)

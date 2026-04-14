@@ -42,24 +42,9 @@ FEE = TRADING_FEE
 # Get regime classification for each month
 pi_monthly = panel[['date', 'pi_filter']].dropna().drop_duplicates('date').set_index('date')
 
-# Train XGB ensemble
-from xgboost import XGBRegressor
-
-X_tr = train[REDUCED].values.astype(float)
-X_te = test[REDUCED].values.astype(float)
-y_tr = train['ret_fwd'].values.astype(float)
-
-print("\n  Training XGB ensemble ...")
-preds = np.zeros(len(X_te))
-for xs in XGB_SEEDS[:5]:
-    xgb = XGBRegressor(n_estimators=N_ESTIMATORS, max_depth=MAX_DEPTH,
-                       learning_rate=LEARNING_RATE, subsample=SUBSAMPLE,
-                       colsample_bytree=COLSAMPLE, tree_method='hist',
-                       random_state=xs, verbosity=0)
-    xgb.fit(X_tr, y_tr)
-    preds += xgb.predict(X_te)
-preds /= 5
-test['score'] = preds
+# Use production 50-seed ensemble scores from artefacts (no retraining)
+print("\n  Using production XGB scores from artefacts ...")
+test['score'] = test['score_xgb']
 
 # Classify each test month
 test_pi = test.merge(pi_monthly.reset_index()[['date', 'pi_filter']].rename(

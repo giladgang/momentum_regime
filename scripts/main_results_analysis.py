@@ -286,14 +286,9 @@ test['score_lr_red'] = lr_red.predict_proba(X_te_red_s)[:, 1]
 r_lr_red = build_port(test, 'score_lr_red')
 print(f"  M1: LR (mom+pi) — {len(r_lr_red)} monthly obs")
 
-# XGB: fit on reduced features (XGB handles NaN natively)
-y_train_vals = train['ret_fwd'].values.astype(float)
-xgb_red = XGBRegressor(n_estimators=500, max_depth=4, learning_rate=0.05,
-                        subsample=0.8, colsample_bytree=0.8,
-                        tree_method='hist', random_state=42, verbosity=0)
-xgb_red.fit(X_train_red, y_train_vals)
-test['score_xgb_red'] = xgb_red.predict(X_test_red)
-r_xgb_red = build_port(test, 'score_xgb_red')
+# XGB: use the production 50-seed ensemble scores from the artefacts
+# (score_xgb was trained on mom+pi features with 50 seeds averaged)
+r_xgb_red = build_port(test, 'score_xgb')
 print(f"  M2: XGB (mom+pi) — {len(r_xgb_red)} monthly obs")
 
 # ══════════════════════════════════════════════════════════════════════════════
