@@ -106,7 +106,11 @@ GAMMAS = list(range(0, 11))
 results = []
 shap_by_gamma = {}
 
-for gamma in GAMMAS:
+import time
+
+for i_gamma, gamma in enumerate(GAMMAS):
+    if i_gamma > 0:
+        time.sleep(10)  # cool down between runs
     print(f"\n{'='*60}")
     print(f"  gamma = {gamma}")
     print(f"{'='*60}")
@@ -123,7 +127,7 @@ for gamma in GAMMAS:
         # Compute risk-adjusted target and retrain
         y_train_g = train['ret_fwd'].values - (gamma / 2) * train['trail_var'].values
 
-        XGB_SEEDS = list(range(1, 51))
+        XGB_SEEDS = list(range(1, 51))  # 50 seeds (same as production baseline)
         preds = np.zeros(len(X_test))
         last_model = None
         for xs in XGB_SEEDS:
@@ -164,8 +168,10 @@ for gamma in GAMMAS:
     print(f"  Top 5 SHAP: {agg.head(5).to_dict()}")
 
 res_df = pd.DataFrame(results)
+res_df.to_csv('risk_aversion_results.csv', index=False, float_format='%.4f')
 print("\n\nSummary:")
 print(res_df.to_string(index=False))
+print("\nSaved: risk_aversion_results.csv")
 
 # ══════════════════════════════════════════════════════════════════════════════
 # 4. Combined plot
