@@ -179,7 +179,7 @@ The preceding analysis established that the regime signal is essential for long-
 \toprule
 Target family & Parameter & Sharpe & $\pi$ share \\
 \midrule
-Baseline ($r$) & --- & 1.07 & 45\% \\
+Baseline ($r$) & --- & 1.11 & 45\% \\
 \midrule
 \multicolumn{4}{l}{\textit{Sharpe-like: $r\,/\,\sigma^a$}} \\[2pt]
  & $a = 0.5$ & 1.04 & 56\% \\
@@ -194,7 +194,7 @@ Baseline ($r$) & --- & 1.07 & 45\% \\
  & --- & 0.47 & 49\% \\
 \bottomrule
 \end{tabular}
-\caption{Risk-adjusted training targets and regime signal importance. ``$\pi$ share'' is the regime signal's fraction of total feature importance (remainder is momentum). Sharpe ratios use 10 XGB seeds.}
+\caption{Risk-adjusted training targets and regime signal importance. ``$\pi$ share'' is the regime signal's fraction of total feature importance (remainder is momentum). The baseline uses the production 50-seed ensemble; risk-adjusted variants use 10 seeds for computational efficiency.}
 \label{tab:risk_aversion}
 \end{table}
 
