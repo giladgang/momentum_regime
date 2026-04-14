@@ -118,7 +118,7 @@ Twelve trailing momentum signals are computed for each stock, corresponding to l
 \begin{equation}
     \text{mom}_{k,t}^s = \prod_{\ell=1}^{k}(1 + r_{t-\ell}^s) - 1, \qquad k = 1, \dots, 12,
 \end{equation}
-where $r_{t-\ell}^s$ is the adjusted return of stock $s$ in month $t - \ell$. The current month's return is excluded from all lookbacks to avoid mechanical correlation with the forward return being predicted. Including all twelve horizons rather than a single lookback allows the models to learn which horizons are most informative in each regime.
+where $r_{t-\ell}^s$ is the adjusted return of stock $s$ in month $t - \ell$. The current month's return is excluded from all lookbacks to avoid mechanical correlation with the forward return being predicted. Including all twelve horizons rather than a single lookback allows the models to learn how the full momentum term structure interacts with the regime signal.
 
 \paragraph{Regime signal}
 The filtered panic probability $\pi_t^{\text{filter}}$ from the HMM enters as a single feature. Because it varies only at the monthly market level (every stock in the same month receives the same value), it functions as a conditioning variable rather than a stock-level predictor.

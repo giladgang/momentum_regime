@@ -199,7 +199,7 @@ A strategy's net-of-cost performance depends critically on its turnover. Table~\
 
 \input{tables/table_turnover}
 
-In long-short construction, M2's monthly turnover is 103.6\%, substantially higher than in long-only because the strategy must rebalance both legs and regime-conditional switching between continuation and reversal bets changes the portfolio composition substantially. Table~\ref{tab:cost_sensitivity} translates these turnover differences into Sharpe ratio sensitivity across a range of transaction cost assumptions.
+In long-short construction, M2's monthly turnover is 103.6\%, substantially higher than in long-only because the strategy must rebalance both legs and regime-conditional changes in stock selection shift the portfolio composition substantially. Table~\ref{tab:cost_sensitivity} translates these turnover differences into Sharpe ratio sensitivity across a range of transaction cost assumptions.
 
 \input{tables/table_cost_sensitivity}
 
@@ -337,7 +337,7 @@ M2 (XGBoost) & --- & 1.08 & 20.6\% & 19.1\% & $-$22.5\% & 0.80 / 1.50 \\
 \label{tab:ridge}
 \end{table}
 
-The Ridge regression assigns $\pi_t^{\text{filter}}$ a coefficient of $+0.003$, which is positive but economically negligible: a one-standard-deviation increase in the panic probability shifts the predicted return by only 0.3 basis points. The linear model cannot use the regime signal to condition which momentum horizons are informative, regardless of the training target.
+The Ridge regression assigns $\pi_t^{\text{filter}}$ a coefficient of $+0.003$, which is positive but economically negligible: a one-standard-deviation increase in the panic probability shifts the predicted return by only 0.3 basis points. The linear model cannot use the regime signal to condition how the momentum horizons jointly determine the stock ranking, regardless of the training target.
 
 \subsection{M1 Polynomial and Interaction Tests}\label{app:m1_poly}
 
