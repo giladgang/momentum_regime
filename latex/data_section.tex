@@ -82,7 +82,7 @@ In the second pass (\emph{portfolio ranking}), surviving combinations are evalua
 In the third pass (\emph{stability validation}), the finalists are tested for robustness across random seed partitions. A combination that achieves a high Sharpe on one lucky seed combination but collapses on another is unreliable. We run 20 independent experiments with different seed draws and classify combinations as stable ($\sigma < 0.10$), moderate ($0.10 \leq \sigma < 0.15$), or unstable ($\sigma \geq 0.15$).
 
 \paragraph{Selected features}
-The four-feature combination DD+DISP+REL\_N+CS is selected as the most stable. With the production configuration (200 HMM seeds), it achieves a long-short Sharpe of 1.08 ($\sigma = 0.08$ across independent seed partitions; Section~\ref{sec:results}).
+The four-feature combination DD+DISP+REL\_N+CS ranks first on both ensemble Sharpe and stability mean (Table~\ref{tab:feature_selection}). The Sharpe ratios in the table are based on the selection pipeline's seed budget (10 HMM seeds, 20 XGBoost seeds); the production configuration (200 HMM seeds, 50 XGBoost seeds) raises the Sharpe to 1.08 ($\sigma = 0.08$; Section~\ref{sec:results}) because additional seed averaging reduces MCMC and model noise.
 
 \input{tables/table_feature_selection}
 
