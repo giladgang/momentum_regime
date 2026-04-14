@@ -311,6 +311,34 @@ A further concern is that XGBoost's improvement from adding $\pi_t^{\text{filter
 
 The real HMM signal more than doubles the Sharpe ratio (1.08 vs.\ 0.48 without), confirming that the regime signal's contribution is specific and economically meaningful.
 
+\subsection{Ridge Regression Baseline}\label{app:ridge}
+
+To isolate the effect of linearity from the choice of training target, a Ridge regression is estimated on the same 13 standardised features as M1 and M2, predicting continuous forward returns (the same target as XGBoost). Table~\ref{tab:ridge} reports results across a range of regularisation strengths.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{l r r r r r r}
+\toprule
+Model & $\alpha$ & Sharpe & Ann.\ Ret & Ann.\ Vol & MDD & Calm / Panic SR \\
+\midrule
+OLS (no reg.) & --- & $-$0.57 & $-$10.9\% & 17.4\% & $-$81.7\% & $-$0.60 / $-$0.55 \\
+Ridge & 0.1 & $-$0.57 & $-$10.9\% & 17.4\% & $-$81.7\% & $-$0.60 / $-$0.55 \\
+Ridge & 1.0 & $-$0.57 & $-$10.9\% & 17.4\% & $-$81.7\% & $-$0.60 / $-$0.55 \\
+Ridge & 10 & $-$0.57 & $-$10.9\% & 17.4\% & $-$81.7\% & $-$0.60 / $-$0.55 \\
+Ridge & 100 & $-$0.57 & $-$10.9\% & 17.4\% & $-$81.6\% & $-$0.60 / $-$0.55 \\
+Ridge & 1{,}000 & $-$0.54 & $-$10.5\% & 17.5\% & $-$80.1\% & $-$0.60 / $-$0.47 \\
+\midrule
+M1 (LR, classification) & --- & $-$0.03 & $-$1.6\% & 15.1\% & $-$44.1\% & $-$0.30 / 0.35 \\
+M2 (XGBoost) & --- & 1.08 & 20.6\% & 19.1\% & $-$22.5\% & 0.80 / 1.50 \\
+\bottomrule
+\end{tabular}
+\caption{Ridge regression baseline: a linear model predicting continuous forward returns (same target as M2). The Sharpe ratio of $-$0.57 is robust across all regularisation strengths and is worse than M1's $-$0.03, confirming that M1's failure is driven by linearity, not the classification target. The classification target actually limits the damage by compressing scores into a narrow probability band.}
+\label{tab:ridge}
+\end{table}
+
+The Ridge regression assigns $\pi_t^{\text{filter}}$ a coefficient of $+0.003$, which is positive but economically negligible: a one-standard-deviation increase in the panic probability shifts the predicted return by only 0.3 basis points. The linear model cannot use the regime signal to condition which momentum horizons are informative, regardless of the training target.
+
 \subsection{M1 Polynomial and Interaction Tests}\label{app:m1_poly}
 
 To rule out the possibility that M1's failure is due to insufficient flexibility rather than a fundamental limitation of linear models, the logistic regression is augmented with polynomial terms ($\pi^2$, $\pi^3$, $\pi^4$) and explicit interaction terms ($\pi \times mom_k$ for all 12 horizons). The polynomial terms leave the Sharpe near zero, while the interaction terms recover only a fraction of M2's performance. This confirms that the regime-momentum interaction involves higher-order conditional logic that tree-based models capture but linear models, even with augmented feature spaces, cannot.
@@ -346,6 +374,22 @@ Normal & $-$1046.4 & $-$862.6 & \textbf{2257.3} & --- & --- \\
 \end{table}
 
 The Normal model achieves the lowest BIC (2257.3 vs.\ 2257.6 for the best Student-$t$ at $\nu = 100$), indicating no meaningful improvement from heavier tails. Regime classifications agree with the Normal HMM on at least 97.8\% of months across all $\nu$ values, and the correlation of filtered panic probabilities exceeds 0.98 everywhere. These results confirm that the Gaussian emission specification is robust for this application.
+
+\section{Label Switching: Sign Correction Procedure}\label{app:label_switching}
+
+Because the four HMM features respond to stress in different directions, the expected direction of each feature during stress is determined empirically. For each feature $j$, the 95th percentile is computed separately on training months falling within known crisis windows (the dot-com bust of 2000--2002 and the Global Financial Crisis of 2007--2009) and on all remaining training months:
+\begin{equation}
+\text{sign}_j =
+\begin{cases}
++1 & \text{if } q_{0.95}^{\text{crisis}}(z_j) \geq q_{0.95}^{\text{normal}}(z_j), \\
+-1 & \text{otherwise}.
+\end{cases}
+\end{equation}
+Features that spike upward during crises receive $\text{sign}_j = +1$; features that decline receive $\text{sign}_j = -1$. The panic state is then identified as the regime $k \in \{0, 1\}$ whose posterior mean vector $\hat{\boldsymbol{\mu}}_k$ best aligns with the crisis direction:
+\begin{equation}
+k^\ast = \arg\max_{k \in \{0,1\}} \sum_{j=1}^{D} \text{sign}_j \cdot \hat{\mu}_{k,j}.
+\end{equation}
+The state labelled $k^\ast$ is designated as ``panic'' and the other as ``calm.''
 
 \section{Convergence Diagnostics}\label{app:convergence}
 

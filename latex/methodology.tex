@@ -285,8 +285,16 @@ where $h_m$ is the $m$-th decision tree and $\eta$ is the learning rate that shr
 
 A maximum depth of 4 allows the model to capture pairwise and higher-order interactions. Critically, this means XGBoost can learn splits that condition on $\pi_t^{\text{filter}}$ and then branch on momentum horizons differently within each regime, without requiring explicit interaction terms.
 
+\paragraph{Isolating Linearity from the Training Target}\label{sec:target_confound}
+
+Methods~1 and~2 differ not only in functional form (linear vs.\ nonlinear) but also in their training targets: M1 predicts a binary classification label, while M2 predicts the continuous forward return. To ensure that any performance difference reflects linearity rather than the choice of target, a Ridge regression baseline is included. Ridge regression is a linear model (identical functional form to logistic regression) that predicts continuous forward returns (identical target to XGBoost), using the same 13 standardised features:
+\begin{equation}
+    \hat{r}_{t+1}^s = \boldsymbol{\beta}^\top \tilde{\mathbf{x}}_t^s, \qquad \hat{\boldsymbol{\beta}} = \arg\min_{\boldsymbol{\beta}} \left[\sum_i (r_{i,t+1} - \boldsymbol{\beta}^\top \tilde{\mathbf{x}}_i)^2 + \alpha \|\boldsymbol{\beta}\|_2^2\right],
+\end{equation}
+with $\alpha = 1.0$. Results are robust across regularisation strengths from $\alpha = 0.01$ to $\alpha = 1{,}000$ (Appendix~\ref{app:ridge}). If Ridge regression succeeds where logistic regression fails, the classification target is the bottleneck; if both linear models fail, linearity itself is the constraint.
+
 \paragraph{The Role of $\pi_t^{\text{filter}}$}\label{sec:pi_context}
 
-A key distinction between Methods~1 and~2 lies in how each model uses the regime signal. Logistic regression assigns $\pi_t^{\text{filter}}$ a single linear coefficient, which is near zero because the regime signal is not a direct return predictor. XGBoost, by contrast, uses $\pi_t^{\text{filter}}$ as a \emph{context variable} through tree splits, conditioning its use of momentum horizons on the current market state. This interaction effect cannot be represented by a single linear coefficient. The empirical consequences of this distinction are analysed in Section~\ref{sec:shap_results}.
+A key distinction between the linear models (M1 and Ridge) and M2 lies in how each model uses the regime signal. A linear model assigns $\pi_t^{\text{filter}}$ a single coefficient, which is near zero because the regime signal is not a direct return predictor. XGBoost, by contrast, uses $\pi_t^{\text{filter}}$ as a context variable through tree splits, conditioning its use of momentum horizons on the current market state. This interaction effect, well-known in the machine learning literature \citep{Gu2020}, cannot be represented by a single linear coefficient. The empirical consequences of this distinction are analysed in Section~\ref{sec:shap_results}.
 
 With the two-stage framework in place, the next section describes the data, sample construction, and the feature selection procedure used to choose the HMM's input features.
