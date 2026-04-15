@@ -100,18 +100,11 @@ The pattern is striking. In calm months, all 12 horizons have positive, signific
 
 \subsection{Feature Importance Decomposition}\label{sec:shap_results}
 
-To understand how XGBoost uses each feature, we apply SHAP \citep[SHapley Additive exPlanations;][]{Lundberg2017}. For each stock-month prediction, SHAP decomposes the predicted return into contributions from each of the 13 features. It does this by asking, for each feature: across all possible subsets of the other 12 features, how much does adding this feature change the prediction? The average of these marginal contributions, weighted to ensure fairness, is the feature's SHAP value for that observation. The key property is additivity: the SHAP values of all 13 features sum exactly to the difference between the stock's predicted return and the average prediction, so every basis point is accounted for (see Appendix~\ref{app:shap} for the formal definition). The mean absolute SHAP value across all test-set observations measures a feature's overall importance: a higher value means the feature has a larger average effect on the model's output (Table~\ref{tab:shap} and Figure~\ref{fig:shap_importance}).
+To understand how XGBoost uses each feature, we apply SHAP \citep[SHapley Additive exPlanations;][]{Lundberg2017}. For each stock-month prediction, SHAP decomposes the predicted return into contributions from each of the 13 features. It does this by asking, for each feature: across all possible subsets of the other 12 features, how much does adding this feature change the prediction? The average of these marginal contributions, weighted to ensure fairness, is the feature's SHAP value for that observation. The key property is additivity: the SHAP values of all 13 features sum exactly to the difference between the stock's predicted return and the average prediction, so every basis point is accounted for (see Appendix~\ref{app:shap} for the formal definition). The mean absolute SHAP value across all test-set observations measures a feature's overall importance: a higher value means the feature has a larger average effect on the model's output (Table~\ref{tab:shap}).
 
 \input{tables/table_shap}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{cs_feature_importance.png}
-    \caption{Mean absolute SHAP values for the XGBoost model (M2), decomposed by calm and panic months. The regime signal $\pi_t^{\text{filter}}$ is the second most important feature after aggregate momentum, and all features increase in importance during panic.}
-    \label{fig:shap_importance}
-\end{figure}
-
-The regime signal $\pi_t^{\text{filter}}$ is the second most important feature after aggregate momentum, with importance that increases from calm to panic months. This confirms that XGBoost relies more heavily on the regime signal precisely when markets are stressed, consistent with the IC analysis documented above.
+The regime signal $\pi_t^{\text{filter}}$ is the second most important feature after aggregate momentum (Table~\ref{tab:shap}), with importance that increases from calm to panic months. This confirms that XGBoost relies more heavily on the regime signal precisely when markets are stressed, consistent with the IC analysis documented above.
 
 An important implication is that the regime-momentum interaction cannot be decomposed into per-horizon changes. SHAP dependence analysis (examining each momentum horizon's SHAP contribution as a function of its value, separately for calm and panic) shows that individual horizons do not exhibit a clean slope reversal between regimes. Instead, the model selects stocks based on the \emph{shape} of their momentum term structure -- the pattern across all 12 horizons jointly -- conditioned on the regime signal.
 
