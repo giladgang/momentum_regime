@@ -216,11 +216,13 @@ for regime_val in ['Calm', 'Panic']:
         z_data[(regime_val, leg_val)] = zs
 
 # |SHAP|
-abs_shap_data = {}
+pct_shap = {}
 for regime_val in ['Calm', 'Panic']:
     for leg_val in ['long', 'short']:
         mask = (regime_arr == regime_val) & (leg_arr == leg_val)
-        abs_shap_data[(regime_val, leg_val)] = np.abs(shap_values[mask][:, mom_indices]).mean(axis=0) * 10000
+        abs_shap = np.abs(shap_values[mask][:, mom_indices]).mean(axis=0)
+        total = abs_shap.sum()
+        pct_shap[(regime_val, leg_val)] = abs_shap / total * 100
 
 w = 0.35
 fig, axes = plt.subplots(2, 2, figsize=(16, 10), sharex=True)
@@ -248,9 +250,9 @@ for i, regime_val in enumerate(['Calm', 'Panic']):
 axes[1, 0].sharey(axes[1, 1])
 for i, regime_val in enumerate(['Calm', 'Panic']):
     ax = axes[1, i]
-    ax.bar(x - w/2, abs_shap_data[(regime_val, 'long')], w, label='Long leg',
+    ax.bar(x - w/2, pct_shap[(regime_val, 'long')], w, label='Long leg',
            color='#2196F3', alpha=0.85, edgecolor='white')
-    ax.bar(x + w/2, abs_shap_data[(regime_val, 'short')], w, label='Short leg',
+    ax.bar(x + w/2, pct_shap[(regime_val, 'short')], w, label='Short leg',
            color='#E53935', alpha=0.85, edgecolor='white')
     ax.set_title(f'{regime_val}',
                  fontsize=12, fontweight='bold')
@@ -260,7 +262,7 @@ for i, regime_val in enumerate(['Calm', 'Panic']):
     ax.legend(fontsize=9)
     ax.grid(axis='y', alpha=0.3)
     if i == 0:
-        ax.set_ylabel('Mean |SHAP| (bps)', fontsize=11)
+        ax.set_ylabel('Share of momentum |SHAP| (%)', fontsize=11)
 
 plt.suptitle('Momentum term structure by regime',
              fontsize=14, fontweight='bold', y=1.02)
