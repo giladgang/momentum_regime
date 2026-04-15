@@ -153,8 +153,10 @@ The partial dependence plot (Figure~\ref{fig:pdp_pi}) completes the picture by s
 
 \subsection{Ablation Studies}\label{sec:ablation_results}
 
+While SHAP measures each feature's contribution to individual predictions within the trained model, the ablation studies in this section retrain the model without specific features entirely -- testing whether the model's \emph{learning} depends on them, not just its predictions. A feature could have high SHAP importance but be redundant in an ablation if other features compensate when the model is retrained.
+
 \paragraph{Regime signal removal}
-Removing the regime signal drops M2's Sharpe from 1.11 to 0.41, confirming that the HMM captures decision-relevant information not spanned by the momentum features themselves.
+Removing the regime signal and retraining XGBoost on the 12 momentum features alone drops the Sharpe from 1.11 to 0.41, confirming that the HMM captures decision-relevant information that the momentum features cannot compensate for even when the model is free to adapt.
 
 \paragraph{Linear model confound test}\label{sec:target_confound}
 Because M1 uses a classification target while M2 uses continuous returns, a natural concern is whether M1's failure reflects the choice of training target rather than linearity. A Ridge regression predicting continuous forward returns -- the same target as M2 -- achieves a Sharpe of $-$0.57, even worse than M1's $-$0.03 (Appendix~\ref{app:ridge}). Both linear models fail because they assign $\pi_t^{\text{filter}}$ a single coefficient that cannot capture the conditional logic required to adapt stock selection across regimes.
