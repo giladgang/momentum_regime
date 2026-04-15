@@ -100,7 +100,7 @@ The pattern is striking. In calm months, all 12 horizons have positive, signific
 
 \subsection{Feature Importance Decomposition}\label{sec:shap_results}
 
-To understand how XGBoost uses each feature, we apply SHAP \citep[SHapley Additive exPlanations;][]{Lundberg2017}, a method that assigns each feature a contribution to every individual prediction based on cooperative game theory. The mean absolute SHAP value measures a feature's overall importance: a higher value means the feature has a larger average effect on the model's output (Table~\ref{tab:shap} and Figure~\ref{fig:shap_importance}).
+To understand how XGBoost uses each feature, we apply SHAP \citep[SHapley Additive exPlanations;][]{Lundberg2017}. For each stock-month prediction, SHAP decomposes the predicted return into contributions from each of the 13 features. It does this by asking, for each feature: across all possible subsets of the other 12 features, how much does adding this feature change the prediction? The average of these marginal contributions, weighted to ensure fairness, is the feature's SHAP value for that observation. The key property is additivity: the SHAP values of all 13 features sum exactly to the difference between the stock's predicted return and the average prediction, so every basis point is accounted for (see Appendix~\ref{app:shap} for the formal definition). The mean absolute SHAP value across all test-set observations measures a feature's overall importance: a higher value means the feature has a larger average effect on the model's output (Table~\ref{tab:shap} and Figure~\ref{fig:shap_importance}).
 
 \input{tables/table_shap}
 
