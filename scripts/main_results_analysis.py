@@ -169,6 +169,9 @@ def sig_stars(p):
 
 
 def write_tex(filename, content):
+    import re
+    # Escape unescaped % signs in data (digit followed by % not preceded by \)
+    content = re.sub(r'(\d)%', r'\1\\%', content)
     path = os.path.join(TABLES_DIR, filename)
     with open(path, 'w') as f:
         f.write(content)
