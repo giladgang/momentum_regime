@@ -128,7 +128,7 @@ To illustrate concretely: consider two stocks with identical 12-month momentum o
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{zscore_and_absshap_v3.png}
-    \caption{Top panels: cross-sectional z-score of stocks selected for the long and short legs at each momentum lookback horizon. A z-score of $+0.39$ means the selected stocks are 0.39 standard deviations above the cross-sectional average at that horizon. Bottom panels: mean $|$SHAP$|$ contribution of each horizon. In calm, the z-score curve is humped (peaking at intermediate horizons); in panic, it is flat and negative (uniformly below average). The $|$SHAP$|$ distribution is similar across regimes, confirming that the model uses the same horizons but selects from opposite sides of the distribution.}
+    \caption{Momentum term structure by regime. \emph{Top panels:} cross-sectional z-score of stocks selected for the long and short legs at each momentum lookback horizon. A z-score of $+0.39$ means the selected stocks are 0.39 standard deviations above the cross-sectional average at that horizon. In calm, the long leg's z-score curve is humped (peaking at month~8, consistent with \citet{NovyMarx2012}); in panic, it is flat and negative (uniformly below average). \emph{Bottom panels:} mean $|$SHAP$|$ contribution of each horizon, measuring how much the model relies on each lookback. The distribution is broadly similar across regimes, confirming that the model uses the same horizons but selects from opposite sides of the distribution.}
     \label{fig:term_structure}
 \end{figure}
 

@@ -237,8 +237,7 @@ for i, regime_val in enumerate(['Calm', 'Panic']):
     ax.fill_between(x, z_data[(regime_val, 'long')], 0, alpha=0.08, color='#2196F3')
     ax.fill_between(x, z_data[(regime_val, 'short')], 0, alpha=0.08, color='#E53935')
     n = 108 if regime_val == 'Calm' else 59
-    ax.set_title(f'{regime_val} ({n} months): which stocks are selected\n'
-                 f'(momentum z-score vs cross-section)',
+    ax.set_title(f'{regime_val} ({n} months)',
                  fontsize=12, fontweight='bold')
     ax.legend(fontsize=9)
     ax.grid(alpha=0.3)
@@ -253,8 +252,7 @@ for i, regime_val in enumerate(['Calm', 'Panic']):
            color='#2196F3', alpha=0.85, edgecolor='white')
     ax.bar(x + w/2, abs_shap_data[(regime_val, 'short')], w, label='Short leg',
            color='#E53935', alpha=0.85, edgecolor='white')
-    ax.set_title(f'{regime_val}: feature importance by horizon\n'
-                 f'(mean |SHAP| contribution)',
+    ax.set_title(f'{regime_val}',
                  fontsize=12, fontweight='bold')
     ax.set_xticks(x)
     ax.set_xticklabels([f'{h}' for h in horizons], fontsize=10)
@@ -264,7 +262,7 @@ for i, regime_val in enumerate(['Calm', 'Panic']):
     if i == 0:
         ax.set_ylabel('Mean |SHAP| (bps)', fontsize=11)
 
-plt.suptitle('Momentum term structure: stock selection (top) and feature importance (bottom)',
+plt.suptitle('Momentum term structure by regime',
              fontsize=14, fontweight='bold', y=1.02)
 plt.tight_layout()
 fig.savefig('zscore_and_absshap_v3.png', dpi=150, bbox_inches='tight')
