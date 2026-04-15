@@ -128,6 +128,9 @@ def main():
 
         14: ('scripts/depth_vs_sharpe.py',
              'STEP 14: Tree depth analysis (interaction order requirements)'),
+
+        15: ('scripts/tree_path_analysis.py',
+             'STEP 15: Tree path analysis (momentum decision paths by regime and leg)'),
     }
 
     if args.step > 0:
