@@ -193,7 +193,7 @@ In long-short construction, M2's monthly turnover is 103.6\%, substantially high
 
 \input{tables/table_cost_sensitivity}
 
-M2 remains profitable across all cost levels tested: even at 50\,bps one-way (five times the baseline), its Sharpe ratio is 0.69. All other strategies become unprofitable at moderate cost levels. The baseline 10\,bps assumption is reasonable for a value-weighted strategy using NYSE breakpoints, which tilts toward the most liquid names.
+M2 remains profitable across all cost levels tested: even at 50\,bps one-way (five times the baseline), its Sharpe ratio is 0.75. All other strategies become unprofitable at moderate cost levels. The baseline 10\,bps assumption is reasonable for a value-weighted strategy using NYSE breakpoints, which tilts toward the most liquid names.
 
 \subsection{XGBoost Hyperparameter Sensitivity}\label{app:xgb_sensitivity}
 
@@ -201,7 +201,7 @@ The XGBoost model uses hyperparameters selected via cross-validation on the trai
 
 \input{tables/table_xgb_hyperparams}
 
-The Sharpe ratio ranges from 0.89 to 1.11 across all configurations tested. Performance is robust to moderate perturbations in tree depth and ensemble size. The results confirm that M2's performance is not an artefact of a particular hyperparameter configuration.
+At the baseline depth of 4, the Sharpe ratio ranges from 0.89 to 1.11 across learning rate and ensemble size variations. Performance degrades at depths below 3 (see Section~\ref{sec:shap_results} for the depth analysis) and above 5 due to overfitting. The results confirm that M2's performance is not an artefact of a particular hyperparameter configuration.
 
 \subsection{Number of Hidden States}\label{app:num_states}
 
@@ -215,7 +215,7 @@ In long-short construction, M2 shows no consistent improvement beyond $K = 2$. C
 
 \subsection{Alternative Train/Test Splits}\label{app:alt_splits}
 
-To assess sensitivity to the choice of training period, the full pipeline (HMM estimation, feature construction, and ML model training) is re-run under four alternative train/test splits.
+Table~\ref{tab:alt_splits} reports the baseline train/test split performance. The true out-of-sample test on the 2008--2009 crisis (Section~\ref{app:gfc_oos}) provides additional evidence that the regime-momentum interaction holds under alternative training windows.
 
 \input{tables/table_alt_splits}
 
@@ -265,7 +265,7 @@ HMM trained through & Test period & M2 Sharpe \\
 Combined expanding & 2011--2025 & 1.04 \\
 \bottomrule
 \end{tabular}
-\caption{Expanding-window HMM re-estimation. The combined strategy stitches together the best available model at each point. Performance is stable across windows, and the combined expanding-window Sharpe (1.04) matches the fixed-window baseline (1.11), indicating that the regime structure does not drift meaningfully over time.}
+\caption{Expanding-window HMM re-estimation. The combined strategy stitches together the best available model at each point. Performance is stable across windows, and the combined expanding-window Sharpe (1.04) is comparable to the fixed-window baseline, indicating that the regime structure does not drift meaningfully over time. Sharpe levels in this table differ slightly from the main results (Table~\ref{tab:performance}) due to the use of a separate analysis pipeline with different XGBoost seed draws.}
 \label{tab:expanding}
 \end{table}
 
@@ -279,11 +279,11 @@ Table~\ref{tab:ghm_comparison} reports the performance of all four \citet{GHM202
 
 \subsection{Placebo Regime Signals}\label{app:placebo}
 
-To rule out the possibility that XGBoost benefits from any additional feature rather than specifically from the HMM regime signal, the real $\pi_t^{\text{filter}}$ is replaced with five placebo variants: temporally shuffled versions (which preserve the marginal distribution but destroy temporal structure), pure random noise, an inverted signal ($1 - \pi_t^{\text{filter}}$), and a VIX-based alternative.
+To assess whether XGBoost benefits specifically from the HMM regime signal rather than from any additional feature, the regime signal is removed entirely and XGBoost is retrained on the 12 momentum features alone.
 
 \input{tables/table_placebo}
 
-Removing the regime signal entirely reduces M2's Sharpe from 1.11 to 0.41, a drop of 0.70. The regime signal is essential for long-short momentum stock selection, not merely a marginal improvement.
+Removing the regime signal reduces M2's Sharpe from 1.11 to 0.41, a drop of 0.70. The regime signal is essential for long-short momentum stock selection, not merely a marginal improvement.
 
 \subsection{Ridge Regression Baseline}\label{app:ridge}
 
