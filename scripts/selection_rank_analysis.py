@@ -264,7 +264,7 @@ for i, regime_val in enumerate(['Calm', 'Panic']):
     if i == 0:
         ax.set_ylabel('Share of momentum |SHAP| (%)', fontsize=11)
 
-plt.suptitle('Momentum term structure by regime',
+plt.suptitle('Momentum term structure by regime: stock selection and feature importance',
              fontsize=14, fontweight='bold', y=1.02)
 plt.tight_layout()
 fig.savefig('zscore_and_absshap_v3.png', dpi=150, bbox_inches='tight')
