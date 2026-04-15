@@ -996,6 +996,42 @@ preds_ghm /= len(XGB_SEEDS)
 test_ghm['score_ghm_xgb'] = preds_ghm
 r_ghm_xgb = build_port(test_ghm, 'score_ghm_xgb')
 
+# Raw HMM features (DD, DISP, REL_N, CS) without HMM processing
+print("  Training XGB with raw HMM features (no pi_filter) ...")
+HMM_RAW_FEATURES = ['DD_z', 'DISP_z', 'REL_N_z', 'CS_z']
+
+# Load raw HMM features from panel
+panel_raw = panel[['date'] + HMM_RAW_FEATURES].dropna()
+
+train_raw = train.copy().merge(panel_raw, on='date', how='left')
+test_raw = test.copy().merge(panel_raw, on='date', how='left')
+for col in HMM_RAW_FEATURES:
+    med = train_raw[col].median()
+    train_raw[col] = train_raw[col].fillna(med)
+    test_raw[col] = test_raw[col].fillna(med)
+
+RAW_FEATURES = MOM_FEATURES + HMM_RAW_FEATURES
+X_tr_raw_hmm = train_raw[RAW_FEATURES].values.astype(float)
+X_te_raw_hmm = test_raw[RAW_FEATURES].values.astype(float)
+for j in range(X_tr_raw_hmm.shape[1]):
+    col_med = np.nanmedian(X_tr_raw_hmm[:, j])
+    X_tr_raw_hmm[np.isnan(X_tr_raw_hmm[:, j]), j] = col_med
+    X_te_raw_hmm[np.isnan(X_te_raw_hmm[:, j]), j] = col_med
+
+preds_raw_hmm = np.zeros(len(X_te_raw_hmm))
+for xs in XGB_SEEDS:
+    xgb_raw = XGBRegressor(n_estimators=N_ESTIMATORS, max_depth=MAX_DEPTH,
+                           learning_rate=LEARNING_RATE, subsample=SUBSAMPLE,
+                           colsample_bytree=COLSAMPLE, tree_method='hist',
+                           random_state=xs, verbosity=0)
+    xgb_raw.fit(X_tr_raw_hmm, y_tr_val)
+    preds_raw_hmm += xgb_raw.predict(X_te_raw_hmm)
+preds_raw_hmm /= len(XGB_SEEDS)
+test_raw['score_raw_hmm'] = preds_raw_hmm
+r_raw_hmm = build_port(test_raw, 'score_raw_hmm')
+ar_raw, av_raw, sh_raw, mdd_raw, _ = metrics(r_raw_hmm)
+print(f"  Raw HMM features: Sharpe={sh_raw:.3f}  Ann.Ret={ar_raw:.1%}")
+
 ar_hmm, av_hmm, sh_hmm, mdd_hmm, _ = metrics(r_xgb_red)
 ar_ghm_x, av_ghm_x, sh_ghm_x, mdd_ghm_x, _ = metrics(r_ghm_xgb)
 ar_no, av_no, sh_no, mdd_no, _ = metrics(r_no_pi)
@@ -1009,13 +1045,14 @@ tex_lines.append(r"\toprule")
 tex_lines.append(r"Regime Signal Variant & Ann.\ Ret & Ann.\ Vol & Sharpe & Max DD \\")
 tex_lines.append(r"\midrule")
 tex_lines.append(f"XGB + $\\pi_t^{{\\text{{filter}}}}$ (HMM)   & {ar_hmm:.1%} & {av_hmm:.1%} & {sh_hmm:.3f} & $-${abs(mdd_hmm):.1%} \\\\")
+tex_lines.append(f"XGB + raw stress indicators              & {ar_raw:.1%} & {av_raw:.1%} & {sh_raw:.3f} & $-${abs(mdd_raw):.1%} \\\\")
 tex_lines.append(f"XGB + GHM cycle                         & {ar_ghm_x:.1%} & {av_ghm_x:.1%} & {sh_ghm_x:.3f} & $-${abs(mdd_ghm_x):.1%} \\\\")
 tex_lines.append(f"XGB (no regime signal)                   & {ar_no:.1%} & {av_no:.1%} & {sh_no:.3f} & $-${abs(mdd_no):.1%} \\\\")
 tex_lines.append(r"\midrule")
-tex_lines.append(f"\\multicolumn{{5}}{{l}}{{\\footnotesize Sharpe difference: HMM vs GHM = {sh_hmm-sh_ghm_x:+.3f}; HMM vs None = {sh_hmm-sh_no:+.3f}; GHM vs None = {sh_ghm_x-sh_no:+.3f}}} \\\\")
+tex_lines.append(f"\\multicolumn{{5}}{{l}}{{\\footnotesize Sharpe difference: HMM vs Raw = {sh_hmm-sh_raw:+.3f}; HMM vs GHM = {sh_hmm-sh_ghm_x:+.3f}; HMM vs None = {sh_hmm-sh_no:+.3f}}} \\\\")
 tex_lines.append(r"\bottomrule")
 tex_lines.append(r"\end{tabular}")
-tex_lines.append(r"\caption{Regime signal ablation: XGBoost performance with alternative regime indicators (50-seed ensemble). The HMM filtered probability ($\pi_t^{\text{filter}}$) is replaced by the GHM market-cycle variable or removed entirely. The HMM signal produces the highest Sharpe ratio.}")
+tex_lines.append(r"\caption{Regime signal ablation: XGBoost performance with alternative regime indicators (50-seed ensemble). The HMM filtered probability ($\pi_t^{\text{filter}}$) is replaced by the four raw stress indicators (DD, DISP, REL\_N, CS) without HMM processing, the GHM market-cycle variable, or removed entirely.}")
 tex_lines.append(r"\label{tab:regime_signal_ablation}")
 tex_lines.append(r"\end{table}")
 write_tex('table_regime_signal_ablation.tex', '\n'.join(tex_lines))
