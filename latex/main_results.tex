@@ -33,7 +33,7 @@ Decomposing performance by market regime reveals how M2 uses momentum differentl
 
 \input{tables/table_regime_sharpe}
 
-To understand this regime dependence, we decompose M2's predictions using two complementary tools: SHAP values \citep{Lundberg2017}, which measure how much each horizon contributes to the prediction (see Appendix~\ref{app:shap}), and cross-sectional z-scores, which measure where in the distribution the model selects at each horizon. Table~\ref{tab:shap} reports aggregate feature importance: the regime signal $\pi_t^{\text{filter}}$ accounts for 45\% of total importance, comparable to the combined contribution of all 12 momentum horizons, with its importance increasing from calm to panic months.
+To open the black box of M2's regime-conditional decisions, we decompose its predictions using two complementary tools: SHAP values \citep{Lundberg2017}, which measure how much each horizon contributes to the prediction (see Appendix~\ref{app:shap}), and cross-sectional z-scores, which measure where in the distribution the model selects at each horizon. Table~\ref{tab:shap} reports aggregate feature importance: the regime signal $\pi_t^{\text{filter}}$ accounts for 45\% of total importance, comparable to the combined contribution of all 12 momentum horizons, with its importance increasing from calm to panic months.
 
 \input{tables/table_shap}
 
@@ -75,7 +75,7 @@ The central finding is the panic long leg's uniformly negative z-scores. To our 
 
 This mechanism contrasts with the managed momentum approach of \citet{DanielMoskowitz2016}, who proposed scaling portfolio \emph{exposure} when crash risk is elevated. M2 instead reconstructs the portfolio by selecting from the opposite tail of the distribution (Section~\ref{sec:ablation_results} provides a quantitative comparison).
 
-SHAP horizon weights remain broadly stable across regimes while the z-score direction flips, confirming that the regime signal functions as a context switch rather than a feature reweighting mechanism. The one exception is month~1, where SHAP weight increases from 4.8\% to 7.0\% in panic -- consistent with the increased value of short-term liquidity provision during crises documented by \citet{Nagel2012}. The model nonetheless treats month~1 as a supporting signal: months 8--12 still account for over 60\% of total momentum SHAP even in panic.
+SHAP horizon weights remain broadly stable across regimes while the z-score direction flips, confirming that the regime signal functions as a context switch rather than a feature reweighting mechanism. The one exception is month~1, where SHAP weight roughly doubles in panic, particularly on the short side, consistent with the increased value of short-term liquidity provision during crises \citep{Nagel2012}. Months 8--12 nonetheless account for over 60\% of total momentum SHAP even in panic.
 
 \subsubsection{Tree Path Analysis}\label{sec:tree_paths}
 
