@@ -196,24 +196,31 @@ mom_indices = [FEATURES.index(f'mom_{h}') for h in horizons]
 regime_arr = test_pi['regime'].values
 leg_arr = test_pi['leg'].values
 
-# Z-scores
+# Z-scores (mean and std across stocks)
 z_data = {}
+z_std = {}
 for regime_val in ['Calm', 'Panic']:
     for leg_val in ['long', 'short']:
-        zs = []
+        zs_mean = []
+        zs_std = []
         for h in horizons:
             col = f'mom_{h}'
             mask = test_pi['regime'] == regime_val
-            monthly_z = []
+            monthly_z_mean = []
+            monthly_z_std = []
             for date, grp in test_pi[mask].groupby('date'):
                 leg_mask = grp['leg'] == leg_val
                 if leg_mask.sum() == 0: continue
                 mean = grp[col].mean()
                 std = grp[col].std()
                 if std > 0:
-                    monthly_z.append((grp.loc[leg_mask, col].mean() - mean) / std)
-            zs.append(np.mean(monthly_z))
-        z_data[(regime_val, leg_val)] = zs
+                    stock_zs = (grp.loc[leg_mask, col] - mean) / std
+                    monthly_z_mean.append(stock_zs.mean())
+                    monthly_z_std.append(stock_zs.std() / np.sqrt(len(stock_zs)))
+            zs_mean.append(np.mean(monthly_z_mean))
+            zs_std.append(np.mean(monthly_z_std))
+        z_data[(regime_val, leg_val)] = zs_mean
+        z_std[(regime_val, leg_val)] = zs_std
 
 # |SHAP| per leg, each leg sums to 100%
 pct_shap = {}
@@ -235,8 +242,12 @@ for i, regime_val in enumerate(['Calm', 'Panic']):
     ax.plot(x, z_data[(regime_val, 'short')], 's-', color='#E53935', linewidth=2.5,
             markersize=8, label='Short leg', zorder=5)
     ax.axhline(0, color='black', linewidth=0.8, linestyle='--', alpha=0.5)
-    ax.fill_between(x, z_data[(regime_val, 'long')], 0, alpha=0.08, color='#2196F3')
-    ax.fill_between(x, z_data[(regime_val, 'short')], 0, alpha=0.08, color='#E53935')
+    long_mean = np.array(z_data[(regime_val, 'long')])
+    long_sd = np.array(z_std[(regime_val, 'long')])
+    short_mean = np.array(z_data[(regime_val, 'short')])
+    short_sd = np.array(z_std[(regime_val, 'short')])
+    ax.fill_between(x, long_mean - long_sd, long_mean + long_sd, alpha=0.12, color='#2196F3')
+    ax.fill_between(x, short_mean - short_sd, short_mean + short_sd, alpha=0.12, color='#E53935')
     n = 108 if regime_val == 'Calm' else 59
     ax.set_title(f'{regime_val} ({n} months)',
                  fontsize=12, fontweight='bold')
