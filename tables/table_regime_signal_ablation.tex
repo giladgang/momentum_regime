@@ -6,9 +6,10 @@
 Regime Signal Variant & Ann.\ Ret & Ann.\ Vol & Sharpe & Max DD \\
 \midrule
 XGB + $\pi_t^{\text{filter}}$ (HMM)   & 21.9\% & 19.7\% & 1.109 & $-$24.8\% \\
+XGB + raw indicators (DD, DISP, REL\_N, CS) & 4.1\% & 19.2\% & 0.300 & $-$40.3\% \\
 XGB (no regime signal)                   & 6.4\% & 20.3\% & 0.405 & $-$41.0\% \\
 \bottomrule
 \end{tabular}
-\caption{Regime signal ablation: XGBoost performance with and without the HMM regime signal (50-seed ensemble). Removing $\pi_t^{\text{filter}}$ reduces the Sharpe from 1.11 to 0.41.}
+\caption{Regime signal ablation (50-seed ensemble). The HMM signal outperforms both raw stress indicators and no regime signal.}
 \label{tab:regime_signal_ablation}
 \end{table}
