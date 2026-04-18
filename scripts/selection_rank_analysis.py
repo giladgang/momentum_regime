@@ -281,4 +281,46 @@ fig.savefig('zscore_and_absshap_v3.png', dpi=150, bbox_inches='tight')
 plt.close(fig)
 print("Saved: zscore_and_absshap_v3.png")
 
+# ── Export LaTeX table: table_zscore_shap_detail.tex ──
+TABLES_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'tables')
+os.makedirs(TABLES_DIR, exist_ok=True)
+
+tex_lines = []
+tex_lines.append(r'\begin{table}[H]')
+tex_lines.append(r'\centering')
+tex_lines.append(r'\small')
+tex_lines.append(r'\begin{tabular}{r rr rr rr rr}')
+tex_lines.append(r'\toprule')
+tex_lines.append(r' & \multicolumn{4}{c}{Z-score} & \multicolumn{4}{c}{SHAP share (\%)} \\')
+tex_lines.append(r'\cmidrule(lr){2-5} \cmidrule(lr){6-9}')
+tex_lines.append(r'Horizon & \multicolumn{2}{c}{Calm} & \multicolumn{2}{c}{Panic} & \multicolumn{2}{c}{Calm} & \multicolumn{2}{c}{Panic} \\')
+tex_lines.append(r' & Long & Short & Long & Short & Long & Short & Long & Short \\')
+tex_lines.append(r'\midrule')
+
+for h in horizons:
+    i = h - 1  # index into z_data / pct_shap lists
+    z_cl = z_data[('Calm', 'long')][i]
+    z_cs = z_data[('Calm', 'short')][i]
+    z_pl = z_data[('Panic', 'long')][i]
+    z_ps = z_data[('Panic', 'short')][i]
+    s_cl = pct_shap[('Calm', 'long')][i]
+    s_cs = pct_shap[('Calm', 'short')][i]
+    s_pl = pct_shap[('Panic', 'long')][i]
+    s_ps = pct_shap[('Panic', 'short')][i]
+    tex_lines.append(
+        f'{h} & {z_cl:+.2f} & {z_cs:+.2f} & {z_pl:+.2f} & {z_ps:+.2f} '
+        f'& {s_cl:.1f} & {s_cs:.1f} & {s_pl:.1f} & {s_ps:.1f} \\\\'
+    )
+
+tex_lines.append(r'\bottomrule')
+tex_lines.append(r'\end{tabular}')
+tex_lines.append(r"\caption{Z-score and SHAP share by momentum horizon, regime, and portfolio leg. Z-scores measure how far above or below the cross-sectional average the selected stocks are at each lookback. SHAP share measures each horizon's contribution to the model's momentum decision (each leg sums to 100\%).}")
+tex_lines.append(r'\label{tab:zscore_shap_detail}')
+tex_lines.append(r'\end{table}')
+
+tex_path = os.path.join(TABLES_DIR, 'table_zscore_shap_detail.tex')
+with open(tex_path, 'w') as f:
+    f.write('\n'.join(tex_lines) + '\n')
+print(f"Saved: {tex_path}")
+
 print("Done.")

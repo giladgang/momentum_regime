@@ -64,11 +64,7 @@ The economic basis for this inversion rests on three mechanisms captured by the 
 
 \subsubsection{Discussion}\label{sec:novelty}
 
-The central finding is the panic long leg's uniformly negative z-scores. To our knowledge, no prior study has documented that a momentum-based model, when conditioned on regime, learns to buy losers in panic across the entire term structure. This differs qualitatively from conventional short-term reversal, which targets month~1 only \citep{Jegadeesh1990, Nagel2012}. A stock that is below average at \emph{every} horizon from 1 to 12 months is more likely a victim of indiscriminate selling than of genuine fundamental decline, which would typically appear first at short horizons and propagate outward.
-
-This contrasts with \citet{DanielMoskowitz2016}, who proposed scaling portfolio \emph{exposure} when crash risk is elevated. M2 instead reconstructs the portfolio by selecting from the opposite tail of the distribution (Section~\ref{sec:ablation_results} provides a quantitative comparison).
-
-SHAP horizon weights remain broadly stable across regimes while the z-score direction flips, confirming that the regime signal functions as a context switch rather than a feature reweighting mechanism. The one exception is month~1, where SHAP weight roughly doubles in panic, particularly on the short side. Months 8--12 nonetheless account for over 60\% of total momentum SHAP even in panic.
+To our knowledge, no prior study has documented that a momentum-based model, when conditioned on regime, learns to buy losers in panic across the entire term structure. This differs from conventional short-term reversal \citep{Jegadeesh1990, Nagel2012}, which targets month~1 only. A stock that is below average at \emph{every} horizon from 1 to 12 months is more likely a victim of indiscriminate selling than of genuine fundamental decline, which would typically appear first at short horizons and propagate outward. This contrasts with \citet{DanielMoskowitz2016}, who proposed scaling portfolio \emph{exposure} when crash risk is elevated. M2 instead reconstructs the portfolio by selecting from the opposite tail of the distribution (Section~\ref{sec:ablation_results} provides a quantitative comparison).
 
 \subsubsection{Tree Path Analysis}\label{sec:tree_paths}
 
