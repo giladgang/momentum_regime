@@ -100,15 +100,6 @@ The tree depth analysis provides direct evidence for why multi-dimensional condi
     \label{fig:depth_sharpe}
 \end{figure}
 
-The partial dependence plot (Figure~\ref{fig:pdp_pi}) provides additional evidence by showing how the regime signal itself enters the model's predictions. If $\pi_t^{\text{filter}}$ were a conventional return predictor, the plot would show a monotonic relationship. Instead, it displays a staircase pattern, with predicted returns rising in some ranges and falling in others. Each step corresponds to a tree-split threshold where XGBoost adjusts how it jointly weighs the momentum features. This non-monotonic structure is precisely why the logistic regression assigns $\pi_t^{\text{filter}}$ a near-zero coefficient: a single linear slope through this staircase averages to approximately zero.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.85\textwidth]{cs_pdp_pi_filter.png}
-    \caption{Partial dependence plot of XGBoost predicted return on $\pi_t^{\text{filter}}$. The non-monotonic staircase pattern confirms that $\pi_t^{\text{filter}}$ functions as a context variable rather than a direct return predictor.}
-    \label{fig:pdp_pi}
-\end{figure}
-
 
 \subsection{Ablation Studies}\label{sec:ablation_results}
 
