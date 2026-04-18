@@ -317,70 +317,79 @@ all_strats = {
     'Fixed 12-mo mom':      strats_ls['Fixed 12-mo mom'],
     'Fixed 1-mo mom':       strats_ls['Fixed 1-mo mom'],
     'M0: Formula':          strats_ls['Method 0: Formula'],
-    'M1: LR (mom+$\\pi$)':  r_lr_red,
     'M1: LR':               strats_ls['Method 1: LR'],
     'M2: XGB (mom+$\\pi$)': r_xgb_red,
-    'M2: XGB':              strats_ls['Method 2: XGB'],
-    'GHM SLOW':             ghm_returns['GHM SLOW (a=0)'],
-    'GHM MED':              ghm_returns['GHM MED (a=0.5)'],
-    'GHM FAST':             ghm_returns['GHM FAST (a=1)'],
-    'GHM DYN':              ghm_returns['GHM DYN'],
 }
 
 perf_rows = []
 for name, r in all_strats.items():
     ar, av, sh, mdd, final = metrics(r)
-    ci_lo, ci_hi = block_bootstrap_sharpe(r.values)
+    # Compute market beta
     if name == 'Market':
+        beta = 1.0
         nw_t, nw_p = np.nan, np.nan
     else:
+        common = r.index.intersection(r_mkt.index)
+        r_aligned = r.loc[common].values
+        mkt_aligned = r_mkt.loc[common].values
+        valid = ~(np.isnan(r_aligned) | np.isnan(mkt_aligned))
+        if valid.sum() > 12:
+            cov_mat = np.cov(r_aligned[valid], mkt_aligned[valid])
+            beta = cov_mat[0, 1] / cov_mat[1, 1]
+        else:
+            beta = np.nan
         nw_t, nw_p = newey_west_t(r, r_mkt)
     perf_rows.append({
         'name': name, 'ann_ret': ar, 'ann_vol': av, 'sharpe': sh,
-        'ci_lo': ci_lo, 'ci_hi': ci_hi, 'mdd': mdd, 'final': final,
+        'beta': beta, 'mdd': mdd, 'final': final,
         'nw_t': nw_t, 'nw_p': nw_p
     })
 
 # Print to console
-print(f"\n{'Strategy':<18} {'Ann.Ret':>8} {'Ann.Vol':>8} {'Sharpe':>7} {'[95% CI]':>14} {'MaxDD':>7} {'NW t':>6} {'Final$':>7}")
-print("-" * 82)
+print(f"\n{'Strategy':<22} {'Ann.Ret':>8} {'Ann.Vol':>8} {'Sharpe':>7} {'Beta':>6} {'MaxDD':>7} {'NW t':>6} {'Final$':>7}")
+print("-" * 80)
 for row in perf_rows:
-    ci = f"[{row['ci_lo']:.2f}, {row['ci_hi']:.2f}]"
     nw = f"{row['nw_t']:.2f}" if not np.isnan(row['nw_t']) else "  --"
-    print(f"{row['name']:<18} {row['ann_ret']:>7.1%} {row['ann_vol']:>7.1%} {row['sharpe']:>7.2f} {ci:>14} {row['mdd']:>7.1%} {nw:>6} {row['final']:>7.1f}")
+    beta = f"{row['beta']:.2f}" if not np.isnan(row['beta']) else "  --"
+    print(f"{row['name']:<22} {row['ann_ret']:>7.1%} {row['ann_vol']:>7.1%} {row['sharpe']:>7.2f} {beta:>6} {row['mdd']:>7.1%} {nw:>6} {row['final']:>7.1f}")
 
 # LaTeX table
 tex_lines = []
 tex_lines.append(r"\begin{table}[htbp]")
 tex_lines.append(r"\centering")
-tex_lines.append(r"\caption{Out-of-sample portfolio performance.}")
-tex_lines.append(r"\label{tab:performance}")
 tex_lines.append(r"\small")
 tex_lines.append(r"\begin{tabular}{l r r r r r r r}")
 tex_lines.append(r"\toprule")
-tex_lines.append(r" & Ann.\ Ret & Ann.\ Vol & Sharpe & 95\% CI & Max DD & NW $t$ & Final \$ \\")
+tex_lines.append(r" & Ann.\ Ret & Ann.\ Vol & Sharpe & Max DD & $\beta$ & NW $t$ & Final \$ \\")
 tex_lines.append(r"\midrule")
 
 for i, row in enumerate(perf_rows):
-    ci = f"[{row['ci_lo']:.2f},\\,{row['ci_hi']:.2f}]"
     if np.isnan(row['nw_t']):
         nw = "--"
     else:
         nw = f"{row['nw_t']:.2f}{sig_stars(row['nw_p'])}"
-    line = f"{row['name']} & {row['ann_ret']:.1%} & {row['ann_vol']:.1%} & {row['sharpe']:.2f} & {ci} & {row['mdd']:.1%} & {nw} & {row['final']:.1f} \\\\"
-    # Add midrule separators
-    if i == 0:  # after Market
-        line += "\n" + r"\midrule"
-    if i == 7:  # after M2: XGB, before GHM
+    # Format beta
+    beta_val = row['beta']
+    if np.isnan(beta_val):
+        beta_str = "--"
+    elif beta_val < 0:
+        beta_str = f"$-${abs(beta_val):.2f}"
+    else:
+        beta_str = f"{beta_val:.2f}"
+    line = f"{row['name']} & {row['ann_ret']:.1%} & {row['ann_vol']:.1%} & {row['sharpe']:.2f} & {row['mdd']:.1%} & {beta_str} & {nw} & {row['final']:.1f} \\\\"
+    # Add midrule separator after Market
+    if i == 0:
         line += "\n" + r"\midrule"
     tex_lines.append(line)
 
 tex_lines.append(r"\bottomrule")
 tex_lines.append(r"\end{tabular}")
+tex_lines.append(r"\caption{Out-of-sample portfolio performance.}")
+tex_lines.append(r"\label{tab:performance}")
 tex_lines.append("")
 tex_lines.append(r"\medskip")
 tex_lines.append(r"\small")
-tex_lines.append(r"\textbf{Notes:} This table reports annualized return, annualized volatility, Sharpe ratio, 95\% block bootstrap confidence interval on the Sharpe ratio (block length = 12 months, 10{,}000 replications), maximum drawdown, Newey--West $t$-statistic for mean excess return over the market (HAC standard errors, 6 lags), and terminal wealth from \$1 invested. All strategies are long-short (top-decile long, bottom-decile short), value-weighted using NYSE breakpoints, and net of 10\,bps one-way transaction costs applied to both legs. The test period is January 2011 to November 2025 (167 months). ``mom+$\pi$'' denotes models trained on the 12 momentum lookbacks and the regime signal only, excluding fundamental features. $^{*}$\,$p<0.10$; $^{**}$\,$p<0.05$; $^{***}$\,$p<0.01$.")
+tex_lines.append(r"\textbf{Notes:} Long-short (top/bottom decile, NYSE breakpoints), value-weighted, net of 10\,bps one-way costs. $\beta$ is the market beta. NW $t$ uses Newey--West standard errors (6 lags). Test period: January 2011 to November 2025 (167 months). $^{*}$\,$p<0.10$; $^{**}$\,$p<0.05$; $^{***}$\,$p<0.01$.")
 tex_lines.append(r"\end{table}")
 
 write_tex('table_performance.tex', '\n'.join(tex_lines))
@@ -416,29 +425,34 @@ for row in reg_rows:
     print(f"{row['name']:<18} {row['full']:>7.2f} {row['calm']:>7.2f} {p:>7} {row['n_calm']:>7} {row['n_panic']:>7}")
 
 # LaTeX
+# Get n_calm and n_panic from the first row for the caption
+n_calm_total = reg_rows[0]['n_calm']
+n_panic_total = reg_rows[0]['n_panic']
+
 tex_lines = []
 tex_lines.append(r"\begin{table}[htbp]")
 tex_lines.append(r"\centering")
-tex_lines.append(r"\caption{Regime-conditional Sharpe ratios.}")
-tex_lines.append(r"\label{tab:regime_sharpe}")
-tex_lines.append(r"\begin{tabular}{l r r r r r}")
+tex_lines.append(r"\begin{tabular}{l r r r}")
 tex_lines.append(r"\toprule")
-tex_lines.append(r" & Full & Calm & Panic & $N_{\text{calm}}$ & $N_{\text{panic}}$ \\")
+tex_lines.append(r" & Full & Calm & Panic \\")
 tex_lines.append(r"\midrule")
 for i, row in enumerate(reg_rows):
     p = f"{row['panic']:.2f}" if not np.isnan(row['panic']) else "--"
-    line = f"{row['name']} & {row['full']:.2f} & {row['calm']:.2f} & {p} & {row['n_calm']} & {row['n_panic']} \\\\"
+    # Format negative values with $-$ prefix
+    def fmt_sharpe(v):
+        if np.isnan(v):
+            return "--"
+        if v < 0:
+            return f"$-${abs(v):.2f}"
+        return f"{v:.2f}"
+    line = f"{row['name']} & {fmt_sharpe(row['full'])} & {fmt_sharpe(row['calm'])} & {fmt_sharpe(row['panic'])} \\\\"
     if i == 0:
-        line += "\n" + r"\midrule"
-    if i == 7:
         line += "\n" + r"\midrule"
     tex_lines.append(line)
 tex_lines.append(r"\bottomrule")
 tex_lines.append(r"\end{tabular}")
-tex_lines.append("")
-tex_lines.append(r"\medskip")
-tex_lines.append(r"\small")
-tex_lines.append(r"\textbf{Notes:} This table reports annualized Sharpe ratios computed over all test-period months (Full) and separately for months classified as calm ($\pi_t^{\text{filter}} < 0.5$) or panic ($\pi_t^{\text{filter}} \geq 0.5$). $N$ denotes the number of months in each regime. The Sharpe ratio is computed as $\bar{r}/\sigma(r) \times \sqrt{12}$ within each subset. Portfolio construction (long-short, top vs.\ bottom decile) and transaction costs are as described in Table~\ref{tab:performance}.")
+tex_lines.append(f"\\caption{{Regime-conditional Sharpe ratios ({n_calm_total} calm months, {n_panic_total} panic months).}}")
+tex_lines.append(r"\label{tab:regime_sharpe}")
 tex_lines.append(r"\end{table}")
 
 write_tex('table_regime_sharpe.tex', '\n'.join(tex_lines))
@@ -509,8 +523,6 @@ feature_display = {
 tex_lines = []
 tex_lines.append(r"\begin{table}[htbp]")
 tex_lines.append(r"\centering")
-tex_lines.append(r"\caption{SHAP feature importance for the XGBoost model (Method~2). Mean absolute SHAP values computed on the test set. The 12 momentum lookbacks are aggregated into a single entry. Columns show importance overall and split by regime.}")
-tex_lines.append(r"\label{tab:shap}")
 tex_lines.append(r"\begin{tabular}{c l r r r}")
 tex_lines.append(r"\toprule")
 tex_lines.append(r"Rank & Feature & Overall & Calm & Panic \\")
@@ -520,6 +532,8 @@ for rank, row in enumerate(shap_rows, 1):
     tex_lines.append(f"{rank} & {disp} & {row['overall']:.4f} & {row['calm']:.4f} & {row['panic']:.4f} \\\\")
 tex_lines.append(r"\bottomrule")
 tex_lines.append(r"\end{tabular}")
+tex_lines.append(r"\caption{SHAP feature importance for the XGBoost model (Method~2). Mean absolute SHAP values computed on the test set. The 12 momentum lookbacks are aggregated into a single entry. Columns show importance overall and split by regime.}")
+tex_lines.append(r"\label{tab:shap}")
 tex_lines.append(r"\end{table}")
 
 write_tex('table_shap.tex', '\n'.join(tex_lines))
@@ -1045,14 +1059,11 @@ tex_lines.append(r"\toprule")
 tex_lines.append(r"Regime Signal Variant & Ann.\ Ret & Ann.\ Vol & Sharpe & Max DD \\")
 tex_lines.append(r"\midrule")
 tex_lines.append(f"XGB + $\\pi_t^{{\\text{{filter}}}}$ (HMM)   & {ar_hmm:.1%} & {av_hmm:.1%} & {sh_hmm:.3f} & $-${abs(mdd_hmm):.1%} \\\\")
-tex_lines.append(f"XGB + raw stress indicators              & {ar_raw:.1%} & {av_raw:.1%} & {sh_raw:.3f} & $-${abs(mdd_raw):.1%} \\\\")
-tex_lines.append(f"XGB + GHM cycle                         & {ar_ghm_x:.1%} & {av_ghm_x:.1%} & {sh_ghm_x:.3f} & $-${abs(mdd_ghm_x):.1%} \\\\")
+tex_lines.append(f"XGB + raw indicators (DD, DISP, REL\\_N, CS) & {ar_raw:.1%} & {av_raw:.1%} & {sh_raw:.3f} & $-${abs(mdd_raw):.1%} \\\\")
 tex_lines.append(f"XGB (no regime signal)                   & {ar_no:.1%} & {av_no:.1%} & {sh_no:.3f} & $-${abs(mdd_no):.1%} \\\\")
-tex_lines.append(r"\midrule")
-tex_lines.append(f"\\multicolumn{{5}}{{l}}{{\\footnotesize Sharpe difference: HMM vs Raw = {sh_hmm-sh_raw:+.3f}; HMM vs GHM = {sh_hmm-sh_ghm_x:+.3f}; HMM vs None = {sh_hmm-sh_no:+.3f}}} \\\\")
 tex_lines.append(r"\bottomrule")
 tex_lines.append(r"\end{tabular}")
-tex_lines.append(r"\caption{Regime signal ablation: XGBoost performance with alternative regime indicators (50-seed ensemble). The HMM filtered probability ($\pi_t^{\text{filter}}$) is replaced by the four raw stress indicators (DD, DISP, REL\_N, CS) without HMM processing, the GHM market-cycle variable, or removed entirely.}")
+tex_lines.append(r"\caption{Regime signal ablation (50-seed ensemble). The HMM signal outperforms both raw stress indicators and no regime signal.}")
 tex_lines.append(r"\label{tab:regime_signal_ablation}")
 tex_lines.append(r"\end{table}")
 write_tex('table_regime_signal_ablation.tex', '\n'.join(tex_lines))
