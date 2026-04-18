@@ -15,7 +15,9 @@ Unconditional momentum is effectively dead: fixed 12-month momentum achieves a S
 
 The HMM's compression of the four stress indicators into a single filtered probability is itself essential. Replacing $\pi_t^{\text{filter}}$ with the four raw indicators (DD, DISP, REL\_N, CS) fed directly to XGBoost reduces the Sharpe from 1.11 to 0.30, worse than removing regime information entirely (Sharpe 0.41 without any regime signal; see Table~\ref{tab:regime_signal_ablation}). The raw features add noise rather than signal: with four additional dimensions the model must discover the regime structure from scratch at each split, while the HMM distils the indicators into a single dimension -- the degree of market stress -- that XGBoost can condition on efficiently.
 
-M2's factor alphas are significant across all standard specifications: CAPM 23.8\% ($t = 4.08$), Fama--French three-factor 23.7\% ($t = 4.46$), Carhart four-factor 24.9\% ($t = 4.74$), Fama--French five-factor 23.4\% ($t = 4.56$), and the six-factor model 24.7\% ($t = 4.78$). The alpha increases as more factors are added because M2 has near-zero loadings on all factors: the strategy is approximately market-neutral and its returns are not repackaged factor exposure. The Newey--West $t$-statistic for mean returns (1.83) is not individually significant, which is expected for a market-neutral long-short strategy with 19.7\% annualised volatility; the economically meaningful test is the factor alpha.
+M2's factor alphas are significant across all standard specifications (Table~\ref{tab:factor_alphas}). The alpha is stable at 23--25\% across CAPM, Fama--French three- and five-factor, Carhart, and six-factor models, with $t$-statistics exceeding 4.0 in every case. Factor loadings are near zero throughout, confirming that M2's returns are not repackaged factor exposure. The Newey--West $t$-statistic for mean returns (1.83) is not individually significant, which is expected for a market-neutral long-short strategy with 19.7\% annualised volatility; the economically meaningful test is the factor alpha.
+
+\input{tables/table_factor_alphas}
 
 \begin{figure}[H]
     \centering
