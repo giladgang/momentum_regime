@@ -165,7 +165,7 @@ Baseline ($r$) & -- & 1.007 & 21.6\% & 21.8\% & $-$26.1\% \\
  & $a = 2.0$ & 0.894 & 11.8\% & 13.6\% & $-$26.5\% \\
 \bottomrule
 \end{tabular}
-\caption{Out-of-sample performance of XGBoost (M2) under alternative training targets (long-only construction shown; the pattern is qualitatively identical in long-short). All models use the same features, hyperparameters, and portfolio construction. The baseline (raw return) achieves the highest Sharpe ratio; every risk-adjusted target reduces returns faster than volatility. The result is robust across all three functional forms and all parameter values tested.}
+\caption{Out-of-sample performance of XGBoost (M2) under alternative training targets (long-only construction). Every risk-adjusted target reduces returns faster than volatility.}
 \label{tab:alt_targets}
 \end{table}
 
@@ -241,7 +241,7 @@ Training period & Test months & M2 Sharpe & GFC cumulative & 2009 rebound \\
 \multicolumn{2}{l}{Fixed 12-mo momentum} & $-$0.18 & --- & $-$59.5\% \\
 \bottomrule
 \end{tabular}
-\caption{True out-of-sample test on the 2008--2009 crisis. The HMM and XGBoost are trained on pre-crisis data and evaluated on a test period that includes the GFC. ``GFC cumulative'' is the total return from October 2007 to June 2009; ``2009 rebound'' is March to December 2009, the period where traditional momentum crashed $-$59.5\%. M2 earned +21\% to +43\% during the rebound across all training windows.}
+\caption{True out-of-sample test on the 2008--2009 crisis. Models are trained on pre-crisis data. ``GFC cumulative'' covers October 2007 to June 2009; ``2009 rebound'' covers March to December 2009.}
 \label{tab:gfc_oos}
 \end{table}
 
@@ -309,7 +309,7 @@ M1 (LR, classification) & --- & $-$0.03 & $-$1.6\% & 15.1\% & $-$44.1\% & $-$0.3
 M2 (XGBoost) & --- & 1.11 & 21.9\% & 19.7\% & $-$24.8\% & 0.82 / 1.56 \\
 \bottomrule
 \end{tabular}
-\caption{Ridge regression baseline: a linear model predicting continuous forward returns (same target as M2). The Sharpe ratio of $-$0.57 is robust across all regularisation strengths and is worse than M1's $-$0.03, confirming that M1's failure is driven by linearity, not the classification target. The classification target actually limits the damage by compressing scores into a narrow probability band.}
+\caption{Ridge regression baseline predicting continuous forward returns (same target as M2). The Sharpe of $-$0.57 is robust across all regularisation strengths.}
 \label{tab:ridge}
 \end{table}
 
@@ -341,7 +341,7 @@ $\nu$ & LL (train) & LL (test) & BIC & Agreement & Corr($\pi$) \\
 Normal & $-$1046.4 & $-$862.6 & \textbf{2257.3} & --- & --- \\
 \bottomrule
 \end{tabular}
-\caption{Student-$t$ vs.\ Normal emission HMM comparison. LL = log-likelihood; Agreement = fraction of months with identical binary regime classification ($\pi > 0.5$) as the Normal HMM; Corr($\pi$) = Pearson correlation of filtered panic probabilities. The Normal model achieves the lowest BIC. Even the heaviest-tailed specification ($\nu = 3$) agrees with the Normal HMM on 97.8\% of months.}
+\caption{Student-$t$ vs.\ Normal emission HMM comparison. LL = log-likelihood; Agreement = fraction of months with identical binary regime classification as the Normal HMM; Corr($\pi$) = correlation of filtered panic probabilities.}
 \label{tab:student_t_hmm}
 \end{table}
 
@@ -379,7 +379,7 @@ The state labelled $k^\ast$ is designated as ``panic'' and the other as ``calm.'
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{convergence_trace.png}
-    \caption{Trace plots of the Gibbs sampler. Each panel shows the sampled regime means (calm in blue, panic in red) for one of the four HMM input features: drawdown (DD), return dispersion (DISP), relative market participation (REL\_N), and credit spread (CS). The bottom panel shows the persistence probabilities $P_{00}$ (calm) and $P_{11}$ (panic). The dashed line at iteration $500$ marks the end of burn-in.}
+    \caption{Trace plots of the Gibbs sampler. Each panel shows sampled regime means (calm in blue, panic in red) for one HMM feature. The dashed line marks the end of burn-in.}
     \label{fig:convergence_trace}
 \end{figure}
 
