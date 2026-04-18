@@ -1,0 +1,7 @@
+duration,mkt_loss,m2_loss,mdd_worst
+Baseline (no recession),,,-0.2482
+3 months,-0.1016,-0.1016,-0.3957
+6 months,-0.1930,-0.1930,-0.4320
+12 months,-0.3487,-0.3487,-0.5103
+18 months,-0.4744,-0.4744,-0.6231
+24 months,-0.5758,-0.5758,-0.7008

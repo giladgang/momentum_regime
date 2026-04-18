@@ -1,0 +1,13 @@
+param,rhat,status
+mu_Panic[DD_z],1.0001,ok
+mu_Panic[DISP_z],0.9998,ok
+mu_Panic[REL_N_z],1.0000,ok
+mu_Panic[CS_z],0.9999,ok
+mu_Calm[DD_z],0.9998,ok
+mu_Calm[DISP_z],1.0000,ok
+mu_Calm[REL_N_z],1.0000,ok
+mu_Calm[CS_z],1.0000,ok
+$P_{00}$ (calm persistence),1.0001,ok
+$P_{01}$ (calm $\to$ panic),1.0001,ok
+$P_{10}$ (panic $\to$ calm),1.0000,ok
+$P_{11}$ (panic persistence),1.0000,ok

@@ -1,0 +1,5 @@
+metric,train,test,full
+Unique stocks,13363,7037,16657
+Stock-month observations,1161014,557087,1718101
+Avg. stocks per month,4838,3336,4221
+Market-level months,240,167,407
