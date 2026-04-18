@@ -149,6 +149,8 @@ configs = [
     ('Train 1990-2006, Test 2007-2010', '2007-01-01', '2011-01-01', True),
 ]
 
+gfc_table_rows = []  # collect results for LaTeX export
+
 for label, test_start, test_end, use_dotcom_crisis in configs:
     t0 = time.time()
     train_end = test_start
@@ -235,9 +237,18 @@ for label, test_start, test_end, use_dotcom_crisis in configs:
             print(f"\n  2009 Rebound (Mar-Dec 2009):")
             print(f"  Months: {len(rebound)}, Cumulative: {reb_cum*100:+.1f}%")
             print(f"  (This is where traditional momentum crashed -73%)")
+        # Collect for LaTeX table
+        gfc_table_rows.append({
+            'label': label,
+            'train_end': train_end,
+            'n_test_months': len(r),
+            'sharpe': sr,
+            'gfc_cum': gfc_cum * 100 if len(gfc) > 0 else None,
+            'rebound_cum': reb_cum * 100 if len(rebound) > 0 else None,
+        })
     else:
         print(f"  Insufficient data or zero variance")
-    
+
     elapsed = time.time() - t0
     print(f"\n  Time: {elapsed:.0f}s")
 
@@ -255,5 +266,50 @@ if len(r_mom) > 1:
     gfc_mom = r_mom[(r_mom.index >= '2009-03-01') & (r_mom.index <= '2009-12-01')]
     if len(gfc_mom) > 0:
         print(f"  2009 Rebound: {(1+gfc_mom).prod()*100-100:+.1f}%")
+
+# ── Export LaTeX table: table_gfc_oos.tex ─────────────────────────────────────
+
+TABLES_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'tables')
+os.makedirs(TABLES_DIR, exist_ok=True)
+
+# Map config labels to training period strings for the table
+train_period_map = {
+    'Train 1990-1999, Test 2000-2010': '1990--1999',
+    'Train 1990-2004, Test 2005-2010': '1990--2004',
+    'Train 1990-2006, Test 2007-2010': '1990--2006',
+}
+
+tex = []
+tex.append(r'\begin{table}[H]')
+tex.append(r'\centering')
+tex.append(r'\small')
+tex.append(r'\begin{tabular}{l r r r r}')
+tex.append(r'\toprule')
+tex.append(r'Training period & Test months & M2 Sharpe & GFC cumulative & 2009 rebound \\')
+tex.append(r'\midrule')
+for row in gfc_table_rows:
+    tp = train_period_map.get(row['label'], row['label'])
+    n = row['n_test_months']
+    sh = f"{row['sharpe']:.2f}"
+    gfc_str = f"{row['gfc_cum']:+.1f}\\%" if row['gfc_cum'] is not None else '---'
+    reb_str = f"{row['rebound_cum']:+.1f}\\%" if row['rebound_cum'] is not None else '---'
+    tex.append(f'{tp} & {n} & {sh} & {gfc_str} & {reb_str} \\\\')
+tex.append(r'\midrule')
+# Fixed 12-mo momentum row
+if len(r_mom) > 1:
+    sr_mom_val = r_mom.mean() / r_mom.std() * 12**0.5
+    gfc_mom_reb = r_mom[(r_mom.index >= '2009-03-01') & (r_mom.index <= '2009-12-01')]
+    reb_mom_str = f"{(1+gfc_mom_reb).prod()*100-100:+.1f}\\%" if len(gfc_mom_reb) > 0 else '---'
+    tex.append(f'\\multicolumn{{2}}{{l}}{{Fixed 12-mo momentum}} & $-${abs(sr_mom_val):.2f} & --- & {reb_mom_str} \\\\')
+tex.append(r'\bottomrule')
+tex.append(r'\end{tabular}')
+tex.append(r"\caption{True out-of-sample test on the 2008--2009 crisis. Models are trained on pre-crisis data. ``GFC cumulative'' covers October 2007 to June 2009; ``2009 rebound'' covers March to December 2009.}")
+tex.append(r'\label{tab:gfc_oos}')
+tex.append(r'\end{table}')
+
+tex_path = os.path.join(TABLES_DIR, 'table_gfc_oos.tex')
+with open(tex_path, 'w') as f:
+    f.write('\n'.join(tex) + '\n')
+print(f"Saved: {tex_path}")
 
 print("\nDone.")

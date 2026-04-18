@@ -252,4 +252,159 @@ with open(tex_path, 'w') as f:
     f.write('\n'.join(tex_lines) + '\n')
 print(f"Saved: {tex_path}")
 
+# ── Export appendix table: table_alt_targets.tex (long-only, extended grid) ───
+
+def long_only_port(df_test, score_col, fee=TRADING_FEE):
+    """Long-only portfolio: top decile by NYSE breakpoints, VW."""
+    monthly, prev_weights = [], {}
+    for date, grp in df_test.groupby('date'):
+        nyse = grp[grp['exchcd'] == 1][score_col].dropna()
+        if len(nyse) < 10:
+            continue
+        hi = nyse.quantile(0.90)
+        longs = grp[grp[score_col] >= hi]
+        if longs['me'].sum() == 0:
+            continue
+        total_me = longs['me'].sum()
+        new_w = (longs.set_index('permno')['me'] / total_me).to_dict()
+        turnover = sum(abs(new_w.get(p, 0) - prev_weights.get(p, 0))
+                       for p in set(new_w) | set(prev_weights)) / 2
+        r_gross = (longs['ret_fwd'] * longs['me']).sum() / total_me
+        monthly.append({'date': date, 'ret': r_gross - fee * turnover})
+        prev_weights = new_w
+    if not monthly:
+        return pd.Series(dtype=float)
+    return pd.DataFrame(monthly).set_index('date')['ret']
+
+def metrics_full(r):
+    r = r.dropna()
+    ann_ret = (1 + r).prod() ** (12 / len(r)) - 1
+    ann_vol = r.std() * np.sqrt(12)
+    sharpe = r.mean() / r.std() * np.sqrt(12) if r.std() > 0 else 0
+    cum = (1 + r).cumprod()
+    mdd = ((cum - cum.cummax()) / cum.cummax()).min()
+    return sharpe, ann_ret, ann_vol, mdd
+
+def train_and_evaluate_lo(name, y_target):
+    """Train 50-seed XGB, build long-only portfolio, return metrics."""
+    print(f"  Training (long-only) for: {name}")
+    preds = np.zeros(len(X_test))
+    for xs in XGB_SEEDS:
+        model = XGBRegressor(
+            n_estimators=500, max_depth=4, learning_rate=0.05,
+            subsample=0.8, colsample_bytree=0.8,
+            tree_method='hist', random_state=xs, verbosity=0
+        )
+        model.fit(X_train, y_target)
+        preds += model.predict(X_test)
+    preds /= len(XGB_SEEDS)
+
+    score_col = f'score_alt_{name}'
+    test[score_col] = preds
+    r = long_only_port(test, score_col)
+    sharpe, ann_ret, ann_vol, mdd = metrics_full(r)
+    return sharpe, ann_ret, ann_vol, mdd
+
+# Define the extended target grid for the appendix table
+alt_targets = []
+
+# Baseline
+alt_targets.append(('Baseline', None, None, r_train))
+
+# Mean-variance: r - (gamma/2) * sigma^2
+for gamma in [0.5, 1, 2, 5, 10]:
+    y = r_train - (gamma / 2) * var_train
+    alt_targets.append(('MV', f'$\\gamma = {gamma}$', gamma, y))
+
+# Log mean-variance: log(1+r) - (gamma/2) * sigma^2
+for gamma in [0.5, 1, 2, 5, 10]:
+    y = np.log1p(np.clip(r_train, -0.999, None)) - (gamma / 2) * var_train
+    alt_targets.append(('LogMV', f'$\\gamma = {gamma}$', gamma, y))
+
+# Sharpe-like: r / sigma^a
+for a in [0.5, 1.0, 1.5, 2.0]:
+    y = r_train / (sigma_train ** a)
+    alt_targets.append(('Sharpe', f'$a = {a}$', a, y))
+
+print("\n" + "=" * 60)
+print("  ALT TARGETS (LONG-ONLY, APPENDIX TABLE)")
+print("=" * 60)
+
+alt_results = []
+for family, param_str, param_val, y_target in alt_targets:
+    if family == 'Baseline':
+        # Use production artefact scores for baseline
+        test['score_alt_baseline'] = test['score_xgb']
+        r = long_only_port(test, 'score_alt_baseline')
+        sharpe, ann_ret, ann_vol, mdd = metrics_full(r)
+        alt_results.append({
+            'family': family, 'param_str': param_str, 'param_val': param_val,
+            'sharpe': sharpe, 'ann_ret': ann_ret, 'ann_vol': ann_vol, 'mdd': mdd,
+        })
+        print(f"  Baseline (long-only): Sharpe={sharpe:.3f}")
+    else:
+        label = f"{family}_{param_val}"
+        sharpe, ann_ret, ann_vol, mdd = train_and_evaluate_lo(label, y_target)
+        alt_results.append({
+            'family': family, 'param_str': param_str, 'param_val': param_val,
+            'sharpe': sharpe, 'ann_ret': ann_ret, 'ann_vol': ann_vol, 'mdd': mdd,
+        })
+
+# Build LaTeX
+def fmt_sh(v):
+    s = f"{abs(v):.3f}"
+    return f"$-${s}" if v < 0 else s
+
+def fmt_pct(v):
+    s = f"{abs(v)*100:.1f}\\%"
+    return f"$-${s}" if v < 0 else s
+
+tex2 = []
+tex2.append(r'\begin{table}[H]')
+tex2.append(r'\centering')
+tex2.append(r'\small')
+tex2.append(r'\begin{tabular}{l l r r r r}')
+tex2.append(r'\toprule')
+tex2.append(r'Target family & Parameter & Sharpe & Ann.\ Ret & Ann.\ Vol & MDD \\')
+tex2.append(r'\midrule')
+
+# Baseline row
+bl = alt_results[0]
+tex2.append(f"Baseline ($r$) & -- & {fmt_sh(bl['sharpe'])} & {fmt_pct(bl['ann_ret'])} & {fmt_pct(bl['ann_vol'])} & {fmt_pct(bl['mdd'])} \\\\")
+tex2.append(r'\midrule')
+
+# Mean-variance block
+mv_rows = [r for r in alt_results if r['family'] == 'MV']
+for i, row in enumerate(mv_rows):
+    if i == 0:
+        tex2.append(r"\multirow{" + str(len(mv_rows)) + r"}{*}{Mean-variance: $r - \frac{\gamma}{2}\sigma^2$}")
+    tex2.append(f" & {row['param_str']} & {fmt_sh(row['sharpe'])} & {fmt_pct(row['ann_ret'])} & {fmt_pct(row['ann_vol'])} & {fmt_pct(row['mdd'])} \\\\")
+tex2.append(r'\midrule')
+
+# Log mean-variance block
+lmv_rows = [r for r in alt_results if r['family'] == 'LogMV']
+for i, row in enumerate(lmv_rows):
+    if i == 0:
+        tex2.append(r"\multirow{" + str(len(lmv_rows)) + r"}{*}{Log mean-variance: $\log(1{+}r) - \frac{\gamma}{2}\sigma^2$}")
+    tex2.append(f" & {row['param_str']} & {fmt_sh(row['sharpe'])} & {fmt_pct(row['ann_ret'])} & {fmt_pct(row['ann_vol'])} & {fmt_pct(row['mdd'])} \\\\")
+tex2.append(r'\midrule')
+
+# Sharpe-like block
+sh_rows = [r for r in alt_results if r['family'] == 'Sharpe']
+for i, row in enumerate(sh_rows):
+    if i == 0:
+        tex2.append(r"\multirow{" + str(len(sh_rows)) + r"}{*}{Sharpe-like: $r\,/\,\sigma^a$}")
+    tex2.append(f" & {row['param_str']} & {fmt_sh(row['sharpe'])} & {fmt_pct(row['ann_ret'])} & {fmt_pct(row['ann_vol'])} & {fmt_pct(row['mdd'])} \\\\")
+
+tex2.append(r'\bottomrule')
+tex2.append(r'\end{tabular}')
+tex2.append(r'\caption{Out-of-sample performance of XGBoost (M2) under alternative training targets (long-only construction). Every risk-adjusted target reduces returns faster than volatility.}')
+tex2.append(r'\label{tab:alt_targets}')
+tex2.append(r'\end{table}')
+
+alt_tex_path = os.path.join(TABLES_DIR, 'table_alt_targets.tex')
+with open(alt_tex_path, 'w') as f:
+    f.write('\n'.join(tex2) + '\n')
+print(f"Saved: {alt_tex_path}")
+
 print("Done.")
