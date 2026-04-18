@@ -642,27 +642,19 @@ def shade_crises(ax, label=False):
 
 dates = panel['date']
 
-# Plot A: smoothed vs filtered panic probability
-fig, axes = plt.subplots(2, 1, figsize=(14, 7), sharex=True)
+# Plot A: filtered panic probability (single panel)
+fig, ax = plt.subplots(figsize=(14, 4))
 
-axes[0].fill_between(dates, pi_smooth_full, alpha=0.6, color='crimson')
-axes[0].axvline(pd.Timestamp('2011-01-01'), color='black', linewidth=1,
-                linestyle='--', label='Train/test split')
-axes[0].set_ylabel('Smoothed π_panic', fontsize=9)
-axes[0].set_ylim(0, 1)
-axes[0].axhline(0.5, color='black', linewidth=0.5, linestyle=':')
-axes[0].legend(fontsize=8, loc='upper left')
-shade_crises(axes[0], label=True)
+ax.fill_between(dates, pi_filter_full, alpha=0.5, color='crimson')
+ax.axvline(pd.Timestamp('2011-01-01'), color='black', linewidth=1,
+           linestyle='--', label='Train/test split')
+ax.set_ylabel('$\\pi_t^{\\mathrm{filter}}$', fontsize=11)
+ax.set_ylim(0, 1)
+ax.axhline(0.5, color='black', linewidth=0.5, linestyle=':')
+ax.legend(fontsize=8, loc='upper left')
+shade_crises(ax, label=True)
+ax.set_xlabel('Date')
 
-axes[1].fill_between(dates, pi_filter_full, alpha=0.5, color='crimson')
-axes[1].axvline(pd.Timestamp('2011-01-01'), color='black', linewidth=1, linestyle='--')
-axes[1].set_ylabel('Filtered π_panic (trading signal)', fontsize=9)
-axes[1].set_ylim(0, 1)
-axes[1].axhline(0.5, color='black', linewidth=0.5, linestyle=':')
-shade_crises(axes[1])
-
-axes[1].set_xlabel('Date')
-fig.suptitle('Posterior Panic Probability — dashed line = train/test split', fontsize=11)
 plt.tight_layout()
 fig.savefig('regime_probabilities.png', dpi=150)
 plt.close(fig)
