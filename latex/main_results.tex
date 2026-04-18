@@ -1,6 +1,6 @@
 \section{Results}\label{sec:results}
 
-All strategies are evaluated out-of-sample on 2011--2025 (167 months), using the long-short construction described in Section~\ref{sec:stage2}. The central question is whether momentum's cross-sectional structure is regime-dependent, and whether exploiting this dependence requires nonlinear modelling. The analysis proceeds from aggregate performance (Section~\ref{sec:performance_results}), to regime-conditional decomposition and model-free confirmation (Section~\ref{sec:regime_results}), to feature importance analysis (Section~\ref{sec:shap_results}), ablation studies and benchmarking against \citet{DanielMoskowitz2016} (Section~\ref{sec:ablation_results}), and finally the effect of risk aversion on the regime signal (Section~\ref{sec:risk_aversion}).
+All strategies are evaluated out-of-sample on 2011--2025 (167 months), using the long-short construction described in Section~\ref{sec:stage2}. The central question is whether momentum's cross-sectional structure is regime-dependent, and whether exploiting this dependence requires nonlinear modelling. The analysis proceeds from aggregate performance (Section~\ref{sec:performance_results}), to regime-conditional decomposition (Section~\ref{sec:regime_results}), to the regime-momentum interaction (Section~\ref{sec:shap_results}), ablation studies and benchmarking against \citet{DanielMoskowitz2016} (Section~\ref{sec:ablation_results}), and finally the effect of risk aversion on the regime signal (Section~\ref{sec:risk_aversion}).
 
 
 \subsection{Portfolio Performance}\label{sec:performance_results}
@@ -92,14 +92,6 @@ The strategy can absorb substantial downturns. Even a 12-month recession -- roug
 The historical stress periods in the test sample confirm the reversal mechanism: M2 earned +29.9\% during the COVID crash (February--April 2020) and +21.5\% during the 2022 bear market (January--October 2022). In both cases, the decline was temporary and reversed within months.
 
 The scenario that would truly break the strategy -- a sustained fundamental deterioration where beaten-down stocks never recover, as in the Great Depression or Japan's lost decades -- has not occurred in the 2011--2025 test period. This mirrors the vulnerability identified by \citet{DanielMoskowitz2016} for traditional momentum, but on the opposite side: standard momentum crashes when winners stop winning; the regime-conditioned strategy would struggle when losers stop reverting. The hybrid approach combining stock selection with exposure scaling (Section~\ref{sec:future_work}) is designed precisely for this contingency.
-
-\subsubsection{Model-Free Confirmation: Information Coefficient Analysis}\label{sec:ic_analysis}
-
-A natural concern is whether the regime-dependent behaviour described above reflects genuine economic structure or model-specific overfitting. To rule this out, Table~\ref{tab:ic_rotation} examines the raw predictive power of each momentum horizon in calm versus panic months, without involving any model. The information coefficient (IC) -- the Spearman rank correlation between a momentum signal and subsequent stock returns, computed cross-sectionally each month -- directly measures whether ranking stocks by a given horizon correctly identifies future outperformers.
-
-\input{tables/table_ic_rotation}
-
-The pattern is striking. In calm months, all 12 horizons have positive, significant ICs ($t > 2.5$), with the strongest power at intermediate horizons ($mom_8$ through $mom_{10}$, IC $\approx 0.03$): past winners keep winning. In panic months, the pattern inverts -- short-horizon signals ($mom_1$ through $mom_3$) develop \emph{negative} ICs ($-$0.012 to $-$0.010), meaning that stocks which dropped most recently are more likely to bounce back than to keep falling. Longer horizons retain weakly positive ICs but none is individually significant ($t < 1.6$), reflecting the limited sample of 59 panic months. The key finding is the systematic \emph{contrast}: all 12 horizons are significant in calm, none in panic, and the short horizons flip sign. This confirms that the continuation-to-reversal shift M2 exploits is a real feature of the data, not an artefact of the model. It also explains why fixed momentum and M1 collapse in long-short construction: they assign static weights to each horizon, making them unable to adapt when the cross-sectional structure inverts.
 
 
 \subsection{The Regime-Momentum Interaction}\label{sec:shap_results}
