@@ -215,21 +215,19 @@ for regime_val in ['Calm', 'Panic']:
             zs.append(np.mean(monthly_z))
         z_data[(regime_val, leg_val)] = zs
 
-# Signed SHAP normalised per-stock by L1 norm
-signed_shap = {}
+# |SHAP| per leg, each leg sums to 100%
+pct_shap = {}
 for regime_val in ['Calm', 'Panic']:
     for leg_val in ['long', 'short']:
         mask = (regime_arr == regime_val) & (leg_arr == leg_val)
-        sv = shap_values[mask][:, mom_indices]
-        l1 = np.abs(sv).sum(axis=1, keepdims=True)
-        l1 = np.where(l1 == 0, 1, l1)
-        normalized = sv / l1 * 100
-        signed_shap[(regime_val, leg_val)] = normalized.mean(axis=0)
+        abs_shap = np.abs(shap_values[mask][:, mom_indices]).mean(axis=0)
+        pct_shap[(regime_val, leg_val)] = abs_shap / abs_shap.sum() * 100
 
 w = 0.35
 fig, axes = plt.subplots(2, 2, figsize=(16, 10), sharex=True)
 
-# Top row: Z-scores (independent y-axes to show panic crossover clearly)
+# Top row: Z-scores (shared y-axis)
+axes[0, 0].sharey(axes[0, 1])
 for i, regime_val in enumerate(['Calm', 'Panic']):
     ax = axes[0, i]
     ax.plot(x, z_data[(regime_val, 'long')], 'o-', color='#2196F3', linewidth=2.5,
@@ -247,17 +245,14 @@ for i, regime_val in enumerate(['Calm', 'Panic']):
     if i == 0:
         ax.set_ylabel('Z-score vs cross-section', fontsize=11)
 
-# Bottom row: Signed SHAP (shared y-axis)
+# Bottom row: |SHAP| percentage (shared y-axis, each leg sums to 100%)
 axes[1, 0].sharey(axes[1, 1])
 for i, regime_val in enumerate(['Calm', 'Panic']):
     ax = axes[1, i]
-    long_vals = signed_shap[(regime_val, 'long')]
-    short_vals = signed_shap[(regime_val, 'short')]
-    ax.bar(x - w/2, long_vals, w, label='Long leg',
+    ax.bar(x - w/2, pct_shap[(regime_val, 'long')], w, label='Long leg',
            color='#2196F3', alpha=0.85, edgecolor='white')
-    ax.bar(x + w/2, short_vals, w, label='Short leg',
+    ax.bar(x + w/2, pct_shap[(regime_val, 'short')], w, label='Short leg',
            color='#E53935', alpha=0.85, edgecolor='white')
-    ax.axhline(0, color='black', linewidth=0.8, linestyle='--', alpha=0.5)
     ax.set_title(f'{regime_val}',
                  fontsize=12, fontweight='bold')
     ax.set_xticks(x)
@@ -266,7 +261,7 @@ for i, regime_val in enumerate(['Calm', 'Panic']):
     ax.legend(fontsize=9)
     ax.grid(axis='y', alpha=0.3)
     if i == 0:
-        ax.set_ylabel('Normalised SHAP contribution (%)', fontsize=11)
+        ax.set_ylabel('Share of momentum |SHAP| (%)', fontsize=11)
 
 plt.suptitle('Momentum term structure by regime: stock selection and feature importance',
              fontsize=14, fontweight='bold', y=1.02)
