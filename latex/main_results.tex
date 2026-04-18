@@ -66,13 +66,16 @@ The resulting long-short spread in panic is 3.09\% per month -- more than double
 
 \subsubsection{Discussion}\label{sec:novelty}
 
-The analysis above reveals two findings that, to our knowledge, have not been documented in the prior literature.
+Prior work has established that momentum profits depend on market state \citep{Cooper2004}, that momentum crashes are tied to rebounds after stress \citep{DanielMoskowitz2016}, and that blending fast and slow momentum signals across market cycles can improve performance \citep{GHM2023}. The analysis above extends these findings in three specific ways.
+
+\paragraph{Term-structure-wide loser selection}
+In panic, the model's long leg is below average at \emph{every} horizon from 1 to 12 months. This differs from conventional short-term reversal \citep{Jegadeesh1990, Nagel2012}, which targets month~1 only, from long-term contrarian strategies \citep{DeBondtThaler1985}, which operate at multi-year horizons, and from state-dependent strategies that switch between two momentum signals. A stock that is uniformly below average across the entire term structure is more likely a victim of indiscriminate forced selling than of genuine fundamental decline, which would typically appear first at short horizons and propagate outward.
 
 \paragraph{Regime-conditional distribution selection}
-Traditional momentum strategies apply a fixed rule -- buy winners, short losers -- regardless of market conditions. Conditional strategies such as \citet{DanielMoskowitz2016} adapt the \emph{amount} of exposure but not the \emph{type} of stocks selected. M2 does something qualitatively different: it uses the same momentum horizons to select from the upper tail of the cross-sectional distribution in calm and the lower tail in panic. The regime signal does not change which features matter; it changes where in the distribution the model selects. This is only possible because XGBoost can condition the direction of its splits on $\pi_t^{\text{filter}}$, an interaction that linear models cannot represent (Section~\ref{sec:ablation_results} provides a quantitative comparison).
+Traditional momentum strategies apply a fixed rule -- buy winners, short losers -- regardless of market conditions. Conditional strategies adapt the \emph{amount} of exposure \citep{DanielMoskowitz2016} or the \emph{blend} of horizons \citep{GHM2023}, but not the region of the cross-sectional distribution from which stocks are selected. M2 uses the same momentum horizons to select from the upper tail in calm and the lower tail in panic. The regime signal does not change which features matter; it changes where in the distribution the model selects.
 
-\paragraph{Term-structure-wide reversal}
-In panic, the model buys stocks that are below average at \emph{every} horizon from 1 to 12 months. This differs from conventional short-term reversal \citep{Jegadeesh1990, Nagel2012}, which targets month~1 only, and from long-term contrarian strategies \citep{DeBondtThaler1985}, which operate at multi-year horizons. A stock that is uniformly below average across the entire term structure is more likely a victim of indiscriminate forced selling than of genuine fundamental decline, which would typically appear first at short horizons and propagate outward over time.
+\paragraph{Nonlinear regime conditioning}
+Exploiting this pattern requires a nonlinear model in which the regime variable acts as a conditioning feature rather than a direct linear predictor. A linear model assigns $\pi_t^{\text{filter}}$ a single coefficient and cannot flip the selection direction across regimes (Section~\ref{sec:ablation_results}). XGBoost can condition the sign of its splits on the regime signal, enabling the same tree structure to buy winners in calm and losers in panic.
 
 \subsubsection{Tree Path Analysis}\label{sec:tree_paths}
 
@@ -110,10 +113,6 @@ Removing the regime signal and retraining XGBoost on the 12 momentum features al
 \paragraph{Linear model confound test}\label{sec:target_confound}
 Because M1 uses a classification target while M2 uses continuous returns, a natural concern is whether M1's failure reflects the choice of training target rather than linearity. A Ridge regression predicting continuous forward returns -- the same target as M2 -- achieves a Sharpe of $-$0.57, even worse than M1's $-$0.03 (Appendix~\ref{app:ridge}). Both linear models fail because they assign $\pi_t^{\text{filter}}$ a single coefficient that cannot capture the conditional logic required to adapt stock selection across regimes.
 
-\paragraph{Comparison with \citet{DanielMoskowitz2016}}
-On the same data and with the same transaction costs, M2 (Sharpe 1.11, alpha 23.8\%, $t = 4.08$) outperforms the D\&M managed momentum strategy (Sharpe 0.49, alpha 10.3\%, $t = 1.86$). The comparison illustrates two mechanisms for using regime information: D\&M scale exposure to a fixed portfolio (how much to hold), while M2 changes which stocks are held (what to hold). The tree path analysis in Section~\ref{sec:tree_paths} provides structural evidence for this distinction: the nearly identical horizon combination frequencies across regimes confirm that M2 maintains the same attention structure in both calm and panic, reversing the selection direction rather than scaling exposure. Adding D\&M-style scaling on top of M2 does not improve performance, suggesting that M2 already internalises the regime information D\&M uses.
-
-
 \subsection{Risk Aversion and Stress Testing}\label{sec:risk_aversion}
 
 \subsubsection{Alternative Training Targets}
@@ -137,5 +136,11 @@ But the premise can fail. In a sustained economic deterioration -- a depression 
 \input{tables/table_stress_scenarios}
 
 The strategy can absorb substantial downturns. A 12-month recession produces a worst-case drawdown of $-$51\%, after which calm-period continuation resumes. Only a depression-length downturn of 24 months produces a drawdown of $-$70\%. This mirrors the vulnerability identified by \citet{DanielMoskowitz2016} for traditional momentum, but on the opposite side: standard momentum crashes when winners stop winning; the regime-conditioned strategy would struggle when losers stop reverting. The hybrid approach combining stock selection with exposure scaling (Section~\ref{sec:future_work}) is designed for this contingency.
+
+\subsubsection{Comparison with \citet{DanielMoskowitz2016}}
+
+On the same data and with the same transaction costs, M2 (Sharpe 1.11, alpha 23.8\%, $t = 4.08$) outperforms the D\&M managed momentum strategy (Sharpe 0.49, alpha 10.3\%, $t = 1.86$). The two approaches use regime information differently: D\&M scale portfolio \emph{exposure} based on predicted crash risk (how much to hold), while M2 changes \emph{which stocks} are held by selecting from the opposite tail of the cross-sectional distribution (what to hold).
+
+A natural extension is to combine the two: use M2's stock selection for portfolio construction and D\&M-style exposure scaling as a circuit breaker. Adding D\&M-style scaling on top of M2 does not improve performance in the current test period, because the condition it guards against -- a sustained reversal failure where beaten-down stocks never recover -- did not occur. Although the test period contains panic streaks of up to 15 consecutive months, M2 never loses more than 3 consecutive panic months. The stress test above (Table~\ref{tab:stress_scenarios}) shows that only a depression-length downturn of 24 months or more would produce drawdowns severe enough to justify exposure scaling. The hybrid approach remains a valuable contingency for deployment in environments where such prolonged deterioration is possible (Section~\ref{sec:future_work}).
 
 Taken together, the results provide converging evidence that, in the sample studied, momentum's cross-sectional predictability shifts between continuation and reversal across market regimes, and that exploiting this shift requires nonlinear conditioning on a regime signal. The signal's value lies not in predicting returns directly but in conditioning how the model jointly uses the full momentum term structure -- a multi-dimensional interaction that only tree-based models can learn. The next section summarises these findings and discusses their implications.
