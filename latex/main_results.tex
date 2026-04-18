@@ -29,6 +29,8 @@ M2's factor alphas are significant across all standard specifications (Table~\re
 
 \subsection{The Regime-Momentum Interaction}\label{sec:regime_results}
 
+This section examines how M2 adapts its use of momentum across regimes. We first decompose performance by regime, then use SHAP values and cross-sectional z-scores to analyse the model's selection at each momentum horizon. We show that the model recovers known patterns from the momentum literature in calm, and discovers a novel term-structure-wide reversal mechanism in panic. Tree path and depth analyses confirm that the nonlinearity comes from regime-conditional direction flipping, not from complex horizon interactions.
+
 Decomposing performance by market regime reveals how M2 uses momentum differently in calm and panic (Table~\ref{tab:regime_sharpe}). M2 achieves a Sharpe ratio of 1.56 during panic months compared to 0.82 during calm months. This panic-period dominance contrasts sharply with the long-only literature, where calm-period improvement typically drives overall performance. In long-short construction, the ability to correctly position the short side becomes the primary source of value.
 
 \input{tables/table_regime_sharpe}
