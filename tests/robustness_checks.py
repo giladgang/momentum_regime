@@ -241,7 +241,7 @@ test_c = test.copy()
 test_c['score_lr'] = lr.predict_proba(X_te_s)[:, 1]
 
 # Use production 50-seed ensemble scores from artefacts (no retraining)
-test_c['score_xgb'] = test['score_xgb']
+test_c['score_xgb'] = test_art['score_xgb'].values
 
 # Fixed momentum scores
 test_c['score_mom12'] = test_c.groupby('date')['mom_12'].rank(pct=True)
