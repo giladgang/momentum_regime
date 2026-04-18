@@ -34,6 +34,9 @@ The current analysis is limited to US equities. Testing whether the continuation
 \paragraph{Exposure-scaling circuit breaker}
 The strategy's primary vulnerability is a prolonged fundamental deterioration where beaten-down stocks do not recover. A natural extension is to combine M2's stock selection with a D\&M-style exposure-scaling overlay that reduces overall portfolio exposure when a sustained bear market indicator (e.g., consecutive months of elevated $\pi_t^{\text{filter}}$) is triggered. Preliminary tests on the current sample show no improvement -- the 2011--2025 period contains no prolonged recession, so the circuit breaker only cuts profitable panic months -- but the value of this mechanism would emerge in a sustained downturn outside the current sample.
 
+\paragraph{Long-short symmetry}
+In both regimes, the short leg's z-score curve approximately mirrors the long leg's -- the model applies symmetric but opposite selection criteria to both sides of the portfolio. Whether this symmetry is an inherent property of cross-sectional momentum or an artefact of the decile-based construction is an open question.
+
 \paragraph{Regime-conditional feature sets}
 The ablation analysis (Section~\ref{sec:ablation_results}) shows that adding fundamental characteristics reduces calm-period performance while leaving panic-period performance unchanged. This suggests that the optimal feature set may itself be regime-dependent: momentum and the regime signal suffice during panic (where reversal dominates), but fundamentals might add value during calm if used differently -- for example, as a quality filter applied after the momentum ranking rather than as an input to the model. Exploring regime-conditional feature sets, where the model uses different inputs depending on the market state, could improve calm-period stock selection without diluting the reversal mechanism.
 
