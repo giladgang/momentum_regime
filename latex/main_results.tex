@@ -37,7 +37,9 @@ To open the black box of M2's regime-conditional decisions, we decompose its pre
 
 \input{tables/table_shap}
 
-Figure~\ref{fig:term_structure} decomposes this further by horizon. The top panels show the z-score of stocks selected for the long and short legs at each lookback; the bottom panels show each horizon's share of total momentum $|$SHAP$|$.
+The split between calm and panic is informative: momentum's aggregate importance rises from 0.0174 to 0.0277 in panic, while $\pi_t^{\text{filter}}$'s importance increases only modestly (0.0164 to 0.0187). This means the model relies more heavily on momentum signals during stress -- but as the term-structure analysis below reveals, it uses them in a fundamentally different way.
+
+Figure~\ref{fig:term_structure} decomposes the aggregate SHAP importance into individual momentum horizons, split by regime and portfolio leg. The top panels plot the average cross-sectional z-score of stocks in the long and short legs at each lookback horizon from 1 to 12 months: a positive z-score means the selected stocks have higher momentum than the cross-sectional average at that horizon, and vice versa. Shaded bands show $\pm 1$ standard error. The bottom panels show each horizon's share of the model's total momentum SHAP contribution, indicating how much attention the model pays to each lookback when forming its predictions. Calm (left) and panic (right) are shown side by side.
 
 \begin{figure}[H]
     \centering
