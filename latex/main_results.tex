@@ -132,31 +132,7 @@ On the same data and with the same transaction costs, M2 (Sharpe 1.11, alpha 23.
 
 The preceding analysis established that the regime signal is essential for long-short momentum. A natural question is whether this finding depends on how the model's training objective balances return against risk. To test this, XGBoost is retrained under three families of risk-adjusted targets, each with varying intensity:
 
-\begin{table}[H]
-\centering
-\small
-\begin{tabular}{l l r r}
-\toprule
-Target family & Parameter & Sharpe & $\pi$ share \\
-\midrule
-Baseline ($r$) & --- & 1.11 & 45\% \\
-\midrule
-\multicolumn{4}{l}{\textit{Sharpe-like: $r\,/\,\sigma^a$}} \\[2pt]
- & $a = 0.5$ & 1.02 & 57\% \\
- & $a = 1.0$ & 0.36 & 57\% \\
-\midrule
-\multicolumn{4}{l}{\textit{Mean-variance: $r - \frac{\gamma}{2}\sigma^2$}} \\[2pt]
- & $\gamma = 0.1$ & 1.07 & 47\% \\
- & $\gamma = 0.2$ & 1.06 & 44\% \\
- & $\gamma = 0.5$ & 0.75 & 35\% \\
-\midrule
-\multicolumn{4}{l}{\textit{Log return: $\log(1+r)$}} \\[2pt]
- & --- & 0.57 & 48\% \\
-\bottomrule
-\end{tabular}
-\caption{Risk-adjusted training targets and regime signal importance. ``$\pi$ share'' is the regime signal's fraction of total feature importance (remainder is momentum). All variants use 50 XGB seeds on the same sample as the main results.}
-\label{tab:risk_aversion}
-\end{table}
+\input{tables/table_risk_aversion}
 
 Two findings emerge. First, under mild risk adjustment ($r/\sigma^{0.5}$ or small $\gamma$), the regime signal's share of feature importance actually \emph{increases} (from 45\% to 57\%), while the Sharpe ratio barely changes. Mild risk penalisation removes the noisiest bets but preserves the regime-conditional structure -- the model still adapts its joint use of momentum horizons across regimes, just with less exposure to extreme outcomes.
 
@@ -170,24 +146,7 @@ The reversal mechanism documented in Section~\ref{sec:panic} rests on a specific
 
 But the premise can fail. In a sustained economic deterioration -- a depression or structural decline -- beaten-down stocks fall because their businesses are failing, not because of temporary mispricing. We call this \emph{reversal failure}: the regime classification is correct, but the momentum structure within that regime has changed. To quantify this vulnerability, we simulate recessions of increasing duration, replacing consecutive months with M2's average losing panic-month return ($-$3.51\% per month) at every possible insertion point.
 
-\begin{table}[H]
-\centering
-\small
-\begin{tabular}{l r r r}
-\toprule
-Recession Duration & Market Loss & M2 Loss & MDD (worst case) \\
-\midrule
-Baseline (no recession) & --- & --- & $-$24.8\% \\
-3 months & $-$7\% & $-$10\% & $-$40\% \\
-6 months & $-$14\% & $-$19\% & $-$43\% \\
-12 months & $-$26\% & $-$35\% & $-$51\% \\
-18 months & $-$37\% & $-$47\% & $-$62\% \\
-24 months & $-$46\% & $-$58\% & $-$70\% \\
-\bottomrule
-\end{tabular}
-\caption{Prolonged bear market simulation. Each row injects a recession during which M2 loses 3.51\% per month (its average losing panic-month return). MDD is the worst-case maximum drawdown across all possible insertion points.}
-\label{tab:stress_scenarios}
-\end{table}
+\input{tables/table_stress_scenarios}
 
 The strategy can absorb substantial downturns. A 12-month recession produces a worst-case drawdown of $-$51\%, after which calm-period continuation resumes. Only a depression-length downturn of 24 months produces a drawdown of $-$70\%. This mirrors the vulnerability identified by \citet{DanielMoskowitz2016} for traditional momentum, but on the opposite side: standard momentum crashes when winners stop winning; the regime-conditioned strategy would struggle when losers stop reverting. The hybrid approach combining stock selection with exposure scaling (Section~\ref{sec:future_work}) is designed for this contingency.
 

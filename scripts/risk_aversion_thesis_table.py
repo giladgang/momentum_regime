@@ -191,4 +191,65 @@ for _, row in res_df.iterrows():
     print(f"  {row['name']:<18s} {row['sharpe']:>7.2f} {row['pi_share']:>8.0f}%")
 
 print(f"\nSaved: risk_aversion_thesis_results.csv")
+
+# ── Export LaTeX and CSV tables ─────────────────────────────────────────────
+
+TABLES_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'tables')
+os.makedirs(TABLES_DIR, exist_ok=True)
+
+# Save CSV to tables dir as well
+res_df.to_csv(os.path.join(TABLES_DIR, 'table_risk_aversion.csv'), index=False, float_format='%.4f')
+
+# Build LaTeX table matching the thesis format
+def fmt_sharpe(v):
+    s = f"{abs(v):.2f}"
+    return f"$-${s}" if v < 0 else s
+
+tex_lines = []
+tex_lines.append(r'\begin{table}[H]')
+tex_lines.append(r'\centering')
+tex_lines.append(r'\begin{tabular}{l l r r}')
+tex_lines.append(r'\toprule')
+tex_lines.append(r'Target family & Parameter & Sharpe & $\pi$ share \\')
+tex_lines.append(r'\midrule')
+
+# Map result names to table rows
+# Row order and grouping must match thesis
+for _, row in res_df.iterrows():
+    name = row['name']
+    sh = fmt_sharpe(row['sharpe'])
+    pi_pct = f"{row['pi_share']:.0f}\\%"
+
+    if name == 'Baseline (r)':
+        tex_lines.append(f"Baseline ($r$) & --- & {sh} & {pi_pct} \\\\")
+        tex_lines.append(r'\midrule')
+        tex_lines.append(r"\multicolumn{4}{l}{\textit{Sharpe-like: $r\,/\,\sigma^a$}} \\[2pt]")
+    elif name == 'Sharpe a=0.5':
+        tex_lines.append(f" & $a = 0.5$ & {sh} & {pi_pct} \\\\")
+    elif name == 'Sharpe a=1.0':
+        tex_lines.append(f" & $a = 1.0$ & {sh} & {pi_pct} \\\\")
+        tex_lines.append(r'\midrule')
+        tex_lines.append(r"\multicolumn{4}{l}{\textit{Mean-variance: $r - \frac{\gamma}{2}\sigma^2$}} \\[2pt]")
+    elif name == 'MV gamma=0.1':
+        tex_lines.append(f" & $\\gamma = 0.1$ & {sh} & {pi_pct} \\\\")
+    elif name == 'MV gamma=0.2':
+        tex_lines.append(f" & $\\gamma = 0.2$ & {sh} & {pi_pct} \\\\")
+    elif name == 'MV gamma=0.5':
+        tex_lines.append(f" & $\\gamma = 0.5$ & {sh} & {pi_pct} \\\\")
+        tex_lines.append(r'\midrule')
+        tex_lines.append(r"\multicolumn{4}{l}{\textit{Log return: $\log(1+r)$}} \\[2pt]")
+    elif name == 'Log return':
+        tex_lines.append(f" & --- & {sh} & {pi_pct} \\\\")
+
+tex_lines.append(r'\bottomrule')
+tex_lines.append(r'\end{tabular}')
+tex_lines.append(r"\caption{Risk-adjusted training targets and regime signal importance. ``$\pi$ share'' is the regime signal's fraction of total feature importance (remainder is momentum). All variants use 50 XGB seeds on the same sample as the main results.}")
+tex_lines.append(r'\label{tab:risk_aversion}')
+tex_lines.append(r'\end{table}')
+
+tex_path = os.path.join(TABLES_DIR, 'table_risk_aversion.tex')
+with open(tex_path, 'w') as f:
+    f.write('\n'.join(tex_lines) + '\n')
+print(f"Saved: {tex_path}")
+
 print("Done.")

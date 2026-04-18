@@ -464,3 +464,106 @@ print(f"""
 print("=" * 70)
 print("  STRESS TEST COMPLETE")
 print("=" * 70)
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#  EXPORT: STRESS SCENARIO TABLE (LaTeX + CSV)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+TABLES_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'tables')
+os.makedirs(TABLES_DIR, exist_ok=True)
+
+# Compute the recession injection table matching the thesis:
+# Each row injects a recession of N months where M2 loses its average
+# losing panic-month return per month, at every possible insertion point.
+# MDD = worst-case maximum drawdown across all insertion points.
+
+# Average losing panic-month return
+panic_losing = r_strat[(panic_mask) & (r_strat < 0)]
+avg_panic_loss = panic_losing.mean()
+print(f"\n  Avg losing panic-month return: {avg_panic_loss:.2%}")
+
+# Baseline MDD (no recession injected)
+cum_base = (1 + r_strat).cumprod()
+mdd_base = ((cum_base - cum_base.cummax()) / cum_base.cummax()).min()
+
+recession_durations = [3, 6, 12, 18, 24]
+stress_rows = []
+stress_rows.append({
+    'duration': 'Baseline (no recession)',
+    'mkt_loss': np.nan,
+    'm2_loss': np.nan,
+    'mdd_worst': mdd_base
+})
+
+r_arr_strat = r_strat.values
+n_months_total = len(r_arr_strat)
+
+for n_rec in recession_durations:
+    # Market loss: compounded loss at avg_panic_loss rate
+    mkt_loss = (1 + avg_panic_loss) ** n_rec - 1
+    m2_loss = mkt_loss  # same rate assumption
+
+    # Worst-case MDD: try every insertion point
+    worst_mdd = mdd_base
+    for start in range(n_months_total - n_rec + 1):
+        # Create modified return series: replace months start..start+n_rec with avg_panic_loss
+        r_mod = r_arr_strat.copy()
+        r_mod[start:start + n_rec] = avg_panic_loss
+        cum_mod = np.cumprod(1 + r_mod)
+        peak_mod = np.maximum.accumulate(cum_mod)
+        dd_mod = (cum_mod - peak_mod) / peak_mod
+        mdd_mod = dd_mod.min()
+        if mdd_mod < worst_mdd:
+            worst_mdd = mdd_mod
+
+    stress_rows.append({
+        'duration': f'{n_rec} months',
+        'mkt_loss': mkt_loss,
+        'm2_loss': m2_loss,
+        'mdd_worst': worst_mdd
+    })
+
+# Save CSV
+stress_df = pd.DataFrame(stress_rows)
+stress_df.to_csv(os.path.join(TABLES_DIR, 'table_stress_scenarios.csv'), index=False, float_format='%.4f')
+print(f"Saved: {os.path.join(TABLES_DIR, 'table_stress_scenarios.csv')}")
+
+# Build LaTeX table
+def fmt_pct_round(v):
+    """Format as rounded percentage with $-$ for negative."""
+    pct = v * 100
+    s = f"{abs(pct):.0f}\\%"
+    return f"$-${s}" if v < 0 else s
+
+tex_lines = []
+tex_lines.append(r'\begin{table}[H]')
+tex_lines.append(r'\centering')
+tex_lines.append(r'\small')
+tex_lines.append(r'\begin{tabular}{l r r r}')
+tex_lines.append(r'\toprule')
+tex_lines.append(r'Recession Duration & Market Loss & M2 Loss & MDD (worst case) \\')
+tex_lines.append(r'\midrule')
+
+for row in stress_rows:
+    dur = row['duration']
+    if np.isnan(row['mkt_loss']):
+        mkt = '---'
+        m2 = '---'
+    else:
+        mkt = fmt_pct_round(row['mkt_loss'])
+        m2 = fmt_pct_round(row['m2_loss'])
+    mdd = fmt_pct_round(row['mdd_worst'])
+    tex_lines.append(f"{dur} & {mkt} & {m2} & {mdd} \\\\")
+
+tex_lines.append(r'\bottomrule')
+tex_lines.append(r'\end{tabular}')
+tex_lines.append(r"\caption{Prolonged bear market simulation. Each row injects a recession during which M2 loses " +
+                 f"{avg_panic_loss:.2%}".replace('-', '') +
+                 r" per month (its average losing panic-month return). MDD is the worst-case maximum drawdown across all possible insertion points.}")
+tex_lines.append(r'\label{tab:stress_scenarios}')
+tex_lines.append(r'\end{table}')
+
+tex_path = os.path.join(TABLES_DIR, 'table_stress_scenarios.tex')
+with open(tex_path, 'w') as f:
+    f.write('\n'.join(tex_lines) + '\n')
+print(f"Saved: {tex_path}")

@@ -129,6 +129,71 @@ train['above_med'] = train.groupby('date')['ret_fwd'].transform(
 
 print(f"  Train: {len(train):,} rows  |  Test: {len(test):,} rows")
 
+# ── Sample summary table (for LaTeX export) ─────────────────────────────────
+
+_TABLES_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'tables')
+os.makedirs(_TABLES_DIR, exist_ok=True)
+
+# Compute sample summary statistics
+_unique_train = train['permno'].nunique()
+_unique_test  = test['permno'].nunique()
+_unique_full  = df['permno'].nunique()
+
+_obs_train = len(train)
+_obs_test  = len(test)
+_obs_full  = len(df)
+
+_months_train = train['date'].nunique()
+_months_test  = test['date'].nunique()
+_months_full  = df['date'].nunique()
+
+_avg_stocks_train = _obs_train / _months_train if _months_train > 0 else 0
+_avg_stocks_test  = _obs_test / _months_test if _months_test > 0 else 0
+_avg_stocks_full  = _obs_full / _months_full if _months_full > 0 else 0
+
+print(f"  Sample summary: Train {_unique_train:,} stocks, {_obs_train:,} obs, {_months_train} months")
+print(f"                  Test  {_unique_test:,} stocks, {_obs_test:,} obs, {_months_test} months")
+print(f"                  Full  {_unique_full:,} stocks, {_obs_full:,} obs, {_months_full} months")
+
+# Save CSV
+_summary_rows = [
+    {'metric': 'Unique stocks', 'train': _unique_train, 'test': _unique_test, 'full': _unique_full},
+    {'metric': 'Stock-month observations', 'train': _obs_train, 'test': _obs_test, 'full': _obs_full},
+    {'metric': 'Avg. stocks per month', 'train': round(_avg_stocks_train), 'test': round(_avg_stocks_test), 'full': round(_avg_stocks_full)},
+    {'metric': 'Market-level months', 'train': _months_train, 'test': _months_test, 'full': _months_full},
+]
+_summary_df = pd.DataFrame(_summary_rows)
+_summary_df.to_csv(os.path.join(_TABLES_DIR, 'table_sample_summary.csv'), index=False)
+print(f"  Saved: {os.path.join(_TABLES_DIR, 'table_sample_summary.csv')}")
+
+# Build LaTeX table
+def _fmt_int(v):
+    """Format integer with LaTeX thousands separator."""
+    s = f"{int(v):,}"
+    return s.replace(',', '{,}')
+
+_tex_lines = []
+_tex_lines.append(r'\begin{table}[H]')
+_tex_lines.append(r'\centering')
+_tex_lines.append(r'\begin{tabular}{l r r r}')
+_tex_lines.append(r'\toprule')
+_tex_lines.append(r' & Train (1990--2010) & Test (2011--2025) & Full \\')
+_tex_lines.append(r'\midrule')
+_tex_lines.append(f"Unique stocks & {_fmt_int(_unique_train)} & {_fmt_int(_unique_test)} & {_fmt_int(_unique_full)} \\\\")
+_tex_lines.append(f"Stock-month observations & {_fmt_int(_obs_train)} & {_fmt_int(_obs_test)} & {_fmt_int(_obs_full)} \\\\")
+_tex_lines.append(f"Avg.\\ stocks per month & {_fmt_int(round(_avg_stocks_train))} & {_fmt_int(round(_avg_stocks_test))} & {_fmt_int(round(_avg_stocks_full))} \\\\")
+_tex_lines.append(f"Market-level months & {_months_train} & {_months_test} & {_months_full} \\\\")
+_tex_lines.append(r'\bottomrule')
+_tex_lines.append(r'\end{tabular}')
+_tex_lines.append(r'\caption{Sample summary. The sample includes all ordinary common shares listed on NYSE, AMEX, or NASDAQ with price above \$1.}')
+_tex_lines.append(r'\label{tab:sample_summary}')
+_tex_lines.append(r'\end{table}')
+
+_tex_path = os.path.join(_TABLES_DIR, 'table_sample_summary.tex')
+with open(_tex_path, 'w') as f:
+    f.write('\n'.join(_tex_lines) + '\n')
+print(f"  Saved: {_tex_path}")
+
 # ── Section 5: Portfolio construction helper ──────────────────────────────────
 
 # One-way transaction cost per unit of portfolio turnover.

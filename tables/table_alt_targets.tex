@@ -1,0 +1,33 @@
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{l l r r r r}
+\toprule
+Target family & Parameter & Sharpe & Ann.\ Ret & Ann.\ Vol & MDD \\
+\midrule
+Baseline ($r$) & -- & 1.007 & 21.6\% & 21.8\% & $-$26.1\% \\
+\midrule
+\multirow{5}{*}{Mean-variance: $r - \frac{\gamma}{2}\sigma^2$}
+ & $\gamma = 0.5$ & 0.918 & 16.7\% & 18.8\% & $-$27.9\% \\
+ & $\gamma = 1$   & 0.911 & 16.0\% & 18.1\% & $-$26.5\% \\
+ & $\gamma = 2$   & 0.770 & 12.0\% & 16.5\% & $-$29.8\% \\
+ & $\gamma = 5$   & 0.760 & 11.4\% & 16.0\% & $-$32.7\% \\
+ & $\gamma = 10$  & 0.748 & 11.3\% & 16.1\% & $-$33.1\% \\
+\midrule
+\multirow{5}{*}{Log mean-variance: $\log(1{+}r) - \frac{\gamma}{2}\sigma^2$}
+ & $\gamma = 0.5$ & 0.842 & 13.2\% & 16.4\% & $-$27.5\% \\
+ & $\gamma = 1$   & 0.859 & 13.3\% & 16.1\% & $-$28.2\% \\
+ & $\gamma = 2$   & 0.712 & 10.4\% & 15.7\% & $-$31.5\% \\
+ & $\gamma = 5$   & 0.725 & 10.7\% & 15.9\% & $-$32.9\% \\
+ & $\gamma = 10$  & 0.689 & 10.2\% & 16.1\% & $-$33.8\% \\
+\midrule
+\multirow{4}{*}{Sharpe-like: $r\,/\,\sigma^a$}
+ & $a = 0.5$ & 0.920 & 16.7\% & 18.8\% & $-$28.3\% \\
+ & $a = 1.0$ & 0.803 & 13.2\% & 17.5\% & $-$32.7\% \\
+ & $a = 1.5$ & 0.914 & 13.7\% & 15.4\% & $-$31.0\% \\
+ & $a = 2.0$ & 0.894 & 11.8\% & 13.6\% & $-$26.5\% \\
+\bottomrule
+\end{tabular}
+\caption{Out-of-sample performance of XGBoost (M2) under alternative training targets (long-only construction). Every risk-adjusted target reduces returns faster than volatility.}
+\label{tab:alt_targets}
+\end{table}

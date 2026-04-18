@@ -135,39 +135,7 @@ Two additional analyses are performed. First, the mean absolute SHAP value of $\
 
 The risk-aversion analysis in Section~\ref{sec:risk_aversion} uses the mean-variance utility target $y_t^s = r_{t+1}^s - \frac{\gamma}{2}\sigma_s^2$. To verify that the finding -- risk penalties reduce the Sharpe ratio by suppressing regime-adaptive bets -- is not an artefact of this particular functional form, Table~\ref{tab:alt_targets} reports XGBoost performance under three families of training targets with varying risk tolerance.
 
-\begin{table}[H]
-\centering
-\small
-\begin{tabular}{l l r r r r}
-\toprule
-Target family & Parameter & Sharpe & Ann.\ Ret & Ann.\ Vol & MDD \\
-\midrule
-Baseline ($r$) & -- & 1.007 & 21.6\% & 21.8\% & $-$26.1\% \\
-\midrule
-\multirow{5}{*}{Mean-variance: $r - \frac{\gamma}{2}\sigma^2$}
- & $\gamma = 0.5$ & 0.918 & 16.7\% & 18.8\% & $-$27.9\% \\
- & $\gamma = 1$   & 0.911 & 16.0\% & 18.1\% & $-$26.5\% \\
- & $\gamma = 2$   & 0.770 & 12.0\% & 16.5\% & $-$29.8\% \\
- & $\gamma = 5$   & 0.760 & 11.4\% & 16.0\% & $-$32.7\% \\
- & $\gamma = 10$  & 0.748 & 11.3\% & 16.1\% & $-$33.1\% \\
-\midrule
-\multirow{5}{*}{Log mean-variance: $\log(1{+}r) - \frac{\gamma}{2}\sigma^2$}
- & $\gamma = 0.5$ & 0.842 & 13.2\% & 16.4\% & $-$27.5\% \\
- & $\gamma = 1$   & 0.859 & 13.3\% & 16.1\% & $-$28.2\% \\
- & $\gamma = 2$   & 0.712 & 10.4\% & 15.7\% & $-$31.5\% \\
- & $\gamma = 5$   & 0.725 & 10.7\% & 15.9\% & $-$32.9\% \\
- & $\gamma = 10$  & 0.689 & 10.2\% & 16.1\% & $-$33.8\% \\
-\midrule
-\multirow{4}{*}{Sharpe-like: $r\,/\,\sigma^a$}
- & $a = 0.5$ & 0.920 & 16.7\% & 18.8\% & $-$28.3\% \\
- & $a = 1.0$ & 0.803 & 13.2\% & 17.5\% & $-$32.7\% \\
- & $a = 1.5$ & 0.914 & 13.7\% & 15.4\% & $-$31.0\% \\
- & $a = 2.0$ & 0.894 & 11.8\% & 13.6\% & $-$26.5\% \\
-\bottomrule
-\end{tabular}
-\caption{Out-of-sample performance of XGBoost (M2) under alternative training targets (long-only construction). Every risk-adjusted target reduces returns faster than volatility.}
-\label{tab:alt_targets}
-\end{table}
+\input{tables/table_alt_targets}
 
 The pattern is consistent: returns fall faster than volatility under every risk penalty, regardless of functional form. The mildest adjustments (mean-variance with $\gamma = 0.5$, Sharpe-like with $a = 0.5$) come closest to the baseline but still underperform. This confirms that the finding in Section~\ref{sec:risk_aversion} is not specific to the mean-variance utility formulation.
 
@@ -227,23 +195,7 @@ In the baseline split (1990--2010 training, 2011--2025 test), M2 achieves a Shar
 
 The main test period (2011--2025) does not include the global financial crisis, which is the event that motivated \citet{DanielMoskowitz2016}. To test whether the strategy would have survived the 2009 momentum crash out-of-sample, the HMM and XGBoost are retrained on earlier data so that the GFC falls entirely in the test period.
 
-\begin{table}[H]
-\centering
-\small
-\begin{tabular}{l r r r r}
-\toprule
-Training period & Test months & M2 Sharpe & GFC cumulative & 2009 rebound \\
-\midrule
-1990--1999 & 132 & 0.28 & +37.7\% & +42.7\% \\
-1990--2004 & 72 & 0.47 & +14.2\% & +21.8\% \\
-1990--2006 & 48 & 0.38 & +17.6\% & +21.3\% \\
-\midrule
-\multicolumn{2}{l}{Fixed 12-mo momentum} & $-$0.18 & --- & $-$59.5\% \\
-\bottomrule
-\end{tabular}
-\caption{True out-of-sample test on the 2008--2009 crisis. Models are trained on pre-crisis data. ``GFC cumulative'' covers October 2007 to June 2009; ``2009 rebound'' covers March to December 2009.}
-\label{tab:gfc_oos}
-\end{table}
+\input{tables/table_gfc_oos}
 
 M2 not only survived the 2009 momentum crash but profited from it, correctly switching to reversal bets during the panic. The lower overall Sharpe (0.28--0.47 vs.\ 1.11 in the main test) reflects the shorter training period (109--193 months vs.\ 241), not a failure of the mechanism.
 
@@ -251,25 +203,7 @@ M2 not only survived the 2009 momentum crash but profited from it, correctly swi
 
 The baseline HMM is trained on 1990--2010 and held fixed. To test whether re-estimating with more recent data improves performance, the HMM is re-estimated every three years using all data up to that point, and XGBoost is retrained accordingly.
 
-\begin{table}[H]
-\centering
-\small
-\begin{tabular}{l l r}
-\toprule
-HMM trained through & Test period & M2 Sharpe \\
-\midrule
-2010 (baseline) & 2011--2025 & 1.04 \\
-2013 & 2014--2025 & 1.21 \\
-2016 & 2017--2025 & 0.91 \\
-2019 & 2020--2025 & 1.60 \\
-2022 & 2023--2025 & 1.14 \\
-\midrule
-Combined expanding & 2011--2025 & 1.04 \\
-\bottomrule
-\end{tabular}
-\caption{Expanding-window HMM re-estimation. The combined strategy stitches together the best available model at each point. Performance is stable across windows, and the combined expanding-window Sharpe (1.04) is comparable to the fixed-window baseline, indicating that the regime structure does not drift meaningfully over time. Sharpe levels in this table differ slightly from the main results (Table~\ref{tab:performance}) due to the use of a separate analysis pipeline with different XGBoost seed draws.}
-\label{tab:expanding}
-\end{table}
+\input{tables/table_expanding}
 
 The regime structure is stable: re-estimating the HMM with more recent data neither helps nor hurts. This alleviates the concern that the fixed training split produces a stale regime signal.
 
@@ -285,27 +219,7 @@ Removing the regime signal reduces M2's Sharpe from 1.11 to 0.41, a drop of 0.70
 
 To isolate the effect of linearity from the choice of training target, a Ridge regression is estimated on the same 13 standardised features as M1 and M2, predicting continuous forward returns (the same target as XGBoost). Table~\ref{tab:ridge} reports results across a range of regularisation strengths.
 
-\begin{table}[H]
-\centering
-\small
-\begin{tabular}{l r r r r r r}
-\toprule
-Model & $\alpha$ & Sharpe & Ann.\ Ret & Ann.\ Vol & MDD & Calm / Panic SR \\
-\midrule
-OLS (no reg.) & --- & $-$0.57 & $-$10.9\% & 17.4\% & $-$81.7\% & $-$0.60 / $-$0.55 \\
-Ridge & 0.1 & $-$0.57 & $-$10.9\% & 17.4\% & $-$81.7\% & $-$0.60 / $-$0.55 \\
-Ridge & 1.0 & $-$0.57 & $-$10.9\% & 17.4\% & $-$81.7\% & $-$0.60 / $-$0.55 \\
-Ridge & 10 & $-$0.57 & $-$10.9\% & 17.4\% & $-$81.7\% & $-$0.60 / $-$0.55 \\
-Ridge & 100 & $-$0.57 & $-$10.9\% & 17.4\% & $-$81.6\% & $-$0.60 / $-$0.55 \\
-Ridge & 1{,}000 & $-$0.54 & $-$10.5\% & 17.5\% & $-$80.1\% & $-$0.60 / $-$0.47 \\
-\midrule
-M1 (LR, classification) & --- & $-$0.03 & $-$1.6\% & 15.1\% & $-$44.1\% & $-$0.30 / 0.35 \\
-M2 (XGBoost) & --- & 1.11 & 21.9\% & 19.7\% & $-$24.8\% & 0.82 / 1.56 \\
-\bottomrule
-\end{tabular}
-\caption{Ridge regression baseline predicting continuous forward returns (same target as M2). The Sharpe of $-$0.57 is robust across all regularisation strengths.}
-\label{tab:ridge}
-\end{table}
+\input{tables/table_ridge}
 
 The Ridge regression assigns $\pi_t^{\text{filter}}$ a coefficient of $+0.003$, which is positive but economically negligible: a one-standard-deviation increase in the panic probability shifts the predicted return by only 0.3 basis points. The linear model cannot use the regime signal to condition how the momentum horizons jointly determine the stock ranking, regardless of the training target.
 
@@ -315,29 +229,7 @@ To verify that regime identification is robust to the choice of emission distrib
 
 The Student-$t$ model is estimated via data augmentation \citep{Geweke1993}: each observation receives a latent weight $w_t \sim \text{Gamma}(\nu/2, \nu/2)$, so that $\mathbf{z}_t \mid s_t{=}k,\, w_t \sim \mathcal{N}(\boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k / w_t)$. Marginalising over $w_t$ yields a multivariate $t$ with $\nu$ degrees of freedom. Crucially, conditional on $w_t$ the emission is Gaussian, so the Normal-Inverse-Wishart conjugate updates carry over with weighted sufficient statistics, preserving the efficiency of the Gibbs sampler.
 
-\begin{table}[H]
-\centering
-\small
-\begin{tabular}{r r r r r r}
-\toprule
-$\nu$ & LL (train) & LL (test) & BIC & Agreement & Corr($\pi$) \\
-\midrule
-3   & $-$1085.0 & $-$834.0 & 2334.5 & 97.8\% & 0.980 \\
-5   & $-$1066.7 & $-$828.4 & 2297.9 & 98.3\% & 0.987 \\
-7   & $-$1059.1 & $-$829.4 & 2282.6 & 98.5\% & 0.990 \\
-10  & $-$1053.9 & $-$831.8 & 2272.4 & 98.5\% & 0.993 \\
-15  & $-$1050.3 & $-$836.8 & 2265.2 & 99.0\% & 0.996 \\
-20  & $-$1048.9 & $-$840.0 & 2262.4 & 98.8\% & 0.998 \\
-30  & $-$1047.8 & $-$845.0 & 2260.1 & 99.8\% & 0.999 \\
-50  & $-$1047.0 & $-$850.4 & 2258.5 & 100.0\% & 1.000 \\
-100 & $-$1046.5 & $-$855.6 & 2257.6 & 100.0\% & 1.000 \\
-\midrule
-Normal & $-$1046.4 & $-$862.6 & \textbf{2257.3} & --- & --- \\
-\bottomrule
-\end{tabular}
-\caption{Student-$t$ vs.\ Normal emission HMM comparison. LL = log-likelihood; Agreement = fraction of months with identical binary regime classification as the Normal HMM; Corr($\pi$) = correlation of filtered panic probabilities.}
-\label{tab:student_t_hmm}
-\end{table}
+\input{tables/table_student_t_hmm}
 
 The Normal model achieves the lowest BIC (2257.3 vs.\ 2257.6 for the best Student-$t$ at $\nu = 100$), indicating no meaningful improvement from heavier tails. Regime classifications agree with the Normal HMM on at least 97.8\% of months across all $\nu$ values, and the correlation of filtered panic probabilities exceeds 0.98 everywhere. These results confirm that the Gaussian emission specification is robust for this application.
 
@@ -383,30 +275,7 @@ The state labelled $k^\ast$ is designated as ``panic'' and the other as ``calm.'
 
 The Gelman--Rubin $\hat{R}$ statistic \citep{Gelman2013} assesses convergence by comparing within-chain and between-chain variance across the five independent Gibbs sampler chains. For each parameter $\theta$, $\hat{R} = \sqrt{\hat{V}/W}$, where $W$ is the mean within-chain variance and $\hat{V} = \frac{n-1}{n}W + \frac{B}{n}$ combines within-chain variance with the between-chain variance $B$. Values near 1.0 indicate that the chains have converged to the same posterior distribution; $\hat{R} < 1.1$ is the standard threshold.
 
-\begin{table}[H]
-\centering
-\small
-\begin{tabular}{l r l}
-\toprule
-Parameter & $\hat{R}$ & Status \\
-\midrule
-$\mu_{\text{calm}}(\text{DD})$ & 1.000 & OK \\
-$\mu_{\text{calm}}(\text{DISP})$ & 1.000 & OK \\
-$\mu_{\text{calm}}(\text{REL\_N})$ & 1.000 & OK \\
-$\mu_{\text{calm}}(\text{CS})$ & 1.000 & OK \\
-$\mu_{\text{panic}}(\text{DD})$ & 1.000 & OK \\
-$\mu_{\text{panic}}(\text{DISP})$ & 1.000 & OK \\
-$\mu_{\text{panic}}(\text{REL\_N})$ & 1.000 & OK \\
-$\mu_{\text{panic}}(\text{CS})$ & 1.000 & OK \\
-$P_{00}$ (calm persistence) & 1.000 & OK \\
-$P_{01}$ (calm $\to$ panic) & 1.000 & OK \\
-$P_{10}$ (panic $\to$ calm) & 1.001 & OK \\
-$P_{11}$ (panic persistence) & 1.001 & OK \\
-\bottomrule
-\end{tabular}
-\caption{Gelman--Rubin $\hat{R}$ statistics for all HMM parameters, computed across 5 independent chains (1{,}500 post-burn-in draws each). All values are below 1.01, well within the convergence threshold of 1.1.}
-\label{tab:gelman_rubin}
-\end{table}
+\input{tables/table_gelman_rubin}
 
 \section{Fundamental Feature Definitions}\label{app:fundamental_features}
 

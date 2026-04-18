@@ -156,4 +156,138 @@ for name in ['Method 1: LR', 'Method 2: XGB']:
         print(f"  {name:<26s}  |  Sharpe={sh:>6.2f}  Ann.Ret={ar:>7.1%}  "
               f"Ann.Vol={av:>7.1%}  MDD={mdd:>7.1%}  |  Calm={sr_calm:>6.2f}  Panic={sr_panic:>6.2f}")
 
+# ── Export LaTeX and CSV tables ─────────────────────────────────────────────
+
+import os
+TABLES_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'tables')
+os.makedirs(TABLES_DIR, exist_ok=True)
+
+# Collect all results into a list for export
+rows = []
+
+# OLS
+test['score_ols_final'] = ols.predict(X_te_s)
+r_ols_final = long_short_port(test, 'score_ols_final')
+ar_o, av_o, sh_o, mdd_o = metrics(r_ols_final)
+pi_o = test_dates.reindex(r_ols_final.index)['pi_filter']
+calm_o = r_ols_final[pi_o < 0.5]
+panic_o = r_ols_final[pi_o >= 0.5]
+sr_calm_o = calm_o.mean() / calm_o.std() * np.sqrt(12) if len(calm_o) > 1 and calm_o.std() > 0 else float('nan')
+sr_panic_o = panic_o.mean() / panic_o.std() * np.sqrt(12) if len(panic_o) > 1 and panic_o.std() > 0 else float('nan')
+rows.append({'model': 'OLS (no reg.)', 'alpha': '---', 'sharpe': sh_o,
+             'ann_ret': ar_o, 'ann_vol': av_o, 'mdd': mdd_o,
+             'sr_calm': sr_calm_o, 'sr_panic': sr_panic_o})
+
+# Ridge models
+for alpha in alphas_to_test:
+    ridge_m = Ridge(alpha=alpha)
+    ridge_m.fit(X_tr_s, y_train)
+    test['score_ridge_exp'] = ridge_m.predict(X_te_s)
+    r_r = long_short_port(test, 'score_ridge_exp')
+    ar_r, av_r, sh_r, mdd_r = metrics(r_r)
+    pi_r = test_dates.reindex(r_r.index)['pi_filter']
+    calm_r = r_r[pi_r < 0.5]
+    panic_r = r_r[pi_r >= 0.5]
+    sr_calm_r = calm_r.mean() / calm_r.std() * np.sqrt(12) if len(calm_r) > 1 and calm_r.std() > 0 else float('nan')
+    sr_panic_r = panic_r.mean() / panic_r.std() * np.sqrt(12) if len(panic_r) > 1 and panic_r.std() > 0 else float('nan')
+    # Format alpha for display
+    if alpha >= 1000:
+        alpha_str = f"{alpha:,.0f}"
+    elif alpha == int(alpha):
+        alpha_str = f"{int(alpha)}"
+    else:
+        alpha_str = f"{alpha}"
+    rows.append({'model': 'Ridge', 'alpha': alpha_str, 'sharpe': sh_r,
+                 'ann_ret': ar_r, 'ann_vol': av_r, 'mdd': mdd_r,
+                 'sr_calm': sr_calm_r, 'sr_panic': sr_panic_r})
+
+# M1 and M2 from artefacts
+strats = artefacts['strategies_lo']
+for name_key, label in [('Method 1: LR', 'M1 (LR, classification)'),
+                         ('Method 2: XGB', 'M2 (XGBoost)')]:
+    if name_key in strats:
+        r = strats[name_key]
+        ar_m, av_m, sh_m, mdd_m = metrics(r)
+        pi_m = test_dates.reindex(r.index)['pi_filter']
+        calm_m = r[pi_m < 0.5]
+        panic_m = r[pi_m >= 0.5]
+        sr_calm_m = calm_m.mean() / calm_m.std() * np.sqrt(12) if len(calm_m) > 1 and calm_m.std() > 0 else float('nan')
+        sr_panic_m = panic_m.mean() / panic_m.std() * np.sqrt(12) if len(panic_m) > 1 and panic_m.std() > 0 else float('nan')
+        rows.append({'model': label, 'alpha': '---', 'sharpe': sh_m,
+                     'ann_ret': ar_m, 'ann_vol': av_m, 'mdd': mdd_m,
+                     'sr_calm': sr_calm_m, 'sr_panic': sr_panic_m})
+
+# Save CSV
+df_ridge = pd.DataFrame(rows)
+df_ridge.to_csv(os.path.join(TABLES_DIR, 'table_ridge.csv'), index=False, float_format='%.4f')
+print(f"Saved: {os.path.join(TABLES_DIR, 'table_ridge.csv')}")
+
+# Helper to format numbers for LaTeX
+def fmt_pct(v):
+    """Format as percentage with $-$ for negative."""
+    s = f"{abs(v):.1%}"
+    return f"$-${s}" if v < 0 else s
+
+def fmt_sharpe(v):
+    """Format Sharpe with $-$ for negative."""
+    s = f"{abs(v):.2f}"
+    return f"$-${s}" if v < 0 else s
+
+def fmt_alpha_tex(a):
+    """Format alpha for LaTeX (add thousands comma)."""
+    if a == '---':
+        return '---'
+    try:
+        val = float(a.replace(',', ''))
+        if val >= 1000:
+            return f"{int(val):,}".replace(',', '{,}')
+        elif val == int(val):
+            return f"{int(val)}"
+        else:
+            return a
+    except ValueError:
+        return a
+
+# Build LaTeX table
+# Only include selected ridge alphas matching the thesis (0.1, 1, 10, 100, 1000)
+selected_alphas = {'---', '0.1', '1', '10', '100', '1,000'}
+tex_lines = []
+tex_lines.append(r'\begin{table}[H]')
+tex_lines.append(r'\centering')
+tex_lines.append(r'\small')
+tex_lines.append(r'\begin{tabular}{l r r r r r r}')
+tex_lines.append(r'\toprule')
+tex_lines.append(r'Model & $\alpha$ & Sharpe & Ann.\ Ret & Ann.\ Vol & MDD & Calm / Panic SR \\')
+tex_lines.append(r'\midrule')
+
+for row in rows:
+    m = row['model']
+    a = row['alpha']
+    # Skip alphas not in the thesis table (0.01)
+    if m == 'Ridge' and a not in selected_alphas:
+        continue
+    a_tex = fmt_alpha_tex(a)
+    sh = fmt_sharpe(row['sharpe'])
+    ar = fmt_pct(row['ann_ret'])
+    av = fmt_pct(row['ann_vol'])
+    mdd = fmt_pct(row['mdd'])
+    sr_c = fmt_sharpe(row['sr_calm'])
+    sr_p = fmt_sharpe(row['sr_panic'])
+    line = f"{m} & {a_tex} & {sh} & {ar} & {av} & {mdd} & {sr_c} / {sr_p} \\\\"
+    # Add midrule before M1
+    if m == 'M1 (LR, classification)':
+        tex_lines.append(r'\midrule')
+    tex_lines.append(line)
+
+tex_lines.append(r'\bottomrule')
+tex_lines.append(r'\end{tabular}')
+tex_lines.append(r'\caption{Ridge regression baseline predicting continuous forward returns (same target as M2). The Sharpe of $-$0.57 is robust across all regularisation strengths.}')
+tex_lines.append(r'\label{tab:ridge}')
+tex_lines.append(r'\end{table}')
+
+tex_path = os.path.join(TABLES_DIR, 'table_ridge.tex')
+with open(tex_path, 'w') as f:
+    f.write('\n'.join(tex_lines) + '\n')
+print(f"Saved: {tex_path}")
+
 print("\nDone.")
