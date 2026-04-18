@@ -9,7 +9,7 @@ The second stage uses this regime signal to guide cross-sectional stock selectio
 
 \subsubsection{Model Specification}\label{sec:hmm_spec}
 
-This thesis employs a two-state ($K = 2$) Bayesian Hidden Markov Model to classify the market into latent regimes. The choice of $K = 2$ is validated empirically: Appendix~\ref{app:num_states} shows that increasing to $K = 3, 4,$ or $5$ states does not improve downstream portfolio performance and introduces estimation instability. The hidden state $s_t \in \{0, 1\}$ represents the unobserved regime at month $t$, where $s_t = 0$ denotes the \emph{calm} regime and $s_t = 1$ denotes the \emph{panic} regime. Crucially, as emphasized by \citet{Hamilton1989}, market regimes are not directly observable: an investor cannot know with certainty whether the market is currently in a calm or panic state. While regime classifications may appear obvious in retrospect, distinguishing regimes in real time is fairly difficult. The HMM formalises this uncertainty by treating regimes as hidden states that must be inferred probabilistically from observable market data (see Figure~\ref{fig:hmm_diagram}).
+This thesis employs a two-state ($K = 2$) Bayesian Hidden Markov Model to classify the market into latent regimes. The choice of $K = 2$ is validated empirically: Appendix~\ref{app:num_states} shows that increasing to $K = 3, 4,$ or $5$ states does not improve downstream portfolio performance and introduces estimation instability. The hidden state $s_t \in \{0, 1\}$ represents the unobserved regime at month $t$, where $s_t = 0$ denotes the \emph{calm} regime and $s_t = 1$ denotes the \emph{panic} regime. Crucially, as emphasized by \citet{Hamilton1989}, market regimes are not directly observable: an investor cannot know with certainty whether the market is currently in a calm or panic state. While regime classifications may appear obvious in retrospect, distinguishing regimes in real time is inherently difficult. The HMM formalises this uncertainty by treating regimes as hidden states that must be inferred probabilistically from observable market data (see Figure~\ref{fig:hmm_diagram}).
 
 \textbf{Observation equation} Conditional on the regime, the vector of standardized features $\mathbf{z}_t \in \mathbb{R}^D$ (where $D = 4$) is drawn from a regime-specific multivariate Gaussian. The shorthand $\mathbf{z}_{1:t} = (\mathbf{z}_1, \mathbf{z}_2, \dots, \mathbf{z}_t)$ denotes the full history of observations up to and including month~$t$:
 \begin{equation}
@@ -194,7 +194,7 @@ For each seed, posterior mean parameters $\bar{\boldsymbol{\mu}}_k$, $\bar{\bold
 \begin{equation}
 \pi_t^{\text{filter}} = \frac{1}{N_s} \sum_{s=1}^{N_s} \pi_t^{\text{filter},(s)}.
 \end{equation}
-This Bayesian model averaging over 200 seeds substantially reduces the variance of the regime signal. Heavy-variance tests confirm that the resulting Sharpe ratio has a standard deviation of only 0.082 across independent seed partitions, indicating that performance is not sensitive to the particular random seeds used.
+This Bayesian model averaging over 200 seeds substantially reduces the variance of the regime signal. Cross-seed stability tests confirm that the resulting Sharpe ratio has a standard deviation of only 0.082 across independent seed partitions, indicating that performance is not sensitive to the particular random seeds used.
 
 \paragraph{Convergence Diagnostics}\label{sec:convergence}
 
@@ -255,7 +255,7 @@ The simplest approach exploits the economic intuition that the optimal momentum 
 \end{align}
 Stocks are then ranked by this score; the top decile forms the long leg and the bottom decile the short leg, as described in Appendix~\ref{app:portfolio_construction}.
 
-When $\pi_t^{\text{filter}} \approx 0$ (calm), $\ell_t = 12$, recovering the standard 12-month momentum signal that captures continuation in trending markets \citep{JegadeeshTitman1993}. When $\pi_t^{\text{filter}} \approx 1$ (panic), $\ell_t = 1$, switching to 1-month reversal to exploit the tendency of oversold stocks to snap back after panic selling \citep{GHM2023}. At intermediate values, the lookback smoothly interpolates between these extremes.
+When $\pi_t^{\text{filter}} \approx 0$ (calm), $\ell_t = 12$, recovering the standard 12-month momentum signal that captures continuation in trending markets \citep{JegadeeshTitman1993}. When $\pi_t^{\text{filter}} \approx 1$ (panic), $\ell_t = 1$, switching to 1-month reversal to exploit the tendency of oversold stocks to recover after panic selling \citep{GHM2023}. At intermediate values, the lookback smoothly interpolates between these extremes.
 
 \paragraph{Method 1: Logistic Regression}\label{sec:method1}
 
