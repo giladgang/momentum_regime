@@ -654,6 +654,7 @@ ax.axhline(0.5, color='black', linewidth=0.5, linestyle=':')
 ax.legend(fontsize=8, loc='upper left')
 shade_crises(ax, label=True)
 ax.set_xlabel('Date')
+ax.set_xlim(dates.min(), dates.max())
 
 plt.tight_layout()
 fig.savefig('regime_probabilities.png', dpi=150)
