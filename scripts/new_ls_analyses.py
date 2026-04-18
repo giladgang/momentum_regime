@@ -165,16 +165,21 @@ def get_alphas(r, name):
     y = merged['ret'].values
 
     results = {}
+    all_factors = ['Mkt-RF', 'SMB', 'HML', 'UMD', 'RMW', 'CMA']
     for model_name, cols in [
         ('CAPM', ['Mkt-RF']),
         ('FF3', ['Mkt-RF', 'SMB', 'HML']),
-        ('Carhart4', ['Mkt-RF', 'SMB', 'HML', 'UMD']),
+        ('Carhart', ['Mkt-RF', 'SMB', 'HML', 'UMD']),
         ('FF5', ['Mkt-RF', 'SMB', 'HML', 'RMW', 'CMA']),
-        ('FF5+Mom', ['Mkt-RF', 'SMB', 'HML', 'RMW', 'CMA', 'UMD']),
+        ('FF6', ['Mkt-RF', 'SMB', 'HML', 'RMW', 'CMA', 'UMD']),
     ]:
         X = sm.add_constant(merged[cols].values)
         res = sm.OLS(y, X).fit(cov_type='HAC', cov_kwds={'maxlags': 6})
-        results[model_name] = {'alpha': res.params[0] * 12, 't': res.tvalues[0], 'p': res.pvalues[0]}
+        betas = {}
+        for j, c in enumerate(cols):
+            betas[c] = res.params[j + 1]
+        results[model_name] = {'alpha': res.params[0] * 12, 't': res.tvalues[0],
+                               'p': res.pvalues[0], 'betas': betas, 'cols': cols}
 
     print(f"\n  {name}:")
     for m, r_dict in results.items():
@@ -186,6 +191,36 @@ alpha_m2 = get_alphas(r_m2, 'M2 (mom+pi)')
 alpha_dm = get_alphas(r_dm, 'D&M managed')
 alpha_wml = get_alphas(r_wml_net, 'Unscaled WML')
 alpha_m1 = get_alphas(r_m1, 'M1 (LR)')
+
+# Export factor alpha table for M2
+all_factors = ['Mkt-RF', 'SMB', 'HML', 'UMD', 'RMW', 'CMA']
+tex = []
+tex.append(r'\begin{table}[H]')
+tex.append(r'\centering')
+tex.append(r'\small')
+tex.append(r'\begin{tabular}{l r r r r r r r r}')
+tex.append(r'\toprule')
+tex.append(r'Model & $\alpha$ (\%) & $t(\alpha)$ & Mkt-RF & SMB & HML & UMD & RMW & CMA \\')
+tex.append(r'\midrule')
+for mname, mdata in alpha_m2.items():
+    alpha_ann = mdata['alpha'] * 100
+    t_alpha = mdata['t']
+    cells = [mname, f'{alpha_ann:.1f}', f'{t_alpha:.2f}']
+    for f in all_factors:
+        if f in mdata['betas']:
+            cells.append(f'{mdata["betas"][f]:+.2f}')
+        else:
+            cells.append('')
+    tex.append(' & '.join(cells) + r' \\')
+tex.append(r'\bottomrule')
+tex.append(r'\end{tabular}')
+tex.append(r"\caption{Factor model regressions for M2 (XGBoost, mom+$\pi$). $\alpha$ is annualised. $t$-statistics use Newey--West standard errors (6 lags).}")
+tex.append(r'\label{tab:factor_alphas}')
+tex.append(r'\end{table}')
+
+with open(os.path.join('tables', 'table_factor_alphas.tex'), 'w') as f:
+    f.write('\n'.join(tex) + '\n')
+print("  Saved: tables/table_factor_alphas.tex")
 
 # ═══════════════════════════════════════════════════════════════════
 # 3. M1 POLYNOMIAL/INTERACTION TESTS

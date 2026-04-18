@@ -131,6 +131,18 @@ def main():
 
         15: ('scripts/tree_path_analysis.py',
              'STEP 15: Tree path analysis (momentum decision paths by regime and leg)'),
+
+        16: ('scripts/tree_combo_grouped.py',
+             'STEP 16: Grouped combo analysis (S/M/I/L horizon interactions by regime)'),
+
+        17: ('scripts/test_2008_oos.py',
+             'STEP 17: GFC out-of-sample test (2008-2009 crisis)'),
+
+        18: ('scripts/expanding_window.py',
+             'STEP 18: Expanding-window HMM re-estimation'),
+
+        99: ('scripts/validate_production.py',
+             'STEP 99: Validate production artefacts (tables match pickle)'),
     }
 
     if args.step > 0:
@@ -138,7 +150,7 @@ def main():
             script, desc = steps[args.step]
             run_script(script, desc)
         else:
-            print(f"  Unknown step {args.step}. Valid steps: 1-8")
+            print(f"  Unknown step {args.step}. Valid steps: {sorted(steps.keys())}")
     else:
         # Run all steps in order
         for step_num in sorted(steps.keys()):
