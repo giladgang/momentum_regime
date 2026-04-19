@@ -521,19 +521,29 @@ feature_display = {
     'log_me': 'Log market equity',
 }
 
+total_overall = sum(r['overall'] for r in shap_rows)
+total_calm    = sum(r['calm']    for r in shap_rows)
+total_panic   = sum(r['panic']   for r in shap_rows)
+
 tex_lines = []
 tex_lines.append(r"\begin{table}[htbp]")
 tex_lines.append(r"\centering")
-tex_lines.append(r"\begin{tabular}{c l r r r}")
+tex_lines.append(r"\begin{tabular}{l r r r}")
 tex_lines.append(r"\toprule")
-tex_lines.append(r"Rank & Feature & Overall & Calm & Panic \\")
+tex_lines.append(r"Feature & Overall & Calm & Panic \\")
 tex_lines.append(r"\midrule")
-for rank, row in enumerate(shap_rows, 1):
+for row in shap_rows:
     disp = feature_display.get(row['feature'], row['feature'])
-    tex_lines.append(f"{rank} & {disp} & {row['overall']:.4f} & {row['calm']:.4f} & {row['panic']:.4f} \\\\")
+    # Display name for momentum aggregate
+    if 'Momentum' in row['feature']:
+        disp = 'Momentum (12 horizons)'
+    pct_o = row['overall'] / total_overall * 100
+    pct_c = row['calm']    / total_calm    * 100
+    pct_p = row['panic']   / total_panic   * 100
+    tex_lines.append(f"{disp} & {pct_o:.0f}\\% & {pct_c:.0f}\\% & {pct_p:.0f}\\% \\\\")
 tex_lines.append(r"\bottomrule")
 tex_lines.append(r"\end{tabular}")
-tex_lines.append(r"\caption{SHAP feature importance for the XGBoost model (Method~2). Mean absolute SHAP values computed on the test set. The 12 momentum lookbacks are aggregated into a single entry. Columns show importance overall and split by regime.}")
+tex_lines.append(r"\caption{SHAP feature importance shares for M2. Each column sums to 100\%.}")
 tex_lines.append(r"\label{tab:shap}")
 tex_lines.append(r"\end{table}")
 
