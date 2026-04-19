@@ -11,7 +11,7 @@ Fixed 12-mo mom & -1.9\% & 26.1\% & 0.06 & -72.3\% & $-$0.66 & -1.22 & 0.8 \\
 Fixed 1-mo mom & 3.1\% & 17.6\% & 0.26 & -30.2\% & $-$0.34 & -1.35 & 1.5 \\
 M0: Formula & -0.2\% & 23.6\% & 0.11 & -63.8\% & $-$0.59 & -1.24 & 1.0 \\
 M1: LR & -1.6\% & 15.1\% & $-$0.03 & -44.1\% & 0.06 & -2.50** & 0.8 \\
-M1: LR (augmented) & 4.3\% & 17.7\% & 0.32 & -39.3\% & 0.06 & 1.40 & 1.8 \\
+M1: LR (nonlinear) & 4.3\% & 17.7\% & 0.32 & -39.3\% & 0.06 & 1.40 & 1.8 \\
 M2: XGB (mom+$\pi$) & 21.9\% & 19.7\% & 1.11 & -24.8\% & 0.46 & 1.83* & 15.7 \\
 \bottomrule
 \end{tabular}
@@ -20,5 +20,5 @@ M2: XGB (mom+$\pi$) & 21.9\% & 19.7\% & 1.11 & -24.8\% & 0.46 & 1.83* & 15.7 \\
 
 \medskip
 \small
-\textbf{Notes:} Long-short (top/bottom decile, NYSE breakpoints), value-weighted, net of 10\,bps one-way costs. $\beta$ is the market beta. NW $t$ uses Newey--West standard errors (6 lags). Test period: January 2011 to November 2025 (167 months). ``Augmented'' adds $\pi^2$ and $\pi \times mom_k$ interaction terms to the logistic regression. $^{*}$\,$p<0.10$; $^{**}$\,$p<0.05$; $^{***}$\,$p<0.01$.
+\textbf{Notes:} Long-short (top/bottom decile, NYSE breakpoints), value-weighted, net of 10\,bps one-way costs. $\beta$ is the market beta. NW $t$ uses Newey--West standard errors (6 lags). Test period: January 2011 to November 2025 (167 months). ``Nonlinear'' adds $\pi^2$ and $\pi \times mom_k$ interaction terms to the logistic regression. $^{*}$\,$p<0.10$; $^{**}$\,$p<0.05$; $^{***}$\,$p<0.01$.
 \end{table}
