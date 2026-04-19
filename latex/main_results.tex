@@ -149,9 +149,9 @@ Second, aggressive risk adjustment breaks the strategy. At $\gamma = 0.5$ the Sh
 
 The implication is that detecting the regime-dependent structure of momentum requires the model to be free to learn flexible, regime-conditional feature interactions. Conservative risk objectives constrain this flexibility, forcing the model toward static low-volatility selections that obscure the very regime-dependent structure the regime signal is designed to capture.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{plots/risk_aversion_sweep.pdf}
+    \includegraphics[width=0.95\textwidth]{plots/risk_aversion_sweep.pdf}
     \caption{Performance and regime signal importance under mean-variance training targets with risk aversion $\gamma \in [0.5, 10]$. Left: Sharpe ratio drops sharply as $\gamma$ increases, crossing zero near $\gamma = 1$ for both MV and Log-MV targets. Right: $\pi^{\text{filter}}$ SHAP share declines from 45\% to below 10\%, confirming that the variance penalty crowds out the regime signal. Dashed lines show the baseline ($y = r$) and log return ($y = \log(1+r)$) targets for reference.}
     \label{fig:risk_aversion}
 \end{figure}
