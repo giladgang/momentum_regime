@@ -361,14 +361,18 @@ print("  " + "-" * 60)
 
 xgb_rows = []
 for config_name, params in configs:
-    model = XGBRegressor(
-        subsample=0.8, colsample_bytree=0.8,
-        tree_method='hist', random_state=42, verbosity=0,
-        **params
-    )
-    model.fit(X_tr_raw, y_tr_raw)
+    preds = np.zeros(len(X_te_raw))
+    for xs in XGB_SEEDS:
+        model = XGBRegressor(
+            subsample=0.8, colsample_bytree=0.8,
+            tree_method='hist', random_state=xs, verbosity=0,
+            **params
+        )
+        model.fit(X_tr_raw, y_tr_raw)
+        preds += model.predict(X_te_raw)
+    preds /= len(XGB_SEEDS)
     test_hp = test.copy()
-    test_hp['score'] = model.predict(X_te_raw)
+    test_hp['score'] = preds
     r = long_short_port(test_hp, 'score')
     ar, av, sh, _ = metrics(r)
     marker = " <-- baseline" if "depth=4, lr=0.05, n=500" in config_name else ""
@@ -533,12 +537,15 @@ lr2 = LogisticRegression(C=1.0, max_iter=1000, random_state=42)
 lr2.fit(X_tr2_s, train2['above_med'].values)
 test2['score_lr'] = lr2.predict_proba(X_te2_s)[:, 1]
 
-# XGB
-xgb2 = XGBRegressor(n_estimators=500, max_depth=4, learning_rate=0.05,
-                     subsample=0.8, colsample_bytree=0.8,
-                     tree_method='hist', random_state=42, verbosity=0)
-xgb2.fit(X_tr2, y_tr2)
-test2['score_xgb'] = xgb2.predict(X_te2)
+# XGB (50-seed ensemble)
+preds_xgb2 = np.zeros(len(X_te2))
+for xs in XGB_SEEDS:
+    xgb2 = XGBRegressor(n_estimators=500, max_depth=4, learning_rate=0.05,
+                         subsample=0.8, colsample_bytree=0.8,
+                         tree_method='hist', random_state=xs, verbosity=0)
+    xgb2.fit(X_tr2, y_tr2)
+    preds_xgb2 += xgb2.predict(X_te2)
+test2['score_xgb'] = preds_xgb2 / len(XGB_SEEDS)
 
 # Fixed 12-mo
 test2['score_mom12'] = test2.groupby('date')['mom_12'].rank(pct=True)
@@ -546,13 +553,24 @@ test2['score_mom12'] = test2.groupby('date')['mom_12'].rank(pct=True)
 print(f"\n  {'Strategy':<20s}  {'Sharpe (skip)':>14s}  {'Sharpe (base)':>14s}")
 print("  " + "-" * 55)
 
-for name, col, base_sh in [
-    ('Fixed 12-mo', 'score_mom12', 0.70),
-    ('M1: LR', 'score_lr', 1.038),
-    ('M2: XGB', 'score_xgb', 1.007),
-]:
+# Compute baselines from production artefacts (no-skip features)
+base_sharpes = {}
+for name, col in [('Fixed 12-mo', 'score_mom12'), ('M1: LR', 'score_lr'), ('M2: XGB', 'score_xgb')]:
+    if col == 'score_mom12':
+        test_base = test_art.copy()
+        test_base['score_mom12'] = test_base.groupby('date')['mom_12'].rank(pct=True)
+        r_base = long_short_port(test_base, 'score_mom12')
+    elif col == 'score_lr':
+        r_base = long_short_port(test_art, 'score_lr') if 'score_lr' in test_art.columns else pd.Series(dtype=float)
+    elif col == 'score_xgb':
+        r_base = long_short_port(test_art, 'score_xgb')
+    _, _, base_sh, _ = metrics(r_base) if len(r_base) > 0 else (0, 0, np.nan, 0)
+    base_sharpes[name] = base_sh
+
+for name, col in [('Fixed 12-mo', 'score_mom12'), ('M1: LR', 'score_lr'), ('M2: XGB', 'score_xgb')]:
     r = long_short_port(test2, col)
     _, _, sh, _ = metrics(r)
+    base_sh = base_sharpes[name]
     print(f"  {name:<20s}  {sh:>14.3f}  {base_sh:>14.3f}")
 
 
@@ -727,12 +745,15 @@ def evaluate_k_state(K_val, seeds_list):
         _, _, sh_lr, _ = metrics(r_lr_k)
         sharpes_lr.append(sh_lr)
 
-        # XGB
-        xgb_k = XGBRegressor(n_estimators=500, max_depth=4, learning_rate=0.05,
-                              subsample=0.8, colsample_bytree=0.8,
-                              tree_method='hist', random_state=42, verbosity=0)
-        xgb_k.fit(X_trk, y_trk)
-        test_k['score_xgb'] = xgb_k.predict(X_tek)
+        # XGB (50-seed ensemble)
+        preds_k = np.zeros(len(X_tek))
+        for xs in XGB_SEEDS:
+            xgb_k = XGBRegressor(n_estimators=500, max_depth=4, learning_rate=0.05,
+                                  subsample=0.8, colsample_bytree=0.8,
+                                  tree_method='hist', random_state=xs, verbosity=0)
+            xgb_k.fit(X_trk, y_trk)
+            preds_k += xgb_k.predict(X_tek)
+        test_k['score_xgb'] = preds_k / len(XGB_SEEDS)
         r_xgb_k = long_short_port(test_k, 'score_xgb')
         _, _, sh_xgb, _ = metrics(r_xgb_k)
         sharpes_xgb.append(sh_xgb)
