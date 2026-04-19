@@ -66,7 +66,7 @@ One possible interpretation is that the z-score peak at month~8 reflects where t
 \paragraph{SHAP: where the model discriminates}
 Month~1 carries negligible SHAP (around 5\%), indicating the model largely ignores the most recent month's return when forming predictions, consistent with the short-term reversal documented by \citet{Jegadeesh1990} and the standard practice of skipping the most recent month in momentum construction \citep{JegadeeshTitman1993}.
 
-Months 11 and 12 are the most influential individual horizons (18.5\% and 18.0\% of long-leg SHAP), with months 8--12 together accounting for roughly 67\%. The model's decision depends most heavily on the longer end of the term structure. Section~\ref{sec:nonlinearity} examines how the model uses these horizons jointly through tree path analysis.
+Months 11 and 12 are the most influential individual horizons (18.5\% and 18.0\% of long-leg SHAP), with months 8--12 together accounting for roughly 67\%. Where the z-score peak at month~8 indicates where the momentum signal is clearest (largest separation between long and short), the SHAP peak at months 11--12 indicates where the signal is strongest (most influential for the model's predictions). Section~\ref{sec:nonlinearity} examines how the model uses these horizons jointly through tree path analysis.
 
 \paragraph{Model validation}
 None of the patterns described above were imposed. The model receives 12 undifferentiated momentum horizons and recovers the intermediate-horizon dominance, the skip-month convention, and the concentration of discriminative power at the longer end of the term structure from the data alone, providing confidence that it captures genuine economic patterns rather than overfitting to noise.
