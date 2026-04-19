@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import (MOM_FEATURES, N_ESTIMATORS, MAX_DEPTH, LEARNING_RATE,
                     SUBSAMPLE, COLSAMPLE, XGB_SEEDS)
 
-with open('cs_artefacts_data.pkl', 'rb') as f:
+with open('artefacts/cs_artefacts_data.pkl', 'rb') as f:
     art = pickle.load(f)
 test = art['test'].copy()
 train = art['train'].copy()
@@ -100,7 +100,7 @@ ax.annotate('In calm: model\nfavors winners', xy=(8.5, 0.038), fontsize=9,
             color='steelblue', fontweight='bold', ha='center')
 
 plt.tight_layout()
-fig.savefig('score_vs_momentum_v2.png', dpi=150, bbox_inches='tight')
+fig.savefig('plots/score_vs_momentum_v2.png', dpi=150, bbox_inches='tight')
 plt.close(fig)
 print("Saved: score_vs_momentum_v2.png")
 
@@ -137,7 +137,7 @@ ax.grid(axis='y', alpha=0.3)
 plt.suptitle('How XGBoost scores stocks based on past returns: calm vs panic',
              fontsize=13, fontweight='bold', y=1.02)
 plt.tight_layout()
-fig2.savefig('score_vs_momentum_v2_2panel.png', dpi=150, bbox_inches='tight')
+fig2.savefig('plots/score_vs_momentum_v2_2panel.png', dpi=150, bbox_inches='tight')
 plt.close(fig2)
 print("Saved: score_vs_momentum_v2_2panel.png")
 

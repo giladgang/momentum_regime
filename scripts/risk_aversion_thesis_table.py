@@ -26,7 +26,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # ── Load artefacts ──
 print("Loading artefacts ...")
-with open('cs_artefacts_data.pkl', 'rb') as f:
+with open('artefacts/cs_artefacts_data.pkl', 'rb') as f:
     art = pickle.load(f)
 
 train = art['train'].copy()
@@ -168,7 +168,7 @@ for i, (name, y_target) in enumerate(targets):
         r = long_short_port(test, 'score_baseline')
         ann_ret, ann_vol, sharpe = metrics(r)
         import joblib
-        model = joblib.load('cs_artefacts_xgb.pkl')
+        model = joblib.load('artefacts/cs_artefacts_xgb.pkl')
         pi_share = compute_pi_share(model, X_test, FEATURES, MOM_FEATURES)
         results.append({'name': name, 'sharpe': sharpe, 'ann_ret': ann_ret,
                        'ann_vol': ann_vol, 'pi_share': pi_share})
@@ -180,7 +180,7 @@ for i, (name, y_target) in enumerate(targets):
 
 # ── Save results ──
 res_df = pd.DataFrame(results)
-res_df.to_csv('risk_aversion_thesis_results.csv', index=False, float_format='%.4f')
+res_df.to_csv('results/risk_aversion_thesis_results.csv', index=False, float_format='%.4f')
 
 print("\n\n" + "=" * 60)
 print("  RESULTS SUMMARY")

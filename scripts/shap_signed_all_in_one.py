@@ -45,7 +45,7 @@ for leg, title in [('long', 'Long leg'), ('short', 'Short leg')]:
     ax.grid(axis='y', alpha=0.3)
 
     plt.tight_layout()
-    fig.savefig(f'shap_signed_{leg}_final.png', dpi=150, bbox_inches='tight')
+    fig.savefig(f'plots/shap_signed_{leg}_final.png', dpi=150, bbox_inches='tight')
     plt.close(fig)
     print(f"Saved: shap_signed_{leg}_final.png")
 

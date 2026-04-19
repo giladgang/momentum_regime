@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import (MOM_FEATURES, N_ESTIMATORS, MAX_DEPTH, LEARNING_RATE,
                     SUBSAMPLE, COLSAMPLE, XGB_SEEDS)
 
-with open('cs_artefacts_data.pkl', 'rb') as f:
+with open('artefacts/cs_artefacts_data.pkl', 'rb') as f:
     art = pickle.load(f)
 test = art['test'].copy()
 train = art['train'].copy()
@@ -125,7 +125,7 @@ ax.legend(fontsize=11)
 ax.grid(axis='y', alpha=0.3)
 
 plt.tight_layout()
-fig.savefig('selection_rate_by_decile.png', dpi=150, bbox_inches='tight')
+fig.savefig('plots/selection_rate_by_decile.png', dpi=150, bbox_inches='tight')
 plt.close(fig)
 print("\nSaved: selection_rate_by_decile.png")
 
@@ -149,7 +149,7 @@ ax.legend(fontsize=11)
 ax.grid(axis='y', alpha=0.3)
 
 plt.tight_layout()
-fig2.savefig('net_selection_by_decile.png', dpi=150, bbox_inches='tight')
+fig2.savefig('plots/net_selection_by_decile.png', dpi=150, bbox_inches='tight')
 plt.close(fig2)
 print("Saved: net_selection_by_decile.png")
 

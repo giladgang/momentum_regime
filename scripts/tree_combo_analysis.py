@@ -30,7 +30,7 @@ from config import (N_ESTIMATORS, MAX_DEPTH, LEARNING_RATE, SUBSAMPLE,
 
 print("[ 1/4 ] Loading data ...")
 
-with open('cs_artefacts_data.pkl', 'rb') as f:
+with open('artefacts/cs_artefacts_data.pkl', 'rb') as f:
     art = pickle.load(f)
 test = art['test'].copy()
 train = art['train'].copy()
@@ -241,7 +241,7 @@ for gname, combos in all_results.items():
                   f"(median {z['median_z']:+.2f}, std {z['std_z']:.2f})")
 
 # Save
-with open('tree_combo_results.pkl', 'wb') as f:
+with open('artefacts/tree_combo_results.pkl', 'wb') as f:
     pickle.dump(all_results, f)
 
 # CSV summary

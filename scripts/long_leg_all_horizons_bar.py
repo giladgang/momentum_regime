@@ -10,7 +10,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import pickle
 
-with open('cs_artefacts_data.pkl', 'rb') as f:
+with open('artefacts/cs_artefacts_data.pkl', 'rb') as f:
     art = pickle.load(f)
 test = art['test'].copy()
 
@@ -54,7 +54,7 @@ ax.legend(fontsize=11)
 ax.grid(axis='y', alpha=0.3)
 
 plt.tight_layout()
-fig.savefig('long_leg_all_horizons_bar.png', dpi=150, bbox_inches='tight')
+fig.savefig('plots/long_leg_all_horizons_bar.png', dpi=150, bbox_inches='tight')
 plt.close(fig)
 print("Saved: long_leg_all_horizons_bar.png")
 

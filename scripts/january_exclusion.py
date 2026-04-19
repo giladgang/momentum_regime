@@ -19,7 +19,7 @@ os.makedirs(TABLES_DIR, exist_ok=True)
 # ── Load artefacts ───────────────────────────────────────────────────────────
 
 print("Loading artefacts ...")
-with open('cs_artefacts_data.pkl', 'rb') as f:
+with open('artefacts/cs_artefacts_data.pkl', 'rb') as f:
     artefacts = pickle.load(f)
 
 test  = artefacts['test'].copy()

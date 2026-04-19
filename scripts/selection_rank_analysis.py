@@ -35,7 +35,7 @@ from config import TRADING_FEE
 
 # ── Load data ──
 print("Loading artefacts ...")
-with open('cs_artefacts_data.pkl', 'rb') as f:
+with open('artefacts/cs_artefacts_data.pkl', 'rb') as f:
     art = pickle.load(f)
 test = art['test'].copy()
 FEATURES = art['FEATURES']
@@ -108,7 +108,7 @@ for h in horizons:
             })
 
 df = pd.DataFrame(rows)
-df.to_csv('selection_rank_analysis.csv', index=False, float_format='%.1f')
+df.to_csv('results/selection_rank_analysis.csv', index=False, float_format='%.1f')
 print(f"Saved: selection_rank_analysis.csv ({len(df)} rows)")
 
 # ── Print summary ──
@@ -152,7 +152,7 @@ ax.legend(fontsize=9, loc='upper left')
 ax.grid(alpha=0.3)
 ax.set_ylim(25, 70)
 plt.tight_layout()
-fig.savefig('chart2_rank_by_horizon_v2.png', dpi=150, bbox_inches='tight')
+fig.savefig('plots/chart2_rank_by_horizon_v2.png', dpi=150, bbox_inches='tight')
 plt.close(fig)
 
 # ── Chart 2: L/S with yearly bands ──
@@ -181,7 +181,7 @@ plt.suptitle('Long-short stock selection by momentum horizon and regime\n'
              '(yearly averages, bands = 25th-75th percentile across years)',
              fontsize=14, fontweight='bold', y=1.02)
 plt.tight_layout()
-fig.savefig('chart_ls_rank_yearly.png', dpi=150, bbox_inches='tight')
+fig.savefig('plots/chart_ls_rank_yearly.png', dpi=150, bbox_inches='tight')
 plt.close(fig)
 
 print("Saved: chart2_rank_by_horizon_v2.png")
@@ -277,7 +277,7 @@ for i, regime_val in enumerate(['Calm', 'Panic']):
 plt.suptitle('Momentum term structure by regime: stock selection and feature importance',
              fontsize=14, fontweight='bold', y=1.02)
 plt.tight_layout()
-fig.savefig('zscore_and_absshap_v3.png', dpi=150, bbox_inches='tight')
+fig.savefig('plots/zscore_and_absshap_v3.png', dpi=150, bbox_inches='tight')
 plt.close(fig)
 print("Saved: zscore_and_absshap_v3.png")
 

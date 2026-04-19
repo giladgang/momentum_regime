@@ -365,7 +365,7 @@ ax_lr.axvline(0, color='black', linewidth=0.8)
 ax_lr.set_xlabel('Learned weight (standardized)', fontsize=9)
 ax_lr.set_title('Logistic Regression weights\n(positive = predicts above-median return)', fontsize=10)
 plt.tight_layout()
-fig_lr.savefig('cs_lr_weights.png', dpi=150)
+fig_lr.savefig('plots/cs_lr_weights.png', dpi=150)
 plt.close(fig_lr)
 print("  LR weights saved: cs_lr_weights.png")
 
@@ -510,7 +510,7 @@ ax_avg.axis('off')
 ax_avg.set_title('Average XGBoost tree (most common feature & median threshold\n'
                  'at each split position, aggregated over all 500 trees)', fontsize=11, pad=10)
 plt.tight_layout()
-fig_avg.savefig('cs_avg_tree.png', dpi=150, bbox_inches='tight')
+fig_avg.savefig('plots/cs_avg_tree.png', dpi=150, bbox_inches='tight')
 plt.close(fig_avg)
 print("  Average tree saved: cs_avg_tree.png")
 
@@ -688,7 +688,7 @@ ax2.set_ylabel('pi_filter (panic prob)', fontsize=9)
 ax2.set_xlabel('Date')
 ax2.legend(fontsize=8)
 plt.tight_layout()
-fig.savefig('cs_performance.png', dpi=150)
+fig.savefig('plots/cs_performance.png', dpi=150)
 plt.close(fig)
 
 # Plot 2: SHAP feature importance (3 panels)
@@ -732,7 +732,7 @@ ax.set_title('Feature importance:\ncalm vs panic regime models', fontsize=10)
 ax.legend(fontsize=8)
 
 plt.tight_layout()
-fig.savefig('cs_feature_importance.png', dpi=150)
+fig.savefig('plots/cs_feature_importance.png', dpi=150)
 plt.close(fig)
 
 # Plot 3: Partial dependence of pi_filter
@@ -748,7 +748,7 @@ ax.set_ylabel('Predicted forward return (score)', fontsize=10)
 ax.set_title('Partial dependence of pi_filter\n(all other features at median)', fontsize=11)
 ax.legend(fontsize=9)
 plt.tight_layout()
-fig.savefig('cs_pdp_pi_filter.png', dpi=150)
+fig.savefig('plots/cs_pdp_pi_filter.png', dpi=150)
 plt.close(fig)
 
 print("Plots saved: cs_performance.png  cs_feature_importance.png  cs_pdp_pi_filter.png")
@@ -756,10 +756,10 @@ print("Plots saved: cs_performance.png  cs_feature_importance.png  cs_pdp_pi_fil
 # ── Save artefacts for fast re-plotting ──────────────────────────────────────
 import pickle, joblib
 
-joblib.dump(xgb, 'cs_artefacts_xgb.pkl')
-joblib.dump(lr,  'cs_artefacts_lr.pkl')
+joblib.dump(xgb, 'artefacts/cs_artefacts_xgb.pkl')
+joblib.dump(lr,  'artefacts/cs_artefacts_lr.pkl')
 
-with open('cs_artefacts_data.pkl', 'wb') as f:
+with open('artefacts/cs_artefacts_data.pkl', 'wb') as f:
     pickle.dump({
         'test':        test,
         'train':       train,

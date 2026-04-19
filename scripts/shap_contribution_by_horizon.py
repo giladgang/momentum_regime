@@ -16,7 +16,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import (MOM_FEATURES, N_ESTIMATORS, MAX_DEPTH, LEARNING_RATE,
                     SUBSAMPLE, COLSAMPLE, XGB_SEEDS)
 
-with open('cs_artefacts_data.pkl', 'rb') as f:
+with open('artefacts/cs_artefacts_data.pkl', 'rb') as f:
     art = pickle.load(f)
 test = art['test'].copy()
 train = art['train'].copy()
@@ -86,7 +86,7 @@ ax.legend(fontsize=11)
 ax.grid(axis='y', alpha=0.3)
 
 plt.tight_layout()
-fig.savefig('shap_contribution_by_horizon.png', dpi=150, bbox_inches='tight')
+fig.savefig('plots/shap_contribution_by_horizon.png', dpi=150, bbox_inches='tight')
 plt.close(fig)
 print("\nSaved: shap_contribution_by_horizon.png")
 

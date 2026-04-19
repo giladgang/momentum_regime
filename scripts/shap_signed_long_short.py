@@ -35,7 +35,7 @@ ax.set_title('Long leg', fontsize=13, fontweight='bold')
 ax.legend(fontsize=11)
 ax.grid(axis='y', alpha=0.3)
 plt.tight_layout()
-fig1.savefig('shap_signed_long.png', dpi=150, bbox_inches='tight')
+fig1.savefig('plots/shap_signed_long.png', dpi=150, bbox_inches='tight')
 plt.close(fig1)
 
 # Figure 2: Short leg
@@ -57,7 +57,7 @@ ax.set_title('Short leg', fontsize=13, fontweight='bold')
 ax.legend(fontsize=11)
 ax.grid(axis='y', alpha=0.3)
 plt.tight_layout()
-fig2.savefig('shap_signed_short.png', dpi=150, bbox_inches='tight')
+fig2.savefig('plots/shap_signed_short.png', dpi=150, bbox_inches='tight')
 plt.close(fig2)
 
 from PIL import Image

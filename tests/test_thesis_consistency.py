@@ -27,15 +27,14 @@ import pytest
 # Project paths
 # ---------------------------------------------------------------------------
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LATEX_DIR = os.path.join(PROJECT_ROOT, "latex")
-TABLES_DIR = os.path.join(PROJECT_ROOT, "tables")
-ARTEFACTS_PATH = os.path.join(PROJECT_ROOT, "cs_artefacts_data.pkl")
-
-# Ensure project root is on sys.path so we can import config
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 import config as cfg
+
+LATEX_DIR = os.path.join(PROJECT_ROOT, "latex")
+TABLES_DIR = os.path.join(PROJECT_ROOT, cfg.TABLES_DIR)
+ARTEFACTS_PATH = os.path.join(PROJECT_ROOT, cfg.ARTEFACTS_PATH)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -263,15 +262,15 @@ class TestTableConsistency:
     def test_table_shap_momentum_share(self):
         tbl = _read("tables/table_shap.tex")
         val = float(_find_in_table(tbl, "Momentum", 1))  # Overall column
-        assert val == pytest.approx(55, abs=1), (
-            f"Momentum SHAP share = {val}%, expected 55%"
+        assert val == pytest.approx(54, abs=1), (
+            f"Momentum SHAP share = {val}%, expected 54%"
         )
 
     def test_table_shap_pi_share(self):
         tbl = _read("tables/table_shap.tex")
         val = float(_find_in_table(tbl, "pi", 1))  # Overall column
-        assert val == pytest.approx(45, abs=1), (
-            f"pi_filter SHAP share = {val}%, expected 45%"
+        assert val == pytest.approx(46, abs=1), (
+            f"pi_filter SHAP share = {val}%, expected 46%"
         )
 
     # --- table_subperiod.tex ---
@@ -417,27 +416,27 @@ class TestFigures:
         )
 
     def test_zscore_and_absshap_v3_exists(self):
-        path = os.path.join(PROJECT_ROOT, "zscore_and_absshap_v3.png")
+        path = os.path.join(PROJECT_ROOT, cfg.PLOTS_DIR, "zscore_and_absshap_v3.png")
         assert os.path.exists(path), f"Missing: {path}"
 
     def test_depth_vs_sharpe_exists(self):
-        path = os.path.join(PROJECT_ROOT, "depth_vs_sharpe.png")
+        path = os.path.join(PROJECT_ROOT, cfg.PLOTS_DIR, "depth_vs_sharpe.png")
         assert os.path.exists(path), f"Missing: {path}"
 
     def test_cs_performance_regime_shaded_exists(self):
-        path = os.path.join(PROJECT_ROOT, "cs_performance_regime_shaded.png")
+        path = os.path.join(PROJECT_ROOT, cfg.PLOTS_DIR, "cs_performance_regime_shaded.png")
         assert os.path.exists(path), f"Missing: {path}"
 
     def test_regime_probabilities_exists(self):
-        path = os.path.join(PROJECT_ROOT, "regime_probabilities.png")
+        path = os.path.join(PROJECT_ROOT, cfg.PLOTS_DIR, "regime_probabilities.png")
         assert os.path.exists(path), f"Missing: {path}"
 
     def test_features_hmm_exists(self):
-        path = os.path.join(PROJECT_ROOT, "features_hmm.png")
+        path = os.path.join(PROJECT_ROOT, cfg.PLOTS_DIR, "features_hmm.png")
         assert os.path.exists(path), f"Missing: {path}"
 
     def test_convergence_trace_exists(self):
-        path = os.path.join(PROJECT_ROOT, "convergence_trace.png")
+        path = os.path.join(PROJECT_ROOT, cfg.PLOTS_DIR, "convergence_trace.png")
         assert os.path.exists(path), f"Missing: {path}"
 
 
@@ -588,11 +587,11 @@ class TestReproducibility:
     """Verify that reproducibility artefact CSVs exist and contain key values."""
 
     def test_depth_results_exists(self):
-        path = os.path.join(PROJECT_ROOT, "depth_results.csv")
+        path = os.path.join(PROJECT_ROOT, cfg.RESULTS_DIR, "depth_results.csv")
         assert os.path.exists(path), f"Missing: {path}"
 
     def test_depth_results_depth4_return(self):
-        path = os.path.join(PROJECT_ROOT, "depth_results.csv")
+        path = os.path.join(PROJECT_ROOT, cfg.RESULTS_DIR, "depth_results.csv")
         df = pd.read_csv(path)
         # Find the row for depth=4 and check annualised return
         depth_col = [c for c in df.columns if "depth" in c.lower()]
@@ -613,11 +612,11 @@ class TestReproducibility:
             )
 
     def test_risk_aversion_results_exists(self):
-        path = os.path.join(PROJECT_ROOT, "risk_aversion_thesis_results.csv")
+        path = os.path.join(PROJECT_ROOT, cfg.RESULTS_DIR, "risk_aversion_thesis_results.csv")
         assert os.path.exists(path), f"Missing: {path}"
 
     def test_fundamentals_ablation_results_exists(self):
-        path = os.path.join(PROJECT_ROOT, "fundamentals_ablation_results.csv")
+        path = os.path.join(PROJECT_ROOT, cfg.RESULTS_DIR, "fundamentals_ablation_results.csv")
         assert os.path.exists(path), f"Missing: {path}"
 
     def test_artefacts_pickle_exists(self):

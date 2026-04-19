@@ -21,7 +21,7 @@ from config import (N_ESTIMATORS, LEARNING_RATE, SUBSAMPLE, COLSAMPLE,
 
 # Load artefacts
 print("Loading artefacts ...")
-with open('cs_artefacts_data.pkl', 'rb') as f:
+with open('artefacts/cs_artefacts_data.pkl', 'rb') as f:
     art = pickle.load(f)
 
 train = art['train'].copy()
@@ -81,7 +81,7 @@ for depth in depths_list:
 
 # Save results
 df = pd.DataFrame(results)
-df.to_csv('depth_results.csv', index=False)
+df.to_csv('results/depth_results.csv', index=False)
 print("Saved: depth_results.csv")
 
 returns = df['ann_ret'].values
@@ -117,7 +117,7 @@ ax.set_ylim(0, max(returns) + 5)
 ax.grid(axis='y', alpha=0.3)
 
 plt.tight_layout()
-fig.savefig('depth_vs_sharpe.png', dpi=150, bbox_inches='tight')
+fig.savefig('plots/depth_vs_sharpe.png', dpi=150, bbox_inches='tight')
 plt.close(fig)
 print("Saved: depth_vs_sharpe.png")
 

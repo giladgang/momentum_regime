@@ -22,7 +22,7 @@ warnings.filterwarnings('ignore')
 # ══════════════════════════════════════════════════════════════════════════════
 
 print("Loading artefacts ...")
-with open('cs_artefacts_data.pkl', 'rb') as f:
+with open('artefacts/cs_artefacts_data.pkl', 'rb') as f:
     artefacts = pickle.load(f)
 
 train = artefacts['train'].copy()
@@ -121,7 +121,7 @@ for i_gamma, gamma in enumerate(GAMMAS):
         # Use production artefact scores for baseline (same as main results)
         test[score_col] = test['score_xgb']
         import joblib
-        model = joblib.load('cs_artefacts_xgb.pkl')
+        model = joblib.load('artefacts/cs_artefacts_xgb.pkl')
         print("  Using production artefact scores for baseline")
     else:
         # Compute risk-adjusted target and retrain
@@ -168,7 +168,7 @@ for i_gamma, gamma in enumerate(GAMMAS):
     print(f"  Top 5 SHAP: {agg.head(5).to_dict()}")
 
 res_df = pd.DataFrame(results)
-res_df.to_csv('risk_aversion_results.csv', index=False, float_format='%.4f')
+res_df.to_csv('results/risk_aversion_results.csv', index=False, float_format='%.4f')
 print("\n\nSummary:")
 print(res_df.to_string(index=False))
 print("\nSaved: risk_aversion_results.csv")
@@ -288,7 +288,7 @@ ax4.legend(handles[::-1], labels[::-1], loc='center left',
 fig.suptitle(r'XGBoost with Mean-Variance Utility Target:  $y_s = r_{t+1}^s - \frac{\gamma}{2}\,\sigma_s^2$',
              fontsize=15, fontweight='bold', y=0.98)
 
-plt.savefig('risk_aversion_analysis.png', dpi=200, bbox_inches='tight',
+plt.savefig('plots/risk_aversion_analysis.png', dpi=200, bbox_inches='tight',
             facecolor='white', edgecolor='none')
 plt.close(fig)
 print("\nSaved risk_aversion_analysis.png")

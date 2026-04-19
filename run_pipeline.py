@@ -92,6 +92,9 @@ def main():
     print()
 
     os.makedirs(cfg.TABLES_DIR, exist_ok=True)
+    os.makedirs(cfg.PLOTS_DIR, exist_ok=True)
+    os.makedirs(cfg.RESULTS_DIR, exist_ok=True)
+    os.makedirs(cfg.ARTEFACTS_DIR, exist_ok=True)
 
     # Check if HMM results already exist
     import pandas as pd

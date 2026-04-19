@@ -482,7 +482,7 @@ axes[D].legend(fontsize=8, loc='upper right')
 
 fig.suptitle('Trace plots - dashed line = end of burn-in', fontsize=11)
 plt.tight_layout()
-fig.savefig('convergence_trace.png', dpi=150)
+fig.savefig('plots/convergence_trace.png', dpi=150)
 plt.close(fig)
 print("Saved: convergence_trace.png")
 
@@ -657,7 +657,7 @@ ax.set_xlabel('Date')
 ax.set_xlim(dates.min(), dates.max())
 
 plt.tight_layout()
-fig.savefig('regime_probabilities.png', dpi=150)
+fig.savefig('plots/regime_probabilities.png', dpi=150)
 plt.close(fig)
 
 # Plot B: raw features coloured by regime — split into two charts
@@ -677,7 +677,7 @@ for ax, feat_z, feat_raw in zip(axes,
 axes[-1].set_xlabel('Date')
 fig.suptitle('HMM Features (DD, CS, DISP, REL_N) coloured by regime (red=panic, blue=calm)', fontsize=11)
 plt.tight_layout()
-fig.savefig('regime_features_1.png', dpi=150)
+fig.savefig('plots/regime_features_1.png', dpi=150)
 plt.close(fig)
 
 print("\nPlots saved: regime_probabilities.png, regime_features_1.png")
@@ -718,7 +718,7 @@ ax.set_title('Test period: predicted vs realized panic probability\n'
              'Blue leads red = filter anticipates transitions. Blue lags = filter is slow.',
              fontsize=10)
 plt.tight_layout()
-fig.savefig('transition_accuracy.png', dpi=150)
+fig.savefig('plots/transition_accuracy.png', dpi=150)
 plt.close(fig)
 print("Saved: transition_accuracy.png")
 
@@ -778,6 +778,6 @@ ax.legend(fontsize=8, loc='upper left', ncol=2)
 ax.set_title('Test period regime signal — red▼ = missed panic, orange▲ = false alarm, gold = economic events',
              fontsize=10)
 plt.tight_layout()
-fig.savefig('regime_signal_test.png', dpi=150)
+fig.savefig('plots/regime_signal_test.png', dpi=150)
 plt.close(fig)
 print("Saved: regime_signal_test.png")

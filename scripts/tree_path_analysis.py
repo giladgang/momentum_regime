@@ -40,7 +40,7 @@ MAX_DEPTH = 4
 
 print("[ 1/5 ] Loading data ...")
 
-with open('cs_artefacts_data.pkl', 'rb') as f:
+with open('artefacts/cs_artefacts_data.pkl', 'rb') as f:
     art = pickle.load(f)
 test = art['test'].copy()
 FEATURES = art['FEATURES']
@@ -307,7 +307,7 @@ for gname, paths in all_results.items():
                   f"{dir_label} threshold {s['median_threshold']*100:+.1f}%")
 
 # Save
-with open('tree_path_results.pkl', 'wb') as f:
+with open('artefacts/tree_path_results.pkl', 'wb') as f:
     pickle.dump({
         'results': all_results,
         'tree_stats': tree_stats,
@@ -329,7 +329,7 @@ for gname, paths in all_results.items():
             'pct': p['pct'],
             'avg_leaf_pct': p['avg_leaf_pct'],
         })
-pd.DataFrame(rows).to_csv('tree_path_results.csv', index=False, float_format='%.4f')
+pd.DataFrame(rows).to_csv('results/tree_path_results.csv', index=False, float_format='%.4f')
 
 print("\nSaved: tree_path_results.pkl, tree_path_results.csv")
 print("Done.")

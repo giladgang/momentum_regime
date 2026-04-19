@@ -308,7 +308,7 @@ def load_data():
                 panel[f'{col}_z'] = (vals - mu) / sd
 
     # Stock data
-    with open('cs_artefacts_data.pkl', 'rb') as f:
+    with open('artefacts/cs_artefacts_data.pkl', 'rb') as f:
         art = pickle.load(f)
     test = art['test'].copy()
     train = art['train'].copy()
@@ -418,7 +418,7 @@ def run_pass1(panel, available, all_combos):
                   f"{period_str}  {status}  [{elapsed:.0f}s, {n_passed} passed]")
 
     df = pd.DataFrame(results)
-    df.to_csv('hmm_feature_selection_pass1.csv', index=False)
+    df.to_csv('results/hmm_feature_selection_pass1.csv', index=False)
     passed_combos = [r for r in results if r['passed']]
     print(f"\n  Pass 1 complete: {len(results)} tested, {len(passed_combos)} passed")
     print(f"  Saved: hmm_feature_selection_pass1.csv")
@@ -514,7 +514,7 @@ def run_pass2(panel, train_stocks, test_stocks, passed_combos):
 
     results.sort(key=lambda x: -x['sh_xgb'])
     df = pd.DataFrame(results)
-    df.to_csv('hmm_feature_selection_pass2.csv', index=False)
+    df.to_csv('results/hmm_feature_selection_pass2.csv', index=False)
 
     print(f"\n  Top 10:")
     for i, r in enumerate(results[:10], 1):
@@ -681,7 +681,7 @@ def run_pass3(panel, train_stocks, test_stocks, top_combos):
         })
 
     df = pd.DataFrame(results)
-    df.to_csv('hmm_feature_selection_pass3.csv', index=False)
+    df.to_csv('results/hmm_feature_selection_pass3.csv', index=False)
 
     print(f"\n  Final ranking (by ensemble Sharpe):")
     for i, r in enumerate(sorted(results, key=lambda x: -x['sharpe']), 1):
@@ -803,7 +803,7 @@ def run_pass4(panel, train_stocks, test_stocks, top_combos):
         print(f"  {r['name']:<25s} {r['mean']:>6.3f} {r['std']:>6.3f} {r['min']:>6.3f} {r['max']:>6.3f} {stability:>10s}")
 
     df = pd.DataFrame([{k: v for k, v in r.items() if k != 'all_sharpes'} for r in results])
-    df.to_csv('hmm_feature_selection_pass4.csv', index=False)
+    df.to_csv('results/hmm_feature_selection_pass4.csv', index=False)
     print(f"\n  Saved: hmm_feature_selection_pass4.csv")
     return results
 
@@ -825,7 +825,7 @@ def main():
         passed = run_pass1(panel, available, all_combos)
     else:
         # Load from saved results
-        df = pd.read_csv('hmm_feature_selection_pass1.csv')
+        df = pd.read_csv('results/hmm_feature_selection_pass1.csv')
         passed = [{'name': r['name'], 'combo': eval(r['combo']),
                    'min_ess': r['min_ess'], 'n_sig': r['n_sig']}
                   for _, r in df[df['passed']].iterrows()]
@@ -833,7 +833,7 @@ def main():
     if args.run_pass in (0, 2):
         top = run_pass2(panel, train_stocks, test_stocks, passed)
     else:
-        df = pd.read_csv('hmm_feature_selection_pass2.csv')
+        df = pd.read_csv('results/hmm_feature_selection_pass2.csv')
         top = [{'name': r['name'], 'combo': eval(r['combo']),
                 'sh_xgb': r['sh_xgb']}
                for _, r in df.head(TOP_N_FOR_PASS3).iterrows()]

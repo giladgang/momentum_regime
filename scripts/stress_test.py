@@ -35,7 +35,7 @@ print("  STRESS TEST: VULNERABILITY ANALYSIS")
 print("=" * 70)
 
 # ── Load data ──
-with open('cs_artefacts_data.pkl', 'rb') as f:
+with open('artefacts/cs_artefacts_data.pkl', 'rb') as f:
     art = pickle.load(f)
 test = art['test'].copy()
 r_mkt = art['r_mkt']

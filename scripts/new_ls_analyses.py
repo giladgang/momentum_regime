@@ -34,7 +34,7 @@ print("  NEW LONG-SHORT ANALYSES")
 print("=" * 70)
 
 # ── Load data ──
-with open('cs_artefacts_data.pkl', 'rb') as f:
+with open('artefacts/cs_artefacts_data.pkl', 'rb') as f:
     art = pickle.load(f)
 test = art['test'].copy()
 train = art['train'].copy()

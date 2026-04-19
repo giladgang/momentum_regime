@@ -11,7 +11,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import pickle, sys, os
 
-with open('cs_artefacts_data.pkl', 'rb') as f:
+with open('artefacts/cs_artefacts_data.pkl', 'rb') as f:
     art = pickle.load(f)
 test = art['test'].copy()
 shap_values = art['shap_values']
@@ -66,7 +66,7 @@ ax.legend(fontsize=11)
 ax.grid(alpha=0.3)
 
 plt.tight_layout()
-fig.savefig('shap_dependence_mom12.png', dpi=150, bbox_inches='tight')
+fig.savefig('plots/shap_dependence_mom12.png', dpi=150, bbox_inches='tight')
 plt.close(fig)
 print("Saved: shap_dependence_mom12.png")
 
@@ -120,7 +120,7 @@ ax.grid(alpha=0.3)
 plt.suptitle('How XGBoost uses momentum differently by regime',
              fontsize=13, fontweight='bold', y=1.02)
 plt.tight_layout()
-fig2.savefig('shap_dependence_2panel.png', dpi=150, bbox_inches='tight')
+fig2.savefig('plots/shap_dependence_2panel.png', dpi=150, bbox_inches='tight')
 plt.close(fig2)
 print("Saved: shap_dependence_2panel.png")
 

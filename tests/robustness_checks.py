@@ -42,7 +42,7 @@ def write_tex(filename, content):
 # ═══════════════════════════════════════════════════════════════════════════════
 
 print("Loading data ...")
-with open('cs_artefacts_data.pkl', 'rb') as f:
+with open('artefacts/cs_artefacts_data.pkl', 'rb') as f:
     artefacts = pickle.load(f)
 
 strats_lo = artefacts['strategies_lo']

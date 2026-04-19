@@ -134,7 +134,9 @@ N_PLACEBO_RUNS = 5
 # ═══════════════════════════════════════════════════════════════════════════════
 
 TABLES_DIR = 'tables'
-PLOTS_DIR = '.'  # plots saved to project root (matching current convention)
+PLOTS_DIR = 'plots'
+RESULTS_DIR = 'results'
+ARTEFACTS_DIR = 'artefacts'
 
 # ═══════════════════════════════════════════════════════════════════════════════
 #  DATA PATHS
@@ -143,6 +145,8 @@ PLOTS_DIR = '.'  # plots saved to project root (matching current convention)
 PANEL_PATH = 'data/panel.parquet'
 PANEL_WITH_REGIMES_PATH = 'data/panel_with_regimes.parquet'
 STOCK_DATA_PATH = 'data/crsp_msf_raw.parquet'
-ARTEFACTS_PATH = 'cs_artefacts_data.pkl'
+ARTEFACTS_PATH = 'artefacts/cs_artefacts_data.pkl'
+XGB_MODEL_PATH = 'artefacts/cs_artefacts_xgb.pkl'
+LR_MODEL_PATH = 'artefacts/cs_artefacts_lr.pkl'
 FF_FACTORS_PATH = 'data/ff_factors.parquet'
 EXTRA_HMM_FEATURES_PATH = 'data/extra_hmm_features.pkl'

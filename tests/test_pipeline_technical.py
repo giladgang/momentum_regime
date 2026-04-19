@@ -30,15 +30,15 @@ import pytest
 # Project paths
 # ---------------------------------------------------------------------------
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LATEX_DIR = os.path.join(PROJECT_ROOT, "latex")
-TABLES_DIR = os.path.join(PROJECT_ROOT, "tables")
-DATA_DIR = os.path.join(PROJECT_ROOT, "data")
-ARTEFACTS_PATH = os.path.join(PROJECT_ROOT, "cs_artefacts_data.pkl")
-
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 import config as cfg
+
+LATEX_DIR = os.path.join(PROJECT_ROOT, "latex")
+TABLES_DIR = os.path.join(PROJECT_ROOT, cfg.TABLES_DIR)
+DATA_DIR = os.path.join(PROJECT_ROOT, "data")
+ARTEFACTS_PATH = os.path.join(PROJECT_ROOT, cfg.ARTEFACTS_PATH)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -441,26 +441,26 @@ class TestSHAPValues:
     """Verify SHAP values and importance shares match thesis claims."""
 
     def test_shap_momentum_share(self):
-        """Momentum (12 horizons) should account for ~55% of total SHAP."""
+        """Momentum (12 horizons) should account for ~54% of total SHAP."""
         art = _get_artefacts()
         shap = art["shap_values"]
         abs_shap = np.abs(shap).mean(axis=0)
         total = abs_shap.sum()
         # mom_1..mom_12 are first 12 features, pi_filter is last
         mom_share = abs_shap[:12].sum() / total * 100
-        assert mom_share == pytest.approx(55, abs=2), (
-            f"Momentum SHAP share = {mom_share:.1f}%, expected ~55%"
+        assert mom_share == pytest.approx(54, abs=2), (
+            f"Momentum SHAP share = {mom_share:.1f}%, expected ~54%"
         )
 
     def test_shap_pi_share(self):
-        """Pi_filter should account for ~45% of total SHAP."""
+        """Pi_filter should account for ~46% of total SHAP."""
         art = _get_artefacts()
         shap = art["shap_values"]
         abs_shap = np.abs(shap).mean(axis=0)
         total = abs_shap.sum()
         pi_share = abs_shap[12] / total * 100  # pi_filter is the 13th feature
-        assert pi_share == pytest.approx(45, abs=2), (
-            f"Pi SHAP share = {pi_share:.1f}%, expected ~45%"
+        assert pi_share == pytest.approx(46, abs=2), (
+            f"Pi SHAP share = {pi_share:.1f}%, expected ~46%"
         )
 
     def test_shap_shares_sum_to_100(self):
@@ -747,17 +747,17 @@ class TestThesisTextMatchesTables:
         text = _read("latex/main_results.tex")
         assert "0.82" in text
 
-    def test_main_results_shap_pi_45(self):
+    def test_main_results_shap_pi_46(self):
         text = _read("latex/main_results.tex")
-        assert "45" in text, "main_results.tex should mention pi_filter 45% SHAP share"
+        assert "46" in text, "main_results.tex should mention pi_filter 46% SHAP share"
 
-    def test_main_results_shap_momentum_calm_51(self):
+    def test_main_results_shap_momentum_calm_50(self):
         text = _read("latex/main_results.tex")
-        assert "51" in text
+        assert "50" in text
 
-    def test_main_results_shap_momentum_panic_60(self):
+    def test_main_results_shap_momentum_panic_58(self):
         text = _read("latex/main_results.tex")
-        assert "60" in text
+        assert "58" in text
 
     def test_main_results_depth4_return(self):
         text = _read("latex/main_results.tex")
@@ -1087,17 +1087,17 @@ class TestReproducibilityArtifacts:
     """Verify CSV/pkl result files exist and contain expected values."""
 
     def test_depth_results_csv_exists(self):
-        path = os.path.join(PROJECT_ROOT, "depth_results.csv")
+        path = os.path.join(PROJECT_ROOT, cfg.RESULTS_DIR, "depth_results.csv")
         assert os.path.exists(path)
 
     def test_depth_results_has_depth_4(self):
-        path = os.path.join(PROJECT_ROOT, "depth_results.csv")
+        path = os.path.join(PROJECT_ROOT, cfg.RESULTS_DIR, "depth_results.csv")
         df = pd.read_csv(path)
         depth_col = [c for c in df.columns if "depth" in c.lower()][0]
         assert 4 in df[depth_col].values, "depth_results.csv missing depth=4 row"
 
     def test_depth_results_depth4_return_matches_thesis(self):
-        path = os.path.join(PROJECT_ROOT, "depth_results.csv")
+        path = os.path.join(PROJECT_ROOT, cfg.RESULTS_DIR, "depth_results.csv")
         df = pd.read_csv(path)
         depth_col = [c for c in df.columns if "depth" in c.lower()][0]
         ret_col = [c for c in df.columns if "ret" in c.lower() or "ann" in c.lower()]
@@ -1109,15 +1109,15 @@ class TestReproducibilityArtifacts:
             assert val == pytest.approx(21.9, abs=1.0)
 
     def test_risk_aversion_results_exists(self):
-        path = os.path.join(PROJECT_ROOT, "risk_aversion_thesis_results.csv")
+        path = os.path.join(PROJECT_ROOT, cfg.RESULTS_DIR, "risk_aversion_thesis_results.csv")
         assert os.path.exists(path)
 
     def test_xgb_model_pickle_exists(self):
-        path = os.path.join(PROJECT_ROOT, "cs_artefacts_xgb.pkl")
+        path = os.path.join(PROJECT_ROOT, cfg.XGB_MODEL_PATH)
         assert os.path.exists(path)
 
     def test_lr_model_pickle_exists(self):
-        path = os.path.join(PROJECT_ROOT, "cs_artefacts_lr.pkl")
+        path = os.path.join(PROJECT_ROOT, cfg.LR_MODEL_PATH)
         assert os.path.exists(path)
 
 

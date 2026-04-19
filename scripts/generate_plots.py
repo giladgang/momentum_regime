@@ -31,7 +31,7 @@ print("  GENERATING ALL PLOTS")
 print("=" * 70)
 
 # ── Load data ──
-with open('cs_artefacts_data.pkl', 'rb') as f:
+with open('artefacts/cs_artefacts_data.pkl', 'rb') as f:
     art = pickle.load(f)
 test = art['test'].copy()
 train = art['train'].copy()
@@ -154,7 +154,7 @@ ax.grid(True, alpha=0.3)
 ax.set_yscale('log')
 ax.axhline(1, color='black', linewidth=0.5, linestyle=':')
 plt.tight_layout()
-fig.savefig('cs_performance_regime_shaded.png', dpi=150)
+fig.savefig('plots/cs_performance_regime_shaded.png', dpi=150)
 plt.close(fig)
 print("  Saved: cs_performance_regime_shaded.png")
 
@@ -165,7 +165,7 @@ print("  Saved: cs_performance_regime_shaded.png")
 print("[ 3 ] PDP plot ...")
 
 import joblib
-xgb = joblib.load('cs_artefacts_xgb.pkl')
+xgb = joblib.load('artefacts/cs_artefacts_xgb.pkl')
 
 X_te = test[REDUCED].values.astype(float)
 pi_grid = np.linspace(0, 1, 100)
@@ -186,7 +186,7 @@ ax.set_title('Partial Dependence of XGBoost Predicted Return on pi_filter')
 ax.grid(True, alpha=0.3)
 ax.axhline(0, color='grey', linewidth=0.5, linestyle='--')
 plt.tight_layout()
-fig.savefig('cs_pdp_pi_filter.png', dpi=150)
+fig.savefig('plots/cs_pdp_pi_filter.png', dpi=150)
 plt.close(fig)
 print("  Saved: cs_pdp_pi_filter.png")
 
@@ -219,7 +219,7 @@ ax.set_title('Feature Importance by Regime')
 ax.legend()
 ax.grid(True, alpha=0.3, axis='y')
 plt.tight_layout()
-fig.savefig('cs_feature_importance.png', dpi=150)
+fig.savefig('plots/cs_feature_importance.png', dpi=150)
 plt.close(fig)
 print("  Saved: cs_feature_importance.png")
 

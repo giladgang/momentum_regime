@@ -26,7 +26,7 @@ from config import TRADING_FEE, MOM_FEATURES
 # ── Load saved artefacts ─────────────────────────────────────────────────────
 
 print("Loading artefacts ...")
-with open('cs_artefacts_data.pkl', 'rb') as f:
+with open('artefacts/cs_artefacts_data.pkl', 'rb') as f:
     artefacts = pickle.load(f)
 
 test     = artefacts['test'].copy()
