@@ -97,10 +97,10 @@ for bar, r in zip(bars, returns):
     ax.text(bar.get_x() + bar.get_width()/2, r + 0.4,
             f'{r:.1f}%', ha='center', va='bottom', fontsize=11, fontweight='bold')
 
-ax.annotate('No interactions', xy=(1, returns[0]), xytext=(1.5, 3),
+ax.annotate('Single feature', xy=(1, returns[0]), xytext=(1.5, 3),
             fontsize=9, color='#E53935', fontweight='bold',
             arrowprops=dict(arrowstyle='->', color='#E53935', lw=1.5))
-ax.annotate('Pairwise only', xy=(2, returns[1]), xytext=(2.5, 11),
+ax.annotate('$\\pi$ + one horizon', xy=(2, returns[1]), xytext=(2.5, 11),
             fontsize=9, color='#E53935', fontweight='bold',
             arrowprops=dict(arrowstyle='->', color='#E53935', lw=1.5))
 ax.annotate('Overfitting', xy=(5.5, (returns[4]+returns[5])/2), xytext=(5.5, 13),
