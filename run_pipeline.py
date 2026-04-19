@@ -44,6 +44,29 @@ def run_script(script_path, description):
     return True
 
 
+def run_pytest(test_path, description):
+    """Run a pytest test file and report status."""
+    print(f"\n{'='*70}")
+    print(f"  {description}")
+    print(f"  Test:   {test_path}")
+    print(f"{'='*70}\n")
+
+    t0 = time.time()
+    result = subprocess.run(
+        [sys.executable, '-m', 'pytest', test_path, '-v'],
+        capture_output=False,
+        text=True,
+    )
+    elapsed = time.time() - t0
+
+    if result.returncode == 0:
+        print(f"\n  DONE: {description} ({elapsed:.0f}s)")
+    else:
+        print(f"\n  FAILED: {description} (exit code {result.returncode})")
+        return False
+    return True
+
+
 def main():
     import argparse
     parser = argparse.ArgumentParser(description='Run momentum regime shifts pipeline')
@@ -141,14 +164,23 @@ def main():
         18: ('scripts/expanding_window.py',
              'STEP 18: Expanding-window HMM re-estimation'),
 
-        99: ('scripts/validate_production.py',
-             'STEP 99: Validate production artefacts (tables match pickle)'),
+        99: ('tests/test_thesis_consistency.py',
+             'STEP 99: Run thesis consistency tests (tables, figures, cross-refs)'),
+
+        100: ('tests/test_pipeline_technical.py',
+              'STEP 100: Run technical pipeline tests (data integrity, numbers, connections)'),
     }
+
+    # Steps that should be run via pytest instead of plain python
+    pytest_steps = {99, 100}
 
     if args.step > 0:
         if args.step in steps:
             script, desc = steps[args.step]
-            run_script(script, desc)
+            if args.step in pytest_steps:
+                run_pytest(script, desc)
+            else:
+                run_script(script, desc)
         else:
             print(f"  Unknown step {args.step}. Valid steps: {sorted(steps.keys())}")
     else:
@@ -162,7 +194,10 @@ def main():
             if not os.path.exists(script):
                 print(f"\n  SKIPPING: {script} (file not found)")
                 continue
-            success = run_script(script, desc)
+            if step_num in pytest_steps:
+                success = run_pytest(script, desc)
+            else:
+                success = run_script(script, desc)
             if not success:
                 print(f"\n  Pipeline stopped at step {step_num}.")
                 print(f"  Fix the error and rerun with: python run_pipeline.py --step {step_num}")

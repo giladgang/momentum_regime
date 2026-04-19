@@ -771,8 +771,9 @@ k_states_to_test = [2] + K_STATES_ROBUSTNESS  # [2, 3, 4, 5]
 hmm_seeds = [42, 2201, 1337, 7, 999]
 multistate_rows = []
 
-# K=2: use baseline numbers (std ~ 0 since we average 200 seeds)
-multistate_rows.append((2, sh_m1_base, 0.001, sh_m2_base, 0.065))
+# K=2: baseline uses all 200 seeds averaged into one pi_filter,
+# so there is only one Sharpe per method (std = 0 by construction).
+multistate_rows.append((2, sh_m1_base, 0.000, sh_m2_base, 0.000))
 
 t0 = time.time()
 for K_val in K_STATES_ROBUSTNESS:

@@ -84,7 +84,7 @@ scaler = StandardScaler()
 X_tr_s = scaler.fit_transform(imp.fit_transform(X_tr))
 X_te_s = scaler.transform(imp.transform(X_te))
 train_c = train.copy()
-train_c['above_med'] = train_c.groupby('date')['ret_fwd'].transform(lambda x: (x >= x.median()).astype(int))
+train_c['above_med'] = train_c.groupby('date')['ret_fwd'].transform(lambda x: (x > x.median()).astype(int))
 lr = LogisticRegression(C=1.0, max_iter=1000, random_state=42)
 lr.fit(X_tr_s, train_c['above_med'].values)
 test['score_m1'] = lr.predict_proba(X_te_s)[:, 1]

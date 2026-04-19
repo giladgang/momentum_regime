@@ -248,7 +248,7 @@ for i, regime_val in enumerate(['Calm', 'Panic']):
     short_sd = np.array(z_std[(regime_val, 'short')])
     ax.fill_between(x, long_mean - long_sd, long_mean + long_sd, alpha=0.12, color='#2196F3')
     ax.fill_between(x, short_mean - short_sd, short_mean + short_sd, alpha=0.12, color='#E53935')
-    n = 108 if regime_val == 'Calm' else 59
+    n = int((test_pi.drop_duplicates('date')['regime'] == regime_val).sum())
     ax.set_title(f'{regime_val} ({n} months)',
                  fontsize=12, fontweight='bold')
     ax.legend(fontsize=9)
