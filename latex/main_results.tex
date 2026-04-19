@@ -17,7 +17,7 @@ Unconditional momentum fails: fixed 12-month momentum achieves a Sharpe of 0.06 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{cs_performance_regime_shaded.png}
+    \includegraphics[width=\textwidth]{plots/cs_performance_regime_shaded.png}
     \caption{Cumulative wealth paths (log scale) starting from \$1 in January 2011. Shaded bands indicate panic months ($\pi_t^{\text{filter}} \geq 0.5$).}
     \label{fig:cumulative}
 \end{figure}
@@ -47,7 +47,7 @@ Figure~\ref{fig:term_structure} decomposes the aggregate SHAP importance into in
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{zscore_and_absshap_v3.png}
+    \includegraphics[width=\textwidth]{plots/zscore_and_absshap_v3.png}
     \caption{Momentum term structure by regime. Calm (left) and panic (right), split by long and short legs.}
     \label{fig:term_structure}
 \end{figure}
@@ -56,7 +56,9 @@ Figure~\ref{fig:term_structure} decomposes the aggregate SHAP importance into in
 
 The z-score curve for the calm long leg is humped: near zero at month~1, peaking at $+0.39$ at month~8, declining to $+0.17$ at month~12. SHAP peaks later, at month~11. The short leg mirrors this with negative z-scores, deepest at months 8--10 ($-0.27$ to $-0.30$). The portfolio characteristics confirm: the long side holds stocks with $+23.7\%$ trailing 12-month momentum; the short side holds stocks with weaker momentum ($+8.3\%$). The long-short spread is 1.33\% per month.
 
-The humped z-score shape is broadly consistent with the information diffusion literature: at the shortest horizon, returns are dominated by microstructure noise and short-term mean reversion \citep{Jegadeesh1990}; at intermediate horizons, gradual information diffusion creates predictable continuation \citep{HongStein1999, Barberis1998}; and at longer horizons, the continuation effect fades as underreaction gives way to overreaction \citep{LeeSwaminathan2000}. The z-score peak at month~8 is consistent with \citet{NovyMarx2012}, who shows that returns from 7 to 12 months prior are the primary driver of momentum profits. However, the SHAP evidence complicates this interpretation: the model allocates the most attention to months 10--11, where z-scores are already declining. This divergence suggests that the model's use of momentum horizons does not map cleanly onto the information diffusion story -- the longer horizons may carry additional discriminating power (e.g., separating sustained trends from temporary spikes) beyond what the z-score level alone captures.
+The model independently recovers several established features of cross-sectional momentum without being constrained to do so. Month~1 carries negligible weight (z-scores near zero on both legs, SHAP around 5\%), consistent with the short-term reversal documented by \citet{Jegadeesh1990} and the standard practice of skipping the most recent month in momentum construction \citep{JegadeeshTitman1993}. The z-score peak at month~8 and the concentration of SHAP at months 8--12 (accounting for roughly 67\% of the long leg's momentum SHAP) are consistent with \citet{NovyMarx2012}'s finding that intermediate-horizon returns are the primary driver of momentum profits. The decline in z-scores at months 11--12 is consistent with the onset of long-term mean reversion at extended lookbacks \citep{DeBondtThaler1985}. The short leg mirrors this structure with negative z-scores deepest at months 8--10, confirming that the model applies symmetric selection criteria around the same intermediate horizons. None of these patterns were imposed on the model -- it receives 12 undifferentiated momentum horizons and recovers the structure from the data alone, providing confidence that the model captures genuine economic patterns rather than overfitting to noise.
+
+Second, the model does not simply select the stocks with the highest momentum. The long leg's z-scores are moderately above average, peaking at $+0.39$ at month~8 -- well within the distribution, not at its extremes. Separately, the SHAP distribution reveals that months 11 and 12 are the most discriminative individual horizons (18.5\% and 18.0\% of long-leg SHAP respectively), meaning the model's predictions are most sensitive to momentum values at these lookbacks. Z-scores describe the characteristics of selected stocks; SHAP measures how much each horizon contributes to the prediction. Together, they suggest that the model uses the full term structure jointly -- selecting stocks based on their momentum profile across horizons rather than the momentum level at any single lookback. This interpretation is developed further in Section~\ref{sec:nonlinearity}, where tree path analysis confirms that the model conditions on multiple horizon groups simultaneously.
 
 \subsubsection{Panic: Reversal}\label{sec:panic}
 
@@ -102,7 +104,7 @@ The tree depth analysis provides direct evidence for why multi-dimensional condi
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\textwidth]{depth_vs_sharpe.png}
+    \includegraphics[width=0.75\textwidth]{plots/depth_vs_sharpe.png}
     \caption{Out-of-sample annualised return as a function of maximum tree depth. Volatility is approximately constant ($\approx$19.5\%) across all depths.}
     \label{fig:depth_sharpe}
 \end{figure}
