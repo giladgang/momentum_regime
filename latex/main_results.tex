@@ -5,21 +5,15 @@ All strategies are evaluated out-of-sample on 2011--2025 (167 months), using the
 
 \subsection{Portfolio Performance}\label{sec:performance_results}
 
+\subsubsection{Strategy Comparison}
+
 Table~\ref{tab:performance} reports the out-of-sample performance of all strategies.\footnote{All Sharpe ratios are computed using raw returns rather than excess returns above the risk-free rate. Since the same convention is applied to every strategy, relative comparisons are unaffected. The risk-free rate averaged roughly 2\% annualised over the 2011--2025 window, so absolute Sharpe ratios are overstated by approximately 0.05--0.10.}
 
 \input{tables/table_performance}
 
-The central result is that momentum's cross-sectional predictability is regime-dependent, and that exploiting this dependence requires both a probabilistic regime signal and a nonlinear model. XGBoost combined with the HMM filtered probability (M2, mom+$\pi$) achieves an annualised Sharpe of 1.11 with a six-factor alpha of 24.7\% ($t = 4.78$). Every other specification in the table fails to produce economically meaningful long-short performance, and the pattern of failures is informative.
+The central result is that momentum's cross-sectional predictability is regime-dependent, and that exploiting this dependence requires both a probabilistic regime signal and a nonlinear model. XGBoost combined with the HMM filtered probability (M2, mom+$\pi$) achieves an annualised Sharpe of 1.11 with a six-factor alpha of 24.7\% ($t = 4.78$; see Appendix~\ref{app:factor_alphas} for the full factor model regressions). Every other specification in the table fails to produce economically meaningful long-short performance, and the pattern of failures is informative.
 
 Unconditional momentum fails: fixed 12-month momentum achieves a Sharpe of 0.06 with a maximum drawdown of $-$72.3\%, consistent with the deterioration of unconditional momentum strategies documented in the post-2000 literature \citep{DanielMoskowitz2016, BarrosoSantaClara2015}. Conditioning on the regime helps directionally -- M0, which switches the lookback horizon based on $\pi_t^{\text{filter}}$, improves to 0.11 -- but crude switching is not enough. The logistic regression (M1), which receives identical features to M2, collapses to a Sharpe of $-$0.03. Augmenting M1 with $\pi_t^{\text{filter}}$ polynomial and $\pi_t^{\text{filter}} \times mom_k$ interaction terms improves it to 0.32 -- confirming that the regime-momentum interaction exists -- but this still captures less than a third of XGBoost's performance, which discovers richer multi-way interactions automatically. Section~\ref{sec:regime_results} examines why.
-
-The regime signal is essential: removing $\pi_t^{\text{filter}}$ entirely and retraining on the 12 momentum features alone drops the Sharpe to 0.41 (Table~\ref{tab:regime_signal_ablation}). Without the regime signal, the model cannot distinguish calm from panic and applies fixed momentum weights regardless of market conditions. Replacing $\pi_t^{\text{filter}}$ with the four raw stress indicators (DD, DISP, REL\_N, CS) performs even worse (Sharpe 0.30): with four additional dimensions the model must discover the regime structure from scratch at each split, while the HMM distils the indicators into a single dimension that XGBoost can condition on with a single tree split.
-
-\input{tables/table_regime_signal_ablation}
-
-M2's factor alphas are significant across all standard specifications (Table~\ref{tab:factor_alphas}). The alpha is stable at 23--25\% across CAPM, Fama--French three- and five-factor, Carhart, and six-factor models, with $t$-statistics exceeding 4.0 in every case. Factor loadings are near zero throughout, confirming that M2's returns are not repackaged factor exposure. The Newey--West $t$-statistic for mean returns (1.83) is not individually significant, which is expected for a market-neutral long-short strategy with 19.7\% annualised volatility; the economically meaningful test is the factor alpha.
-
-\input{tables/table_factor_alphas}
 
 \begin{figure}[H]
     \centering
@@ -27,6 +21,12 @@ M2's factor alphas are significant across all standard specifications (Table~\re
     \caption{Cumulative wealth paths (log scale) starting from \$1 in January 2011. Shaded bands indicate panic months ($\pi_t^{\text{filter}} \geq 0.5$).}
     \label{fig:cumulative}
 \end{figure}
+
+\subsubsection{Regime Signal Ablation}
+
+The regime signal is essential: removing $\pi_t^{\text{filter}}$ entirely and retraining on the 12 momentum features alone drops the Sharpe to 0.41 (Table~\ref{tab:regime_signal_ablation}). Without the regime signal, the model cannot distinguish calm from panic and applies fixed momentum weights regardless of market conditions. Replacing $\pi_t^{\text{filter}}$ with the four raw stress indicators (DD, DISP, REL\_N, CS) performs even worse (Sharpe 0.30): with four additional dimensions the model must discover the regime structure from scratch at each split, while the HMM distils the indicators into a single dimension that XGBoost can condition on with a single tree split.
+
+\input{tables/table_regime_signal_ablation}
 
 
 \subsection{The Regime-Momentum Interaction}\label{sec:regime_results}

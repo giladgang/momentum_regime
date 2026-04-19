@@ -215,6 +215,10 @@ To assess whether XGBoost benefits specifically from the HMM regime signal rathe
 
 Removing the regime signal reduces M2's Sharpe from 1.11 to 0.41, a drop of 0.70. The regime signal is essential for long-short momentum stock selection, not merely a marginal improvement.
 
+\subsection{Factor Model Regressions}\label{app:factor_alphas}
+
+\input{tables/table_factor_alphas}
+
 \subsection{Ridge Regression Baseline}\label{app:ridge}
 
 To isolate the effect of linearity from the choice of training target, a Ridge regression is estimated on the same 13 standardised features as M1 and M2, predicting continuous forward returns (the same target as XGBoost). Table~\ref{tab:ridge} reports results across a range of regularisation strengths.
