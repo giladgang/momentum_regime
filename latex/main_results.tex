@@ -31,7 +31,7 @@ M2's factor alphas are significant across all standard specifications (Table~\re
 
 \subsection{The Regime-Momentum Interaction}\label{sec:regime_results}
 
-This section examines how M2 adapts its use of momentum across regimes. We first decompose performance by regime, then use SHAP values and cross-sectional z-scores to analyse the model's selection at each momentum horizon. We show that the model recovers known patterns from the momentum literature in calm, and discovers a novel term-structure-wide reversal mechanism in panic. Tree path and depth analyses confirm that the nonlinearity comes from regime-conditional direction flipping, not from complex horizon interactions.
+This section examines how M2 adapts its use of momentum across regimes. We decompose performance by regime, then use SHAP values and cross-sectional z-scores to analyse the model's selection at each momentum horizon. The model recovers known patterns from the momentum literature in calm and discovers a term-structure-wide reversal mechanism in panic. Section~\ref{sec:nonlinearity} then examines the mechanical source of this nonlinearity.
 
 Decomposing performance by market regime reveals how M2 uses momentum differently in calm and panic (Table~\ref{tab:regime_sharpe}). M2 achieves a Sharpe ratio of 1.56 during panic months compared to 0.82 during calm months. This panic-period dominance contrasts sharply with the long-only literature, where calm-period improvement typically drives overall performance. In long-short construction, the ability to correctly position the short side becomes the primary source of value.
 
@@ -77,15 +77,13 @@ The strongest empirical contribution is descriptive. In panic, the model's long 
 The second contribution is structural. The regime does not simply flip one horizon from continuation to reversal or shift weight between a fast and a slow signal. It alters how the model uses the \emph{entire} 12-horizon term structure: buying from the upper tail at intermediate horizons in calm and from the lower tail at all horizons in panic. The SHAP distribution remains broadly stable across regimes (Table~\ref{tab:zscore_shap_detail}), confirming that the model attends to the same horizons in both states. What changes is not which horizons matter, but the direction of selection at those horizons.
 
 \paragraph{The role of nonlinearity}
-The third contribution concerns the modelling requirement. That nonlinear models outperform linear ones in cross-sectional asset pricing is well established \citep{Gu2020}. What is more specific here is \emph{where} the nonlinearity matters: in transforming a macrofinancial regime probability into a conditioning variable for multi-horizon momentum selection. A linear model assigns $\pi_t^{\text{filter}}$ a single coefficient and cannot flip the selection direction across regimes (Section~\ref{sec:performance_results}). XGBoost can condition the sign of its splits on the regime signal, enabling the same tree structure to buy winners in calm and losers in panic. The nonlinearity is not generic feature interaction -- the tree path analysis (Section~\ref{sec:tree_paths}) shows that horizon combinations are regime-invariant -- but specifically the ability of $\pi_t^{\text{filter}}$ to act as a context switch.
+The third contribution concerns the modelling requirement. That nonlinear models outperform linear ones in cross-sectional asset pricing is well established \citep{Gu2020}. What is more specific here is \emph{where} the nonlinearity matters: in transforming a macrofinancial regime probability into a conditioning variable for multi-horizon momentum selection. Section~\ref{sec:nonlinearity} provides structural evidence that the nonlinearity is not generic feature interaction but specifically the ability of $\pi_t^{\text{filter}}$ to act as a context switch.
 
 \subsection{Nonlinearity and Feature Interactions}\label{sec:nonlinearity}
 
-The preceding section documented \emph{what} the model selects in each regime. This section examines \emph{how} -- whether the model relies on specific horizon interactions, and why nonlinear modelling is required.
-
 \subsubsection{Tree Path Analysis}\label{sec:tree_paths}
 
-The z-score and SHAP analysis treats each horizon independently. A natural question is whether the model relies on specific \emph{interactions} between horizons that the per-horizon decomposition would miss.
+The z-score and SHAP analysis in Section~\ref{sec:regime_results} treats each horizon independently. A natural question is whether the model relies on specific \emph{interactions} between horizons that the per-horizon decomposition would miss.
 
 To test this, we trace 5{,}000 sampled stocks from each regime$\times$leg group through 50{,}000 individual trees, recording which momentum horizon groups each decision path splits on (see Appendix~\ref{app:combo_analysis} for details). Horizons are grouped into four bands: short (S, months 1--3), medium (M, months 4--6), intermediate (I, months 7--9), and long (L, months 10--12). Table~\ref{tab:combo_freq} reports the frequency of each of the 15 possible combinations, where each column sums to 100\%.
 
