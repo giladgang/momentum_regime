@@ -149,6 +149,13 @@ Second, aggressive risk adjustment breaks the strategy. At $\gamma = 0.5$ the Sh
 
 The implication is that detecting the regime-dependent structure of momentum requires the model to be free to learn flexible, regime-conditional feature interactions. Conservative risk objectives constrain this flexibility, forcing the model toward static low-volatility selections that obscure the very regime-dependent structure the regime signal is designed to capture.
 
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{plots/risk_aversion_sweep.pdf}
+    \caption{Performance and regime signal importance under mean-variance training targets with risk aversion $\gamma \in [0.5, 10]$. Left: Sharpe ratio drops sharply as $\gamma$ increases, crossing zero near $\gamma = 1$ for both MV and Log-MV targets. Right: $\pi^{\text{filter}}$ SHAP share declines from 45\% to below 10\%, confirming that the variance penalty crowds out the regime signal. Dashed lines show the baseline ($y = r$) and log return ($y = \log(1+r)$) targets for reference.}
+    \label{fig:risk_aversion}
+\end{figure}
+
 \subsubsection{Stress Test: Prolonged Bear Market}\label{sec:stress_test}
 
 The reversal mechanism documented in Section~\ref{sec:panic} rests on a specific premise: that price declines during panic are temporary (driven by liquidity pressure) rather than permanent (driven by fundamental deterioration). The historical stress periods in the test sample support this: M2 earned $+29.9\%$ during the COVID crash (February--April 2020) and $+21.5\%$ during the 2022 bear market (January--October 2022). In both cases, the decline was temporary and reversed within months. The panic sub-type decomposition in Section~\ref{sec:panic} corroborates this: the 18 panic months with negative concurrent market returns produced an average loss of $-0.49\%$ per month, while the 41 recovery months generated $+4.42\%$.
