@@ -43,7 +43,9 @@ Table~\ref{tab:shap} reports aggregate feature importance: the regime signal $\p
 
 \input{tables/table_shap}
 
-Figure~\ref{fig:term_structure} decomposes the aggregate SHAP importance into individual momentum horizons, split by regime and portfolio leg. The top panels plot the average cross-sectional z-score of stocks in the long and short legs at each lookback horizon from 1 to 12 months: a positive z-score means the selected stocks have higher momentum than the cross-sectional average at that horizon, and vice versa. Shaded bands show $\pm 1$ standard error. The bottom panels show each horizon's share of the model's total momentum SHAP contribution, indicating how much attention the model pays to each lookback when forming its predictions. Calm (left) and panic (right) are shown side by side.
+Figure~\ref{fig:term_structure} decomposes the aggregate SHAP importance into individual momentum horizons, split by regime and portfolio leg. The top panels plot the average cross-sectional z-score of stocks in the long and short legs at each lookback horizon from 1 to 12 months: a positive z-score means the selected stocks have higher momentum than the cross-sectional average at that horizon, and vice versa. Shaded bands show $\pm 1$ standard error. The bottom panels show each horizon's share of the model's total momentum SHAP contribution. Calm (left) and panic (right) are shown side by side.
+
+An important distinction is needed for interpreting the figure. Z-scores describe the \emph{characteristics} of selected stocks -- where they fall in the cross-sectional momentum distribution at each horizon. SHAP measures something different: how much each horizon \emph{contributes to the model's prediction}. The two need not peak at the same horizon, and they do not: in calm, z-scores peak at month~8, while SHAP peaks at months 11--12. The subsections below analyse each measure separately before drawing joint conclusions.
 
 \begin{figure}[H]
     \centering
@@ -53,8 +55,6 @@ Figure~\ref{fig:term_structure} decomposes the aggregate SHAP importance into in
 \end{figure}
 
 \subsubsection{Calm: Momentum Continuation}\label{sec:calm}
-
-An important distinction is needed for interpreting Figure~\ref{fig:term_structure}. Z-scores describe the \emph{characteristics} of selected stocks -- where they fall in the cross-sectional momentum distribution at each horizon. SHAP measures something different: how much each horizon \emph{contributes to the model's prediction}. The two need not peak at the same horizon, and they do not: z-scores peak at month~8, SHAP peaks at months 11--12.
 
 \paragraph{Z-scores: characteristics of selected stocks}
 The z-score curve for the calm long leg is humped: near zero at month~1, peaking at $+0.39$ at month~8, declining to $+0.17$ at month~12. The short leg mirrors this with negative z-scores, deepest at months 8--10 ($-0.27$ to $-0.30$). The long-short spread is 1.33\% per month.
