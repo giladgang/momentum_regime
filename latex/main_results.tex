@@ -139,22 +139,24 @@ The tree depth analysis provides direct evidence for why multi-dimensional condi
 
 \subsubsection{Alternative Training Targets}
 
-The preceding analysis established that the regime signal is essential for long-short momentum. A natural question is whether this finding depends on how the model's training objective balances return against risk. To test this, XGBoost is retrained under three families of risk-adjusted targets, each with varying intensity:
-
-\input{tables/table_risk_aversion}
-
-Two findings emerge. First, under mild risk adjustment ($r/\sigma^{0.5}$ or small $\gamma$), the regime signal's share of feature importance actually \emph{increases} (from 46\% to 57\%), while the Sharpe ratio barely changes. Mild risk penalisation removes the noisiest bets but preserves the regime-conditional structure -- the model still adapts its joint use of momentum horizons across regimes, just with less exposure to extreme outcomes.
-
-Second, aggressive risk adjustment breaks the strategy. At $\gamma = 0.5$ the Sharpe drops to 0.75 and the regime signal's share falls to 35\%; at $a \geq 1$ the strategy collapses (Sharpe 0.36). The variance penalty overwhelms the long-short spread, steering the model toward low-volatility stocks regardless of regime and effectively abandoning the mechanism that makes M2 successful.
-
-The implication is that detecting the regime-dependent structure of momentum requires the model to be free to learn flexible, regime-conditional feature interactions. Conservative risk objectives constrain this flexibility, forcing the model toward static low-volatility selections that obscure the very regime-dependent structure the regime signal is designed to capture.
+The preceding analysis established that the regime signal is essential for long-short momentum. A natural question is whether this finding depends on how the model's training objective balances return against risk. To test this, XGBoost is retrained using the mean-variance utility framework of \citet{Markowitz1952}, which remains the standard approach for incorporating risk preferences in portfolio selection. The training target becomes
+\[
+    y_t^s \;=\; r_{t+1}^s \;-\; \frac{\gamma}{2}\,\sigma_s^2,
+\]
+where $r_{t+1}^s$ is the forward return of stock $s$, $\sigma_s^2$ is its trailing 12-month return variance, and $\gamma$ controls the degree of risk aversion. At $\gamma = 0$ this reduces to the baseline (raw returns); as $\gamma$ increases, the model is trained to penalise high-variance stocks more heavily. Figure~\ref{fig:risk_aversion} reports the Sharpe ratio, annualised return, and regime signal importance across $\gamma \in [0.5, 10]$.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.95\textwidth]{plots/risk_aversion_sweep.pdf}
-    \caption{Performance and regime signal importance under mean-variance training targets with risk aversion $\gamma \in [0.5, 10]$. Left: Sharpe ratio drops sharply as $\gamma$ increases, crossing zero near $\gamma = 1$ for both MV and Log-MV targets. Right: $\pi^{\text{filter}}$ SHAP share declines from 45\% to below 10\%, confirming that the variance penalty crowds out the regime signal. Dashed lines show the baseline ($y = r$) and log return ($y = \log(1+r)$) targets for reference.}
+    \caption{Performance and regime signal importance under mean-variance training targets with risk aversion $\gamma \in [0.5, 10]$. Left: Sharpe ratio drops from 1.11 at baseline to negative values by $\gamma = 1.5$. Centre: annualised return declines from 21.9\% to approximately $-$11\%. Right: $\pi^{\text{filter}}$ SHAP share drops from 45\% to below 10\%, confirming that the variance penalty crowds out the regime signal. Dashed lines mark the baseline ($\gamma = 0$).}
     \label{fig:risk_aversion}
 \end{figure}
+
+Two findings emerge. First, even mild risk aversion degrades the strategy: at $\gamma = 0.5$ the Sharpe drops to 0.75 and the regime signal's share of feature importance falls from 45\% to 35\%. At $\gamma \geq 1.5$ the strategy produces negative Sharpe ratios and annualised returns below $-$4\%.
+
+Second, the regime signal becomes irrelevant under aggressive risk adjustment. The $\pi^{\text{filter}}$ SHAP share falls from 45\% at baseline to below 10\% for $\gamma \geq 3$, indicating that the variance penalty steers the model toward low-volatility stocks regardless of regime. The model effectively abandons the regime-conditional momentum mechanism that makes M2 successful.
+
+The implication is clear: detecting the regime-dependent structure of momentum requires the model to optimise returns directly. The mean-variance penalty, standard in portfolio theory since \citet{Markowitz1952}, constrains the model's flexibility by forcing it toward static low-volatility selections that obscure the very regime-dependent patterns the regime signal is designed to capture.
 
 \subsubsection{Stress Test: Prolonged Bear Market}\label{sec:stress_test}
 
