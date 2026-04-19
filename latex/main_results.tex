@@ -33,7 +33,7 @@ The regime signal is essential: removing $\pi_t^{\text{filter}}$ entirely and re
 
 This section examines how M2 adapts its use of momentum across regimes. We decompose performance by regime, then use SHAP values and cross-sectional z-scores to analyse the model's selection at each momentum horizon. The model recovers known patterns from the momentum literature in calm and discovers a term-structure-wide reversal mechanism in panic. Section~\ref{sec:nonlinearity} then verifies these findings at the tree-structure level.
 
-Decomposing performance by market regime reveals how M2 uses momentum differently in calm and panic (Table~\ref{tab:regime_sharpe}). M2 achieves a Sharpe ratio of 1.56 during panic months compared to 0.82 during calm months. This panic-period dominance contrasts sharply with the long-only literature, where calm-period improvement typically drives overall performance. In long-short construction, the ability to correctly position the short side becomes the primary source of value.
+Decomposing performance by market regime reveals how M2 uses momentum differently in calm and panic (Table~\ref{tab:regime_sharpe}). M2 achieves a Sharpe ratio of 1.56 during panic months compared to 0.82 during calm months. The panic-period Sharpe is nearly double the calm-period Sharpe, indicating that the regime signal adds the most value during stress -- precisely when the model switches from continuation to reversal.
 
 \input{tables/table_regime_sharpe}
 
