@@ -33,13 +33,13 @@ The regime signal is essential: removing $\pi_t^{\text{filter}}$ entirely and re
 
 This section examines how M2 adapts its use of momentum across regimes. We decompose performance by regime, then use SHAP values and cross-sectional z-scores to analyse the model's selection at each momentum horizon. The model recovers known patterns from the momentum literature in calm and discovers a term-structure-wide reversal mechanism in panic. Section~\ref{sec:nonlinearity} then verifies these findings at the tree-structure level.
 
-Decomposing performance by market regime reveals how M2 uses momentum differently in calm and panic (Table~\ref{tab:regime_sharpe}). M2 achieves a Sharpe ratio of 1.56 during panic months compared to 0.82 during calm months. The panic-period Sharpe is nearly double the calm-period Sharpe, indicating that the regime signal adds the most value during stress -- precisely when the model switches from continuation to reversal.
+Decomposing performance by market regime reveals how M2 uses momentum differently in calm and panic (Table~\ref{tab:regime_sharpe}). M2 achieves a Sharpe ratio of 1.56 during panic months compared to 0.82 during calm months. The panic-period Sharpe is nearly double the calm-period Sharpe, indicating that the regime signal adds the most value during stress -- precisely when the model switches from continuation to reversal. This is the opposite of how prior approaches handle market instability: where exposure-scaling methods reduce positions during stress to limit losses, M2 leans into panic by reconstructing its portfolio to exploit the reversal (Section~\ref{sec:dm_comparison} develops this contrast).
 
 \input{tables/table_regime_sharpe}
 
 To open the black box of M2's regime-conditional decisions, we decompose its predictions using two complementary tools: SHAP values \citep{Lundberg2017}, which measure how much each horizon contributes to the prediction (the formal definition and methodology are provided in Appendix~\ref{app:shap}), and cross-sectional z-scores, which measure where in the distribution the model selects at each horizon.
 
-Table~\ref{tab:shap} reports aggregate feature importance: the regime signal $\pi_t^{\text{filter}}$ accounts for 45\% of total importance, comparable to the combined contribution of all 12 momentum horizons. The split between calm and panic is informative: momentum's aggregate importance rises from 0.0174 to 0.0277 in panic, while $\pi_t^{\text{filter}}$'s importance increases only modestly (0.0164 to 0.0187). The model relies more heavily on momentum signals during stress -- but as the analysis below reveals, it uses them in a fundamentally different way.
+Table~\ref{tab:shap} reports aggregate feature importance: the regime signal $\pi_t^{\text{filter}}$ accounts for 45\% of total importance, comparable to the combined contribution of all 12 momentum horizons. The split between calm and panic is informative: momentum's share rises from 51\% in calm to 60\% in panic, while $\pi_t^{\text{filter}}$'s share falls from 49\% to 40\%. The model relies more heavily on momentum signals during stress -- but as the analysis below reveals, it uses them in a fundamentally different way.
 
 \input{tables/table_shap}
 
@@ -130,7 +130,7 @@ But the premise can fail. In a sustained economic deterioration -- a depression 
 
 The strategy can absorb substantial downturns. A 12-month recession produces a worst-case drawdown of $-$51\%, after which calm-period continuation resumes. Only a depression-length downturn of 24 months produces a drawdown of $-$70\%. This mirrors the vulnerability identified by \citet{DanielMoskowitz2016} for traditional momentum, but on the opposite side: standard momentum crashes when winners stop winning; the regime-conditioned strategy would struggle when losers stop reverting. The hybrid approach combining stock selection with exposure scaling (Section~\ref{sec:future_work}) is designed for this contingency.
 
-\subsubsection{Comparison with \citet{DanielMoskowitz2016}}
+\subsubsection{Comparison with \citet{DanielMoskowitz2016}}\label{sec:dm_comparison}
 
 On the same data and with the same transaction costs, M2 (Sharpe 1.11, CAPM alpha 23.8\%, $t = 4.08$) outperforms the D\&M managed momentum strategy (Sharpe 0.49, CAPM alpha 10.3\%, $t = 1.86$). The two approaches use regime information differently: D\&M scale portfolio \emph{exposure} based on predicted crash risk (how much to hold), while M2 changes \emph{which stocks} are held by selecting from the opposite tail of the cross-sectional distribution (what to hold).
 
