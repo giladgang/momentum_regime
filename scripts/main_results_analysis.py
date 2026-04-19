@@ -11,6 +11,12 @@ Tables produced:
   4. table_lr_coef.tex       — Logistic regression coefficients with inference
   5. table_ic.tex            — Information coefficient analysis
   6. table_granger.tex       — Granger causality (pi_filter ↔ momentum IC)
+
+NOTE FOR AI ASSISTANTS: Do NOT modify this pipeline. It is the production
+pipeline for generating thesis results. If you need new analyses or tables,
+create a separate script (e.g. in scripts/) that imports from this pipeline's
+artefacts (cs_artefacts_data.pkl) and config.py. You may reference the helper
+functions here as a template but do not edit, refactor, or restructure this file.
 """
 
 import matplotlib
@@ -145,19 +151,14 @@ def block_bootstrap_sharpe(r, n_boot=10000, block_len=12):
     return lo, hi
 
 
-def newey_west_t(r_strat, r_bench, maxlags=6):
-    """Newey-West t-stat for mean excess return vs benchmark."""
+def newey_west_t(r_strat, r_bench=None, maxlags=6):
+    """Newey-West t-stat for H0: mean return = 0."""
     r_strat = pd.Series(r_strat)
-    r_bench = pd.Series(r_bench)
-    # Align by index
-    common = r_strat.index.intersection(r_bench.index)
-    excess = r_strat.loc[common].values - r_bench.loc[common].values
-    excess = np.asarray(excess, dtype=float)
-    excess = excess[~np.isnan(excess)]
-    if len(excess) < 12:
+    vals = r_strat.dropna().values.astype(float)
+    if len(vals) < 12:
         return np.nan, np.nan
-    X = np.ones((len(excess), 1))
-    model = sm.OLS(excess, X).fit(cov_type='HAC', cov_kwds={'maxlags': maxlags})
+    X = np.ones((len(vals), 1))
+    model = sm.OLS(vals, X).fit(cov_type='HAC', cov_kwds={'maxlags': maxlags})
     return model.tvalues[0], model.pvalues[0]
 
 
