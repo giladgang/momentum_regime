@@ -148,7 +148,7 @@ where $r_{t+1}^s$ is the forward return of stock $s$, $\sigma_s^2$ is its traili
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.95\textwidth]{plots/risk_aversion_sweep.pdf}
-    \caption{Performance and regime signal importance under mean-variance training targets with risk aversion $\gamma \in [0.5, 10]$. Left: Sharpe ratio drops from 1.11 at baseline to negative values by $\gamma = 1.5$. Centre: annualised return declines from 21.9\% to approximately $-$11\%. Right: $\pi^{\text{filter}}$ SHAP share drops from 45\% to below 10\%, confirming that the variance penalty crowds out the regime signal. Dashed lines mark the baseline ($\gamma = 0$).}
+    \caption{Sharpe ratio, annualised return, and $\pi^{\text{filter}}$ SHAP share under mean-variance training targets with $\gamma \in [0.5, 10]$. Dashed lines mark the baseline ($\gamma = 0$).}
     \label{fig:risk_aversion}
 \end{figure}
 
