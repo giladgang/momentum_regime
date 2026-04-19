@@ -37,11 +37,11 @@ Decomposing performance by market regime reveals how M2 uses momentum differentl
 
 \input{tables/table_regime_sharpe}
 
-To open the black box of M2's regime-conditional decisions, we decompose its predictions using two complementary tools: SHAP values \citep{Lundberg2017}, which measure how much each horizon contributes to the prediction (see Appendix~\ref{app:shap}), and cross-sectional z-scores, which measure where in the distribution the model selects at each horizon. Table~\ref{tab:shap} reports aggregate feature importance: the regime signal $\pi_t^{\text{filter}}$ accounts for 45\% of total importance, comparable to the combined contribution of all 12 momentum horizons, with its importance increasing from calm to panic months.
+To open the black box of M2's regime-conditional decisions, we decompose its predictions using two complementary tools: SHAP values \citep{Lundberg2017}, which measure how much each horizon contributes to the prediction (see Appendix~\ref{app:shap}), and cross-sectional z-scores, which measure where in the distribution the model selects at each horizon.
+
+Table~\ref{tab:shap} reports aggregate feature importance: the regime signal $\pi_t^{\text{filter}}$ accounts for 45\% of total importance, comparable to the combined contribution of all 12 momentum horizons. The split between calm and panic is informative: momentum's aggregate importance rises from 0.0174 to 0.0277 in panic, while $\pi_t^{\text{filter}}$'s importance increases only modestly (0.0164 to 0.0187). The model relies more heavily on momentum signals during stress -- but as the analysis below reveals, it uses them in a fundamentally different way.
 
 \input{tables/table_shap}
-
-The split between calm and panic is informative: momentum's aggregate importance rises from 0.0174 to 0.0277 in panic, while $\pi_t^{\text{filter}}$'s importance increases only modestly (0.0164 to 0.0187). This means the model relies more heavily on momentum signals during stress -- but as the term-structure analysis below reveals, it uses them in a fundamentally different way.
 
 Figure~\ref{fig:term_structure} decomposes the aggregate SHAP importance into individual momentum horizons, split by regime and portfolio leg. The top panels plot the average cross-sectional z-score of stocks in the long and short legs at each lookback horizon from 1 to 12 months: a positive z-score means the selected stocks have higher momentum than the cross-sectional average at that horizon, and vice versa. Shaded bands show $\pm 1$ standard error. The bottom panels show each horizon's share of the model's total momentum SHAP contribution, indicating how much attention the model pays to each lookback when forming its predictions. Calm (left) and panic (right) are shown side by side.
 
