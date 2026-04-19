@@ -37,7 +37,7 @@ Decomposing performance by market regime reveals how M2 uses momentum differentl
 
 \input{tables/table_regime_sharpe}
 
-To open the black box of M2's regime-conditional decisions, we decompose its predictions using two complementary tools: SHAP values \citep{Lundberg2017}, which measure how much each horizon contributes to the prediction (see Appendix~\ref{app:shap}), and cross-sectional z-scores, which measure where in the distribution the model selects at each horizon.
+To open the black box of M2's regime-conditional decisions, we decompose its predictions using two complementary tools: SHAP values \citep{Lundberg2017}, which measure how much each horizon contributes to the prediction (the formal definition and methodology are provided in Appendix~\ref{app:shap}), and cross-sectional z-scores, which measure where in the distribution the model selects at each horizon.
 
 Table~\ref{tab:shap} reports aggregate feature importance: the regime signal $\pi_t^{\text{filter}}$ accounts for 45\% of total importance, comparable to the combined contribution of all 12 momentum horizons. The split between calm and panic is informative: momentum's aggregate importance rises from 0.0174 to 0.0277 in panic, while $\pi_t^{\text{filter}}$'s importance increases only modestly (0.0164 to 0.0187). The model relies more heavily on momentum signals during stress -- but as the analysis below reveals, it uses them in a fundamentally different way.
 
