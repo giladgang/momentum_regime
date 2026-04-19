@@ -69,7 +69,7 @@ Month~1 carries negligible SHAP (around 5\%), indicating the model largely ignor
 Months 11 and 12 are the most influential individual horizons (18.5\% and 18.0\% of long-leg SHAP), with months 8--12 together accounting for roughly 67\%, consistent with \citet{NovyMarx2012}'s finding that intermediate-to-long-horizon returns are the primary driver of momentum profits. Where the z-score peak at month~8 indicates where the momentum signal is clearest (largest separation between long and short), the SHAP peak at months 11--12 indicates where the signal is strongest (most influential for the model's predictions). Section~\ref{sec:nonlinearity} examines how the model uses these horizons jointly through tree path analysis.
 
 \paragraph{Model validation}
-None of the patterns described above were imposed. The model receives 12 undifferentiated momentum horizons and recovers the intermediate-horizon dominance, the skip-month convention, and the concentration of discriminative power at the longer end of the term structure from the data alone, providing confidence that it captures genuine economic patterns rather than overfitting to noise.
+None of the patterns described above were imposed. The model receives 12 undifferentiated momentum horizons and independently recovers the skip-month convention \citep{Jegadeesh1990, JegadeeshTitman1993} and the concentration of predictive power at intermediate-to-long horizons \citep{NovyMarx2012} from the data alone. That the model arrives at these known results without guidance provides confidence that it captures genuine economic patterns rather than overfitting to noise.
 
 \subsubsection{Panic: Reversal}\label{sec:panic}
 
