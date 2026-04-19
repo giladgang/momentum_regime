@@ -19,14 +19,5 @@ The analysis assumes frictionless short selling and uses a uniform 10 basis poin
 
 \subsection{Future Work}\label{sec:future_work}
 
-Several directions could extend this framework.
-
-\paragraph{Regime signal improvements}
-The current signal $\pi_t^{\text{filter}}$ estimates panic probability at time $t$. A predictive variant $P(s_{t+1} = 1 \mid \mathbf{z}_{1:t})$, obtainable from the transition matrix, could reposition the portfolio \emph{before} regime shifts. Separately, the fixed HMM parameters may become miscalibrated if markets undergo structural change; rolling or expanding-window re-estimation would address this. A sequential model that conditions on the \emph{trajectory} of $\pi_t^{\text{filter}}$ -- distinguishing fresh stress from prolonged deterioration -- could improve detection of reversal failure.
-
-\paragraph{Robustness and generalisation}
-Testing the framework on international markets (Europe, Japan, emerging markets) would establish whether the term-structure reorganisation is a universal feature of momentum. Comparing XGBoost against alternative nonlinear models (Random Forests, neural networks) would clarify whether the finding is about the data or the model architecture. The HMM's Gaussian emissions could be replaced with Student-$t$ or skew-normal distributions to better accommodate tail events.
-
-\paragraph{Implementation extensions}
-The strategy's vulnerability to prolonged fundamental deterioration could be mitigated by an exposure-scaling circuit breaker that reduces overall position size during sustained bear markets. The feature set may itself be regime-dependent: fundamentals might add value during calm if used as a quality filter rather than as a direct model input. Finally, incorporating stock-specific transaction costs would provide a more realistic picture of implementability.
+Two directions could meaningfully extend this framework. First, the regime signal could be improved by predicting the regime one step ahead via the transition matrix, allowing the portfolio to reposition before regime shifts rather than reacting to them. A sequential model that conditions on the trajectory of $\pi_t^{\text{filter}}$ could further distinguish fresh stress from prolonged deterioration. Second, combining M2's stock selection with an exposure-scaling circuit breaker would address the strategy's primary vulnerability to sustained fundamental deterioration. Testing the framework on international markets would establish whether the term-structure reorganisation generalises beyond US equities.
 
