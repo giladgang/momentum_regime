@@ -2,6 +2,12 @@
 
 ## Pending
 - [ ] Work on fundamental analysis (results in `results/fundamentals_test_results.csv`, script: `scripts/fundamentals_test.py`)
+- [ ] Future work: add alternative nonlinear method (not just XGBoost)
+- [ ] Work on limitations of the method
+- [ ] Add clear explanation of why long-short and not long-only
+- [ ] Ablation test on fundamentals: check specifically for cash flow
+- [ ] Write Denis an email on the XGBoost pattern
+- [ ] Test Denis's risk aversion formula: constant-elasticity utility `sign(x) * log(1 + |x|/eps) - gamma * log(sigma)` (CRRA-style: fixed proportional trade-off between return and vol, vs CARA/MV which has fixed absolute trade-off for variance)
 
 ## Completed
 - [x] Create comprehensive pipeline tests (237 tests in `tests/test_pipeline_technical.py`)
