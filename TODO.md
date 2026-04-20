@@ -5,7 +5,7 @@
 - [ ] Future work: add alternative nonlinear method (not just XGBoost)
 - [ ] Work on limitations of the method
 - [ ] Add clear explanation of why long-short and not long-only
-- [ ] Ablation test on fundamentals: check specifically for cash flow
+- [ ] Ablation test on fundamentals: check specifically for cash flow. Blocked on WRDS auth (interactive login fails). Pull script is ready at `scripts/pull_cashflow.py` — pulls oancfy/capxy/ibq/atq from comp.fundq, computes cfo_a, fcf_a, accruals (Sloan). Once auth fixed: run pull, then write companion ablation script (baseline + add-one for each of 10 fundamentals + LOO from full + fund-only).
 - [ ] Write Denis an email on the XGBoost pattern
 - [ ] Test Denis's risk aversion formula: constant-elasticity utility `sign(x) * log(1 + |x|/eps) - gamma * log(sigma)` (CRRA-style: fixed proportional trade-off between return and vol, vs CARA/MV which has fixed absolute trade-off for variance)
 - [ ] Read the important literature cited in thesis (key papers to study deeply)
