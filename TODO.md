@@ -8,6 +8,8 @@
 - [ ] Ablation test on fundamentals: check specifically for cash flow
 - [ ] Write Denis an email on the XGBoost pattern
 - [ ] Test Denis's risk aversion formula: constant-elasticity utility `sign(x) * log(1 + |x|/eps) - gamma * log(sigma)` (CRRA-style: fixed proportional trade-off between return and vol, vs CARA/MV which has fixed absolute trade-off for variance)
+- [ ] Bootstrap analysis: block bootstrap CIs for M2 Sharpe, paired bootstrap M2 vs benchmarks, regime-conditional Sharpe significance (code exists in `main_results_analysis.py` but not prominently reported)
+- [ ] Read the important literature cited in thesis (key papers to study deeply)
 
 ## Completed
 - [x] Create comprehensive pipeline tests (237 tests in `tests/test_pipeline_technical.py`)
