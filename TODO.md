@@ -11,7 +11,6 @@
 - [ ] Read the important literature cited in thesis (key papers to study deeply)
 - [ ] Improve explanation of the graphs in Chapter 5.2 (term-structure figure and panic sub-type figure): frame what the reader should look for, clarify z-score vs SHAP question they each answer
 - [ ] Improve explanation of how dominant pi_filter is in the trees (75.8% of trees contain a pi split, 54% of stock paths, 67% of panic long-leg return comes from pi-splitting trees vs only 20% in calm)
-- [ ] Check if increasing the number of XGB seeds systematically increases the Sharpe ratio. If it does, this is a problem: Sharpe should converge as seed count grows (averaging reduces noise around a stable mean), not keep rising. A monotonic upward trend would suggest the ensemble is exploiting seed diversification rather than a real signal.
 
 ## Completed
 - [x] Create comprehensive pipeline tests (237 tests in `tests/test_pipeline_technical.py`)
@@ -25,4 +24,6 @@
 - [x] Define z-score inline where first introduced
 - [x] Trim redundant captions
 - [x] Clean literature review (remove unused citations, generic HMM content)
+- [x] Seed convergence check: Sharpe converges around k=50 (plateau 1.085-1.095 from k=50 to k=100), std shrinks as 1/sqrt(k) as expected. No runaway climb, production number is legitimate. See `results/seed_convergence.csv` and `plots/seed_convergence.png`.
+- [x] Test Denis's CRRA risk aversion formula. Degrades faster than MV: even gamma=0 (no vol penalty, just sign(r)*log(1+|r|/eps) target) gives Sharpe 0.29 vs production 1.11. The log-compression of returns removes the magnitude info XGBoost needs for ranking. gamma>=0.5 is negative. Pi_filter SHAP share collapses (54% -> 7%) as momentum SHAP explodes from vol-penalty variance dominance. See `results/risk_aversion_crra_results.csv`, `plots/risk_aversion_crra.png`.
 - [x] Bootstrap analysis: block bootstrap CIs, paired tests vs benchmarks, regime-conditional Sharpe (full table in Appendix app:bootstrap, brief mention in Section 5.1)
