@@ -1,0 +1,4 @@
+config,n_estimators,max_depth,n_seeds,sharpe,ann_ret,ann_vol,mdd,mom_share,pi_share,time_min
+depth4_50seeds,500,4,50,0.728,0.1194,0.1767,-0.2856,82.2,17.8,249.7
+classical_sqrt,200,12,20,0.803,0.1522,0.2017,-0.2757,76.9,23.1,135.2
+depth4_100trees,100,4,20,0.673,0.1084,0.1762,-0.2708,81.0,19.0,19.9
