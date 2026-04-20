@@ -12,6 +12,7 @@
 - [ ] Read the important literature cited in thesis (key papers to study deeply)
 - [ ] Improve explanation of the graphs in Chapter 5.2 (term-structure figure and panic sub-type figure): frame what the reader should look for, clarify z-score vs SHAP question they each answer
 - [ ] Improve explanation of how dominant pi_filter is in the trees (75.8% of trees contain a pi split, 54% of stock paths, 67% of panic long-leg return comes from pi-splitting trees vs only 20% in calm)
+- [ ] Check if increasing the number of XGB seeds systematically increases the Sharpe ratio. If it does, this is a problem: Sharpe should converge as seed count grows (averaging reduces noise around a stable mean), not keep rising. A monotonic upward trend would suggest the ensemble is exploiting seed diversification rather than a real signal.
 
 ## Completed
 - [x] Create comprehensive pipeline tests (237 tests in `tests/test_pipeline_technical.py`)
