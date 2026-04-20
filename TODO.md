@@ -11,6 +11,7 @@
 - [ ] Bootstrap analysis: block bootstrap CIs for M2 Sharpe, paired bootstrap M2 vs benchmarks, regime-conditional Sharpe significance (code exists in `main_results_analysis.py` but not prominently reported)
 - [ ] Read the important literature cited in thesis (key papers to study deeply)
 - [ ] Improve explanation of the graphs in Chapter 5.2 (term-structure figure and panic sub-type figure): frame what the reader should look for, clarify z-score vs SHAP question they each answer
+- [ ] Improve explanation of how dominant pi_filter is in the trees (75.8% of trees contain a pi split, 54% of stock paths, 67% of panic long-leg return comes from pi-splitting trees vs only 20% in calm)
 
 ## Completed
 - [x] Create comprehensive pipeline tests (237 tests in `tests/test_pipeline_technical.py`)
