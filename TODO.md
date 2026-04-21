@@ -11,6 +11,9 @@
 - [ ] Read the important literature cited in thesis (key papers to study deeply)
 - [ ] Improve explanation of the graphs in Chapter 5.2 (term-structure figure and panic sub-type figure): frame what the reader should look for, clarify z-score vs SHAP question they each answer
 - [ ] Improve explanation of how dominant pi_filter is in the trees (75.8% of trees contain a pi split, 54% of stock paths, 67% of panic long-leg return comes from pi-splitting trees vs only 20% in calm)
+- [ ] Integrate Random Forest result into the thesis: RF depth-matched gives Sharpe 0.73 vs XGBoost 1.11, with pi_filter SHAP share dropping from 46% to 18%. Shows the finding is not about "any tree ensemble" but specifically requires sequential boosting. Best placement: add to Section 5.3 (Nonlinearity) as further robustness, or mention briefly in future work section. Data in `results/random_forest_results.csv`.
+- [ ] Integrate seed convergence result into the thesis: Sharpe drifts up from 1.05 (k=1) to 1.10 (k=100), IQR collapses. Production 50-seed captures most of the noise reduction. Worth mentioning as a methodology caveat (either footnote in Section 3 or appendix). Data in `results/seed_convergence.csv`.
+- [ ] Integrate CRRA (Denis's formula) into the thesis: adds robustness to Section 5.4 risk aversion -- even at gamma=0, the sign-log compression of returns drops Sharpe to 0.29. Confirms that any magnitude-compressing target breaks the mechanism, not just MV. Best placement: appendix extension of the risk aversion discussion. Data in `results/risk_aversion_crra_results.csv`.
 
 ## Completed
 - [x] Create comprehensive pipeline tests (237 tests in `tests/test_pipeline_technical.py`)
