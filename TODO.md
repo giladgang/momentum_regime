@@ -1,13 +1,13 @@
 # Thesis TODO
 
 ## Editing thesis
-- [ ] Work on limitations of the method
+- [ ] Work on limitations of the method **(in progress)**
+- [ ] Polish the stress-test section
 - [ ] Add clear explanation of why long-short and not long-only
 - [ ] Improve explanation of the graphs in Chapter 5.2 (term-structure figure and panic sub-type figure): frame what the reader should look for, clarify z-score vs SHAP question they each answer
 - [ ] Improve explanation of how dominant pi_filter is in the trees (75.8% of trees contain a pi split, 54% of stock paths, 67% of panic long-leg return comes from pi-splitting trees vs only 20% in calm)
 - [ ] Integrate Random Forest result into the thesis: RF depth-matched gives Sharpe 0.73 vs XGBoost 1.11, with pi_filter SHAP share dropping from 46% to 18%. Shows the finding is not about "any tree ensemble" but specifically requires sequential boosting. Best placement: add to Section 5.3 (Nonlinearity) as further robustness, or mention briefly in future work section. Data in `results/random_forest_results.csv`.
 - [ ] Integrate seed convergence result into the thesis: Sharpe drifts up from 1.05 (k=1) to 1.10 (k=100), IQR collapses. Production 50-seed captures most of the noise reduction. Worth mentioning as a methodology caveat (either footnote in Section 3 or appendix). Data in `results/seed_convergence.csv`.
-- [ ] Integrate CRRA (Denis's formula) into the thesis: adds robustness to Section 5.4 risk aversion -- even at gamma=0, the sign-log compression of returns drops Sharpe to 0.29. Confirms that any magnitude-compressing target breaks the mechanism, not just MV. Best placement: appendix extension of the risk aversion discussion. Data in `results/risk_aversion_crra_results.csv`.
 - [ ] Integrate monthly z-score heatmaps into the thesis: month x horizon z-scores for long leg, short leg, and L-S spread, with pi_filter panel alongside. Shows the regime-conditional selection pattern at single-month resolution rather than regime averages (useful counter to the "averages hide months that invert the pattern" caveat seen in Sept 2019 / May 2024). Figures `plots/zscore_long_short_heatmap.pdf` and `plots/zscore_longshort_heatmap.pdf`; data in `results/zscore_long_by_month.csv`, `results/zscore_short_by_month.csv`, `results/zscore_longshort_by_month.csv`.
 - [ ] Add a Section 5.1 "Robustness / Method Validity" subsection: consolidate generic validity checks (bootstrap CIs + paired tests, subperiod stability, transaction cost sensitivity, pi threshold sensitivity, multi-state HMM, HMM feature ablation, GFC OOS, expanding window HMM, seed convergence, CRRA, Random Forest) in one place. Keep mechanism-tied tests (Ridge, depth sweep, LR with interactions) in 5.3 where they earn their narrative role. Gives the RF / seed-convergence / CRRA integration tasks a natural home and lets the reader see the robustness story at a glance.
 - [ ] Future work: add alternative nonlinear method (not just XGBoost)
@@ -34,3 +34,4 @@
 - [x] Test Denis's CRRA risk aversion formula. Degrades faster than MV: even gamma=0 (no vol penalty, just sign(r)*log(1+|r|/eps) target) gives Sharpe 0.29 vs production 1.11. The log-compression of returns removes the magnitude info XGBoost needs for ranking. gamma>=0.5 is negative. Pi_filter SHAP share collapses (54% -> 7%) as momentum SHAP explodes from vol-penalty variance dominance. See `results/risk_aversion_crra_results.csv`, `plots/risk_aversion_crra.png`.
 - [x] Bootstrap analysis: block bootstrap CIs, paired tests vs benchmarks, regime-conditional Sharpe (full table in Appendix app:bootstrap, brief mention in Section 5.1)
 - [x] Write Denis an email on the XGBoost pattern (sent 2026-04-23: meeting cancel, checklist, CRRA update, heatmap pivot)
+- [x] Integrate CRRA (Denis's formula) into the thesis: adds robustness to Section 5.4 risk aversion — even at gamma=0, the sign-log compression of returns drops Sharpe to 0.29. Appendix extension of risk aversion discussion. Data in `results/risk_aversion_crra_results.csv`.
