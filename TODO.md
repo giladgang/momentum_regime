@@ -6,8 +6,7 @@
 
 ## Editing thesis
 - [x] Add clear explanation of why long-short and not long-only
-- [ ] Add a Section 5.1 "Robustness / Method Validity" subsection: consolidate generic validity checks (bootstrap CIs + paired tests, subperiod stability, transaction cost sensitivity, pi threshold sensitivity, multi-state HMM, HMM feature ablation, GFC OOS, expanding window HMM, seed convergence, CRRA, Random Forest) in one place. Keep mechanism-tied tests (Ridge, depth sweep, LR with interactions) in 5.3 where they earn their narrative role. Gives the RF / seed-convergence / CRRA integration tasks a natural home and lets the reader see the robustness story at a glance.
-- [ ] Future work: add alternative nonlinear method (not just XGBoost)
+- [x] Add a Section 5.4 "Robustness / Method Validity" subsection consolidating generic validity checks (bootstrap + paired tests, subperiod stability, t-cost, pi threshold, multi-state HMM, HMM feature ablation, GFC OOS, expanding-window HMM, seed convergence, RF, CRRA). Mechanism-tied tests (Ridge, depth sweep, LR with interactions) kept in 5.3. Placed as new 5.4 between Nonlinearity (stays 5.3) and Risk Aversion (pushed to 5.5). Added appendix subsection `app:threshold` for regime threshold sensitivity.
 
 ## New research
 - [ ] Improve explanation of the graphs in Chapter 5.2 (term-structure figure and panic sub-type figure): frame what the reader should look for, clarify z-score vs SHAP question they each answer. Includes integrating monthly z-score heatmaps (month × horizon z-scores for long leg, short leg, L-S spread with pi_filter panel; figures `plots/zscore_long_short_heatmap.pdf` and `plots/zscore_longshort_heatmap.pdf`; data in `results/zscore_long_by_month.csv`, `results/zscore_short_by_month.csv`, `results/zscore_longshort_by_month.csv`) — single-month resolution counters the "averages hide inverting months" caveat seen in Sept 2019 / May 2024.
@@ -17,6 +16,7 @@
 - [ ] Read the important literature cited in thesis (key papers to study deeply)
 
 ## Completed
+- [x] Future work: expanded to six detailed directions (predictive regime signal, alternative nonlinear models, sequential regime conditioning, regime-conditional feature sets, exposure-scaling overlay, international replication). Memoryless-regime limitation trimmed to point at sequential-conditioning paragraph.
 - [x] Create comprehensive pipeline tests (237 tests in `tests/test_pipeline_technical.py`)
 - [x] Code audit and bug fixes (above_med, K=2 std, hardcoded month counts)
 - [x] Restructure project to production layout (artefacts/, plots/, results/, src/)
