@@ -1,11 +1,10 @@
 # Thesis TODO
 
 ## Pending
-- [ ] Work on fundamental analysis (results in `results/fundamentals_test_results.csv`, script: `scripts/fundamentals_test.py`)
+- [ ] Fundamental analysis — ablation test including cash flow. Baseline in `results/fundamentals_test_results.csv` (script: `scripts/fundamentals_test.py`). Cash flow piece **blocked on expired WRDS password** — `~/.pgpass` is correctly formatted but PAM auth fails (verified 2026-04-23). Fix: log in to wrds-www.wharton.upenn.edu, reset password, update `.pgpass` line `wrds-pgdata.wharton.upenn.edu:9737:wrds:giladgang:NEW_PW`. Pull script `scripts/pull_cashflow.py` is ready (reads creds from .pgpass) — pulls oancfy/capxy/ibq/atq from comp.fundq, computes cfo_a, fcf_a, accruals (Sloan). Once auth works: run pull (~5 min), then write companion ablation script (baseline + add-one for each of 10 fundamentals + LOO from full + fund-only).
 - [ ] Future work: add alternative nonlinear method (not just XGBoost)
 - [ ] Work on limitations of the method
 - [ ] Add clear explanation of why long-short and not long-only
-- [ ] Ablation test on fundamentals: check specifically for cash flow. Blocked on WRDS auth (interactive login fails). Pull script is ready at `scripts/pull_cashflow.py` — pulls oancfy/capxy/ibq/atq from comp.fundq, computes cfo_a, fcf_a, accruals (Sloan). Once auth fixed: run pull, then write companion ablation script (baseline + add-one for each of 10 fundamentals + LOO from full + fund-only).
 - [ ] Write Denis an email on the XGBoost pattern
 - [ ] Read the important literature cited in thesis (key papers to study deeply)
 - [ ] Improve explanation of the graphs in Chapter 5.2 (term-structure figure and panic sub-type figure): frame what the reader should look for, clarify z-score vs SHAP question they each answer
