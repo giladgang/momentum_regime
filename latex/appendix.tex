@@ -133,11 +133,11 @@ Two additional analyses are performed. First, the mean absolute SHAP value of $\
 
 \section{Alternative Training Targets for XGBoost}\label{app:alt_targets}
 
-The risk-aversion analysis in Section~\ref{sec:risk_aversion} uses the mean-variance utility target $y_t^s = r_{t+1}^s - \frac{\gamma}{2}\sigma_s^2$. To verify that the finding -- risk penalties reduce the Sharpe ratio by suppressing regime-adaptive bets -- is not an artefact of this particular functional form, Table~\ref{tab:alt_targets} reports XGBoost performance under three families of training targets with varying risk tolerance.
+Section~\ref{sec:risk_aversion} argues that embedding a risk penalty directly in the XGBoost training target degrades performance, motivating the two-model CRRA dual-utility specification used in the main text. Table~\ref{tab:alt_targets} shows this degradation is not an artefact of the mean-variance functional form: the same pattern appears under three families of training targets with varying risk tolerance.
 
 \input{tables/table_alt_targets}
 
-The pattern is consistent: returns fall faster than volatility under every risk penalty, regardless of functional form. The mildest adjustments (mean-variance with $\gamma = 0.5$, Sharpe-like with $a = 0.5$) come closest to the baseline but still underperform. This confirms that the finding in Section~\ref{sec:risk_aversion} is not specific to the mean-variance utility formulation.
+The pattern is consistent: returns fall faster than volatility under every risk penalty, regardless of functional form. The mildest adjustments (mean-variance with $\gamma = 0.5$, Sharpe-like with $a = 0.5$) come closest to the baseline but still underperform. This confirms that the diagnostic in Section~\ref{sec:risk_aversion} is not specific to the mean-variance utility formulation; the single-model training-target approach is structurally unsuited to incorporating risk aversion in a long-short setting, which the CRRA dual-utility framework resolves.
 
 \section{Robustness Checks}\label{app:robustness}
 

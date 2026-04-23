@@ -125,26 +125,29 @@ Tree depth provides direct evidence for why multi-dimensional conditioning is re
 
 \subsection{Risk Aversion and Stress Testing}\label{sec:risk_aversion}
 
-\subsubsection{Alternative Training Targets}
+\subsubsection{Risk-Aversion Control via CRRA Dual-Utility}
 
-The regime signal's value may depend on how the model's training objective balances return against risk. To test this, XGBoost is retrained using the mean-variance utility framework of \citet{Markowitz1952}, the standard approach for incorporating risk preferences in portfolio selection. The training target becomes
+An investor may prefer lower portfolio risk at the cost of some expected return. Introducing a risk-aversion parameter $\gamma$ requires deciding \emph{where} in the pipeline it acts. The algorithmic choice matters: a textbook mean-variance training target $y_t^s = r_{t+1}^s - \frac{\gamma}{2}\sigma_s^2$ \citep{Markowitz1952} degrades out-of-sample performance for any $\gamma > 0$ in long-short construction. The penalty is subtracted from every stock's score, so the top decile (longs) is pushed toward low-$\sigma$ names and the bottom decile (shorts) toward high-$\sigma$ names; the long-short portfolio becomes a betting-against-beta trade in disguise, and realised portfolio volatility rises rather than falls as $\gamma$ grows. At larger $\gamma$, the model also learns $-\gamma\log\sigma$ from features rather than the return signal, dissolving the regime-conditional mechanism documented in Sections~\ref{sec:tree_paths}--\ref{sec:panic}. Appendix~\ref{app:alt_targets} confirms this degradation is not specific to the mean-variance functional form.
+
+The specification used here separates the return signal from the risk penalty using a two-model architecture and a constant-relative-risk-aversion (CRRA) utility. An XGBoost ensemble predicts the expected forward return $\hat r_t^s$. A second XGBoost ensemble, trained on the realised forward volatility $\sigma^s_{[t+1,t+12]} = \mathrm{std}(r^s_{t+1}, \ldots, r^s_{t+12})$, predicts $\hat\sigma_t^s$. Each stock is then evaluated under both trading directions:
 \[
-    y_t^s \;=\; r_{t+1}^s \;-\; \frac{\gamma}{2}\,\sigma_s^2,
+\begin{aligned}
+u_{\text{long}}^s  &= +\,\mathrm{sign}(\hat r^s)\,\log\!\big(1 + |\hat r^s|/\varepsilon\big) \;-\; \gamma\,\log(\hat\sigma^s),\\
+u_{\text{short}}^s &= -\,\mathrm{sign}(\hat r^s)\,\log\!\big(1 + |\hat r^s|/\varepsilon\big) \;-\; \gamma\,\log(\hat\sigma^s),
+\end{aligned}
 \]
-where $r_{t+1}^s$ is the forward return of stock $s$, $\sigma_s^2$ is its trailing 12-month return variance, and $\gamma$ controls the degree of risk aversion. At $\gamma = 0$ this reduces to the baseline (raw returns); as $\gamma$ increases, the model is trained to penalise high-variance stocks more heavily. Figure~\ref{fig:risk_aversion} reports the Sharpe ratio, annualised return, and regime signal importance across $\gamma \in [0.5, 10]$.
+with $\varepsilon = 0.01$. The $-\gamma\log(\hat\sigma)$ term appears with the \emph{same sign} in both directions: a low-$\sigma$ stock is preferred whether considered for the long or the short book. Both legs therefore converge on low-volatility names as $\gamma$ grows, eliminating the betting-against-beta tilt. Longs are the top decile of $u_{\text{long}}$ across the full cross-section, and shorts are the top decile of $u_{\text{short}}$, both with NYSE breakpoints and value weighting.
+
+Why CRRA rather than mean-variance? The log penalty is scale-invariant: a multiplicative shift in all stocks' volatilities leaves rankings unchanged, and $\gamma$ has the interpretable meaning of the \emph{relative} price of volatility. The $\sigma^2$ penalty grows quadratically in absolute vol and over-weights high-vol stocks arbitrarily as $\gamma$ rises. Combined with the dual-utility construction, the log form allows $\gamma$ to act as a smooth concentration dial rather than a signal-corrupting filter.
+
+Figure~\ref{fig:risk_aversion} sweeps $\gamma \in [0, 2]$ with 50 XGBoost seeds per model. At $\gamma = 0.1$ the Sharpe ratio is 1.01, essentially unchanged from the $\gamma = 0$ baseline of 1.11, while maximum drawdown improves from $-25\%$ to $-18\%$: a near-free reduction in tail risk. At $\gamma = 0.5$, annualised volatility halves from 19.7\% to 11.2\%, Sharpe is 0.78, and maximum drawdown falls to $-12\%$. At $\gamma = 1.0$, volatility is 5.2\% (roughly one-quarter of the market), and Sharpe remains positive at 0.46. Beyond $\gamma \approx 1.5$ the $\sigma$ penalty dominates the return term: low-$\hat\sigma$ stocks occupy the top deciles of both utility rankings simultaneously, and the long-short spread collapses to dollar-neutral noise. The useful range is $\gamma \in [0, 1]$, within which $\gamma$ traces a smooth Pareto trade-off between Sharpe and drawdown.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\textwidth]{plots/risk_aversion_sweep.pdf}
-    \caption{Sharpe ratio, annualised return, and $\pi^{\text{filter}}$ SHAP share under mean-variance training targets with $\gamma \in [0.5, 10]$. Dashed lines mark the baseline ($\gamma = 0$).}
+    \includegraphics[width=0.95\textwidth]{plots/risk_aversion_dual_util.pdf}
+    \caption{Risk-aversion sweep under the two-model CRRA dual-utility framework. Sharpe ratio, annualised return, annualised volatility, and maximum drawdown as a function of $\gamma$ over $[0, 2]$. Red markers highlight $\gamma \in \{0, 0.1, 0.5, 1.0\}$; green shading indicates the useful range $\gamma \in [0, 1]$.}
     \label{fig:risk_aversion}
 \end{figure}
-
-Two findings emerge. First, even mild risk aversion degrades the strategy: at $\gamma = 0.5$ the Sharpe drops to 0.75 and the regime signal's share of feature importance falls from 45\% to 35\%. At $\gamma \geq 1.5$ the strategy produces negative Sharpe ratios and annualised returns below $-$4\%.
-
-Second, the regime signal becomes irrelevant under aggressive risk adjustment. The $\pi^{\text{filter}}$ SHAP share falls from 45\% at baseline to below 10\% for $\gamma \geq 3$, indicating that the variance penalty steers the model toward low-volatility stocks regardless of regime. The model effectively abandons the regime-conditional momentum mechanism that makes M2 successful.
-
-The implication is clear: detecting the regime-dependent structure of momentum requires the model to optimise returns directly. The mean-variance penalty, standard in portfolio theory since \citet{Markowitz1952}, constrains the model's flexibility by forcing it toward static low-volatility selections that obscure the very regime-dependent patterns the regime signal is designed to capture.
 
 \subsubsection{Stress Test: Prolonged Bear Market}\label{sec:stress_test}
 
