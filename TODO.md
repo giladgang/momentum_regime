@@ -16,7 +16,6 @@
 - [ ] Fundamental analysis — ablation test including cash flow. Baseline in `results/fundamentals_test_results.csv` (script: `scripts/fundamentals_test.py`). Cash flow piece **blocked on expired WRDS password** — `~/.pgpass` is correctly formatted but PAM auth fails (verified 2026-04-23). Fix: log in to wrds-www.wharton.upenn.edu, reset password, update `.pgpass` line `wrds-pgdata.wharton.upenn.edu:9737:wrds:giladgang:NEW_PW`. Pull script `scripts/pull_cashflow.py` is ready (reads creds from .pgpass) — pulls oancfy/capxy/ibq/atq from comp.fundq, computes cfo_a, fcf_a, accruals (Sloan). Once auth works: run pull (~5 min), then write companion ablation script (baseline + add-one for each of 10 fundamentals + LOO from full + fund-only).
 
 ## External / reading
-- [ ] Write Denis an email on the XGBoost pattern
 - [ ] Read the important literature cited in thesis (key papers to study deeply)
 
 ## Completed
@@ -34,3 +33,4 @@
 - [x] Seed convergence check: Sharpe converges around k=50 (plateau 1.085-1.095 from k=50 to k=100), std shrinks as 1/sqrt(k) as expected. No runaway climb, production number is legitimate. See `results/seed_convergence.csv` and `plots/seed_convergence.png`.
 - [x] Test Denis's CRRA risk aversion formula. Degrades faster than MV: even gamma=0 (no vol penalty, just sign(r)*log(1+|r|/eps) target) gives Sharpe 0.29 vs production 1.11. The log-compression of returns removes the magnitude info XGBoost needs for ranking. gamma>=0.5 is negative. Pi_filter SHAP share collapses (54% -> 7%) as momentum SHAP explodes from vol-penalty variance dominance. See `results/risk_aversion_crra_results.csv`, `plots/risk_aversion_crra.png`.
 - [x] Bootstrap analysis: block bootstrap CIs, paired tests vs benchmarks, regime-conditional Sharpe (full table in Appendix app:bootstrap, brief mention in Section 5.1)
+- [x] Write Denis an email on the XGBoost pattern (sent 2026-04-23: meeting cancel, checklist, CRRA update, heatmap pivot)
