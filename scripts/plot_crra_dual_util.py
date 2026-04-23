@@ -16,6 +16,11 @@ import matplotlib.pyplot as plt
 df = pd.read_csv('results/two_model_dual_util.csv')
 print(f"Loaded {len(df)} gamma points from results/two_model_dual_util.csv")
 
+# Restrict to the useful range (gamma <= 1) for the thesis figure.
+# The beyond-1 regime is discussed qualitatively in the text.
+df = df[df['gamma'] <= 1.0].reset_index(drop=True)
+print(f"Plotting {len(df)} points over gamma in [0, 1]")
+
 HIGHLIGHTS = [0.0, 0.1, 0.5, 1.0]
 HIGHLIGHT_COLOR = '#C62828'
 
@@ -60,21 +65,11 @@ panel(axes[1, 0], df['ann_vol'].values, '#9B2226',
 panel(axes[1, 1], df['mdd'].values,     '#5B3A8C',
       'Maximum Drawdown', 'Max DD', ypct=True)
 
-# shaded region showing the "useful" gamma range (0 to 1)
-for ax in axes.flat:
-    ax.axvspan(0, 1.0, alpha=0.08, color='green', zorder=0)
-
-fig.suptitle(r'Risk-Aversion Sweep: CRRA Dual-Utility Framework '
-             r'($\gamma \in [0, 2]$, 50 seeds)',
+fig.suptitle(r'Risk-Aversion Sweep: Sharpe, Return, Volatility, Drawdown '
+             r'vs. $\gamma$',
              fontsize=14, fontweight='bold', y=0.995)
 
-# legend / caption-ish note at the bottom
-fig.text(0.5, 0.01,
-         r'Red markers: $\gamma \in \{0, 0.1, 0.5, 1.0\}$ reference points.  '
-         r'Green shading: useful range $\gamma \in [0, 1]$.',
-         ha='center', fontsize=10, color='#444444')
-
-plt.tight_layout(rect=[0, 0.025, 1, 0.975])
+plt.tight_layout(rect=[0, 0, 1, 0.975])
 plt.savefig('plots/risk_aversion_dual_util.pdf', bbox_inches='tight',
             facecolor='white', edgecolor='none')
 plt.savefig('plots/risk_aversion_dual_util.png', dpi=200, bbox_inches='tight',
