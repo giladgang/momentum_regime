@@ -184,13 +184,17 @@ In long-short construction, M2's average monthly one-way turnover is 132.4\%, re
 
 M2 remains profitable across all cost levels tested: even at 50\,bps one-way (five times the baseline), its Sharpe ratio is 0.75. All other strategies become unprofitable at moderate cost levels. The baseline 10\,bps assumption is reasonable for a value-weighted strategy using NYSE breakpoints, which tilts toward the most liquid names.
 
-\subsection{XGBoost Hyperparameter Sensitivity}\label{app:xgb_sensitivity}
+\subsection{Model Sensitivity}\label{app:xgb_sensitivity}
 
-The XGBoost model uses hyperparameters selected via cross-validation on the training set. To verify that the results are not an artefact of a particular configuration, Table~\ref{tab:xgb_hyperparams} reports out-of-sample performance under alternative tree depths, learning rates, and ensemble sizes.
+The XGBoost model uses hyperparameters selected via cross-validation on the training set. To verify that the results are not an artefact of a particular configuration, Table~\ref{tab:xgb_hyperparams} reports out-of-sample performance under alternative tree depths, learning rates, and ensemble sizes, along with a depth-matched Random Forest.
 
 \input{tables/table_xgb_hyperparams}
 
+\paragraph{Hyperparameter sensitivity.}
 At the baseline depth of 4, the Sharpe ratio ranges from 0.89 to 1.11 across learning rate and ensemble size variations. Performance degrades at depths below 3 (see Section~\ref{sec:depth_analysis} for the depth analysis) and above 5 due to overfitting. The results confirm that M2's performance is not an artefact of a particular hyperparameter configuration.
+
+\paragraph{Boosting versus bagging.}
+The bottom row of Table~\ref{tab:xgb_hyperparams} replaces XGBoost with a Random Forest matched on depth (4), ensemble size (500 trees per seed), and feature set (the same 13 features), averaged over 50 seeds. Sharpe falls from 1.08 to 0.73 and $\pi_t^{\text{filter}}$'s SHAP share drops from 45\% to 18\%. The mechanism is the difference between boosting and bagging. XGBoost fits each successive tree to the residuals of the current ensemble, so at every iteration the algorithm preferentially selects whichever feature most reduces the current error; for this problem that feature is $\pi_t^{\text{filter}}$, and its importance compounds across trees. Random Forest grows each tree independently on a bootstrap sample and subsamples a random subset of features at every split, which by construction prevents any single feature from dominating the ensemble and distributes importance more evenly across the 13 features. Nonlinearity and depth are therefore necessary but not sufficient: the boosted additive structure is what converts the regime signal into a primary gating variable rather than a marginal predictor, which is the basis for the architecture-dependence claim in Section~\ref{sec:method2}.
 
 \subsection{Number of Hidden States}\label{app:num_states}
 
@@ -315,6 +319,16 @@ The state labelled $k^\ast$ is designated as ``panic'' and the other as ``calm.'
 The Gelman--Rubin $\hat{R}$ statistic \citep{Gelman2013} assesses convergence by comparing within-chain and between-chain variance across the five independent Gibbs sampler chains. For each parameter $\theta$, $\hat{R} = \sqrt{\hat{V}/W}$, where $W$ is the mean within-chain variance and $\hat{V} = \frac{n-1}{n}W + \frac{B}{n}$ combines within-chain variance with the between-chain variance $B$. Values near 1.0 indicate that the chains have converged to the same posterior distribution; $\hat{R} < 1.1$ is the standard threshold.
 
 \input{tables/table_gelman_rubin}
+
+\subsection{Seed Convergence of the Regime Signal}\label{app:seed_convergence}
+
+Gelman--Rubin and the trace plots assess whether a single Gibbs chain has converged to its stationary posterior, but they do not quantify how many chains are needed to stabilise the \emph{downstream} Sharpe ratio. The regime signal $\pi_t^{\text{filter}}$ enters the pipeline as the average of $N_s$ seed-specific forward filters (Section~\ref{sec:implementation}), and because XGBoost is a nonlinear function of $\pi_t^{\text{filter}}$, MCMC noise in any individual chain does not cancel linearly.
+
+To measure this dependence, we subsample $k \in \{1, 2, 3, 5, 10, 15, 20, 30, 50, 75, 100\}$ chains without replacement from the seed pool, average the forward filter over those $k$ chains, retrain the XGBoost ensemble on the resulting signal, and record the out-of-sample Sharpe. For each $k < 100$ we repeat on 30 random subsets; $k = 100$ exhausts the pool.
+
+\input{tables/table_seed_convergence}
+
+Two patterns emerge. First, the mean Sharpe rises from 1.05 at $k = 1$ to 1.09 at $k = 100$, so a single-chain point estimate understates the strategy's performance by roughly 0.04 in Sharpe units. The gap closes monotonically, with most of the lift realised by $k = 30$. Second, the interquartile range across random subsets collapses from 0.10 at $k = 1$ to 0.02 at $k = 50$: once $k \geq 50$, any two random subsets of the seed pool produce nearly the same XGBoost portfolio. The production configuration ($N_s = 200$) sits well inside this plateau, which is why the 1.11 Sharpe reported in Section~\ref{sec:results} is insensitive to which specific seeds were drawn. The practical implication is methodological rather than cosmetic: a single-chain HMM would not reliably support the main conclusions, so the seed ensemble is a requirement of the design, not a late-stage performance tuning.
 
 \section{Fundamental Feature Definitions}\label{app:fundamental_features}
 
