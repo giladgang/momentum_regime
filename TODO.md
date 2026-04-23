@@ -1,7 +1,6 @@
 # Thesis TODO
 
 ## In progress
-- [ ] Work on limitations of the method
 - [ ] Polish the stress-test section
 
 ## Editing thesis
@@ -16,6 +15,7 @@
 - [ ] Read the important literature cited in thesis (key papers to study deeply)
 
 ## Completed
+- [x] Work on limitations of the method: Limitations subsection (sec:limitations) now 8 paragraphs covering economic vulnerability, stress-test simulation caveat, test-period scope, frozen HMM parameters + regime drift, memoryless regime conditioning, implementation frictions, specification search, sample scope + causal inference (0e99d9a, 008e5fa, a697ce9).
 - [x] Future work: expanded to six detailed directions (predictive regime signal, alternative nonlinear models, sequential regime conditioning, regime-conditional feature sets, exposure-scaling overlay, international replication). Memoryless-regime limitation trimmed to point at sequential-conditioning paragraph.
 - [x] Create comprehensive pipeline tests (237 tests in `tests/test_pipeline_technical.py`)
 - [x] Code audit and bug fixes (above_med, K=2 std, hardcoded month counts)
