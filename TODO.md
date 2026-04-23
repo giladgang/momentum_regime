@@ -1,12 +1,8 @@
 # Thesis TODO
 
-## Pending
-- [ ] Fundamental analysis — ablation test including cash flow. Baseline in `results/fundamentals_test_results.csv` (script: `scripts/fundamentals_test.py`). Cash flow piece **blocked on expired WRDS password** — `~/.pgpass` is correctly formatted but PAM auth fails (verified 2026-04-23). Fix: log in to wrds-www.wharton.upenn.edu, reset password, update `.pgpass` line `wrds-pgdata.wharton.upenn.edu:9737:wrds:giladgang:NEW_PW`. Pull script `scripts/pull_cashflow.py` is ready (reads creds from .pgpass) — pulls oancfy/capxy/ibq/atq from comp.fundq, computes cfo_a, fcf_a, accruals (Sloan). Once auth works: run pull (~5 min), then write companion ablation script (baseline + add-one for each of 10 fundamentals + LOO from full + fund-only).
-- [ ] Future work: add alternative nonlinear method (not just XGBoost)
+## Editing thesis
 - [ ] Work on limitations of the method
 - [ ] Add clear explanation of why long-short and not long-only
-- [ ] Write Denis an email on the XGBoost pattern
-- [ ] Read the important literature cited in thesis (key papers to study deeply)
 - [ ] Improve explanation of the graphs in Chapter 5.2 (term-structure figure and panic sub-type figure): frame what the reader should look for, clarify z-score vs SHAP question they each answer
 - [ ] Improve explanation of how dominant pi_filter is in the trees (75.8% of trees contain a pi split, 54% of stock paths, 67% of panic long-leg return comes from pi-splitting trees vs only 20% in calm)
 - [ ] Integrate Random Forest result into the thesis: RF depth-matched gives Sharpe 0.73 vs XGBoost 1.11, with pi_filter SHAP share dropping from 46% to 18%. Shows the finding is not about "any tree ensemble" but specifically requires sequential boosting. Best placement: add to Section 5.3 (Nonlinearity) as further robustness, or mention briefly in future work section. Data in `results/random_forest_results.csv`.
@@ -14,6 +10,14 @@
 - [ ] Integrate CRRA (Denis's formula) into the thesis: adds robustness to Section 5.4 risk aversion -- even at gamma=0, the sign-log compression of returns drops Sharpe to 0.29. Confirms that any magnitude-compressing target breaks the mechanism, not just MV. Best placement: appendix extension of the risk aversion discussion. Data in `results/risk_aversion_crra_results.csv`.
 - [ ] Integrate monthly z-score heatmaps into the thesis: month x horizon z-scores for long leg, short leg, and L-S spread, with pi_filter panel alongside. Shows the regime-conditional selection pattern at single-month resolution rather than regime averages (useful counter to the "averages hide months that invert the pattern" caveat seen in Sept 2019 / May 2024). Figures `plots/zscore_long_short_heatmap.pdf` and `plots/zscore_longshort_heatmap.pdf`; data in `results/zscore_long_by_month.csv`, `results/zscore_short_by_month.csv`, `results/zscore_longshort_by_month.csv`.
 - [ ] Add a Section 5.1 "Robustness / Method Validity" subsection: consolidate generic validity checks (bootstrap CIs + paired tests, subperiod stability, transaction cost sensitivity, pi threshold sensitivity, multi-state HMM, HMM feature ablation, GFC OOS, expanding window HMM, seed convergence, CRRA, Random Forest) in one place. Keep mechanism-tied tests (Ridge, depth sweep, LR with interactions) in 5.3 where they earn their narrative role. Gives the RF / seed-convergence / CRRA integration tasks a natural home and lets the reader see the robustness story at a glance.
+- [ ] Future work: add alternative nonlinear method (not just XGBoost)
+
+## New research
+- [ ] Fundamental analysis — ablation test including cash flow. Baseline in `results/fundamentals_test_results.csv` (script: `scripts/fundamentals_test.py`). Cash flow piece **blocked on expired WRDS password** — `~/.pgpass` is correctly formatted but PAM auth fails (verified 2026-04-23). Fix: log in to wrds-www.wharton.upenn.edu, reset password, update `.pgpass` line `wrds-pgdata.wharton.upenn.edu:9737:wrds:giladgang:NEW_PW`. Pull script `scripts/pull_cashflow.py` is ready (reads creds from .pgpass) — pulls oancfy/capxy/ibq/atq from comp.fundq, computes cfo_a, fcf_a, accruals (Sloan). Once auth works: run pull (~5 min), then write companion ablation script (baseline + add-one for each of 10 fundamentals + LOO from full + fund-only).
+
+## External / reading
+- [ ] Write Denis an email on the XGBoost pattern
+- [ ] Read the important literature cited in thesis (key papers to study deeply)
 
 ## Completed
 - [x] Create comprehensive pipeline tests (237 tests in `tests/test_pipeline_technical.py`)
