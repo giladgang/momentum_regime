@@ -5,7 +5,7 @@
 
 ## Editing thesis
 - [x] Add clear explanation of why long-short and not long-only
-- [x] Add a Section 5.4 "Robustness / Method Validity" subsection consolidating generic validity checks (bootstrap + paired tests, subperiod stability, t-cost, pi threshold, multi-state HMM, HMM feature ablation, GFC OOS, expanding-window HMM, seed convergence, RF, CRRA). Mechanism-tied tests (Ridge, depth sweep, LR with interactions) kept in 5.3. Placed as new 5.4 between Nonlinearity (stays 5.3) and Risk Aversion (pushed to 5.5). Added appendix subsection `app:threshold` for regime threshold sensitivity.
+- [x] Consolidate generic validity checks (bootstrap + paired tests, subperiod stability, t-cost, pi threshold, multi-state HMM, HMM feature ablation, GFC OOS, expanding-window HMM, seed convergence, RF, CRRA) — landed in Appendix `app:robustness` rather than a main-text 5.4 subsection. Mechanism-tied tests (Ridge, depth sweep, LR with interactions) kept in 5.3. Added appendix subsection `app:threshold` for regime threshold sensitivity.
 
 ## New research
 - [ ] Improve explanation of the graphs in Chapter 5.2 (term-structure figure and panic sub-type figure): frame what the reader should look for, clarify z-score vs SHAP question they each answer. Includes integrating monthly z-score heatmaps (month × horizon z-scores for long leg, short leg, L-S spread with pi_filter panel; figures `plots/zscore_long_short_heatmap.pdf` and `plots/zscore_longshort_heatmap.pdf`; data in `results/zscore_long_by_month.csv`, `results/zscore_short_by_month.csv`, `results/zscore_longshort_by_month.csv`) — single-month resolution counters the "averages hide inverting months" caveat seen in Sept 2019 / May 2024.
