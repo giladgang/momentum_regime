@@ -145,19 +145,26 @@ long_df = long_df.rename(columns={'_array_pos': 'test_pos'})
 # classify months as panic (pi_filter >= 0.5) vs calm
 long_df['regime'] = np.where(long_df['pi_filter'] >= 0.5, 'panic', 'calm')
 
-# cap sample per regime for manageable runtime; stats are group-level means, so
-# sampling within each regime is unbiased.
-SAMPLE_PER_REGIME = 1500
-rng = np.random.RandomState(42)
-sampled = []
-for r in ('calm', 'panic'):
-    idx_r = long_df.index[long_df['regime'] == r].to_numpy()
-    if len(idx_r) > SAMPLE_PER_REGIME:
-        idx_r = rng.choice(idx_r, SAMPLE_PER_REGIME, replace=False)
-    sampled.append(long_df.loc[idx_r])
-long_df = pd.concat(sampled)
-print(f"  sampled {len(long_df):,} long-leg rows "
-      f"({(long_df['regime']=='calm').sum()} calm, {(long_df['regime']=='panic').sum()} panic)")
+# Full-population run: trace every long-leg row. Use --sample N for a subsample.
+sample_n = None
+for arg in sys.argv[1:]:
+    if arg.startswith('--sample='):
+        sample_n = int(arg.split('=')[1])
+if sample_n is not None:
+    rng = np.random.RandomState(42)
+    sampled = []
+    for r in ('calm', 'panic'):
+        idx_r = long_df.index[long_df['regime'] == r].to_numpy()
+        if len(idx_r) > sample_n:
+            idx_r = rng.choice(idx_r, sample_n, replace=False)
+        sampled.append(long_df.loc[idx_r])
+    long_df = pd.concat(sampled)
+    print(f"  sampled {len(long_df):,} long-leg rows "
+          f"({(long_df['regime']=='calm').sum()} calm, "
+          f"{(long_df['regime']=='panic').sum()} panic)")
+else:
+    n_c = (long_df['regime']=='calm').sum(); n_p = (long_df['regime']=='panic').sum()
+    print(f"  full population: {len(long_df):,} long-leg rows ({n_c} calm, {n_p} panic)")
 n_panic = (long_df['regime'] == 'panic').sum()
 n_calm  = (long_df['regime'] == 'calm').sum()
 print(f"  long-leg rows: {n_calm:,} calm, {n_panic:,} panic")

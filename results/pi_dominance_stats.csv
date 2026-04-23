@@ -1,0 +1,10 @@
+stat,value,denominator,note
+trees_with_pi_split,18463,25000,50-seed production ensemble (73.9%)
+trees_with_pi_split_seed50,379,500,seed 50 alone (75.8%)
+path_fraction_pi,0.551,1.0,full long-leg population (85760 rows x 25000 trees = 2.144B traces)
+panic_long_leg_share_pi_trees,0.645,1.0,full panic long-leg population (31732 rows)
+calm_long_leg_share_pi_trees,0.169,1.0,full calm long-leg population (54028 rows)
+panic_long_leg_sum_pi,35191.17,,leaf-value sum from pi-splitting trees
+panic_long_leg_sum_nopi,19383.78,,leaf-value sum from momentum-only trees
+calm_long_leg_sum_pi,4251.80,,leaf-value sum from pi-splitting trees
+calm_long_leg_sum_nopi,20957.37,,leaf-value sum from momentum-only trees
