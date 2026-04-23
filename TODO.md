@@ -3,9 +3,6 @@
 ## In progress
 - [ ] Work on limitations of the method
 - [ ] Polish the stress-test section
-- [ ] Improve explanation of how dominant pi_filter is in the trees (75.8% of trees contain a pi split, 54% of stock paths, 67% of panic long-leg return comes from pi-splitting trees vs only 20% in calm)
-- [ ] Integrate Random Forest result into the thesis: RF depth-matched gives Sharpe 0.73 vs XGBoost 1.11, with pi_filter SHAP share dropping from 46% to 18%. Shows the finding is not about "any tree ensemble" but specifically requires sequential boosting. Best placement: add to Section 5.3 (Nonlinearity) as further robustness, or mention briefly in future work section. Data in `results/random_forest_results.csv`.
-- [ ] Integrate seed convergence result into the thesis: Sharpe drifts up from 1.05 (k=1) to 1.10 (k=100), IQR collapses. Production 50-seed captures most of the noise reduction. Worth mentioning as a methodology caveat (either footnote in Section 3 or appendix). Data in `results/seed_convergence.csv`.
 
 ## Editing thesis
 - [x] Add clear explanation of why long-short and not long-only
@@ -36,3 +33,6 @@
 - [x] Bootstrap analysis: block bootstrap CIs, paired tests vs benchmarks, regime-conditional Sharpe (full table in Appendix app:bootstrap, brief mention in Section 5.1)
 - [x] Write Denis an email on the XGBoost pattern (sent 2026-04-23: meeting cancel, checklist, CRRA update, heatmap pivot)
 - [x] Integrate CRRA (Denis's formula) into the thesis: adds robustness to Section 5.4 risk aversion — even at gamma=0, the sign-log compression of returns drops Sharpe to 0.29. Appendix extension of risk aversion discussion. Data in `results/risk_aversion_crra_results.csv`.
+- [x] Improve explanation of how dominant pi_filter is in the trees (rewritten with economic framing in 5a9bb34; numbers verified against full 50-seed ensemble in 9483713: 73.9% of trees contain a pi split, 55% of stock paths, 67% of panic long-leg return from pi-splitting trees vs 17% in calm). Reproducible via `scripts/verify_pi_dominance_stats.py`.
+- [x] Integrate Random Forest result into the thesis: RF row added to `tab:xgb_hyperparams` (Sharpe 0.73 vs XGBoost 1.11; pi_filter SHAP 18% vs 45%); Model Sensitivity appendix separates boosting-vs-bagging from hyperparameter sensitivity (7e1e455).
+- [x] Integrate seed convergence result into the thesis: appendix subsection `app:seed_convergence` with `table_seed_convergence.tex` (7e1e455 + bfbd80f). Data in `results/seed_convergence.csv`.
