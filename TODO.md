@@ -1,8 +1,10 @@
 # Thesis TODO
 
-## Editing thesis
-- [ ] Work on limitations of the method **(in progress)**
+## In progress
+- [ ] Work on limitations of the method
 - [ ] Polish the stress-test section
+
+## Editing thesis
 - [x] Add clear explanation of why long-short and not long-only
 - [ ] Improve explanation of how dominant pi_filter is in the trees (75.8% of trees contain a pi split, 54% of stock paths, 67% of panic long-leg return comes from pi-splitting trees vs only 20% in calm)
 - [ ] Integrate Random Forest result into the thesis: RF depth-matched gives Sharpe 0.73 vs XGBoost 1.11, with pi_filter SHAP share dropping from 46% to 18%. Shows the finding is not about "any tree ensemble" but specifically requires sequential boosting. Best placement: add to Section 5.3 (Nonlinearity) as further robustness, or mention briefly in future work section. Data in `results/random_forest_results.csv`.
