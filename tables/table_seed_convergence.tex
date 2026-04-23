@@ -1,0 +1,23 @@
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{r r r r r r r r r}
+\toprule
+$k$ & $n_{\text{sub}}$ & Mean & Median & Std & P25 & P75 & Min & Max \\
+\midrule
+1   & 30 & 1.048 & 1.039 & 0.073 & 0.998 & 1.094 & 0.905 & 1.190 \\
+2   & 30 & 1.040 & 1.032 & 0.066 & 0.986 & 1.097 & 0.945 & 1.165 \\
+3   & 30 & 1.049 & 1.042 & 0.062 & 1.006 & 1.076 & 0.922 & 1.194 \\
+5   & 30 & 1.045 & 1.048 & 0.061 & 1.024 & 1.079 & 0.907 & 1.149 \\
+10  & 30 & 1.046 & 1.049 & 0.047 & 1.011 & 1.085 & 0.968 & 1.118 \\
+15  & 30 & 1.061 & 1.050 & 0.037 & 1.031 & 1.093 & 0.994 & 1.145 \\
+20  & 30 & 1.076 & 1.075 & 0.029 & 1.060 & 1.094 & 1.001 & 1.137 \\
+30  & 30 & 1.079 & 1.084 & 0.023 & 1.062 & 1.094 & 1.028 & 1.124 \\
+50  & 30 & 1.085 & 1.085 & 0.016 & 1.075 & 1.091 & 1.040 & 1.123 \\
+75  & 30 & 1.084 & 1.082 & 0.017 & 1.075 & 1.096 & 1.044 & 1.133 \\
+100 & 1  & 1.095 & 1.095 & 0.000 & 1.095 & 1.095 & 1.095 & 1.095 \\
+\bottomrule
+\end{tabular}
+\caption{Seed convergence of the XGBoost long-short Sharpe ratio. For each ensemble size $k$, $n_{\text{sub}}$ random size-$k$ subsets are drawn without replacement from the HMM seed pool; within each subset, the filtered probability $\pi_t^{\text{filter}}$ is averaged over those $k$ chains, XGBoost is retrained, and the out-of-sample (2011--2025) Sharpe is recorded. Mean, median, standard deviation, P25/P75, and min/max are taken across the $n_{\text{sub}}$ draws. At $k = 100$ the pool is exhausted, so only one subset exists.}
+\label{tab:seed_convergence}
+\end{table}
