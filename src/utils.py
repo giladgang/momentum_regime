@@ -112,8 +112,13 @@ def metrics(r):
     if len(r) == 0:
         return 0.0, 0.0, 0.0, 0.0
     ann_ret = (1 + r).prod() ** (12 / len(r)) - 1
-    ann_vol = r.std() * np.sqrt(12)
-    sharpe = r.mean() / r.std() * np.sqrt(12) if r.std() > 0 else 0
+    std = r.std()
+    # Treat numerically-zero std as zero (pandas' pairwise variance leaves
+    # ~1e-17 residue on truly constant series).
+    if std < 1e-12:
+        return ann_ret, 0.0, 0.0, 0.0
+    ann_vol = std * np.sqrt(12)
+    sharpe = r.mean() / std * np.sqrt(12)
     cum = (1 + r).cumprod()
     mdd = ((cum - cum.cummax()) / cum.cummax()).min()
     return ann_ret, ann_vol, sharpe, mdd
@@ -122,9 +127,12 @@ def metrics(r):
 def compute_sharpe(r):
     """Compute annualised Sharpe ratio from monthly returns."""
     r = pd.Series(r).dropna()
-    if len(r) == 0 or r.std() == 0:
+    if len(r) == 0:
         return 0.0
-    return r.mean() / r.std() * np.sqrt(12)
+    std = r.std()
+    if std < 1e-12:
+        return 0.0
+    return r.mean() / std * np.sqrt(12)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════

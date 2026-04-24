@@ -44,6 +44,7 @@ from config import (PORTFOLIO_TYPE, TRADING_FEE as CFG_TRADING_FEE, TRAIN_END,
                     SUBSAMPLE, COLSAMPLE, USE_FUNDAMENTALS, MOM_FEATURES,
                     FUND_FEATURES, CS_FEATURES, STOCK_DATA_PATH,
                     PANEL_WITH_REGIMES_PATH, ARTEFACTS_PATH)
+from src.utils import metrics
 
 # ── Section 1: Load & merge data ──────────────────────────────────────────────
 
@@ -287,16 +288,6 @@ def long_short_port(df_test, score_col, fee=TRADING_FEE):
     if not monthly:
         return pd.Series(dtype=float)
     return pd.DataFrame(monthly).set_index('date')['ret']
-
-def metrics(r):
-    r = pd.Series(r).dropna()
-    ann_ret = (1 + r).prod() ** (12 / len(r)) - 1
-    ann_vol = r.std() * np.sqrt(12)
-    sharpe  = r.mean() / r.std() * np.sqrt(12) if r.std() > 0 else 0
-    cum     = (1 + r).cumprod()
-    mdd     = ((cum - cum.cummax()) / cum.cummax()).min()
-    return ann_ret, ann_vol, sharpe, mdd
-
 
 def build_port(df_test, score_col, fee=TRADING_FEE, rebal_months=None):
     """Dispatcher: calls long_only_port or long_short_port based on config."""

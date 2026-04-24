@@ -110,6 +110,28 @@ def main():
         print("  (Delete panel_with_regimes.parquet to force re-estimation)")
     print()
 
+    # ── Pre-flight: fast artefact-independent tests ──────────────────────────
+    # Runs in ~3s. Catches config typos, feature-list bugs, and portfolio
+    # edge cases BEFORE the multi-hour HMM/XGB compute.
+    # Skipped when --step is specified (user is targeting a single step).
+    if args.step == 0:
+        print("  Pre-flight tests (config, utils, portfolio, pipeline smoke) ...")
+        preflight = [
+            'tests/test_config.py',
+            'tests/test_utils.py',
+            'tests/test_portfolio_edge_cases.py',
+            'tests/test_pipeline_smoke.py',
+        ]
+        result = subprocess.run(
+            [sys.executable, '-m', 'pytest', *preflight, '-q', '--tb=short'],
+            text=True,
+        )
+        if result.returncode != 0:
+            print("\n  PRE-FLIGHT FAILED. Fix the failing tests before running "
+                  "the full pipeline.")
+            sys.exit(1)
+        print("  Pre-flight OK.\n")
+
     t_total = time.time()
 
     steps = {
@@ -167,15 +189,33 @@ def main():
         18: ('scripts/expanding_window.py',
              'STEP 18: Expanding-window HMM re-estimation'),
 
+        95: ('tests/test_config.py',
+             'STEP 95: Config sanity checks (dates, features, hyperparameters)'),
+
+        96: ('tests/test_utils.py',
+             'STEP 96: Unit tests for src/utils.py (metrics, portfolio, loaders)'),
+
+        97: ('tests/test_portfolio_edge_cases.py',
+             'STEP 97: Portfolio construction edge cases (NaN, zero ME, regime transitions)'),
+
+        98: ('tests/test_pipeline_smoke.py',
+             'STEP 98: Pipeline orchestration smoke test (imports, steps dict, CLI)'),
+
         99: ('tests/test_thesis_consistency.py',
              'STEP 99: Run thesis consistency tests (tables, figures, cross-refs)'),
 
         100: ('tests/test_pipeline_technical.py',
               'STEP 100: Run technical pipeline tests (data integrity, numbers, connections)'),
+
+        101: ('tests/test_cross_sectional_lookahead.py',
+              'STEP 101: Cross-sectional model lookahead/causality audit'),
+
+        102: ('tests/test_reproducibility.py',
+              'STEP 102: Reproducibility and determinism guards (artefact regression)'),
     }
 
     # Steps that should be run via pytest instead of plain python
-    pytest_steps = {99, 100}
+    pytest_steps = {95, 96, 97, 98, 99, 100, 101, 102}
 
     if args.step > 0:
         if args.step in steps:
