@@ -9,10 +9,13 @@
 
 ## New research
 - [ ] Improve explanation of the graphs in Chapter 5.2 (term-structure figure and panic sub-type figure): frame what the reader should look for, clarify z-score vs SHAP question they each answer. Includes integrating monthly z-score heatmaps (month × horizon z-scores for long leg, short leg, L-S spread with pi_filter panel; figures `plots/zscore_long_short_heatmap.pdf` and `plots/zscore_longshort_heatmap.pdf`; data in `results/zscore_long_by_month.csv`, `results/zscore_short_by_month.csv`, `results/zscore_longshort_by_month.csv`) — single-month resolution counters the "averages hide inverting months" caveat seen in Sept 2019 / May 2024.
-- [ ] Fundamental analysis — ablation test including cash flow. Baseline in `results/fundamentals_test_results.csv` (script: `scripts/fundamentals_test.py`). Cash flow piece **blocked on expired WRDS password** — `~/.pgpass` is correctly formatted but PAM auth fails (verified 2026-04-23). Fix: log in to wrds-www.wharton.upenn.edu, reset password, update `.pgpass` line `wrds-pgdata.wharton.upenn.edu:9737:wrds:giladgang:NEW_PW`. Pull script `scripts/pull_cashflow.py` is ready (reads creds from .pgpass) — pulls oancfy/capxy/ibq/atq from comp.fundq, computes cfo_a, fcf_a, accruals (Sloan). Once auth works: run pull (~5 min), then write companion ablation script (baseline + add-one for each of 10 fundamentals + LOO from full + fund-only).
 
 ## External / reading
 - [ ] Read the important literature cited in thesis (key papers to study deeply)
+
+## Engineering / testing
+- [ ] Move fast, artefact-independent tests (steps 95, 97, 98) to pre-flight so they run before step 1 — fail-fast on config typos saves 2h on full rebuild. Currently run as steps 95/97/98 at the end of `run_pipeline.py`.
+- [ ] Add GitHub Actions workflow (`.github/workflows/tests.yml`) running `pytest tests/test_config.py tests/test_utils.py tests/test_portfolio_edge_cases.py tests/test_pipeline_smoke.py` on every push. These four don't need the 943MB artefacts pickle and would run in <10s in CI.
 
 ## Completed
 - [x] Work on limitations of the method: Limitations subsection (sec:limitations) now 8 paragraphs covering economic vulnerability, stress-test simulation caveat, test-period scope, frozen HMM parameters + regime drift, memoryless regime conditioning, implementation frictions, specification search, sample scope + causal inference (0e99d9a, 008e5fa, a697ce9).
@@ -36,3 +39,4 @@
 - [x] Improve explanation of how dominant pi_filter is in the trees (rewritten with economic framing in 5a9bb34; numbers verified against full 50-seed ensemble in 9483713 and refined in 2cc77f9 to full-population panic share: 73.9% of trees contain a pi split, 55% of stock paths, 65% of panic long-leg return from pi-splitting trees vs 17% in calm). Reproducible via `scripts/verify_pi_dominance_stats.py`.
 - [x] Integrate Random Forest result into the thesis: RF row added to `tab:xgb_hyperparams` (Sharpe 0.73 vs XGBoost 1.11; pi_filter SHAP 18% vs 45%); Model Sensitivity appendix separates boosting-vs-bagging from hyperparameter sensitivity (7e1e455).
 - [x] Integrate seed convergence result into the thesis: appendix subsection `app:seed_convergence` with `table_seed_convergence.tex` (7e1e455 + bfbd80f). Data in `results/seed_convergence.csv`.
+- [x] Fundamental analysis — ablation test complete. Tables: `table_fund_alphas.tex`, `table_fundamentals_ablation.tex`, `table_performance_fund_row.tex`. Data in `results/fundamentals_test_results.csv`. (Cash flow WRDS pull was separate and not required for this ablation.)
