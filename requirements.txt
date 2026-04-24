@@ -1,0 +1,40 @@
+# Python dependencies for momentum_regime_shifts.
+#
+# Versions pinned to those used to produce the thesis numbers. Install
+# with:
+#
+#     python -m venv .venv
+#     source .venv/bin/activate
+#     pip install -r requirements.txt
+#
+# Tested on Python 3.12 (macOS 25 / Ubuntu 22.04 CI).
+
+# ── Core numerical stack ────────────────────────────────────────────
+numpy==2.4.3
+pandas==2.2.3
+scipy==1.17.1
+pyarrow==23.0.1
+
+# ── Machine learning ────────────────────────────────────────────────
+xgboost==3.2.0
+scikit-learn==1.8.0
+shap==0.51.0
+joblib==1.5.3
+
+# ── Statistics / econometrics ───────────────────────────────────────
+statsmodels==0.14.6
+
+# ── Plotting ────────────────────────────────────────────────────────
+matplotlib==3.10.8
+pillow==12.1.1
+
+# ── Testing ─────────────────────────────────────────────────────────
+pytest==9.0.3
+iniconfig==2.3.0
+pluggy==1.6.0
+
+# ── Optional: WRDS data access ──────────────────────────────────────
+# Only needed for scripts/pull_cashflow.py and similar data-pulling
+# scripts; thesis numbers can be reproduced without it using the
+# committed panel.parquet / crsp_msf_raw.parquet.
+wrds==3.5.0

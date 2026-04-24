@@ -8,11 +8,11 @@ on:
 
 jobs:
   fast-tests:
-    # Runs the artefact-independent tests: config sanity, portfolio
-    # edge cases on synthetic fixtures, and pipeline-orchestration
-    # smoke tests. All other test files depend on the 943MB
-    # cs_artefacts_data.pkl which isn't in git, so they run locally
-    # via `python run_pipeline.py` and not in CI.
+    # Runs the artefact-independent tests: config sanity, unit tests for
+    # src/utils, portfolio edge cases on synthetic fixtures, pipeline
+    # orchestration smoke, and CV-script helper tests. Data-dependent
+    # tests inside these files auto-skip via fixtures in tests/conftest.py
+    # when the 943 MB artefacts pickle is absent (which it is in CI).
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,11 +24,13 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install pandas numpy pytest
+          python -m pip install -r requirements.txt
 
       - name: Run fast tests
         run: |
           pytest tests/test_config.py \
+                 tests/test_utils.py \
                  tests/test_portfolio_edge_cases.py \
                  tests/test_pipeline_smoke.py \
+                 tests/test_cv_scripts.py \
                  -v --tb=short

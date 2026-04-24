@@ -252,24 +252,34 @@ class TestPathHelpers:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 class TestDataLoaders:
-    def test_load_panel_with_regimes_returns_dataframe(self):
-        df = utils.load_panel_with_regimes()
-        assert isinstance(df, pd.DataFrame)
-        assert 'date' in df.columns
-        assert 'pi_filter' in df.columns
-        assert len(df) > 0
+    """Data-dependent tests. Each uses a session-scoped fixture from
+    conftest.py that auto-skips when the underlying file is absent
+    (e.g., in CI without the 943 MB artefacts pickle). Loads the
+    file ONCE per pytest session instead of once per test."""
 
-    def test_load_panel_with_regimes_pi_filter_in_range(self):
-        df = utils.load_panel_with_regimes()
-        pi = df['pi_filter'].dropna()
+    def test_load_panel_with_regimes_returns_dataframe(self, panel_with_regimes):
+        assert isinstance(panel_with_regimes, pd.DataFrame)
+        assert 'date' in panel_with_regimes.columns
+        assert 'pi_filter' in panel_with_regimes.columns
+        assert len(panel_with_regimes) > 0
+
+    def test_load_panel_with_regimes_pi_filter_in_range(self, panel_with_regimes):
+        pi = panel_with_regimes['pi_filter'].dropna()
         assert (pi >= 0).all() and (pi <= 1).all()
 
-    def test_load_artefacts_has_expected_keys(self):
-        art = utils.load_artefacts()
+    def test_load_artefacts_has_expected_keys(self, artefacts):
         for key in ('test', 'train', 'FEATURES', 'strategies_lo'):
-            assert key in art, f"artefacts missing expected key: {key}"
+            assert key in artefacts, f"artefacts missing expected key: {key}"
 
-    def test_load_ff_factors_returns_dataframe(self):
-        df = utils.load_ff_factors()
-        assert isinstance(df, pd.DataFrame)
-        assert len(df) > 0
+    def test_load_ff_factors_returns_dataframe(self, ff_factors):
+        assert isinstance(ff_factors, pd.DataFrame)
+        assert len(ff_factors) > 0
+
+    def test_utils_load_functions_match_fixtures(self, artefacts, panel_with_regimes):
+        """Sanity: utils.load_* functions return equivalent data to the
+        conftest fixtures (same file, same content)."""
+        via_utils_panel = utils.load_panel_with_regimes()
+        via_utils_art = utils.load_artefacts()
+        # Cheap equivalence check
+        assert len(via_utils_panel) == len(panel_with_regimes)
+        assert set(via_utils_art.keys()) == set(artefacts.keys())

@@ -215,6 +215,7 @@ def run_cell(train_df, val_df, *, max_depth, learning_rate, n_estimators,
 # ═══════════════════════════════════════════════════════════════════════════════
 
 RESULTS_PATH = 'results/xgb_cv_results.csv'
+SMOKE_RESULTS_PATH = 'results/xgb_cv_smoke.csv'
 WINNER_PATH = 'results/xgb_cv_winner.json'
 TABLE_PATH = 'tables/table_xgb_cv.tex'
 
@@ -313,9 +314,16 @@ def main():
     parser.add_argument('--fee', type=float, default=TRADING_FEE,
                         help='Transaction fee for L/S Sharpe (default from config: '
                              f'{TRADING_FEE})')
-    parser.add_argument('--output', default=RESULTS_PATH,
-                        help='Results CSV path (append, supports resume)')
+    parser.add_argument('--output', default=None,
+                        help='Results CSV path (append, supports resume). '
+                             'Defaults: results/xgb_cv_results.csv for full '
+                             'runs, results/xgb_cv_smoke.csv for --smoke. '
+                             'Smoke NEVER overwrites full results.')
     args = parser.parse_args()
+
+    # Safety: smoke runs must not overwrite full-run results.
+    if args.output is None:
+        args.output = SMOKE_RESULTS_PATH if args.smoke else RESULTS_PATH
 
     grid = GRID_SMOKE if args.smoke else GRID_FULL
     n_seeds = 1 if args.smoke else args.seeds

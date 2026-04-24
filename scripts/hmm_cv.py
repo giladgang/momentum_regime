@@ -275,6 +275,7 @@ def eval_xgb_ensemble(stocks, pi_df, train_end, val_start, val_end,
 # ═══════════════════════════════════════════════════════════════════════════════
 
 RESULTS_PATH = 'results/hmm_cv_features.csv'
+SMOKE_RESULTS_PATH = 'results/hmm_cv_smoke.csv'
 WINNER_PATH = 'results/hmm_cv_winner.json'
 TABLE_PATH = 'tables/table_hmm_cv.tex'
 
@@ -379,8 +380,16 @@ def main():
     parser.add_argument('--hmm-burnin', type=int, default=500)
     parser.add_argument('--n-estimators', type=int, default=None,
                         help='Override XGB n_estimators (default: use config)')
-    parser.add_argument('--output', default=RESULTS_PATH)
+    parser.add_argument('--output', default=None,
+                        help='Results CSV path (append, supports resume). '
+                             'Defaults: results/hmm_cv_features.csv for full '
+                             'runs, results/hmm_cv_smoke.csv for --smoke. '
+                             'Smoke NEVER overwrites full results.')
     args = parser.parse_args()
+
+    # Safety: smoke runs must not overwrite full-run results.
+    if args.output is None:
+        args.output = SMOKE_RESULTS_PATH if args.smoke else RESULTS_PATH
 
     combos = enumerate_combinations()
     folds = FOLDS
