@@ -19,7 +19,7 @@ Test period: **2011-01 to 2025-11** (167 months). Long-short, NYSE decile breakp
 | M1: LR | -1.6% | 15.1% | -0.03 | -44.1% | 0.06 | -2.50** | 0.8 |
 | M1: LR (nonlinear) | 4.3% | 17.7% | 0.32 | -39.3% | 0.06 | 1.40 | 1.8 |
 | **M2: XGB (mom+π)** | **21.9%** | **19.7%** | **1.11** | **-24.8%** | 0.46 | 1.83* | **15.7** |
-| M2: XGB (mom+π+fund) | 16.9% | 17.7% | 0.97 | -19.6% | 0.07 | 3.57*** | 8.7 |
+| M2: XGB (mom+π+fund) | 16.6% | 18.6% | 0.92 | -18.4% | 0.11 | 0.91 | 8.5 |
 
 ### Factor alphas for M2 (`table_factor_alphas`)
 
@@ -186,17 +186,34 @@ RF underperforms XGBoost by ~0.3 Sharpe and shifts SHAP heavily toward momentum.
 
 HMM signal more than doubles Sharpe vs no signal. Raw indicators are worse than no signal.
 
-### Fundamentals ablation (`results/fundamentals_test_results.csv`)
+### Fundamentals ablation (`results/fundamentals_test_results.csv`, `results/fundamentals_returns.pkl`)
 
-| Config | Features | Sharpe | Mom % | Pi % | Fund % |
-|---|---:|---:|---:|---:|---:|
-| Baseline (mom+pi) | 13 | **1.11** | 55 | 45 | 0 |
-| + fundamentals | 20 | 0.97 | 31 | 31 | 38 |
-| Fund only | 7 | 0.37 | 0 | 0 | 100 |
-| Fund + pi | 8 | 0.39 | 0 | 47 | 53 |
-| Mom + fund (no pi) | 19 | 0.63 | 50 | 0 | 50 |
+50-seed ensembles, production settings (depth 4, lr 0.05, 500 trees). **Ten fundamentals**: seven value/quality/size (bm, roe, earnings_growth, leverage, asset_growth, gross_profit_a, log_me) plus three cash-flow (cfo_a, fcf_a, accruals). NW *t* is on excess returns over the market (6-lag Newey-West), matching the convention of `table_performance`.
 
-Fundamentals dilute the regime-momentum signal. 7 fundamentals absorb 38% of SHAP, drop Sharpe to 0.97.
+| Config | Features | Sharpe | Calm Sh | Panic Sh | Beta | NW t (exc) | Mom % | Pi % | Fund % |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| **Baseline (mom+pi)** | 13 | **1.11** | 0.82 | **1.56** | 0.46 | 1.83* | 55 | 45 | 0 |
+| + 10 fundamentals | 23 | 0.92 | 0.62 | 1.34 | 0.11 | 0.91 | 29 | 29 | 43 |
+| Fund only | 10 | 0.58 | 0.84 | 0.37 | 0.16 | -0.56 | 0 | 0 | 100 |
+| Fund + pi | 11 | 0.62 | 0.61 | 0.66 | 0.03 | -0.54 | 0 | 41 | 59 |
+| Mom + fund (no pi) | 22 | 0.59 | 0.64 | 0.50 | 0.07 | -0.62 | 45 | 0 | 55 |
+
+Three findings:
+1. **Fundamentals dilute rather than augment.** Adding ten fundamentals reduces Sharpe 1.11 → 0.92 and the excess-return NW *t* 1.83* → 0.91 (loses conventional significance). Fundamentals absorb 43% of SHAP, redirecting attention from momentum (55 → 29%) and π (45 → 29%) with no net gain. Beta falls 0.46 → 0.11 and MDD tightens -24.8% → -18.4%, so the joint variant looks more like a market-neutral low-beta strategy than a high-alpha one.
+2. **Fundamentals work only in calm.** Fund-only calm Sharpe 0.84 matches the baseline's 0.82, but panic Sharpe 0.37 is a fraction of baseline 1.56. Characteristics describe stable firm attributes that cannot flip direction across regimes. Adding π to fundamentals (fund + π, panic 0.66) doubles the fund-only panic Sharpe but falls well short of the full model because there is no directional relationship for π to reorganise without momentum.
+3. **The regime-momentum interaction is load-bearing.** Removing π from mom + fund collapses to Sharpe 0.59 with panic 0.50, roughly mirroring fund-only. π's role is context for momentum specifically, not a general-purpose conditioning feature.
+
+Factor alphas for mom+π+fund (`tables/table_fund_alphas.tex`):
+
+| Model | α (%) | t(α) |
+|---|---:|---:|
+| CAPM | 18.2 | 2.97*** |
+| FF3 | 17.2 | 3.11*** |
+| Carhart | 18.2 | 3.25*** |
+| FF5 | 16.3 | 3.00*** |
+| FF6 | 17.6 | 3.18*** |
+
+Bootstrap Sharpe 95% CI: [0.54, 1.26]. Turnover: 51.5%/mo (baseline 66.2%).
 
 ### GHM comparison (`table_ghm_comparison`)
 

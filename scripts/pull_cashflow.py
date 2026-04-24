@@ -16,9 +16,18 @@ Output:
 import numpy as np
 import pandas as pd
 import wrds
+from pathlib import Path
 
 print("Connecting to WRDS ...")
-db = wrds.Connection()
+# Read credentials from ~/.pgpass (format: host:port:db:user:password)
+pgpass = Path.home() / '.pgpass'
+_u, _p = 'giladgang', None
+for line in pgpass.read_text().splitlines():
+    parts = line.strip().split(':')
+    if len(parts) == 5 and parts[0].startswith('wrds-pgdata'):
+        _u, _p = parts[3], parts[4]
+        break
+db = wrds.Connection(wrds_username=_u, wrds_password=_p)
 
 print("Pulling comp.fundq (cash flow + net income + assets) ...")
 fundq = db.raw_sql("""

@@ -23,11 +23,13 @@ Price, shares out. & CRSP \texttt{msf} & For market equity computation & Section
 Exchange, share codes & CRSP \texttt{msf} & Universe filtering (codes 10, 11) & Section~\ref{sec:stage2} \\
 Delisting returns & CRSP \texttt{msedelist} & Survivorship bias correction & Section~\ref{sec:stage2} \\
 Book equity (\texttt{ceqq}) & Compustat \texttt{fundq} & Book-to-market, ROE & Appendix~\ref{app:fundamental_features} \\
-Total assets (\texttt{atq}) & Compustat \texttt{fundq} & Asset growth, gross profit & Appendix~\ref{app:fundamental_features} \\
-Income (\texttt{ibq}) & Compustat \texttt{fundq} & ROE, earnings growth & Appendix~\ref{app:fundamental_features} \\
+Total assets (\texttt{atq}) & Compustat \texttt{fundq} & Asset growth, gross profit, CF ratios & Appendix~\ref{app:fundamental_features} \\
+Income (\texttt{ibq}) & Compustat \texttt{fundq} & ROE, earnings growth, accruals & Appendix~\ref{app:fundamental_features} \\
 Revenue (\texttt{revtq}) & Compustat \texttt{fundq} & Gross profitability & Appendix~\ref{app:fundamental_features} \\
 COGS (\texttt{cogsq}) & Compustat \texttt{fundq} & Gross profitability & Appendix~\ref{app:fundamental_features} \\
 Debt (\texttt{dlttq}, \texttt{dlcq}) & Compustat \texttt{fundq} & Leverage ratio & Appendix~\ref{app:fundamental_features} \\
+Operating cash flow (\texttt{oancfy}) & Compustat \texttt{fundq} & CFO, FCF, accruals & Appendix~\ref{app:fundamental_features} \\
+Capital expenditure (\texttt{capxy}) & Compustat \texttt{fundq} & Free cash flow & Appendix~\ref{app:fundamental_features} \\
 \midrule
 \multicolumn{4}{l}{\emph{Market-level variables (HMM inputs)}} \\
 Daily market returns & CRSP \texttt{dsi} & Drawdown (DD) computation & Section~\ref{sec:hmm_features} \\
@@ -38,7 +40,7 @@ BAA, AAA bond yields & FRED & Credit spread (CS) & Section~\ref{sec:hmm_features
 \multicolumn{4}{l}{\emph{Derived features}} \\
 $mom_1, \dots, mom_{12}$ & Computed & 12 trailing momentum signals & Section~\ref{sec:cs_features} \\
 $\pi_t^{\text{filter}}$ & HMM output & Filtered panic probability & Section~\ref{sec:hmm_output} \\
-7 fundamentals (ablation only) & Computed & bm, roe, gross profit, etc. & Appendix~\ref{app:fundamental_features} \\
+10 fundamentals (ablation only) & Computed & bm, roe, gross profit, cash flow, etc. & Appendix~\ref{app:fundamental_features} \\
 \bottomrule
 \end{tabular}
 \caption{Summary of all data variables used in the analysis.}
@@ -250,6 +252,10 @@ Removing the regime signal reduces M2's Sharpe from 1.11 to 0.41, a drop of 0.70
 
 \input{tables/table_factor_alphas}
 
+For completeness, Table~\ref{tab:fund_alphas} reports the same regressions for the fund-augmented variant (M2: mom+$\pi$+fund) discussed in Section~\ref{sec:fund_ablation}. Alphas remain statistically significant under all five specifications ($t > 2.9$) but are materially smaller than the baseline's, consistent with the dilution documented in the main text.
+
+\input{tables/table_fund_alphas}
+
 \subsection{Block Bootstrap Inference}\label{app:bootstrap}
 
 To assess the sampling variability of M2's Sharpe ratio and test its outperformance formally, a block bootstrap is applied to the monthly return series. Returns are resampled with replacement in 12-month blocks to preserve autocorrelation, producing 10{,}000 synthetic 167-month paths (fixed seed 42). The Sharpe ratio is recomputed on each resample to obtain a 95\% confidence interval, and the same block draws are used for M2 and each benchmark to form a paired test of the Sharpe difference. The bottom panel repeats the exercise on M2 returns split by regime.
@@ -332,7 +338,7 @@ Two patterns emerge. First, the mean Sharpe rises from 1.05 at $k = 1$ to 1.09 a
 
 \section{Fundamental Feature Definitions}\label{app:fundamental_features}
 
-Seven firm-level characteristics are computed from Compustat quarterly data (\texttt{fundq}), linked to CRSP via the CCM bridge table. All fundamentals are lagged four months from fiscal quarter end to ensure real-time availability.
+Ten firm-level characteristics are computed from Compustat quarterly data (\texttt{fundq}), linked to CRSP via the CCM bridge table. All fundamentals are lagged four months from fiscal quarter end to ensure real-time availability. Cash-flow items (\texttt{oancfy}, \texttt{capxy}) are reported year-to-date and are differenced within each fiscal year to recover the per-quarter contribution before the trailing twelve-month sum is taken.
 
 \begin{itemize}
     \item \textbf{Book-to-market (bm):} Book equity (\texttt{ceqq}) divided by market equity.
@@ -342,7 +348,10 @@ Seven firm-level characteristics are computed from Compustat quarterly data (\te
     \item \textbf{Leverage:} Total debt divided by total assets: $(\texttt{dlttq} + \texttt{dlcq}) / \texttt{atq}$.
     \item \textbf{Earnings growth:} Year-over-year growth in earnings, transformed as $\text{sign}(g) \cdot \log(1 + |g|)$.
     \item \textbf{Log market equity:} Natural logarithm of market capitalisation (price $\times$ shares outstanding), lagged one month.
+    \item \textbf{Operating cash flow over assets (cfo\_a):} Trailing twelve-month operating cash flow (\texttt{oancfy}, converted to quarterly and summed) scaled by total assets.
+    \item \textbf{Free cash flow over assets (fcf\_a):} Trailing twelve-month operating cash flow minus trailing twelve-month capital expenditure (\texttt{capxy}), scaled by total assets.
+    \item \textbf{Accruals:} The accrual component of earnings, $(\texttt{ibq}_{\text{TTM}} - \texttt{oancf}_{\text{TTM}}) / \texttt{atq}$, which captures the non-cash portion of reported earnings.
 \end{itemize}
 
-Fundamentals are winsorised at the 1st and 99th percentiles (5th and 95th for asset growth) using training-sample bounds.
+Fundamentals are winsorised at the 1st and 99th percentiles (5th and 95th for asset growth) using training-sample bounds. The cash-flow features (cfo\_a, fcf\_a, accruals) are available for roughly 83\% of stock-months; the remaining seven characteristics exceed 82\% coverage individually, and XGBoost handles any residual missingness natively via its default-branch logic.
 

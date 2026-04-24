@@ -72,6 +72,9 @@ FUND_FEATURES = [
     'asset_growth',     # Asset growth
     'gross_profit_a',   # Gross profitability
     'log_me',           # Log market equity
+    'cfo_a',            # Operating cash flow / assets (TTM)
+    'fcf_a',            # Free cash flow / assets (TTM, CFO - capex)
+    'accruals',         # Sloan accruals: (ibq - oancf) / atq (TTM)
 ]
 
 # Derived feature lists
