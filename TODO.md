@@ -14,8 +14,13 @@
 - [ ] Read the important literature cited in thesis (key papers to study deeply)
 
 ## Engineering / testing
-- [ ] Move fast, artefact-independent tests (steps 95, 97, 98) to pre-flight so they run before step 1 — fail-fast on config typos saves 2h on full rebuild. Currently run as steps 95/97/98 at the end of `run_pipeline.py`.
-- [ ] Add GitHub Actions workflow (`.github/workflows/tests.yml`) running `pytest tests/test_config.py tests/test_utils.py tests/test_portfolio_edge_cases.py tests/test_pipeline_smoke.py` on every push. These four don't need the 943MB artefacts pickle and would run in <10s in CI.
+- [x] Move fast, artefact-independent tests to pre-flight so they run before step 1 — fail-fast on config typos saves 2h on full rebuild. Done in `run_pipeline.py:113-133` (commit 97b35b6): runs test_config.py, test_utils.py, test_portfolio_edge_cases.py, test_pipeline_smoke.py when `--step` is not specified.
+- [x] Add GitHub Actions workflow (`.github/workflows/tests.yml`) running pytest on every push. Done (commit 97b35b6). Runs test_config.py, test_portfolio_edge_cases.py, test_pipeline_smoke.py. test_utils.py excluded because its TestDataLoaders class depends on data files not in git; a pytest.skip guard on that class would let it be included (minor follow-up).
+
+## Methodology validation (CV retrofits)
+- [ ] Smoke-test `scripts/xgb_cv.py` after expanding-window backtest finishes: `python scripts/xgb_cv.py --smoke` (~30s). Then kick off full run (~2-5h). Output: `results/xgb_cv_results.csv`. Thesis payoff: replaces false "cross-validation" claim in `latex/appendix.tex` with real CV selection over depth × lr × n_estimators grid.
+- [ ] Smoke-test `scripts/hmm_cv.py` after backtest finishes: `python scripts/hmm_cv.py --smoke` (~5-10 min). Then kick off full run (~15-30h). Output: `results/hmm_cv_features.csv`. Thesis payoff: removes specification-search caveat paragraph in `latex/data_section.tex`. 93 DD-inclusive combinations × 5 folds × 3 HMM × 10 XGB seeds.
+- [ ] After both CV runs finish AND Gilad reviews results: update `latex/methodology.tex` and `latex/appendix.tex` with CV-based framing; remove existing test-set-peek language. DO NOT edit any `.tex` before Gilad sees the numbers — the right framing depends on what the CV winners actually are.
 
 ## Completed
 - [x] Work on limitations of the method: Limitations subsection (sec:limitations) now 8 paragraphs covering economic vulnerability, stress-test simulation caveat, test-period scope, frozen HMM parameters + regime drift, memoryless regime conditioning, implementation frictions, specification search, sample scope + causal inference (0e99d9a, 008e5fa, a697ce9).
