@@ -26,6 +26,23 @@ K_STATES = 2
 # HMM training data start (limited by stock-level data availability)
 HMM_START = '1990-01-01'
 
+# ── HMM priors ────────────────────────────────────────────────────────────────
+# NIW prior on regime emissions (mu_k, Sigma_k). Hyperparameters:
+#   m_0       : prior mean of mu_k (features are z-scored, so 0)
+#   kappa_0   : prior strength on the mean (nearly flat at 0.01 pseudo-obs)
+#   nu_0_off  : additive offset so nu_0 = D + nu_0_off (default D+2, the
+#               minimum integer giving a proper Inverse-Wishart)
+# The scale matrix Psi_0 is computed in hmm_model.py as eye(D)*(nu_0-D-1)
+# so that E[Sigma_k] = I_D before observing data.
+HMM_PRIOR_M0       = 0.0
+HMM_PRIOR_KAPPA0   = 0.01
+HMM_PRIOR_NU0_OFF  = 2   # nu_0 = D + HMM_PRIOR_NU0_OFF
+
+# Dirichlet prior on each row of the transition matrix. Diagonal is 9,
+# off-diagonal is 1, so E[P] has 0.90 persistence in each regime.
+HMM_PRIOR_DIRICHLET_ALPHA = [[9.0, 1.0],
+                             [1.0, 9.0]]
+
 # ═══════════════════════════════════════════════════════════════════════════════
 #  PORTFOLIO SETTINGS
 # ═══════════════════════════════════════════════════════════════════════════════

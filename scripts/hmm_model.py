@@ -60,7 +60,10 @@ import matplotlib.pyplot as plt
 
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from config import HMM_FEATURES, HMM_SEEDS, HMM_ITERATIONS, HMM_BURNIN, K_STATES, HMM_START, TRAIN_END, PANEL_PATH
+from config import (HMM_FEATURES, HMM_SEEDS, HMM_ITERATIONS, HMM_BURNIN,
+                    K_STATES, HMM_START, TRAIN_END, PANEL_PATH,
+                    HMM_PRIOR_M0, HMM_PRIOR_KAPPA0, HMM_PRIOR_NU0_OFF,
+                    HMM_PRIOR_DIRICHLET_ALPHA)
 
 panel = pd.read_parquet(PANEL_PATH)
 
@@ -87,16 +90,16 @@ print(f"Test:  {test_panel['date'].min().date()}  → {test_panel['date'].max().
 
 K = 2  # two hidden regimes: calm and panic
 
-# Normal-Inverse-Wishart (NIW) prior for (μ_k, Σ_k)
-m_0  = np.zeros(D)          # prior mean: zero, since features are z-scored
-κ_0  = 0.01                 # prior strength on mean: nearly flat (0.01 pseudo-observations)
-ν_0  = D + 2                # prior degrees of freedom: minimum valid value for a proper IW
-Ψ_0  = np.eye(D) * (ν_0 - D - 1)  # prior scale matrix: chosen so E[Σ_k] = I (unit covariance)
+# Normal-Inverse-Wishart (NIW) prior for (μ_k, Σ_k). Hyperparameters
+# come from config.py so priors are declared in one place.
+m_0  = np.full(D, HMM_PRIOR_M0)          # prior mean: zero, since features are z-scored
+κ_0  = HMM_PRIOR_KAPPA0                  # prior strength on mean: nearly flat (0.01 pseudo-observations)
+ν_0  = D + HMM_PRIOR_NU0_OFF             # prior degrees of freedom: minimum valid value for a proper IW
+Ψ_0  = np.eye(D) * (ν_0 - D - 1)         # prior scale matrix: chosen so E[Σ_k] = I (unit covariance)
 
 # Dirichlet prior for each row of transition matrix P
 # Row i gets α_dir[i]: diagonal element is 9 (persist), off-diagonal is 1.
-α_dir = np.array([[9.0, 1.0],    # calm→calm 90%, calm→panic 10%
-                   [1.0, 9.0]])   # panic→calm 10%, panic→panic 90%
+α_dir = np.asarray(HMM_PRIOR_DIRICHLET_ALPHA, dtype=float)  # calm/panic persistence priors from config
 
 # ── Section 3: Initialization helper ─────────────────────────────────────────
 
@@ -220,9 +223,30 @@ def sample_P(states):
 
 def forward_filter(Z, mu, Sigma, P):
     """
-    Compute filtered probabilities P(s_t = k | z_{1:t}) with fixed parameters.
-    Returns array of shape (len(Z), K).
-    Causal — uses only data up to t at each step.
+    Compute filtered probabilities alpha_t(k) = P(s_t = k | z_{1:t}).
+
+    This is the CAUSAL filter used to generate the trading signal
+    pi_filter. At each t, the posterior over regimes conditions only
+    on observations up to and including z_t; no information from
+    z_{t+1:T} enters the computation. In particular, FFBS (which
+    samples a full state path using a backward pass) is used only
+    during Gibbs training to improve parameter estimates and does
+    not feed into pi_filter.
+
+    Parameters are held fixed at their posterior means (mu, Sigma, P)
+    estimated on the training sample, so running forward_filter on
+    the test sample introduces no look-ahead.
+
+    Parameters
+    ----------
+    Z     : (T, D) ndarray of observations (z-scored features)
+    mu    : (K, D) ndarray of regime means
+    Sigma : (K, D, D) ndarray of regime covariances
+    P     : (K, K) transition matrix, row-stochastic
+
+    Returns
+    -------
+    (T, K) ndarray of filtered probabilities, rows sum to 1.
     """
     n = len(Z)
     log_emit  = log_emission(Z, mu, Sigma)   # (T, K): log likelihoods under each regime
@@ -612,6 +636,18 @@ print("  " + "-" * 38)
 for name, ess in ess_records:
     print(f"  {name:<22} {ess:>8.0f}  {'ok' if ess >= 100 else 'LOW — check trace'}")
 print(f"  Minimum ESS: {min_ess:.0f}  ({'ok' if min_ess >= 100 else 'WARNING: low — increase n_iter'})")
+
+# Soft ESS threshold: highlight when any parameter is under the recommended minimum
+_low_ess = [(name, ess) for name, ess in ess_records if ess < 100]
+if _low_ess:
+    print()
+    print("  " + "!" * 66)
+    print(f"  !! Low-ESS warning: {len(_low_ess)} of {len(ess_records)} parameters below 100.")
+    for name, ess in _low_ess:
+        print(f"  !!   {name:<20}  ESS = {ess:.0f}")
+    print(f"  !! Recommended fix: raise HMM_ITERATIONS (currently {n_iter}) in config.py,")
+    print(f"  !! or increase the HMM_SEEDS count (currently {N_SEEDS}) for more averaging.")
+    print("  " + "!" * 66)
 
 print("\n" + "=" * 70)
 print("  VALIDATION SUMMARY")

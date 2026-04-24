@@ -33,7 +33,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from xgboost import XGBRegressor
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LogisticRegression, Ridge
 from sklearn.preprocessing import StandardScaler
 import shap
 
@@ -359,6 +359,22 @@ plt.tight_layout()
 fig_lr.savefig('plots/cs_lr_weights.png', dpi=150)
 plt.close(fig_lr)
 print("  LR weights saved: cs_lr_weights.png")
+
+# ── Ridge baseline (linear model, continuous-return target) ──────────────────
+# Isolates linearity from the classification target: identical features and
+# preprocessing to M1, identical target to M2. Detailed sensitivity sweep
+# across regularisation strengths (alpha in [0.01, 1000]) lives in
+# scripts/ridge_baseline_test.py and populates Appendix F.8.
+print("  Method 1b: Ridge (linearity control, alpha=1.0) ...")
+ridge = Ridge(alpha=1.0)
+ridge.fit(X_tr_s, y_train)
+test['score_ridge'] = ridge.predict(X_te_s)
+r_ridge_lo   = build_port(test, 'score_ridge')
+r_ridge_lo_q = build_port(test, 'score_ridge', rebal_months=QUARTERLY_MONTHS)
+_ridge_coef = dict(zip(FEATURES, ridge.coef_))
+_ridge_pi_coef = _ridge_coef.get('pi_filter', float('nan'))
+print(f"    Ridge coef on pi_filter: {_ridge_pi_coef:+.4f}  "
+      f"(standardized; near-zero = cannot use the regime signal linearly)")
 
 # ── Section 9: Method 2 — XGBoost Regressor ──────────────────────────────────
 

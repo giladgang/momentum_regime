@@ -616,7 +616,8 @@ class TestReproducibility:
         assert os.path.exists(path), f"Missing: {path}"
 
     def test_fundamentals_ablation_results_exists(self):
-        path = os.path.join(PROJECT_ROOT, cfg.RESULTS_DIR, "fundamentals_ablation_results.csv")
+        # Produced by scripts/fundamentals_test.py
+        path = os.path.join(PROJECT_ROOT, cfg.RESULTS_DIR, "fundamentals_test_results.csv")
         assert os.path.exists(path), f"Missing: {path}"
 
     def test_artefacts_pickle_exists(self):
