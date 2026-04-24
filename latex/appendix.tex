@@ -206,13 +206,13 @@ The baseline HMM uses $K = 2$ states (calm and panic). A natural question is whe
 
 In long-short construction, M2 shows no consistent improvement beyond $K = 2$. Cross-seed variability increases with $K$, and the intermediate states that emerge for $K \geq 3$ lack the persistence needed to provide a stable conditioning signal. With only 241 training months, the data cannot reliably separate more than two regimes for the purpose of downstream cross-sectional stock selection.
 
+Beyond estimation, $K = 2$ has an interpretability advantage. The two-state model produces a single continuous signal ($\pi_t^{\text{filter}}$) that XGBoost can condition on in a straightforward way: higher values indicate more stress. With $K \geq 3$, the additional states may capture dimensions of the economy that are orthogonal to the continuation-reversal mechanism, for example a ``growth'' state characterised by strong fundamentals but moderate stress indicators. Such a state would conflate two economically distinct situations (a genuine expansion vs.\ a recovery from panic) and could introduce noise into the regime signal, degrading the model's ability to distinguish continuation from reversal. The two-state framework avoids this by restricting the regime classification to a single dimension, the degree of market stress, which is the dimension most relevant to momentum's cross-sectional structure.
+
 \subsection{January Exclusion}\label{app:january}
 
 Momentum is known to reverse in January \citep{JegadeeshTitman1993}: past losers outperform past winners, partially offsetting momentum's annual profitability. To verify that M2's performance is not driven by a January seasonal, Table~\ref{tab:january} recomputes all metrics after excluding the 14 January months from the test period. M2's Sharpe ratio declines marginally from 1.11 to 1.06, confirming that the regime-momentum interaction operates throughout the calendar year. Fixed 12-month momentum improves slightly when January is excluded (0.06 to 0.14), consistent with the well-documented January reversal in unconditional momentum.
 
 \input{tables/table_january}
-
-Beyond estimation, $K = 2$ has an interpretability advantage. The two-state model produces a single continuous signal ($\pi_t^{\text{filter}}$) that XGBoost can condition on in a straightforward way: higher values indicate more stress. With $K \geq 3$, the additional states may capture dimensions of the economy that are orthogonal to the continuation-reversal mechanism -- for example, a ``growth'' state characterised by strong fundamentals but moderate stress indicators. Such a state would conflate two economically distinct situations (a genuine expansion vs.\ a recovery from panic) and could introduce noise into the regime signal, degrading the model's ability to distinguish continuation from reversal. The two-state framework avoids this by restricting the regime classification to a single dimension -- the degree of market stress -- which is the dimension most relevant to momentum's cross-sectional structure.
 
 \section{External Validity}\label{app:external_validity}
 

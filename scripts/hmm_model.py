@@ -100,14 +100,17 @@ m_0  = np.zeros(D)          # prior mean: zero, since features are z-scored
 
 # ── Section 3: Initialization helper ─────────────────────────────────────────
 
-# Use first feature (DD) for initial state assignment -- below-median DD = panic
-vol_idx = 0  # DD_z is always first; below median = more stress
+# Use first feature (DD_z) for initial state assignment. Labels 0/1 are
+# arbitrary here; the post-Gibbs sign-correction step reassigns the panic
+# label to whichever state's posterior mean best matches known crisis
+# directions (see panic_state identification below).
+dd_idx = 0  # DD_z is always first in HMM_FEATURES
 
 def init_sampler(seed):
     """Initialize Gibbs sampler state for a given random seed."""
     np.random.seed(seed)
-    # crude initial state assignment: above-median first feature -> state 1, below -> state 0
-    states = (Z_train[:, vol_idx] > np.median(Z_train[:, vol_idx])).astype(int)
+    # crude initial state assignment: above-median DD_z -> state 1, below -> state 0
+    states = (Z_train[:, dd_idx] > np.median(Z_train[:, dd_idx])).astype(int)
     mu_init    = np.zeros((K, D))
     Sigma_init = np.array([np.eye(D)] * K)
     for k in range(K):
