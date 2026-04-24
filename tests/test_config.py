@@ -140,6 +140,60 @@ class TestHMMSettings:
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# HMM priors (must match methodology.tex §3.1.3)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class TestHMMPriors:
+    """Guard the Bayesian priors documented in methodology.tex §3.1.3.
+
+    The thesis specifies m_0 = 0, kappa_0 = 0.01, nu_0 = D+2, and a
+    Dirichlet transition prior with diagonal 9 and off-diagonal 1.
+    Drifting these silently would invalidate the methodology description
+    and potentially the headline numbers, so we pin them here.
+    """
+
+    def test_niw_prior_mean_is_zero(self):
+        assert cfg.HMM_PRIOR_M0 == 0.0, \
+            "HMM_PRIOR_M0 must be 0 (z-scored features: prior mean at origin)"
+
+    def test_niw_prior_kappa_is_nearly_flat(self):
+        assert cfg.HMM_PRIOR_KAPPA0 == 0.01, \
+            "HMM_PRIOR_KAPPA0 must be 0.01 (nearly flat: data dominates)"
+
+    def test_niw_prior_nu_offset_gives_proper_iw(self):
+        # nu_0 = D + nu_0_off. The minimum for a proper IW is D+2, so
+        # nu_0_off must be >= 2. The thesis uses exactly D+2.
+        assert cfg.HMM_PRIOR_NU0_OFF == 2, \
+            ("HMM_PRIOR_NU0_OFF must be 2 so nu_0 = D+2, the minimum "
+             "integer giving a proper Inverse-Wishart prior")
+
+    def test_dirichlet_prior_is_2x2(self):
+        alpha = cfg.HMM_PRIOR_DIRICHLET_ALPHA
+        assert len(alpha) == 2 and all(len(row) == 2 for row in alpha), \
+            "HMM_PRIOR_DIRICHLET_ALPHA must be 2x2 (one row per state)"
+
+    def test_dirichlet_prior_all_positive(self):
+        for row in cfg.HMM_PRIOR_DIRICHLET_ALPHA:
+            for v in row:
+                assert v > 0, f"Dirichlet pseudocounts must be > 0, got {v}"
+
+    def test_dirichlet_prior_favors_persistence(self):
+        # Diagonal must exceed off-diagonal so the prior mean transition
+        # matrix has regime persistence > regime switching.
+        alpha = cfg.HMM_PRIOR_DIRICHLET_ALPHA
+        assert alpha[0][0] > alpha[0][1], \
+            "Calm-row Dirichlet must favor persistence: alpha[0][0] > alpha[0][1]"
+        assert alpha[1][1] > alpha[1][0], \
+            "Panic-row Dirichlet must favor persistence: alpha[1][1] > alpha[1][0]"
+
+    def test_dirichlet_prior_matches_thesis(self):
+        # Methodology.tex equation (dirichlet_prior) sets these exact values.
+        assert cfg.HMM_PRIOR_DIRICHLET_ALPHA == [[9.0, 1.0], [1.0, 9.0]], \
+            ("HMM_PRIOR_DIRICHLET_ALPHA must be [[9,1],[1,9]] to match "
+             "methodology.tex eq:dirichlet_prior (E[persistence] = 0.9)")
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # XGBoost settings
 # ═══════════════════════════════════════════════════════════════════════════════
 
