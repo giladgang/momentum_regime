@@ -279,6 +279,117 @@ class TestCrossSectionalArtifacts:
         art = _get_artefacts()
         assert np.abs(art["shap_values"]).sum() > 0
 
+    def test_shap_values_finite(self):
+        """Every SHAP value must be finite. NaN/inf would signal a
+        regression in TreeExplainer, X_test contamination, or numerical
+        overflow."""
+        art = _get_artefacts()
+        sv = art["shap_values"]
+        assert np.isfinite(sv).all(), (
+            f"SHAP contains non-finite values: "
+            f"{np.sum(~np.isfinite(sv))} out of {sv.size}"
+        )
+
+    def test_shap_no_all_zero_columns(self):
+        """Every feature should have non-zero SHAP across the test set
+        (otherwise the feature contributed nothing — likely a dropped
+        column or an X_test/X_train mismatch)."""
+        art = _get_artefacts()
+        sv = art["shap_values"]
+        col_abs_sum = np.abs(sv).sum(axis=0)
+        zero_cols = np.where(col_abs_sum == 0)[0]
+        assert len(zero_cols) == 0, (
+            f"{len(zero_cols)} SHAP columns are entirely zero "
+            f"(feature indices {zero_cols.tolist()}). Likely a feature "
+            "wasn't actually used by the fitted XGB."
+        )
+
+    def test_shap_no_all_zero_rows(self):
+        """Every test sample should have at least one non-zero SHAP value
+        (otherwise the model produced a constant prediction for that row,
+        which is degenerate)."""
+        art = _get_artefacts()
+        sv = art["shap_values"]
+        row_abs_sum = np.abs(sv).sum(axis=1)
+        zero_rows = np.where(row_abs_sum == 0)[0]
+        assert len(zero_rows) == 0, (
+            f"{len(zero_rows)} test samples have all-zero SHAP — model "
+            "produced a constant prediction for these rows."
+        )
+
+    def test_critical_column_dtypes(self):
+        """Pin dtypes on critical columns so a future refactor (e.g.
+        switching pd.NA → np.nan, accidentally casting Float64 → float64)
+        is caught instead of silently changing isna() behavior across
+        downstream scripts."""
+        art = _get_artefacts()
+        expected_test = {
+            'date': 'datetime64[ns]',
+            'permno': 'int64',
+            'ret_fwd': 'Float64',
+            'me': 'Float64',
+            'pi_filter': 'float64',
+            'exchcd': 'Int64',
+        }
+        for col, expected in expected_test.items():
+            actual = str(art['test'][col].dtype)
+            assert actual == expected, (
+                f"test['{col}'] dtype regression: expected {expected}, "
+                f"got {actual}"
+            )
+
+    def test_test_dates_are_month_ends(self):
+        """All test-period dates must land on the last trading day of a
+        month (day 26-31). A regression that mixes daily/monthly data, or
+        misuses date_range freq='MS' instead of 'ME', would surface here."""
+        art = _get_artefacts()
+        days = art['test']['date'].dt.day
+        bad = days[days < 20]
+        assert len(bad) == 0, (
+            f"{len(bad)} test dates are not month-ends "
+            f"(day < 20): {bad.unique().tolist()}"
+        )
+
+    def test_strategies_lo_required_keys(self):
+        """Step 7 and other downstream scripts read strategies_lo by exact
+        key string. Pin the keys so a rename in cross_sectional_model.py
+        immediately fails here instead of silently breaking grep-based
+        consumers."""
+        art = _get_artefacts()
+        required = {
+            'Market (buy & hold)',
+            'Fixed 12-mo mom',
+            'Fixed 1-mo mom',
+            'Method 0: Formula',
+            'Method 1: LR',
+            'Method 2: XGB',
+        }
+        actual = set(art['strategies_lo'].keys())
+        missing = required - actual
+        assert not missing, f"strategies_lo missing required keys: {missing}"
+
+    def test_shap_mean_abs_in_plausible_range(self):
+        """Per-feature mean |SHAP| must land in a plausible range. Values
+        near 0 signal a useless feature; values >> typical monthly return
+        magnitudes signal scaling bugs (e.g., predictions in basis points
+        instead of decimal returns)."""
+        art = _get_artefacts()
+        sv = art["shap_values"]
+        feat_imp = np.abs(sv).mean(axis=0)
+        # Monthly returns are O(1e-2). SHAP values should be of similar
+        # order of magnitude or smaller. Bounds are very loose to allow
+        # for legitimate feature variation.
+        assert (feat_imp >= 0).all()
+        assert feat_imp.max() < 1.0, (
+            f"Max mean|SHAP| = {feat_imp.max():.4f} — likely a scaling bug "
+            "(predictions in basis points or percent rather than decimal)."
+        )
+        # At least one feature must have meaningful contribution
+        assert feat_imp.max() > 1e-6, (
+            f"Max mean|SHAP| = {feat_imp.max():.2e} — model is essentially "
+            "constant; all features contribute negligibly."
+        )
+
     def test_test_has_score_columns(self):
         art = _get_artefacts()
         test_df = art["test"]

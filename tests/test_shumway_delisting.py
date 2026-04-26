@@ -315,3 +315,81 @@ class TestDryRunOnRealPanel:
         assert 0 <= counts['rule_4_shumway_only'] < 50
         # Everything else is unchanged (vast majority).
         assert counts['rule_5_unchanged'] > 0.99 * len(real_panel)
+
+    def test_real_panel_rule_1_and_5_dominate(self, sh, real_panel):
+        """Rule 1 (compound ret+dlret) + Rule 5 (passthrough) must account
+        for >99% of all rows. This pins the relative magnitude of
+        delisting-related rows so a regression that mis-routes them into
+        a different rule (e.g. rule 3 firing on non-performance codes)
+        would shift these counts visibly."""
+        _, counts = sh.apply_shumway(real_panel)
+        rule_1_5 = counts['rule_1_compound_ret_dlret'] + counts['rule_5_unchanged']
+        share = rule_1_5 / len(real_panel)
+        assert share > 0.999, (
+            f"Rule 1 + Rule 5 share is {share:.4%}, expected > 99.9%. "
+            f"Counts: {counts}. Suggests rule routing changed."
+        )
+
+    def test_real_panel_rule_1_negative_dlret_yields_lower_ret_adj(self, sh, real_panel):
+        """Rule 1 fires when both ret and dlret are present and compounds
+        them: ret_adj = (1+ret)(1+dlret) - 1. When dlret < 0 (typical for
+        delisting), the compounded result must be <= ret. A sign-flip bug
+        in the compounding (e.g., (1+ret)(1-dlret)) would silently
+        reverse this."""
+        out, _ = sh.apply_shumway(real_panel)
+        # Find rule-1 rows: both ret and dlret present
+        merged = real_panel[['ret', 'dlret']].copy()
+        merged['ret_adj_new'] = out['ret_adj'].values
+        rule1_mask = merged['ret'].notna() & merged['dlret'].notna()
+        rule1 = merged[rule1_mask]
+        if len(rule1) == 0:
+            pytest.skip('no rule-1 rows in real panel')
+        # When dlret <= 0: ret_adj = (1+ret)(1+dlret)-1 <= ret  iff  ret >= -1.
+        # Filter to dlret < 0 and ret > -1 for a clean comparison.
+        sub = rule1[(rule1['dlret'] < 0) & (rule1['ret'] > -1)]
+        if len(sub) == 0:
+            pytest.skip('no negative-dlret rows in rule 1')
+        violations = sub[sub['ret_adj_new'] > sub['ret'] + 1e-9]
+        assert len(violations) == 0, (
+            f"{len(violations)} rule-1 rows have ret_adj > ret despite "
+            f"dlret < 0. Suggests a sign-flip bug in the compounding."
+        )
+
+    def test_real_panel_rule_4_yields_exactly_minus_thirty(self, sh, real_panel):
+        """Rule 4 (both ret and dlret missing, dlstcd in performance
+        bucket) imputes exactly -0.30. A regression to a wrong constant
+        (e.g., -0.10 from an older draft, or +0.30 from a sign flip)
+        would fail this. The constant is the central Shumway claim."""
+        out, _ = sh.apply_shumway(real_panel)
+        rule4_mask = (real_panel['ret'].isna() & real_panel['dlret'].isna()
+                      & real_panel['dlstcd'].between(sh.PERF_DLSTCD_MIN,
+                                                     sh.PERF_DLSTCD_MAX))
+        if rule4_mask.sum() == 0:
+            pytest.skip('no rule-4 rows in real panel')
+        adj = out.loc[rule4_mask, 'ret_adj']
+        # pytest.approx vs a Series doesn't broadcast cleanly, so do it
+        # numerically: every value must be within 1e-9 of -0.30.
+        assert ((adj - (-0.30)).abs() < 1e-9).all(), (
+            f"Rule 4 rows produce ret_adj != -0.30: "
+            f"{adj.unique().tolist()}"
+        )
+
+    def test_real_panel_rule_3_compounds_with_minus_thirty(self, sh, real_panel):
+        """Rule 3 (performance dlst, ret present, dlret missing) compounds
+        ret with -30%: ret_adj = (1+ret)(0.7)-1. For any ret < +1/0.3,
+        this must be lower than ret. Sign-flip in the constant
+        (e.g., +0.30 instead of -0.30) would invert this."""
+        out, _ = sh.apply_shumway(real_panel)
+        rule3_mask = (real_panel['ret'].notna() & real_panel['dlret'].isna()
+                      & real_panel['dlstcd'].between(sh.PERF_DLSTCD_MIN,
+                                                     sh.PERF_DLSTCD_MAX))
+        if rule3_mask.sum() == 0:
+            pytest.skip('no rule-3 rows in real panel')
+        ret = real_panel.loc[rule3_mask, 'ret']
+        adj = out.loc[rule3_mask, 'ret_adj']
+        expected = (1 + ret) * 0.7 - 1
+        diff = (adj - expected).abs()
+        assert (diff < 1e-12).all(), (
+            f"Rule 3 compounding deviates from (1+ret)(0.7)-1; "
+            f"max diff={diff.max():.2e}"
+        )

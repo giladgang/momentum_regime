@@ -192,6 +192,34 @@ class TestHMMPriors:
             ("HMM_PRIOR_DIRICHLET_ALPHA must be [[9,1],[1,9]] to match "
              "methodology.tex eq:dirichlet_prior (E[persistence] = 0.9)")
 
+    def test_priors_are_actually_consumed_by_hmm_model(self):
+        """The config constants exist, but a regression where
+        scripts/hmm_model.py hardcodes the priors and ignores config
+        would not be caught by the value-check tests above. Verify that
+        the script still imports AND uses each prior constant."""
+        import os
+        import re
+        path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                            'scripts', 'hmm_model.py')
+        with open(path) as f:
+            src = f.read()
+        # Imports
+        for name in ('HMM_PRIOR_M0', 'HMM_PRIOR_KAPPA0',
+                     'HMM_PRIOR_NU0_OFF', 'HMM_PRIOR_DIRICHLET_ALPHA'):
+            assert name in src, (
+                f"scripts/hmm_model.py does not reference {name}; the "
+                "prior may have been hardcoded, bypassing config."
+            )
+        # Each constant must appear OUTSIDE the import block (= actually used)
+        # Simple heuristic: appears at least twice (import + use)
+        for name in ('HMM_PRIOR_M0', 'HMM_PRIOR_KAPPA0',
+                     'HMM_PRIOR_NU0_OFF', 'HMM_PRIOR_DIRICHLET_ALPHA'):
+            count = len(re.findall(r'\b' + name + r'\b', src))
+            assert count >= 2, (
+                f"{name} appears only {count}x in scripts/hmm_model.py — "
+                "imported but not used; the prior is dead config."
+            )
+
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # XGBoost settings

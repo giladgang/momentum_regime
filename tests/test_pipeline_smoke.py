@@ -130,12 +130,17 @@ class TestStepsDict:
     def test_step_scripts_exist(self, steps):
         """Every referenced script must exist on disk. If a script is
         intentionally optional, this test is where you'd notice the
-        mismatch and fix the steps dict."""
+        mismatch and fix the steps dict.
+
+        Some steps embed CLI args in the first tuple element (matching
+        run_script which splits on whitespace), so check only the path
+        prefix before the first space."""
         missing = []
         for k, (script, desc) in steps.items():
-            full = os.path.join(REPO, script)
+            path = script.split()[0]
+            full = os.path.join(REPO, path)
             if not os.path.exists(full):
-                missing.append(f"{k}: {script} ({desc!r})")
+                missing.append(f"{k}: {path} ({desc!r})")
         assert not missing, \
             "Steps reference non-existent scripts:\n  " + "\n  ".join(missing)
 
@@ -159,3 +164,92 @@ class TestOutputDirs:
             target = tmp_path / d
             os.makedirs(target, exist_ok=True)
             assert target.exists()
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Pre-flight test block — gated on `args.step == 0`.
+# Lives at run_pipeline.py:117-133. Aborts the multi-hour pipeline if any
+# of the fast unit tests fail. This is the cheapest safety net we have, so
+# regressions in the gate are blocking.
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class TestPreflight:
+
+    @pytest.fixture(scope='class')
+    def source(self):
+        with open(RUN_PIPELINE) as f:
+            return f.read()
+
+    def test_preflight_block_exists(self, source):
+        """The pre-flight pytest invocation must be present and gated."""
+        assert 'if args.step == 0' in source, (
+            "Pre-flight must run only when no specific step is targeted "
+            "(args.step == 0)"
+        )
+        assert 'pytest' in source
+
+    def test_preflight_runs_expected_test_files(self, source):
+        """The pre-flight list must include the four artefact-independent
+        test files. These are the only ones that can run in ~3s before
+        any HMM/XGB compute."""
+        expected = [
+            'tests/test_config.py',
+            'tests/test_utils.py',
+            'tests/test_portfolio_edge_cases.py',
+            'tests/test_pipeline_smoke.py',
+        ]
+        for path in expected:
+            assert path in source, (
+                f"Pre-flight is missing {path}; without it, regressions in "
+                "config/utils/portfolio reach the multi-hour HMM/XGB stages."
+            )
+
+    def test_preflight_aborts_on_failure(self, source):
+        """Failure to abort would defeat the safety net."""
+        assert 'sys.exit(1)' in source
+        assert 'PRE-FLIGHT FAILED' in source
+
+    def test_preflight_files_actually_exist(self):
+        """The four pre-flight test files referenced in run_pipeline.py
+        must exist on disk; otherwise the gate silently no-ops on missing
+        files (pytest's behaviour for unknown paths varies)."""
+        for path in ('tests/test_config.py', 'tests/test_utils.py',
+                     'tests/test_portfolio_edge_cases.py',
+                     'tests/test_pipeline_smoke.py'):
+            full = os.path.join(REPO, path)
+            assert os.path.exists(full), f"Missing: {path}"
+
+    def test_preflight_invokable_directly(self):
+        """Run the pre-flight files via pytest in a subprocess. They must
+        all pass on the current state — otherwise `python run_pipeline.py`
+        would fail at the gate."""
+        import subprocess
+        result = subprocess.run(
+            [sys.executable, '-m', 'pytest', '-q', '--tb=short',
+             'tests/test_config.py', 'tests/test_utils.py',
+             'tests/test_portfolio_edge_cases.py',
+             'tests/test_pipeline_smoke.py',
+             '--deselect', 'tests/test_pipeline_smoke.py::TestPreflight'],
+            cwd=REPO, capture_output=True, text=True, timeout=180,
+        )
+        assert result.returncode == 0, (
+            f"Pre-flight test files failed (rc={result.returncode}). "
+            f"`python run_pipeline.py` would abort at the gate.\n"
+            f"STDOUT tail: {result.stdout[-1500:]}\n"
+            f"STDERR tail: {result.stderr[-500:]}"
+        )
+
+    def test_step_n_skips_preflight(self, source):
+        """`--step N` (N > 0) targets one step only and must NOT trigger
+        pre-flight. The gate `if args.step == 0` enforces this."""
+        # Find the pre-flight block and verify it's inside an `if args.step == 0`
+        idx = source.find('Pre-flight tests')
+        assert idx > 0
+        # Look backwards from the print() for the gating `if`
+        prefix = source[:idx]
+        last_if = prefix.rfind('if args.step == 0')
+        last_else = prefix.rfind('else:')
+        assert last_if > last_else, (
+            "Pre-flight block is not inside an `if args.step == 0:` branch — "
+            "would run on every --step invocation, defeating its purpose."
+        )

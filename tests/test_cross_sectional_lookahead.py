@@ -190,3 +190,57 @@ class TestArtefactAgreesWithSource:
     def test_ret_fwd_never_in_features(self, artefacts):
         assert 'ret_fwd' not in artefacts['FEATURES']
         assert 'ret_next' not in artefacts['FEATURES']
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Dedup-on-date invariants
+# ═══════════════════════════════════════════════════════════════════════════════
+# scripts/cross_sectional_model.py:547,689 collapses many stock-rows per
+# date to one row via `test[['date', 'pi_filter']].drop_duplicates('date')`.
+# This is silently lossy if pi_filter ever varies WITHIN a date — different
+# stock rows on the same date should always carry the same regime
+# probability. These tests pin that invariant.
+
+class TestPiFilterPerDateInvariant:
+
+    def test_pi_filter_unique_per_date_in_test(self):
+        """In the test partition, every (date) must map to exactly one
+        pi_filter value, otherwise drop_duplicates('date') silently keeps
+        the first row and the regime-conditional Sharpe is computed on
+        the wrong pi for some dates."""
+        path = os.path.join(REPO, 'artefacts', 'cs_artefacts_data.pkl')
+        if not os.path.exists(path):
+            pytest.skip('artefacts/cs_artefacts_data.pkl not built yet')
+        import pickle
+        with open(path, 'rb') as f:
+            art = pickle.load(f)
+        test_df = art['test'][['date', 'pi_filter']].dropna()
+        per_date = test_df.groupby('date')['pi_filter'].nunique()
+        bad = per_date[per_date > 1]
+        assert len(bad) == 0, (
+            f"{len(bad)} dates have multiple distinct pi_filter values: "
+            f"{bad.head().to_dict()}. drop_duplicates('date') would lose info."
+        )
+
+    def test_pi_filter_unique_per_date_in_panel(self):
+        """Same invariant on the source panel before any merge."""
+        path = os.path.join(REPO, 'data', 'panel_with_regimes.parquet')
+        if not os.path.exists(path):
+            pytest.skip('panel_with_regimes.parquet not built yet')
+        panel = pd.read_parquet(path)
+        if 'pi_filter' not in panel.columns:
+            pytest.skip('panel has no pi_filter column yet')
+        per_date = panel.dropna(subset=['pi_filter']).groupby('date')['pi_filter'].nunique()
+        bad = per_date[per_date > 1]
+        assert len(bad) == 0, (
+            f"panel has {len(bad)} dates with non-unique pi_filter."
+        )
+
+    def test_drop_duplicates_call_uses_subset_date(self, source):
+        """Source-level guard: the dedup is done on the date subset (so
+        identical (date, pi_filter) pairs collapse) and not on the full
+        row, which would be dependent on column order."""
+        assert "drop_duplicates('date')" in source, (
+            "Expected `drop_duplicates('date')` in cross_sectional_model.py "
+            "for the regime-Sharpe lookup."
+        )
