@@ -36,6 +36,15 @@
 - [ ] Smoke-test `scripts/hmm_cv.py` after backtest finishes: `python scripts/hmm_cv.py --smoke` (~5-10 min). Then kick off full run (~15-30h). Output: `results/hmm_cv_features.csv`. Thesis payoff: removes specification-search caveat paragraph in `latex/data_section.tex`. 93 DD-inclusive combinations × 5 folds × 3 HMM × 10 XGB seeds.
 - [ ] After both CV runs finish AND Gilad reviews results: update `latex/methodology.tex` and `latex/appendix.tex` with CV-based framing; remove existing test-set-peek language. DO NOT edit any `.tex` before Gilad sees the numbers — the right framing depends on what the CV winners actually are.
 
+## Architecture refactors (post-thesis)
+Deferred until after submission. Each requires a bit-exact regression check (`md5 tables/*.tex plots/*.png results/*.csv` before/after, plus `pytest tests/test_reproducibility.py`) on a feature branch before merge. Not safe during the thesis sprint.
+
+- [ ] **#1 Subdivide `scripts/`** into `hmm/`, `cs/`, `backtest/`, `analysis/`, `plots/`, `intl/`. Pure file moves; update subprocess paths in `run_pipeline.py` and any cross-script imports. ~1h incl. validation. Lowest-risk of the refactors; could be done immediately after pipeline finishes if desired.
+- [ ] **#5 Split `scripts/main_results_analysis.py`** (1092 lines) into `performance.py`, `factor_alphas.py`, `ic.py`, `granger.py`, `shap.py`. Watch for float-summation/dict-iteration ordering changes that perturb table values.
+- [ ] **#2 Move HMM/CS/portfolio logic into `src/`** as importable modules; reduce `scripts/*.py` to thin CLIs. Biggest leverage point for testability and reuse, but largest refactor surface. Half-day with careful regression.
+- [ ] **#3 Replace subprocess orchestration with DVC (or Snakemake).** Gains: hash-keyed incremental rebuilds, free parallelism, audit trail. Cost: full pipeline rewrite + re-validation. Worth it for the next project, not this one.
+- [ ] **#4 Split the 943 MB `cs_artefacts_data.pkl`** into parquets (`scores_{train,test}.parquet`, `shap_values.parquet`) + XGBoost native `.json` model files + `manifest.json` (git SHA, config hash, data hash, lib versions). Touches every consumer of the artefact; high coordination cost but yields version-stable artefacts and a reproducibility receipt.
+
 ## Completed
 - [x] Work on limitations of the method: Limitations subsection (sec:limitations) now 8 paragraphs covering economic vulnerability, stress-test simulation caveat, test-period scope, frozen HMM parameters + regime drift, memoryless regime conditioning, implementation frictions, specification search, sample scope + causal inference (0e99d9a, 008e5fa, a697ce9).
 - [x] Future work: expanded to six detailed directions (predictive regime signal, alternative nonlinear models, sequential regime conditioning, regime-conditional feature sets, exposure-scaling overlay, international replication). Memoryless-regime limitation trimmed to point at sequential-conditioning paragraph.
