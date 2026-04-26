@@ -33,7 +33,11 @@ where $P_{ij} = P(s_t = j \mid s_{t-1} = i)$ and each row sums to one. The diago
 
 \subsubsection{Bayesian Estimation via Gibbs Sampling}\label{sec:gibbs}
 
-The standard frequentist alternative is the Baum--Welch algorithm \citep{Baum1970}, a special case of Expectation-Maximisation \citep{Dempster1977}, which finds maximum likelihood point estimates. The Bayesian approach instead draws from the joint posterior:
+The standard frequentist alternative is the Baum--Welch algorithm \citep{Baum1970}, a special case of Expectation-Maximisation \citep{Dempster1977}, which finds maximum likelihood point estimates.
+
+Maximum likelihood estimation of regime-switching HMMs has several known shortcomings for the present application. The likelihood surface is multimodal, with at minimum two equivalent global optima arising from the invariance of the likelihood under state relabelling, and EM can converge to degenerate solutions in which one regime collapses around a single observation \citep{FruhwirthSchnatter2006}. Both problems are exacerbated for rare regimes: the panic state in this sample contains only 91 monthly observations in training, where the asymptotic standard errors that frequentist inference relies on are unreliable and the information matrix can become near-singular at boundary transition probabilities \citep[footnote 12]{Hamilton1989}. The Bayesian approach addresses these issues directly. Posterior sampling integrates over parameter uncertainty rather than relying on a point estimate; conjugate priors regularise rare-regime estimates with explicit, defensible weights (Section~\ref{sec:priors}); and convergence diagnostics across multiple chains (Section~\ref{sec:convergence}) diagnose multimodality that would otherwise go unnoticed under a single EM run.
+
+The Bayesian approach instead draws from the joint posterior:
 \[
 p\!\left(\{s_t\}_{t=1}^T,\; \{\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k\}_{k=0}^1,\; \mathbf{P} \,\middle|\, \mathbf{z}_{1:T}\right).
 \]
