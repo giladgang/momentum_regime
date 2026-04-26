@@ -1,11 +1,21 @@
 """
 expanding_window_backtest.py
 ============================
-Expanding-window out-of-sample backtest. Retrain the full HMM + XGBoost pipeline
-at the start of each year using only data available through the prior year-end,
-then use the resulting model to predict the 12 months of the new year. Stitch
-the resulting monthly OOS L/S returns into a single long time series spanning
-1995-2025.
+30-year expanding-window out-of-sample backtest (Section 5.4.3 historical
+stress evidence). Retrain the full HMM + XGBoost pipeline at the start of
+each year using only data available through the prior year-end, then use
+the resulting model to predict the 12 months of the new year. Stitch the
+resulting monthly OOS L/S returns into a single long time series spanning
+1995-2024.
+
+NOT TO BE CONFUSED WITH scripts/expanding_window.py, which is a different
+analysis (tri-annual HMM re-estimation with fixed 2011-2025 test period
+for the appendix robustness check app:expanding). This script produces a
+true 30-year out-of-sample backtest including dot-com and GFC.
+
+For production use the parallel variant: scripts/expanding_window_backtest_parallel.py
+gives bit-identical output with ~6x speedup. See tests/test_parallel_hmm_determinism.py
+for the bit-exactness check.
 
 Every prediction is strictly causal: the model used for month t was fitted only
 on data through the year preceding t. No look-ahead, no training-test overlap.

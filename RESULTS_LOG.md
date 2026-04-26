@@ -506,6 +506,32 @@ M2 loses 3.51%/month (average losing panic-month return) for N consecutive month
 | 18 mo | -37% | -47% | -62% |
 | 24 mo | -46% | -58% | -70% |
 
+### 30-year expanding-window historical OOS (`table_expanding_subperiods`, `sec:historical_stress`)
+
+Annual retraining from 1995 onward (200 HMM × 50 XGB seeds, bit-identical parallel). Each year predicted by a model trained only on data through the prior year-end. Source: `results/expanding_returns_prod.csv` (359 monthly OOS returns), produced by `scripts/expanding_window_backtest_parallel.py`.
+
+| Period | N | Sharpe | Cumulative | MDD |
+|---|---:|---:|---:|---:|
+| **Full sample 1995–2024** | **359** | **+0.50** | **+1,405.5%** | **−64.8%** |
+| 1995–1999 | 60 | +0.50 | +50.8% | −25.5% |
+| **2000–2002 dot-com** | 36 | **−0.15** | **−35.9%** | **−64.8%** |
+| 2003–2006 bull | 48 | +0.70 | +37.5% | −12.7% |
+| 2007–2009 GFC | 36 | +0.26 | +11.1% | −36.3% |
+| 2010–2019 calm | 120 | +0.67 | +155.4% | −17.9% |
+| 2020–2024 COVID era | 59 | +1.23 | +299.1% | −22.2% |
+
+Key precise-window numbers:
+- **Dot-com bear market proper (Mar 2000–Oct 2002, 32 mo):** Sharpe −0.39, cumulative −43.8%
+- **GFC full episode (Oct 2007–Jun 2009, 21 mo):** Sharpe +0.48, cumulative +22.8%
+- **GFC rebound (Mar–Dec 2009, 10 mo):** Sharpe +0.73, cumulative +20.5%
+- **Production-overlap window (Jan 2011–Nov 2024, 167 mo):** Sharpe +0.88 (vs production 1.11)
+
+Comparison vs unconditional momentum during the 2009 momentum-crash rebound (computed under same L/S construction, source: `results/oos_subperiod_full.csv`):
+- Fixed 12-mo momentum (Mar–Dec 2009): cumulative **−62.6%**
+- M2 (Mar–Dec 2009): cumulative **+20.5%**
+
+The strategy survives all historical bears; the dot-com episode is the worst observed drawdown; the GFC rebound directly validates the regime-conditional mechanism against the period that motivated D&M.
+
 ### LR coefficients for reference (`table_lr_coef`)
 
 Most significant features in the logistic regression (|z| > 3):

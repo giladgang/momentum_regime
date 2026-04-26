@@ -22,7 +22,13 @@ import time
 import os
 
 def run_script(script_path, description):
-    """Run a Python script and report status."""
+    """Run a Python script and report status. `script_path` may be a bare
+    path or a path followed by space-separated CLI arguments (e.g.
+    'scripts/foo.py --tag prod --seeds 200')."""
+    parts = script_path.split()
+    script = parts[0]
+    script_args = parts[1:]
+
     print(f"\n{'='*70}")
     print(f"  {description}")
     print(f"  Script: {script_path}")
@@ -30,7 +36,7 @@ def run_script(script_path, description):
 
     t0 = time.time()
     result = subprocess.run(
-        [sys.executable, '-u', script_path],
+        [sys.executable, '-u', script, *script_args],
         capture_output=False,
         text=True,
     )
@@ -108,6 +114,18 @@ def main():
     if hmm_ready:
         print("  HMM results found in panel_with_regimes.parquet -- skipping Step 1")
         print("  (Delete panel_with_regimes.parquet to force re-estimation)")
+
+    # Check if 30-year expanding-window backtest results already exist
+    _exp_path = os.path.join(cfg.RESULTS_DIR, 'expanding_returns_prod.csv')
+    try:
+        _exp = pd.read_csv(_exp_path)
+        expanding_ready = len(_exp) >= 350  # ~30 years of monthly data
+        del _exp
+    except Exception:
+        expanding_ready = False
+    if expanding_ready:
+        print("  Expanding-window backtest results found -- skipping Step 19")
+        print("  (Delete results/expanding_returns_prod.csv to force re-run)")
     print()
 
     # ── Pre-flight: fast artefact-independent tests ──────────────────────────
@@ -187,7 +205,15 @@ def main():
              'STEP 17: GFC out-of-sample test (2008-2009 crisis)'),
 
         18: ('scripts/expanding_window.py',
-             'STEP 18: Expanding-window HMM re-estimation'),
+             'STEP 18: Expanding-window HMM re-estimation (app:expanding)'),
+
+        19: ('scripts/expanding_window_backtest_parallel.py '
+             '--first-retrain-year 1995 --last-retrain-year 2024 '
+             '--hmm-seeds 200 --xgb-seeds 50 --workers 6 --tag prod',
+             'STEP 19: 30-year expanding-window OOS backtest (Sec 5.4.3, ~12-18 hr)'),
+
+        20: ('scripts/build_table_expanding_subperiods.py',
+             'STEP 20: Build expanding-window sub-period table (depends on Step 19)'),
 
         95: ('tests/test_config.py',
              'STEP 95: Config sanity checks (dates, features, hyperparameters)'),
@@ -233,9 +259,16 @@ def main():
             if step_num == 1 and hmm_ready:
                 print(f"\n  SKIPPING Step 1 (HMM already estimated)")
                 continue
+            # Skip 30-year expanding-window backtest if results exist
+            if step_num == 19 and expanding_ready:
+                print(f"\n  SKIPPING Step 19 (expanding-window backtest results exist)")
+                continue
             script, desc = steps[step_num]
-            if not os.path.exists(script):
-                print(f"\n  SKIPPING: {script} (file not found)")
+            # Path may be 'scripts/foo.py' or 'scripts/foo.py --arg val'; check
+            # only the script-file portion exists.
+            script_file = script.split()[0]
+            if not os.path.exists(script_file):
+                print(f"\n  SKIPPING: {script_file} (file not found)")
                 continue
             if step_num in pytest_steps:
                 success = run_pytest(script, desc)

@@ -1,7 +1,16 @@
 """
-Expanding-window HMM re-estimation.
+Expanding-window HMM re-estimation (Appendix robustness check).
+
 Re-estimates HMM every 3 years using all data up to that point.
+Test period stays fixed at 2011-2025 throughout; this checks whether
+updating the HMM with more recent data changes the headline result.
 Uses 10 HMM seeds + 10 XGB seeds for speed.
+
+Output: tables/table_expanding.tex (referenced from app:expanding).
+
+NOT TO BE CONFUSED WITH expanding_window_backtest_parallel.py, which is
+a different analysis: a 30-year (1995-2024) annual-retraining OOS backtest
+producing the historical-stress evidence in Section 5.4.3.
 """
 import numpy as np, pandas as pd, pickle, warnings, time
 from scipy.stats import multivariate_normal, invwishart

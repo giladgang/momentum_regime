@@ -1,9 +1,22 @@
 """
 historical_oos_production.py
 ============================
-True out-of-sample test with production-level seed ensembles and sub-period
-decomposition, built to answer "how did M2 actually perform during historical
-prolonged bear markets?"
+Single-config out-of-sample test (one training window, one test window) with
+production-level seed ensembles. Built originally to compare retrained
+configurations (1990-1999, 1990-2004, etc.) against the main production model.
+
+Now serves primarily as a SHARED MODULE: scripts/expanding_window_backtest.py
+and scripts/expanding_window_backtest_parallel.py both import fit_hmm and
+build_ls from this file. Standalone use is still supported via CLI args
+(useful for sensitivity checks at single training cutoffs).
+
+The headline 30-year backtest in Section 5.4.3 uses
+expanding_window_backtest_parallel.py (which imports from here), not this
+script directly.
+
+Sign correction in fit_hmm uses theoretical fixed signs for [DD, DISP, REL_N, CS]
+(-1, +1, -1, +1) when the training crisis mask has fewer than 20 months
+of crisis data; otherwise uses data-driven 95th-percentile comparison.
 
 Extends test_2008_oos.py with:
   - CLI-configurable seed counts (for smoke tests vs production runs)
