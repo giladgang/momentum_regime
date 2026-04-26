@@ -61,7 +61,16 @@ Deferred until after submission. Each requires a bit-exact regression check (`md
 - [ ] **#1 Subdivide `scripts/`** into `hmm/`, `cs/`, `backtest/`, `analysis/`, `plots/`, `intl/`. Pure file moves; update subprocess paths in `run_pipeline.py` and any cross-script imports. ~1h incl. validation. Lowest-risk of the refactors; could be done immediately after pipeline finishes if desired.
 - [ ] **#5 Split `scripts/main_results_analysis.py`** (1092 lines) into `performance.py`, `factor_alphas.py`, `ic.py`, `granger.py`, `shap.py`. Watch for float-summation/dict-iteration ordering changes that perturb table values.
 - [ ] **#2 Move HMM/CS/portfolio logic into `src/`** as importable modules; reduce `scripts/*.py` to thin CLIs. Biggest leverage point for testability and reuse, but largest refactor surface. Half-day with careful regression.
-- [ ] **#3 Replace subprocess orchestration with DVC (or Snakemake).** Gains: hash-keyed incremental rebuilds, free parallelism, audit trail. Cost: full pipeline rewrite + re-validation. Worth it for the next project, not this one.
+- [ ] **#3 Replace subprocess orchestration with Snakemake.** *(Pick: Snakemake over DVC — simpler, standard in academic ML, no need for DVC's data-versioning layer on a single-developer thesis with stable inputs.)*
+  - **Project-specific value:**
+    1. *No more "which step do I re-run?"* — change `cross_sectional_model.py`, run `snakemake`, downstream stages auto-rebuild and HMM stays cached. Eliminates the silent-staleness class of bug where one consumer of `cs_artefacts_data.pkl` is forgotten after a regen.
+    2. *International pipeline becomes one DAG* — UK regional, UK Test A, JP regional, JP Test A run in parallel with shared upstream. Today these are four manual sequences in `INTL_VALIDATION_PLAN.md`.
+    3. *Auto-generated dependency diagram* — `snakemake --dag | dot -Tpdf > dag.pdf` is always correct, unlike the hand-maintained architecture diagram which drifts.
+    4. *Rule-level parallelism* — `generate_plots.py` and `main_results_analysis.py` are independent and can run concurrently. Composes with the existing seed-level `multiprocessing.Pool` in `expanding_window_backtest_parallel.py`.
+  - **Approach (low-risk, staged):** write a `Snakefile` *alongside* `run_pipeline.py`, not as a replacement. Both coexist. Validate by running both from a clean state and hash-comparing every output file. Don't delete `run_pipeline.py` until after thesis submission.
+  - **Cost:** 4-6h (write rules for ~25 logical stages folded from the 102 `run_pipeline.py` substeps + regression validation). Add `snakemake` to `requirements.txt` + lockfile.
+  - **Timing:** target post-Step F (after Shumway rerun + leg-betas + advisor checkpoint) so it doesn't risk the active research cycle. Defer to post-thesis if Steps G-K stretch the schedule.
+  - **What it does NOT replace:** seed-level parallelism inside HMM/CV (already handled by `multiprocessing.Pool`); resumable execution across disconnects (handled by `NEXT_RUN_PLAN.md`); pre-flight smoke tests (would need to recreate the `run_pipeline.py:113-133` pattern as a Snakemake `onstart` handler).
 - [ ] **#4 Split the 943 MB `cs_artefacts_data.pkl`** into parquets (`scores_{train,test}.parquet`, `shap_values.parquet`) + XGBoost native `.json` model files + `manifest.json` (git SHA, config hash, data hash, lib versions). Touches every consumer of the artefact; high coordination cost but yields version-stable artefacts and a reproducibility receipt.
 
 ## Completed
