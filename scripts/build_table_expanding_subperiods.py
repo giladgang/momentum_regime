@@ -75,6 +75,22 @@ def main():
         print(f"  {label:<28} N={s['n']:>3}  Sh={s['sharpe']:+.2f}  "
               f"Cum={s['cum'] * 100:>+8.1f}%  MDD={s['mdd'] * 100:>+7.1f}%")
 
+    # Format helpers matching thesis convention:
+    # - Bare numbers: positive shown unsigned, negative as $-$ (math minus).
+    # - Percentages: positive shown unsigned, negative with literal `-`.
+    # - Thousands separator: use {,} so LaTeX doesn't insert extra space.
+    def fmt_sharpe(x):
+        if np.isnan(x):
+            return '---'
+        return f"$-${abs(x):.2f}" if x < 0 else f"{x:.2f}"
+
+    def fmt_pct(x):
+        if np.isnan(x):
+            return '---'
+        pct = x * 100
+        sign = '-' if pct < 0 else ''
+        return f"{sign}{abs(pct):,.1f}\\%".replace(',', '{,}')
+
     # Write LaTeX table
     tex = []
     tex.append(r'\begin{table}[H]')
@@ -86,9 +102,9 @@ def main():
     tex.append(r'\midrule')
     for i, (label, s) in enumerate(rows):
         n = s['n']
-        sh = f"{s['sharpe']:+.2f}" if not np.isnan(s['sharpe']) else '---'
-        cum = f"{s['cum'] * 100:+,.1f}\\%" if not np.isnan(s['cum']) else '---'
-        mdd = f"{s['mdd'] * 100:+,.1f}\\%" if not np.isnan(s['mdd']) else '---'
+        sh = fmt_sharpe(s['sharpe'])
+        cum = fmt_pct(s['cum'])
+        mdd = fmt_pct(s['mdd'])
         tex.append(f"{label} & {n} & {sh} & {cum} & {mdd} \\\\")
         # Visual separator after the full-sample row
         if i == 0:
