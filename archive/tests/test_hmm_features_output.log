@@ -1,0 +1,1198 @@
+================================================================================
+  HMM FEATURE SEARCH — FULL PIPELINE MATCH
+================================================================================
+
+Computing candidate features ...
+  TERM: already in panel
+  CP_SPREAD: OK (334 months)
+  HY_OAS: already in panel
+  DISP: OK
+  ADR: OK
+  SKEW: OK
+  REL_N: OK
+
+  Feature pool: 11 features
+    DD_z             DD (Market drawdown)                (648 months, 1970-12-31 - 2024-11-29)
+    VOL_z            VOL (Realised volatility)           (648 months, 1970-12-31 - 2024-11-29)
+    CS_z             CS (Credit spread BAA-AAA)          (648 months, 1970-12-31 - 2024-11-29)
+    LVIX_z           LVIX (Log VIX)                      (419 months, 1990-01-31 - 2024-11-29)
+    TERM_z           TERM (Yield curve 10Y-2Y)           (582 months, 1976-06-30 - 2024-11-29)
+    CP_SPREAD_z      CPS (Funding stress)                (334 months, 1997-01-31 - 2024-11-29)
+    HY_OAS_z         HY_OAS (High-yield spread)          (336 months, 1996-12-31 - 2024-11-29)
+    DISP_z           DISP (Return dispersion)            (419 months, 1990-01-31 - 2024-11-29)
+    ADR_z            ADR (Advance-decline ratio)         (419 months, 1990-01-31 - 2024-11-29)
+    SKEW_z           SKEW (Return skewness)              (419 months, 1990-01-31 - 2024-11-29)
+    REL_N_z          REL_N (Relative participation)      (408 months, 1990-12-31 - 2024-11-29)
+
+  Total 4-feature combinations: 330
+
+================================================================================
+  PASS 1: HMM quality screen — 330 combinations, 2000 iterations each
+================================================================================
+  [  1/330] DD+VOL+CS+LVIX                            ESS=   711  sig=4  GFC=0.87  calm=0.10  COVID=0.85  PASS  [37s, 1 passed]
+  [  2/330] DD+VOL+CS+TERM                            ESS=    69  sig=4  GFC=0.86  calm=0.27  COVID=0.67  PASS  [73s, 2 passed]
+  [  3/330] DD+VOL+CS+CPS                             ESS=  1003  sig=4  GFC=1.00  calm=0.09  COVID=0.91  PASS  [98s, 3 passed]
+  [  4/330] DD+VOL+CS+HY_OAS                          ESS=  1221  sig=4  GFC=0.86  calm=0.09  COVID=0.79  PASS  [123s, 4 passed]
+  [  5/330] DD+VOL+CS+DISP                            ESS=   155  sig=4  GFC=0.86  calm=0.11  COVID=0.98  PASS  [159s, 5 passed]
+  [  6/330] DD+VOL+CS+ADR                             ESS=   866  sig=4  GFC=0.86  calm=0.11  COVID=0.75  PASS  [195s, 6 passed]
+  [  7/330] DD+VOL+CS+SKEW                            ESS=   822  sig=4  GFC=0.89  calm=0.11  COVID=0.67  PASS  [232s, 7 passed]
+  [  8/330] DD+VOL+CS+REL_N                           ESS=   821  sig=4  GFC=0.88  calm=0.09  COVID=0.78  PASS  [266s, 8 passed]
+  [  9/330] DD+VOL+LVIX+TERM                          ESS=  1209  sig=4  GFC=1.00  calm=0.09  COVID=0.96  PASS  [302s, 9 passed]
+  [ 10/330] DD+VOL+LVIX+CPS                           ESS=  1147  sig=4  GFC=1.00  calm=0.09  COVID=0.96  PASS  [327s, 10 passed]
+  [ 11/330] DD+VOL+LVIX+HY_OAS                        ESS=    61  sig=4  GFC=0.87  calm=0.12  COVID=0.86  PASS  [351s, 11 passed]
+  [ 12/330] DD+VOL+LVIX+DISP                          ESS=   416  sig=4  GFC=0.86  calm=0.13  COVID=1.00  PASS  [387s, 12 passed]
+  [ 13/330] DD+VOL+LVIX+ADR                           ESS=   265  sig=4  GFC=0.86  calm=0.11  COVID=0.79  PASS  [424s, 13 passed]
+  [ 14/330] DD+VOL+LVIX+SKEW                          ESS=   843  sig=3  GFC=1.00  calm=0.24  COVID=0.67  PASS  [460s, 14 passed]
+  [ 16/330] DD+VOL+TERM+CPS                           ESS=   546  sig=4  GFC=1.00  calm=0.09  COVID=1.00  PASS  [519s, 15 passed]
+  [ 17/330] DD+VOL+TERM+HY_OAS                        ESS=    58  sig=4  GFC=0.86  calm=0.09  COVID=0.87  PASS  [544s, 16 passed]
+  [ 18/330] DD+VOL+TERM+DISP                          ESS=   282  sig=3  GFC=0.87  calm=0.09  COVID=1.00  PASS  [580s, 17 passed]
+  [ 19/330] DD+VOL+TERM+ADR                           ESS=   952  sig=3  GFC=0.85  calm=0.33  COVID=0.67  PASS  [616s, 18 passed]
+  [ 20/330] DD+VOL+TERM+SKEW                          ESS=   520  sig=4  GFC=0.89  calm=0.10  COVID=0.67  PASS  [653s, 19 passed]
+  [ 21/330] DD+VOL+TERM+REL_N                         ESS=  1290  sig=4  GFC=0.85  calm=0.40  COVID=0.67  PASS  [687s, 20 passed]
+  [ 22/330] DD+VOL+CPS+HY_OAS                         ESS=  1021  sig=4  GFC=1.00  calm=0.09  COVID=0.97  PASS  [712s, 21 passed]
+  [ 24/330] DD+VOL+CPS+ADR                            ESS=   900  sig=4  GFC=1.00  calm=0.09  COVID=0.82  PASS  [760s, 22 passed]
+  [ 25/330] DD+VOL+CPS+SKEW                           ESS=   842  sig=3  GFC=1.00  calm=0.09  COVID=1.00  PASS  [785s, 23 passed]
+  [ 26/330] DD+VOL+CPS+REL_N                          ESS=   709  sig=4  GFC=1.00  calm=0.12  COVID=0.79  PASS  [809s, 24 passed]
+  [ 27/330] DD+VOL+HY_OAS+DISP                        ESS=   491  sig=4  GFC=0.93  calm=0.22  COVID=1.00  PASS  [834s, 25 passed]
+  [ 28/330] DD+VOL+HY_OAS+ADR                         ESS=   652  sig=4  GFC=0.86  calm=0.10  COVID=0.81  PASS  [858s, 26 passed]
+  [ 29/330] DD+VOL+HY_OAS+SKEW                        ESS=   684  sig=4  GFC=0.86  calm=0.10  COVID=0.76  PASS  [883s, 27 passed]
+  [ 30/330] DD+VOL+HY_OAS+REL_N                       ESS=    10  sig=4  GFC=0.89  calm=0.12  COVID=0.74  fail  [907s, 27 passed]
+  [ 31/330] DD+VOL+DISP+ADR                           ESS=   131  sig=4  GFC=0.86  calm=0.11  COVID=0.83  PASS  [944s, 28 passed]
+  [ 32/330] DD+VOL+DISP+SKEW                          ESS=  1109  sig=4  GFC=0.86  calm=0.14  COVID=0.67  PASS  [980s, 29 passed]
+  [ 33/330] DD+VOL+DISP+REL_N                         ESS=   772  sig=4  GFC=0.86  calm=0.18  COVID=1.00  PASS  [1014s, 30 passed]
+  [ 34/330] DD+VOL+ADR+SKEW                           ESS=   428  sig=4  GFC=0.87  calm=0.11  COVID=0.67  PASS  [1050s, 31 passed]
+  [ 35/330] DD+VOL+ADR+REL_N                          ESS=  1063  sig=3  GFC=0.86  calm=0.11  COVID=0.83  PASS  [1085s, 32 passed]
+  [ 36/330] DD+VOL+SKEW+REL_N                         ESS=   456  sig=4  GFC=0.90  calm=0.11  COVID=0.67  PASS  [1120s, 33 passed]
+  [ 37/330] DD+CS+LVIX+TERM                           ESS=  1271  sig=4  GFC=1.00  calm=0.09  COVID=0.97  PASS  [1156s, 34 passed]
+  [ 38/330] DD+CS+LVIX+CPS                            ESS=  1217  sig=4  GFC=1.00  calm=0.09  COVID=0.97  PASS  [1180s, 35 passed]
+  [ 39/330] DD+CS+LVIX+HY_OAS                         ESS=  1270  sig=4  GFC=0.86  calm=0.09  COVID=0.82  PASS  [1205s, 36 passed]
+  [ 40/330] DD+CS+LVIX+DISP                           ESS=     6  sig=4  GFC=0.88  calm=0.12  COVID=0.99  fail  [1241s, 36 passed]
+  [ 41/330] DD+CS+LVIX+ADR                            ESS=   896  sig=4  GFC=0.86  calm=0.11  COVID=0.70  PASS  [1277s, 37 passed]
+  [ 42/330] DD+CS+LVIX+SKEW                           ESS=   506  sig=4  GFC=0.92  calm=0.13  COVID=0.67  PASS  [1313s, 38 passed]
+  [ 43/330] DD+CS+LVIX+REL_N                          ESS=   730  sig=4  GFC=0.87  calm=0.09  COVID=0.69  PASS  [1348s, 39 passed]
+  [ 44/330] DD+CS+TERM+CPS                            ESS=   514  sig=4  GFC=1.00  calm=0.09  COVID=0.92  PASS  [1372s, 40 passed]
+  [ 45/330] DD+CS+TERM+HY_OAS                         ESS=  1146  sig=4  GFC=0.86  calm=0.09  COVID=0.77  PASS  [1396s, 41 passed]
+  [ 47/330] DD+CS+TERM+ADR                            ESS=   172  sig=4  GFC=0.85  calm=0.10  COVID=0.67  PASS  [1469s, 42 passed]
+  [ 48/330] DD+CS+TERM+SKEW                           ESS=   294  sig=4  GFC=0.87  calm=0.10  COVID=0.67  PASS  [1505s, 43 passed]
+  [ 49/330] DD+CS+TERM+REL_N                          ESS=    61  sig=4  GFC=0.85  calm=0.38  COVID=0.67  PASS  [1539s, 44 passed]
+  [ 50/330] DD+CS+CPS+HY_OAS                          ESS=  1089  sig=4  GFC=1.00  calm=0.09  COVID=0.85  PASS  [1564s, 45 passed]
+  [ 52/330] DD+CS+CPS+ADR                             ESS=   936  sig=4  GFC=1.00  calm=0.09  COVID=0.65  PASS  [1613s, 46 passed]
+  [ 53/330] DD+CS+CPS+SKEW                            ESS=   758  sig=3  GFC=1.00  calm=0.09  COVID=1.00  PASS  [1637s, 47 passed]
+  [ 54/330] DD+CS+CPS+REL_N                           ESS=   890  sig=4  GFC=1.00  calm=0.09  COVID=0.56  PASS  [1661s, 48 passed]
+  [ 55/330] DD+CS+HY_OAS+DISP                         ESS=   965  sig=4  GFC=0.86  calm=0.09  COVID=0.95  PASS  [1686s, 49 passed]
+  [ 56/330] DD+CS+HY_OAS+ADR                          ESS=  1293  sig=4  GFC=0.86  calm=0.09  COVID=0.74  PASS  [1710s, 50 passed]
+  [ 57/330] DD+CS+HY_OAS+SKEW                         ESS=  1284  sig=4  GFC=0.86  calm=0.09  COVID=0.81  PASS  [1734s, 51 passed]
+  [ 58/330] DD+CS+HY_OAS+REL_N                        ESS=   112  sig=4  GFC=0.90  calm=0.09  COVID=0.74  PASS  [1759s, 52 passed]
+  [ 59/330] DD+CS+DISP+ADR                            ESS=   260  sig=4  GFC=0.86  calm=0.10  COVID=0.71  PASS  [1795s, 53 passed]
+  [ 60/330] DD+CS+DISP+SKEW                           ESS=   366  sig=4  GFC=0.86  calm=0.13  COVID=0.67  PASS  [1831s, 54 passed]
+  [ 61/330] DD+CS+DISP+REL_N                          ESS=  1282  sig=4  GFC=0.86  calm=0.13  COVID=0.99  PASS  [1866s, 55 passed]
+  [ 62/330] DD+CS+ADR+SKEW                            ESS=  1247  sig=4  GFC=0.87  calm=0.11  COVID=0.67  PASS  [1902s, 56 passed]
+  [ 63/330] DD+CS+ADR+REL_N                           ESS=   898  sig=3  GFC=0.86  calm=0.09  COVID=0.71  PASS  [1937s, 57 passed]
+  [ 64/330] DD+CS+SKEW+REL_N                          ESS=   909  sig=4  GFC=0.88  calm=0.09  COVID=0.67  PASS  [1971s, 58 passed]
+  [ 65/330] DD+LVIX+TERM+CPS                          ESS=   645  sig=4  GFC=1.00  calm=0.09  COVID=1.00  PASS  [1996s, 59 passed]
+  [ 67/330] DD+LVIX+TERM+DISP                         ESS=  1500  sig=4  GFC=1.00  calm=0.09  COVID=1.00  PASS  [2056s, 60 passed]
+  [ 68/330] DD+LVIX+TERM+ADR                          ESS=  1500  sig=4  GFC=1.00  calm=0.10  COVID=0.92  PASS  [2093s, 61 passed]
+  [ 69/330] DD+LVIX+TERM+SKEW                         ESS=   573  sig=4  GFC=1.00  calm=0.10  COVID=0.69  PASS  [2129s, 62 passed]
+  [ 70/330] DD+LVIX+TERM+REL_N                        ESS=   912  sig=3  GFC=1.00  calm=0.10  COVID=0.97  PASS  [2163s, 63 passed]
+  [ 71/330] DD+LVIX+CPS+HY_OAS                        ESS=  1135  sig=4  GFC=1.00  calm=0.09  COVID=0.99  PASS  [2188s, 64 passed]
+  [ 72/330] DD+LVIX+CPS+DISP                          ESS=   780  sig=4  GFC=1.00  calm=0.12  COVID=1.00  PASS  [2212s, 65 passed]
+  [ 73/330] DD+LVIX+CPS+ADR                           ESS=  1068  sig=4  GFC=1.00  calm=0.09  COVID=0.86  PASS  [2236s, 66 passed]
+  [ 74/330] DD+LVIX+CPS+SKEW                          ESS=  1210  sig=3  GFC=1.00  calm=0.09  COVID=1.00  PASS  [2260s, 67 passed]
+  [ 76/330] DD+LVIX+HY_OAS+DISP                       ESS=  1500  sig=4  GFC=0.93  calm=0.23  COVID=1.00  PASS  [2309s, 68 passed]
+  [ 77/330] DD+LVIX+HY_OAS+ADR                        ESS=    78  sig=3  GFC=0.87  calm=0.16  COVID=0.75  PASS  [2334s, 69 passed]
+  [ 79/330] DD+LVIX+HY_OAS+REL_N                      ESS=  1112  sig=4  GFC=0.89  calm=0.13  COVID=0.71  PASS  [2383s, 70 passed]
+  [ 80/330] DD+LVIX+DISP+ADR                          ESS=   841  sig=4  GFC=0.86  calm=0.10  COVID=0.74  PASS  [2419s, 71 passed]
+  [ 81/330] DD+LVIX+DISP+SKEW                         ESS=   103  sig=4  GFC=0.86  calm=0.14  COVID=0.67  PASS  [2456s, 72 passed]
+  [ 82/330] DD+LVIX+DISP+REL_N                        ESS=  1226  sig=4  GFC=0.99  calm=0.26  COVID=1.00  PASS  [2490s, 73 passed]
+  [ 83/330] DD+LVIX+ADR+SKEW                          ESS=   543  sig=3  GFC=0.86  calm=0.11  COVID=0.67  PASS  [2527s, 74 passed]
+  [ 85/330] DD+LVIX+SKEW+REL_N                        ESS=  1095  sig=3  GFC=0.99  calm=0.27  COVID=0.67  PASS  [2596s, 75 passed]
+  [ 86/330] DD+TERM+CPS+HY_OAS                        ESS=   876  sig=3  GFC=1.00  calm=0.09  COVID=1.00  PASS  [2620s, 76 passed]
+  [ 87/330] DD+TERM+CPS+DISP                          ESS=   912  sig=3  GFC=1.00  calm=0.09  COVID=1.00  PASS  [2644s, 77 passed]
+  [ 88/330] DD+TERM+CPS+ADR                           ESS=  1056  sig=4  GFC=1.00  calm=0.09  COVID=0.96  PASS  [2669s, 78 passed]
+  [ 89/330] DD+TERM+CPS+SKEW                          ESS=   638  sig=3  GFC=1.00  calm=0.09  COVID=1.00  PASS  [2693s, 79 passed]
+  [ 90/330] DD+TERM+CPS+REL_N                         ESS=   962  sig=4  GFC=1.00  calm=0.09  COVID=0.74  PASS  [2718s, 80 passed]
+  [ 92/330] DD+TERM+HY_OAS+ADR                        ESS=   353  sig=4  GFC=0.86  calm=0.09  COVID=0.81  PASS  [2766s, 81 passed]
+  [ 93/330] DD+TERM+HY_OAS+SKEW                       ESS=  1292  sig=4  GFC=0.87  calm=0.09  COVID=0.77  PASS  [2791s, 82 passed]
+  [ 95/330] DD+TERM+DISP+ADR                          ESS=    60  sig=3  GFC=0.88  calm=0.09  COVID=0.99  PASS  [2852s, 83 passed]
+  [ 96/330] DD+TERM+DISP+SKEW                         ESS=  1069  sig=3  GFC=0.86  calm=0.10  COVID=0.67  PASS  [2888s, 84 passed]
+  [ 97/330] DD+TERM+DISP+REL_N                        ESS=  1500  sig=3  GFC=0.86  calm=0.13  COVID=1.00  PASS  [2922s, 85 passed]
+  [ 98/330] DD+TERM+ADR+SKEW                          ESS=  1167  sig=4  GFC=0.86  calm=0.11  COVID=0.67  PASS  [2958s, 86 passed]
+  [100/330] DD+TERM+SKEW+REL_N                        ESS=    84  sig=4  GFC=0.85  calm=0.47  COVID=0.67  fail  [3028s, 86 passed]
+  [102/330] DD+CPS+HY_OAS+ADR                         ESS=  1117  sig=4  GFC=1.00  calm=0.09  COVID=0.89  PASS  [3076s, 87 passed]
+  [103/330] DD+CPS+HY_OAS+SKEW                        ESS=   315  sig=3  GFC=1.00  calm=0.09  COVID=1.00  PASS  [3101s, 88 passed]
+  [104/330] DD+CPS+HY_OAS+REL_N                       ESS=    84  sig=4  GFC=1.00  calm=0.09  COVID=0.62  PASS  [3125s, 89 passed]
+  [105/330] DD+CPS+DISP+ADR                           ESS=   959  sig=4  GFC=1.00  calm=0.10  COVID=0.90  PASS  [3149s, 90 passed]
+  [106/330] DD+CPS+DISP+SKEW                          ESS=   548  sig=3  GFC=1.00  calm=0.11  COVID=1.00  PASS  [3174s, 91 passed]
+  [107/330] DD+CPS+DISP+REL_N                         ESS=   420  sig=4  GFC=1.00  calm=0.14  COVID=1.00  PASS  [3198s, 92 passed]
+  [108/330] DD+CPS+ADR+SKEW                           ESS=  1143  sig=3  GFC=1.00  calm=0.09  COVID=0.51  PASS  [3222s, 93 passed]
+  [109/330] DD+CPS+ADR+REL_N                          ESS=   103  sig=4  GFC=1.00  calm=0.10  COVID=0.56  PASS  [3247s, 94 passed]
+  [110/330] DD+CPS+SKEW+REL_N                         ESS=   248  sig=3  GFC=1.00  calm=0.11  COVID=1.00  PASS  [3271s, 95 passed]
+  [111/330] DD+HY_OAS+DISP+ADR                        ESS=    65  sig=3  GFC=0.86  calm=0.13  COVID=0.70  PASS  [3295s, 96 passed]
+  [113/330] DD+HY_OAS+DISP+REL_N                      ESS=  1287  sig=4  GFC=0.90  calm=0.11  COVID=0.72  PASS  [3344s, 97 passed]
+  [114/330] DD+HY_OAS+ADR+SKEW                        ESS=  1102  sig=4  GFC=0.86  calm=0.10  COVID=0.67  PASS  [3369s, 98 passed]
+  [115/330] DD+HY_OAS+ADR+REL_N                       ESS=   965  sig=3  GFC=0.89  calm=0.12  COVID=0.71  PASS  [3393s, 99 passed]
+  [116/330] DD+HY_OAS+SKEW+REL_N                      ESS=   445  sig=3  GFC=0.89  calm=0.11  COVID=0.99  PASS  [3418s, 100 passed]
+  [117/330] DD+DISP+ADR+SKEW                          ESS=   506  sig=4  GFC=0.86  calm=0.11  COVID=0.67  PASS  [3454s, 101 passed]
+  [118/330] DD+DISP+ADR+REL_N                         ESS=  1203  sig=4  GFC=0.85  calm=0.15  COVID=1.00  PASS  [3489s, 102 passed]
+  [119/330] DD+DISP+SKEW+REL_N                        ESS=  1074  sig=4  GFC=0.85  calm=0.20  COVID=0.67  PASS  [3523s, 103 passed]
+  [120/330] DD+ADR+SKEW+REL_N                         ESS=  1090  sig=3  GFC=0.86  calm=0.11  COVID=0.67  PASS  [3558s, 104 passed]
+  [122/330] VOL+CS+LVIX+CPS                           ESS=    83  sig=4  GFC=1.00  calm=0.00  COVID=0.00  PASS  [3618s, 105 passed]
+  [123/330] VOL+CS+LVIX+HY_OAS                        ESS=  1223  sig=4  GFC=0.86  calm=0.22  COVID=0.34  PASS  [3643s, 106 passed]
+  [124/330] VOL+CS+LVIX+DISP                          ESS=   668  sig=4  GFC=1.00  calm=0.28  COVID=1.00  PASS  [3679s, 107 passed]
+  [125/330] VOL+CS+LVIX+ADR                           ESS=   462  sig=3  GFC=1.00  calm=0.25  COVID=0.68  PASS  [3715s, 108 passed]
+  [126/330] VOL+CS+LVIX+SKEW                          ESS=   908  sig=3  GFC=1.00  calm=0.26  COVID=0.67  PASS  [3751s, 109 passed]
+  [127/330] VOL+CS+LVIX+REL_N                         ESS=  1189  sig=4  GFC=0.99  calm=0.29  COVID=0.67  PASS  [3786s, 110 passed]
+  [128/330] VOL+CS+TERM+CPS                           ESS=   199  sig=3  GFC=1.00  calm=0.00  COVID=0.53  PASS  [3810s, 111 passed]
+  [130/330] VOL+CS+TERM+DISP                          ESS=   562  sig=2  GFC=0.10  calm=0.47  COVID=0.65  fail  [3871s, 111 passed]
+  [132/330] VOL+CS+TERM+SKEW                          ESS=    78  sig=3  GFC=0.99  calm=0.28  COVID=0.67  PASS  [3943s, 112 passed]
+  [134/330] VOL+CS+CPS+HY_OAS                         ESS=   713  sig=4  GFC=1.00  calm=0.00  COVID=0.51  PASS  [4002s, 113 passed]
+  [135/330] VOL+CS+CPS+DISP                           ESS=  1500  sig=3  GFC=1.00  calm=0.00  COVID=0.05  PASS  [4026s, 114 passed]
+  [136/330] VOL+CS+CPS+ADR                            ESS=   697  sig=3  GFC=1.00  calm=0.00  COVID=0.50  PASS  [4050s, 115 passed]
+  [137/330] VOL+CS+CPS+SKEW                           ESS=   976  sig=4  GFC=1.00  calm=0.03  COVID=1.00  PASS  [4075s, 116 passed]
+  [138/330] VOL+CS+CPS+REL_N                          ESS=   504  sig=4  GFC=1.00  calm=0.00  COVID=0.50  PASS  [4099s, 117 passed]
+  [139/330] VOL+CS+HY_OAS+DISP                        ESS=  1253  sig=4  GFC=0.94  calm=0.25  COVID=1.00  PASS  [4123s, 118 passed]
+  [140/330] VOL+CS+HY_OAS+ADR                         ESS=   942  sig=3  GFC=0.85  calm=0.20  COVID=0.66  PASS  [4148s, 119 passed]
+  [141/330] VOL+CS+HY_OAS+SKEW                        ESS=   277  sig=3  GFC=0.85  calm=0.20  COVID=0.64  PASS  [4172s, 120 passed]
+  [143/330] VOL+CS+DISP+ADR                           ESS=   398  sig=3  GFC=0.95  calm=0.24  COVID=1.00  PASS  [4233s, 121 passed]
+  [144/330] VOL+CS+DISP+SKEW                          ESS=   507  sig=4  GFC=0.90  calm=0.22  COVID=0.67  PASS  [4269s, 122 passed]
+  [146/330] VOL+CS+ADR+SKEW                           ESS=   725  sig=3  GFC=0.98  calm=0.28  COVID=0.67  PASS  [4340s, 123 passed]
+  [148/330] VOL+CS+SKEW+REL_N                         ESS=   206  sig=3  GFC=0.95  calm=0.28  COVID=0.67  PASS  [4409s, 124 passed]
+  [149/330] VOL+LVIX+TERM+CPS                         ESS=  1310  sig=4  GFC=0.81  calm=0.00  COVID=0.90  PASS  [4433s, 125 passed]
+  [150/330] VOL+LVIX+TERM+HY_OAS                      ESS=    10  sig=3  GFC=1.00  calm=0.10  COVID=0.70  fail  [4458s, 125 passed]
+  [151/330] VOL+LVIX+TERM+DISP                        ESS=   986  sig=3  GFC=1.00  calm=0.23  COVID=1.00  PASS  [4494s, 126 passed]
+  [152/330] VOL+LVIX+TERM+ADR                         ESS=   705  sig=2  GFC=1.00  calm=0.27  COVID=0.74  PASS  [4530s, 127 passed]
+  [155/330] VOL+LVIX+CPS+HY_OAS                       ESS=  1191  sig=4  GFC=1.00  calm=0.24  COVID=0.54  PASS  [4625s, 128 passed]
+  [156/330] VOL+LVIX+CPS+DISP                         ESS=   809  sig=4  GFC=1.00  calm=0.00  COVID=0.68  PASS  [4649s, 129 passed]
+  [157/330] VOL+LVIX+CPS+ADR                          ESS=  1291  sig=4  GFC=1.00  calm=0.00  COVID=0.50  PASS  [4674s, 130 passed]
+  [158/330] VOL+LVIX+CPS+SKEW                         ESS=   436  sig=4  GFC=1.00  calm=0.04  COVID=1.00  PASS  [4698s, 131 passed]
+  [160/330] VOL+LVIX+HY_OAS+DISP                      ESS=   962  sig=4  GFC=0.95  calm=0.25  COVID=1.00  PASS  [4747s, 132 passed]
+  [161/330] VOL+LVIX+HY_OAS+ADR                       ESS=  1303  sig=3  GFC=0.98  calm=0.27  COVID=0.68  PASS  [4771s, 133 passed]
+  [162/330] VOL+LVIX+HY_OAS+SKEW                      ESS=  1311  sig=4  GFC=1.00  calm=0.34  COVID=1.00  PASS  [4796s, 134 passed]
+  [164/330] VOL+LVIX+DISP+ADR                         ESS=   295  sig=3  GFC=1.00  calm=0.31  COVID=1.00  PASS  [4856s, 135 passed]
+  [165/330] VOL+LVIX+DISP+SKEW                        ESS=    70  sig=3  GFC=0.99  calm=0.27  COVID=0.67  PASS  [4892s, 136 passed]
+  [166/330] VOL+LVIX+DISP+REL_N                       ESS=  1234  sig=4  GFC=1.00  calm=0.35  COVID=1.00  PASS  [4927s, 137 passed]
+  [167/330] VOL+LVIX+ADR+SKEW                         ESS=   926  sig=2  GFC=1.00  calm=0.28  COVID=0.67  PASS  [4963s, 138 passed]
+  [168/330] VOL+LVIX+ADR+REL_N                        ESS=  1177  sig=3  GFC=1.00  calm=0.36  COVID=0.68  PASS  [4998s, 139 passed]
+  [169/330] VOL+LVIX+SKEW+REL_N                       ESS=   968  sig=3  GFC=1.00  calm=0.30  COVID=0.67  PASS  [5032s, 140 passed]
+  [170/330] VOL+TERM+CPS+HY_OAS                       ESS=     7  sig=1  GFC=0.82  calm=0.40  COVID=1.00  fail  [5057s, 140 passed]
+  [171/330] VOL+TERM+CPS+DISP                         ESS=   217  sig=4  GFC=0.94  calm=0.00  COVID=1.00  PASS  [5081s, 141 passed]
+  [180/330] VOL+TERM+DISP+SKEW                        ESS=   553  sig=3  GFC=0.93  calm=0.19  COVID=1.00  PASS  [5324s, 142 passed]
+  [185/330] VOL+CPS+HY_OAS+DISP                       ESS=  1176  sig=4  GFC=1.00  calm=0.23  COVID=0.98  PASS  [5489s, 143 passed]
+  [186/330] VOL+CPS+HY_OAS+ADR                        ESS=  1203  sig=3  GFC=1.00  calm=0.24  COVID=0.53  PASS  [5513s, 144 passed]
+  [187/330] VOL+CPS+HY_OAS+SKEW                       ESS=  1110  sig=3  GFC=1.00  calm=0.29  COVID=1.00  PASS  [5537s, 145 passed]
+  [188/330] VOL+CPS+HY_OAS+REL_N                      ESS=  1172  sig=4  GFC=1.00  calm=0.24  COVID=0.51  PASS  [5562s, 146 passed]
+  [189/330] VOL+CPS+DISP+ADR                          ESS=  1241  sig=4  GFC=1.00  calm=0.00  COVID=0.90  PASS  [5586s, 147 passed]
+  [190/330] VOL+CPS+DISP+SKEW                         ESS=   937  sig=4  GFC=1.00  calm=0.03  COVID=1.00  PASS  [5610s, 148 passed]
+  [191/330] VOL+CPS+DISP+REL_N                        ESS=   811  sig=4  GFC=1.00  calm=0.23  COVID=0.55  PASS  [5635s, 149 passed]
+  [193/330] VOL+CPS+ADR+REL_N                         ESS=   883  sig=3  GFC=1.00  calm=0.23  COVID=0.50  PASS  [5683s, 150 passed]
+  [194/330] VOL+CPS+SKEW+REL_N                        ESS=   145  sig=4  GFC=1.00  calm=0.27  COVID=1.00  PASS  [5708s, 151 passed]
+  [195/330] VOL+HY_OAS+DISP+ADR                       ESS=  1102  sig=3  GFC=0.95  calm=0.24  COVID=1.00  PASS  [5732s, 152 passed]
+  [196/330] VOL+HY_OAS+DISP+SKEW                      ESS=   497  sig=3  GFC=0.97  calm=0.30  COVID=1.00  PASS  [5757s, 153 passed]
+  [197/330] VOL+HY_OAS+DISP+REL_N                     ESS=  1116  sig=4  GFC=0.94  calm=0.28  COVID=0.71  PASS  [5781s, 154 passed]
+  [198/330] VOL+HY_OAS+ADR+SKEW                       ESS=  1286  sig=3  GFC=1.00  calm=0.33  COVID=1.00  PASS  [5805s, 155 passed]
+  [199/330] VOL+HY_OAS+ADR+REL_N                      ESS=  1258  sig=3  GFC=0.94  calm=0.27  COVID=0.67  PASS  [5830s, 156 passed]
+  [200/330] VOL+HY_OAS+SKEW+REL_N                     ESS=  1266  sig=4  GFC=0.99  calm=0.33  COVID=1.00  PASS  [5854s, 157 passed]
+  [202/330] VOL+DISP+ADR+REL_N                        ESS=   124  sig=3  GFC=0.96  calm=0.34  COVID=1.00  PASS  [5925s, 158 passed]
+  [210/330] CS+LVIX+TERM+REL_N                        ESS=   671  sig=3  GFC=0.89  calm=0.96  COVID=0.80  fail  [6186s, 158 passed]
+  [211/330] CS+LVIX+CPS+HY_OAS                        ESS=   281  sig=3  GFC=1.00  calm=0.26  COVID=0.45  PASS  [6211s, 159 passed]
+  [212/330] CS+LVIX+CPS+DISP                          ESS=  1341  sig=2  GFC=1.00  calm=0.25  COVID=0.36  PASS  [6235s, 160 passed]
+  [213/330] CS+LVIX+CPS+ADR                           ESS=   969  sig=2  GFC=1.00  calm=0.26  COVID=0.50  PASS  [6259s, 161 passed]
+  [214/330] CS+LVIX+CPS+SKEW                          ESS=   897  sig=3  GFC=1.00  calm=0.32  COVID=1.00  PASS  [6284s, 162 passed]
+  [215/330] CS+LVIX+CPS+REL_N                         ESS=  1295  sig=3  GFC=1.00  calm=0.25  COVID=0.50  PASS  [6308s, 163 passed]
+  [218/330] CS+LVIX+HY_OAS+SKEW                       ESS=  1285  sig=4  GFC=0.98  calm=0.32  COVID=1.00  PASS  [6381s, 164 passed]
+  [219/330] CS+LVIX+HY_OAS+REL_N                      ESS=   359  sig=4  GFC=0.90  calm=0.19  COVID=0.67  PASS  [6406s, 165 passed]
+  [220/330] CS+LVIX+DISP+ADR                          ESS=   572  sig=3  GFC=0.99  calm=0.90  COVID=0.47  fail  [6442s, 165 passed]
+  [223/330] CS+LVIX+ADR+SKEW                          ESS=   725  sig=2  GFC=1.00  calm=0.27  COVID=0.67  PASS  [6549s, 166 passed]
+  [224/330] CS+LVIX+ADR+REL_N                         ESS=  1272  sig=3  GFC=1.00  calm=0.29  COVID=0.67  PASS  [6583s, 167 passed]
+  [230/330] CS+TERM+CPS+REL_N                         ESS=   207  sig=3  GFC=0.03  calm=0.48  COVID=0.53  fail  [6740s, 167 passed]
+  [240/330] CS+TERM+SKEW+REL_N                        ESS=   427  sig=3  GFC=0.97  calm=0.63  COVID=0.67  fail  [7050s, 167 passed]
+  [241/330] CS+CPS+HY_OAS+DISP                        ESS=  1500  sig=3  GFC=1.00  calm=0.00  COVID=0.45  PASS  [7074s, 168 passed]
+  [242/330] CS+CPS+HY_OAS+ADR                         ESS=  1188  sig=3  GFC=1.00  calm=0.00  COVID=0.50  PASS  [7098s, 169 passed]
+  [243/330] CS+CPS+HY_OAS+SKEW                        ESS=  1143  sig=4  GFC=1.00  calm=0.03  COVID=1.00  PASS  [7123s, 170 passed]
+  [245/330] CS+CPS+DISP+ADR                           ESS=  1321  sig=2  GFC=1.00  calm=0.00  COVID=0.00  PASS  [7171s, 171 passed]
+  [246/330] CS+CPS+DISP+SKEW                          ESS=   643  sig=2  GFC=1.00  calm=0.03  COVID=1.00  PASS  [7196s, 172 passed]
+  [247/330] CS+CPS+DISP+REL_N                         ESS=  1354  sig=2  GFC=1.00  calm=0.00  COVID=0.49  PASS  [7220s, 173 passed]
+  [248/330] CS+CPS+ADR+SKEW                           ESS=  1193  sig=3  GFC=1.00  calm=0.03  COVID=1.00  PASS  [7246s, 174 passed]
+  [249/330] CS+CPS+ADR+REL_N                          ESS=    88  sig=2  GFC=1.00  calm=0.00  COVID=0.50  PASS  [7271s, 175 passed]
+  [250/330] CS+CPS+SKEW+REL_N                         ESS=  1205  sig=3  GFC=1.00  calm=0.03  COVID=1.00  PASS  [7296s, 176 passed]
+  [251/330] CS+HY_OAS+DISP+ADR                        ESS=  1222  sig=3  GFC=0.85  calm=0.21  COVID=0.65  PASS  [7321s, 177 passed]
+  [252/330] CS+HY_OAS+DISP+SKEW                       ESS=   182  sig=3  GFC=0.94  calm=0.31  COVID=1.00  PASS  [7345s, 178 passed]
+  [253/330] CS+HY_OAS+DISP+REL_N                      ESS=   975  sig=4  GFC=0.87  calm=0.21  COVID=0.66  PASS  [7370s, 179 passed]
+  [254/330] CS+HY_OAS+ADR+SKEW                        ESS=   667  sig=3  GFC=0.95  calm=0.29  COVID=1.00  PASS  [7394s, 180 passed]
+  [255/330] CS+HY_OAS+ADR+REL_N                       ESS=  1159  sig=3  GFC=0.89  calm=0.23  COVID=0.67  PASS  [7419s, 181 passed]
+  [256/330] CS+HY_OAS+SKEW+REL_N                      ESS=   898  sig=4  GFC=0.91  calm=0.29  COVID=1.00  PASS  [7444s, 182 passed]
+  [260/330] CS+ADR+SKEW+REL_N                         ESS=   193  sig=2  GFC=0.88  calm=0.28  COVID=0.66  PASS  [7584s, 183 passed]
+  [261/330] LVIX+TERM+CPS+HY_OAS                      ESS=  1339  sig=3  GFC=0.99  calm=0.00  COVID=0.99  PASS  [7608s, 184 passed]
+  [262/330] LVIX+TERM+CPS+DISP                        ESS=   307  sig=4  GFC=0.93  calm=0.00  COVID=0.98  PASS  [7632s, 185 passed]
+  [263/330] LVIX+TERM+CPS+ADR                         ESS=  1261  sig=4  GFC=0.81  calm=0.00  COVID=0.60  PASS  [7657s, 186 passed]
+  [264/330] LVIX+TERM+CPS+SKEW                        ESS=  1277  sig=3  GFC=0.81  calm=0.00  COVID=0.58  PASS  [7681s, 187 passed]
+  [265/330] LVIX+TERM+CPS+REL_N                       ESS=  1359  sig=4  GFC=0.82  calm=0.00  COVID=1.00  PASS  [7705s, 188 passed]
+  [266/330] LVIX+TERM+HY_OAS+DISP                     ESS=  1190  sig=3  GFC=1.00  calm=0.14  COVID=1.00  PASS  [7730s, 189 passed]
+  [267/330] LVIX+TERM+HY_OAS+ADR                      ESS=   120  sig=3  GFC=1.00  calm=0.09  COVID=0.69  PASS  [7754s, 190 passed]
+  [269/330] LVIX+TERM+HY_OAS+REL_N                    ESS=   583  sig=3  GFC=0.99  calm=0.22  COVID=0.69  PASS  [7803s, 191 passed]
+  [270/330] LVIX+TERM+DISP+ADR                        ESS=   756  sig=2  GFC=1.00  calm=0.30  COVID=0.94  PASS  [7839s, 192 passed]
+  [271/330] LVIX+TERM+DISP+SKEW                       ESS=   640  sig=4  GFC=0.99  calm=0.17  COVID=0.67  PASS  [7876s, 193 passed]
+  [273/330] LVIX+TERM+ADR+SKEW                        ESS=   620  sig=2  GFC=1.00  calm=0.28  COVID=0.67  PASS  [7947s, 194 passed]
+  [274/330] LVIX+TERM+ADR+REL_N                       ESS=  1014  sig=3  GFC=1.00  calm=0.38  COVID=0.71  PASS  [7981s, 195 passed]
+  [276/330] LVIX+CPS+HY_OAS+DISP                      ESS=  1021  sig=3  GFC=1.00  calm=0.00  COVID=1.00  PASS  [8040s, 196 passed]
+  [277/330] LVIX+CPS+HY_OAS+ADR                       ESS=  1286  sig=3  GFC=1.00  calm=0.00  COVID=0.50  PASS  [8065s, 197 passed]
+  [278/330] LVIX+CPS+HY_OAS+SKEW                      ESS=   102  sig=3  GFC=1.00  calm=0.03  COVID=1.00  PASS  [8090s, 198 passed]
+  [279/330] LVIX+CPS+HY_OAS+REL_N                     ESS=  1260  sig=4  GFC=1.00  calm=0.27  COVID=0.50  PASS  [8115s, 199 passed]
+  [280/330] LVIX+CPS+DISP+ADR                         ESS=  1115  sig=4  GFC=1.00  calm=0.00  COVID=0.99  PASS  [8139s, 200 passed]
+  [281/330] LVIX+CPS+DISP+SKEW                        ESS=   987  sig=4  GFC=1.00  calm=0.03  COVID=1.00  PASS  [8164s, 201 passed]
+  [282/330] LVIX+CPS+DISP+REL_N                       ESS=   844  sig=4  GFC=1.00  calm=0.24  COVID=0.52  PASS  [8188s, 202 passed]
+  [283/330] LVIX+CPS+ADR+SKEW                         ESS=  1239  sig=4  GFC=1.00  calm=0.04  COVID=1.00  PASS  [8212s, 203 passed]
+  [284/330] LVIX+CPS+ADR+REL_N                        ESS=  1034  sig=3  GFC=1.00  calm=0.32  COVID=0.50  PASS  [8237s, 204 passed]
+  [285/330] LVIX+CPS+SKEW+REL_N                       ESS=   778  sig=4  GFC=1.00  calm=0.30  COVID=1.00  PASS  [8261s, 205 passed]
+  [286/330] LVIX+HY_OAS+DISP+ADR                      ESS=  1185  sig=3  GFC=1.00  calm=0.24  COVID=1.00  PASS  [8286s, 206 passed]
+  [287/330] LVIX+HY_OAS+DISP+SKEW                     ESS=  1218  sig=4  GFC=1.00  calm=0.32  COVID=1.00  PASS  [8310s, 207 passed]
+  [289/330] LVIX+HY_OAS+ADR+SKEW                      ESS=  1272  sig=3  GFC=1.00  calm=0.33  COVID=1.00  PASS  [8359s, 208 passed]
+  [290/330] LVIX+HY_OAS+ADR+REL_N                     ESS=     7  sig=3  GFC=0.94  calm=0.30  COVID=0.67  fail  [8384s, 208 passed]
+  [292/330] LVIX+DISP+ADR+SKEW                        ESS=  1139  sig=2  GFC=1.00  calm=0.28  COVID=0.67  PASS  [8444s, 209 passed]
+  [293/330] LVIX+DISP+ADR+REL_N                       ESS=   761  sig=3  GFC=1.00  calm=0.36  COVID=1.00  PASS  [8479s, 210 passed]
+  [294/330] LVIX+DISP+SKEW+REL_N                      ESS=  1193  sig=3  GFC=1.00  calm=0.28  COVID=0.67  PASS  [8513s, 211 passed]
+  [295/330] LVIX+ADR+SKEW+REL_N                       ESS=  1253  sig=2  GFC=1.00  calm=0.29  COVID=0.67  PASS  [8549s, 212 passed]
+  [300/330] TERM+CPS+DISP+ADR                         ESS=  1101  sig=1  GFC=0.00  calm=0.45  COVID=0.98  fail  [8670s, 212 passed]
+  [310/330] TERM+HY_OAS+ADR+REL_N                     ESS=   708  sig=3  GFC=0.15  calm=0.47  COVID=1.00  fail  [8915s, 212 passed]
+  [316/330] CPS+HY_OAS+DISP+ADR                       ESS=  1096  sig=3  GFC=1.00  calm=0.00  COVID=1.00  PASS  [9104s, 213 passed]
+  [317/330] CPS+HY_OAS+DISP+SKEW                      ESS=  1249  sig=3  GFC=1.00  calm=0.03  COVID=1.00  PASS  [9128s, 214 passed]
+  [320/330] CPS+HY_OAS+ADR+REL_N                      ESS=   311  sig=2  GFC=1.00  calm=0.00  COVID=0.50  PASS  [9201s, 215 passed]
+  [321/330] CPS+HY_OAS+SKEW+REL_N                     ESS=   278  sig=3  GFC=1.00  calm=0.03  COVID=1.00  PASS  [9226s, 216 passed]
+  [322/330] CPS+DISP+ADR+SKEW                         ESS=  1240  sig=4  GFC=1.00  calm=0.03  COVID=1.00  PASS  [9250s, 217 passed]
+  [323/330] CPS+DISP+ADR+REL_N                        ESS=  1173  sig=3  GFC=1.00  calm=0.00  COVID=1.00  PASS  [9274s, 218 passed]
+  [327/330] HY_OAS+DISP+ADR+REL_N                     ESS=   622  sig=3  GFC=0.86  calm=0.25  COVID=0.66  PASS  [9372s, 219 passed]
+  [328/330] HY_OAS+DISP+SKEW+REL_N                    ESS=  1259  sig=3  GFC=0.91  calm=0.32  COVID=1.00  PASS  [9397s, 220 passed]
+  [329/330] HY_OAS+ADR+SKEW+REL_N                     ESS=  1332  sig=2  GFC=0.95  calm=0.33  COVID=1.00  PASS  [9421s, 221 passed]
+  [330/330] DISP+ADR+SKEW+REL_N                       ESS=   951  sig=3  GFC=0.56  calm=0.20  COVID=1.00  PASS  [9456s, 222 passed]
+
+  Pass 1 complete: 9456s
+  Tested: 330  |  Passed: 222
+
+  Passing combinations:
+    DD+LVIX+TERM+DISP                         ESS=  1500  sig=4  GFC=1.00  calm=0.09  COVID=1.00
+    DD+LVIX+HY_OAS+DISP                       ESS=  1500  sig=4  GFC=0.93  calm=0.23  COVID=1.00
+    CS+CPS+HY_OAS+DISP                        ESS=  1500  sig=3  GFC=1.00  calm=0.00  COVID=0.45
+    VOL+CS+CPS+DISP                           ESS=  1500  sig=3  GFC=1.00  calm=0.00  COVID=0.05
+    DD+LVIX+TERM+ADR                          ESS=  1500  sig=4  GFC=1.00  calm=0.10  COVID=0.92
+    DD+TERM+DISP+REL_N                        ESS=  1500  sig=3  GFC=0.86  calm=0.13  COVID=1.00
+    LVIX+TERM+CPS+REL_N                       ESS=  1359  sig=4  GFC=0.82  calm=0.00  COVID=1.00
+    CS+CPS+DISP+REL_N                         ESS=  1354  sig=2  GFC=1.00  calm=0.00  COVID=0.49
+    CS+LVIX+CPS+DISP                          ESS=  1341  sig=2  GFC=1.00  calm=0.25  COVID=0.36
+    LVIX+TERM+CPS+HY_OAS                      ESS=  1339  sig=3  GFC=0.99  calm=0.00  COVID=0.99
+    HY_OAS+ADR+SKEW+REL_N                     ESS=  1332  sig=2  GFC=0.95  calm=0.33  COVID=1.00
+    CS+CPS+DISP+ADR                           ESS=  1321  sig=2  GFC=1.00  calm=0.00  COVID=0.00
+    VOL+LVIX+HY_OAS+SKEW                      ESS=  1311  sig=4  GFC=1.00  calm=0.34  COVID=1.00
+    VOL+LVIX+TERM+CPS                         ESS=  1310  sig=4  GFC=0.81  calm=0.00  COVID=0.90
+    VOL+LVIX+HY_OAS+ADR                       ESS=  1303  sig=3  GFC=0.98  calm=0.27  COVID=0.68
+    CS+LVIX+CPS+REL_N                         ESS=  1295  sig=3  GFC=1.00  calm=0.25  COVID=0.50
+    DD+CS+HY_OAS+ADR                          ESS=  1293  sig=4  GFC=0.86  calm=0.09  COVID=0.74
+    DD+TERM+HY_OAS+SKEW                       ESS=  1292  sig=4  GFC=0.87  calm=0.09  COVID=0.77
+    VOL+LVIX+CPS+ADR                          ESS=  1291  sig=4  GFC=1.00  calm=0.00  COVID=0.50
+    DD+VOL+TERM+REL_N                         ESS=  1290  sig=4  GFC=0.85  calm=0.40  COVID=0.67
+    DD+HY_OAS+DISP+REL_N                      ESS=  1287  sig=4  GFC=0.90  calm=0.11  COVID=0.72
+    LVIX+CPS+HY_OAS+ADR                       ESS=  1286  sig=3  GFC=1.00  calm=0.00  COVID=0.50
+    VOL+HY_OAS+ADR+SKEW                       ESS=  1286  sig=3  GFC=1.00  calm=0.33  COVID=1.00
+    CS+LVIX+HY_OAS+SKEW                       ESS=  1285  sig=4  GFC=0.98  calm=0.32  COVID=1.00
+    DD+CS+HY_OAS+SKEW                         ESS=  1284  sig=4  GFC=0.86  calm=0.09  COVID=0.81
+    DD+CS+DISP+REL_N                          ESS=  1282  sig=4  GFC=0.86  calm=0.13  COVID=0.99
+    LVIX+TERM+CPS+SKEW                        ESS=  1277  sig=3  GFC=0.81  calm=0.00  COVID=0.58
+    LVIX+HY_OAS+ADR+SKEW                      ESS=  1272  sig=3  GFC=1.00  calm=0.33  COVID=1.00
+    CS+LVIX+ADR+REL_N                         ESS=  1272  sig=3  GFC=1.00  calm=0.29  COVID=0.67
+    DD+CS+LVIX+TERM                           ESS=  1271  sig=4  GFC=1.00  calm=0.09  COVID=0.97
+    DD+CS+LVIX+HY_OAS                         ESS=  1270  sig=4  GFC=0.86  calm=0.09  COVID=0.82
+    VOL+HY_OAS+SKEW+REL_N                     ESS=  1266  sig=4  GFC=0.99  calm=0.33  COVID=1.00
+    LVIX+TERM+CPS+ADR                         ESS=  1261  sig=4  GFC=0.81  calm=0.00  COVID=0.60
+    LVIX+CPS+HY_OAS+REL_N                     ESS=  1260  sig=4  GFC=1.00  calm=0.27  COVID=0.50
+    HY_OAS+DISP+SKEW+REL_N                    ESS=  1259  sig=3  GFC=0.91  calm=0.32  COVID=1.00
+    VOL+HY_OAS+ADR+REL_N                      ESS=  1258  sig=3  GFC=0.94  calm=0.27  COVID=0.67
+    LVIX+ADR+SKEW+REL_N                       ESS=  1253  sig=2  GFC=1.00  calm=0.29  COVID=0.67
+    VOL+CS+HY_OAS+DISP                        ESS=  1253  sig=4  GFC=0.94  calm=0.25  COVID=1.00
+    CPS+HY_OAS+DISP+SKEW                      ESS=  1249  sig=3  GFC=1.00  calm=0.03  COVID=1.00
+    DD+CS+ADR+SKEW                            ESS=  1247  sig=4  GFC=0.87  calm=0.11  COVID=0.67
+    VOL+CPS+DISP+ADR                          ESS=  1241  sig=4  GFC=1.00  calm=0.00  COVID=0.90
+    CPS+DISP+ADR+SKEW                         ESS=  1240  sig=4  GFC=1.00  calm=0.03  COVID=1.00
+    LVIX+CPS+ADR+SKEW                         ESS=  1239  sig=4  GFC=1.00  calm=0.04  COVID=1.00
+    VOL+LVIX+DISP+REL_N                       ESS=  1234  sig=4  GFC=1.00  calm=0.35  COVID=1.00
+    DD+LVIX+DISP+REL_N                        ESS=  1226  sig=4  GFC=0.99  calm=0.26  COVID=1.00
+    VOL+CS+LVIX+HY_OAS                        ESS=  1223  sig=4  GFC=0.86  calm=0.22  COVID=0.34
+    CS+HY_OAS+DISP+ADR                        ESS=  1222  sig=3  GFC=0.85  calm=0.21  COVID=0.65
+    DD+VOL+CS+HY_OAS                          ESS=  1221  sig=4  GFC=0.86  calm=0.09  COVID=0.79
+    LVIX+HY_OAS+DISP+SKEW                     ESS=  1218  sig=4  GFC=1.00  calm=0.32  COVID=1.00
+    DD+CS+LVIX+CPS                            ESS=  1217  sig=4  GFC=1.00  calm=0.09  COVID=0.97
+    DD+LVIX+CPS+SKEW                          ESS=  1210  sig=3  GFC=1.00  calm=0.09  COVID=1.00
+    DD+VOL+LVIX+TERM                          ESS=  1209  sig=4  GFC=1.00  calm=0.09  COVID=0.96
+    CS+CPS+SKEW+REL_N                         ESS=  1205  sig=3  GFC=1.00  calm=0.03  COVID=1.00
+    VOL+CPS+HY_OAS+ADR                        ESS=  1203  sig=3  GFC=1.00  calm=0.24  COVID=0.53
+    DD+DISP+ADR+REL_N                         ESS=  1203  sig=4  GFC=0.85  calm=0.15  COVID=1.00
+    LVIX+DISP+SKEW+REL_N                      ESS=  1193  sig=3  GFC=1.00  calm=0.28  COVID=0.67
+    CS+CPS+ADR+SKEW                           ESS=  1193  sig=3  GFC=1.00  calm=0.03  COVID=1.00
+    VOL+LVIX+CPS+HY_OAS                       ESS=  1191  sig=4  GFC=1.00  calm=0.24  COVID=0.54
+    LVIX+TERM+HY_OAS+DISP                     ESS=  1190  sig=3  GFC=1.00  calm=0.14  COVID=1.00
+    VOL+CS+LVIX+REL_N                         ESS=  1189  sig=4  GFC=0.99  calm=0.29  COVID=0.67
+    CS+CPS+HY_OAS+ADR                         ESS=  1188  sig=3  GFC=1.00  calm=0.00  COVID=0.50
+    LVIX+HY_OAS+DISP+ADR                      ESS=  1185  sig=3  GFC=1.00  calm=0.24  COVID=1.00
+    VOL+LVIX+ADR+REL_N                        ESS=  1177  sig=3  GFC=1.00  calm=0.36  COVID=0.68
+    VOL+CPS+HY_OAS+DISP                       ESS=  1176  sig=4  GFC=1.00  calm=0.23  COVID=0.98
+    CPS+DISP+ADR+REL_N                        ESS=  1173  sig=3  GFC=1.00  calm=0.00  COVID=1.00
+    VOL+CPS+HY_OAS+REL_N                      ESS=  1172  sig=4  GFC=1.00  calm=0.24  COVID=0.51
+    DD+TERM+ADR+SKEW                          ESS=  1167  sig=4  GFC=0.86  calm=0.11  COVID=0.67
+    CS+HY_OAS+ADR+REL_N                       ESS=  1159  sig=3  GFC=0.89  calm=0.23  COVID=0.67
+    DD+VOL+LVIX+CPS                           ESS=  1147  sig=4  GFC=1.00  calm=0.09  COVID=0.96
+    DD+CS+TERM+HY_OAS                         ESS=  1146  sig=4  GFC=0.86  calm=0.09  COVID=0.77
+    DD+CPS+ADR+SKEW                           ESS=  1143  sig=3  GFC=1.00  calm=0.09  COVID=0.51
+    CS+CPS+HY_OAS+SKEW                        ESS=  1143  sig=4  GFC=1.00  calm=0.03  COVID=1.00
+    LVIX+DISP+ADR+SKEW                        ESS=  1139  sig=2  GFC=1.00  calm=0.28  COVID=0.67
+    DD+LVIX+CPS+HY_OAS                        ESS=  1135  sig=4  GFC=1.00  calm=0.09  COVID=0.99
+    DD+CPS+HY_OAS+ADR                         ESS=  1117  sig=4  GFC=1.00  calm=0.09  COVID=0.89
+    VOL+HY_OAS+DISP+REL_N                     ESS=  1116  sig=4  GFC=0.94  calm=0.28  COVID=0.71
+    LVIX+CPS+DISP+ADR                         ESS=  1115  sig=4  GFC=1.00  calm=0.00  COVID=0.99
+    DD+LVIX+HY_OAS+REL_N                      ESS=  1112  sig=4  GFC=0.89  calm=0.13  COVID=0.71
+    VOL+CPS+HY_OAS+SKEW                       ESS=  1110  sig=3  GFC=1.00  calm=0.29  COVID=1.00
+    DD+VOL+DISP+SKEW                          ESS=  1109  sig=4  GFC=0.86  calm=0.14  COVID=0.67
+    DD+HY_OAS+ADR+SKEW                        ESS=  1102  sig=4  GFC=0.86  calm=0.10  COVID=0.67
+    VOL+HY_OAS+DISP+ADR                       ESS=  1102  sig=3  GFC=0.95  calm=0.24  COVID=1.00
+    CPS+HY_OAS+DISP+ADR                       ESS=  1096  sig=3  GFC=1.00  calm=0.00  COVID=1.00
+    DD+LVIX+SKEW+REL_N                        ESS=  1095  sig=3  GFC=0.99  calm=0.27  COVID=0.67
+    DD+ADR+SKEW+REL_N                         ESS=  1090  sig=3  GFC=0.86  calm=0.11  COVID=0.67
+    DD+CS+CPS+HY_OAS                          ESS=  1089  sig=4  GFC=1.00  calm=0.09  COVID=0.85
+    DD+DISP+SKEW+REL_N                        ESS=  1074  sig=4  GFC=0.85  calm=0.20  COVID=0.67
+    DD+TERM+DISP+SKEW                         ESS=  1069  sig=3  GFC=0.86  calm=0.10  COVID=0.67
+    DD+LVIX+CPS+ADR                           ESS=  1068  sig=4  GFC=1.00  calm=0.09  COVID=0.86
+    DD+VOL+ADR+REL_N                          ESS=  1063  sig=3  GFC=0.86  calm=0.11  COVID=0.83
+    DD+TERM+CPS+ADR                           ESS=  1056  sig=4  GFC=1.00  calm=0.09  COVID=0.96
+    LVIX+CPS+ADR+REL_N                        ESS=  1034  sig=3  GFC=1.00  calm=0.32  COVID=0.50
+    LVIX+CPS+HY_OAS+DISP                      ESS=  1021  sig=3  GFC=1.00  calm=0.00  COVID=1.00
+    DD+VOL+CPS+HY_OAS                         ESS=  1021  sig=4  GFC=1.00  calm=0.09  COVID=0.97
+    LVIX+TERM+ADR+REL_N                       ESS=  1014  sig=3  GFC=1.00  calm=0.38  COVID=0.71
+    DD+VOL+CS+CPS                             ESS=  1003  sig=4  GFC=1.00  calm=0.09  COVID=0.91
+    LVIX+CPS+DISP+SKEW                        ESS=   987  sig=4  GFC=1.00  calm=0.03  COVID=1.00
+    VOL+LVIX+TERM+DISP                        ESS=   986  sig=3  GFC=1.00  calm=0.23  COVID=1.00
+    VOL+CS+CPS+SKEW                           ESS=   976  sig=4  GFC=1.00  calm=0.03  COVID=1.00
+    CS+HY_OAS+DISP+REL_N                      ESS=   975  sig=4  GFC=0.87  calm=0.21  COVID=0.66
+    CS+LVIX+CPS+ADR                           ESS=   969  sig=2  GFC=1.00  calm=0.26  COVID=0.50
+    VOL+LVIX+SKEW+REL_N                       ESS=   968  sig=3  GFC=1.00  calm=0.30  COVID=0.67
+    DD+HY_OAS+ADR+REL_N                       ESS=   965  sig=3  GFC=0.89  calm=0.12  COVID=0.71
+    DD+CS+HY_OAS+DISP                         ESS=   965  sig=4  GFC=0.86  calm=0.09  COVID=0.95
+    VOL+LVIX+HY_OAS+DISP                      ESS=   962  sig=4  GFC=0.95  calm=0.25  COVID=1.00
+    DD+TERM+CPS+REL_N                         ESS=   962  sig=4  GFC=1.00  calm=0.09  COVID=0.74
+    DD+CPS+DISP+ADR                           ESS=   959  sig=4  GFC=1.00  calm=0.10  COVID=0.90
+    DD+VOL+TERM+ADR                           ESS=   952  sig=3  GFC=0.85  calm=0.33  COVID=0.67
+    DISP+ADR+SKEW+REL_N                       ESS=   951  sig=3  GFC=0.56  calm=0.20  COVID=1.00
+    VOL+CS+HY_OAS+ADR                         ESS=   942  sig=3  GFC=0.85  calm=0.20  COVID=0.66
+    VOL+CPS+DISP+SKEW                         ESS=   937  sig=4  GFC=1.00  calm=0.03  COVID=1.00
+    DD+CS+CPS+ADR                             ESS=   936  sig=4  GFC=1.00  calm=0.09  COVID=0.65
+    VOL+LVIX+ADR+SKEW                         ESS=   926  sig=2  GFC=1.00  calm=0.28  COVID=0.67
+    DD+LVIX+TERM+REL_N                        ESS=   912  sig=3  GFC=1.00  calm=0.10  COVID=0.97
+    DD+TERM+CPS+DISP                          ESS=   912  sig=3  GFC=1.00  calm=0.09  COVID=1.00
+    DD+CS+SKEW+REL_N                          ESS=   909  sig=4  GFC=0.88  calm=0.09  COVID=0.67
+    VOL+CS+LVIX+SKEW                          ESS=   908  sig=3  GFC=1.00  calm=0.26  COVID=0.67
+    DD+VOL+CPS+ADR                            ESS=   900  sig=4  GFC=1.00  calm=0.09  COVID=0.82
+    CS+HY_OAS+SKEW+REL_N                      ESS=   898  sig=4  GFC=0.91  calm=0.29  COVID=1.00
+    DD+CS+ADR+REL_N                           ESS=   898  sig=3  GFC=0.86  calm=0.09  COVID=0.71
+    CS+LVIX+CPS+SKEW                          ESS=   897  sig=3  GFC=1.00  calm=0.32  COVID=1.00
+    DD+CS+LVIX+ADR                            ESS=   896  sig=4  GFC=0.86  calm=0.11  COVID=0.70
+    DD+CS+CPS+REL_N                           ESS=   890  sig=4  GFC=1.00  calm=0.09  COVID=0.56
+    VOL+CPS+ADR+REL_N                         ESS=   883  sig=3  GFC=1.00  calm=0.23  COVID=0.50
+    DD+TERM+CPS+HY_OAS                        ESS=   876  sig=3  GFC=1.00  calm=0.09  COVID=1.00
+    DD+VOL+CS+ADR                             ESS=   866  sig=4  GFC=0.86  calm=0.11  COVID=0.75
+    LVIX+CPS+DISP+REL_N                       ESS=   844  sig=4  GFC=1.00  calm=0.24  COVID=0.52
+    DD+VOL+LVIX+SKEW                          ESS=   843  sig=3  GFC=1.00  calm=0.24  COVID=0.67
+    DD+VOL+CPS+SKEW                           ESS=   842  sig=3  GFC=1.00  calm=0.09  COVID=1.00
+    DD+LVIX+DISP+ADR                          ESS=   841  sig=4  GFC=0.86  calm=0.10  COVID=0.74
+    DD+VOL+CS+SKEW                            ESS=   822  sig=4  GFC=0.89  calm=0.11  COVID=0.67
+    DD+VOL+CS+REL_N                           ESS=   821  sig=4  GFC=0.88  calm=0.09  COVID=0.78
+    VOL+CPS+DISP+REL_N                        ESS=   811  sig=4  GFC=1.00  calm=0.23  COVID=0.55
+    VOL+LVIX+CPS+DISP                         ESS=   809  sig=4  GFC=1.00  calm=0.00  COVID=0.68
+    DD+LVIX+CPS+DISP                          ESS=   780  sig=4  GFC=1.00  calm=0.12  COVID=1.00
+    LVIX+CPS+SKEW+REL_N                       ESS=   778  sig=4  GFC=1.00  calm=0.30  COVID=1.00
+    DD+VOL+DISP+REL_N                         ESS=   772  sig=4  GFC=0.86  calm=0.18  COVID=1.00
+    LVIX+DISP+ADR+REL_N                       ESS=   761  sig=3  GFC=1.00  calm=0.36  COVID=1.00
+    DD+CS+CPS+SKEW                            ESS=   758  sig=3  GFC=1.00  calm=0.09  COVID=1.00
+    LVIX+TERM+DISP+ADR                        ESS=   756  sig=2  GFC=1.00  calm=0.30  COVID=0.94
+    DD+CS+LVIX+REL_N                          ESS=   730  sig=4  GFC=0.87  calm=0.09  COVID=0.69
+    CS+LVIX+ADR+SKEW                          ESS=   725  sig=2  GFC=1.00  calm=0.27  COVID=0.67
+    VOL+CS+ADR+SKEW                           ESS=   725  sig=3  GFC=0.98  calm=0.28  COVID=0.67
+    VOL+CS+CPS+HY_OAS                         ESS=   713  sig=4  GFC=1.00  calm=0.00  COVID=0.51
+    DD+VOL+CS+LVIX                            ESS=   711  sig=4  GFC=0.87  calm=0.10  COVID=0.85
+    DD+VOL+CPS+REL_N                          ESS=   709  sig=4  GFC=1.00  calm=0.12  COVID=0.79
+    VOL+LVIX+TERM+ADR                         ESS=   705  sig=2  GFC=1.00  calm=0.27  COVID=0.74
+    VOL+CS+CPS+ADR                            ESS=   697  sig=3  GFC=1.00  calm=0.00  COVID=0.50
+    DD+VOL+HY_OAS+SKEW                        ESS=   684  sig=4  GFC=0.86  calm=0.10  COVID=0.76
+    VOL+CS+LVIX+DISP                          ESS=   668  sig=4  GFC=1.00  calm=0.28  COVID=1.00
+    CS+HY_OAS+ADR+SKEW                        ESS=   667  sig=3  GFC=0.95  calm=0.29  COVID=1.00
+    DD+VOL+HY_OAS+ADR                         ESS=   652  sig=4  GFC=0.86  calm=0.10  COVID=0.81
+    DD+LVIX+TERM+CPS                          ESS=   645  sig=4  GFC=1.00  calm=0.09  COVID=1.00
+    CS+CPS+DISP+SKEW                          ESS=   643  sig=2  GFC=1.00  calm=0.03  COVID=1.00
+    LVIX+TERM+DISP+SKEW                       ESS=   640  sig=4  GFC=0.99  calm=0.17  COVID=0.67
+    DD+TERM+CPS+SKEW                          ESS=   638  sig=3  GFC=1.00  calm=0.09  COVID=1.00
+    HY_OAS+DISP+ADR+REL_N                     ESS=   622  sig=3  GFC=0.86  calm=0.25  COVID=0.66
+    LVIX+TERM+ADR+SKEW                        ESS=   620  sig=2  GFC=1.00  calm=0.28  COVID=0.67
+    LVIX+TERM+HY_OAS+REL_N                    ESS=   583  sig=3  GFC=0.99  calm=0.22  COVID=0.69
+    DD+LVIX+TERM+SKEW                         ESS=   573  sig=4  GFC=1.00  calm=0.10  COVID=0.69
+    VOL+TERM+DISP+SKEW                        ESS=   553  sig=3  GFC=0.93  calm=0.19  COVID=1.00
+    DD+CPS+DISP+SKEW                          ESS=   548  sig=3  GFC=1.00  calm=0.11  COVID=1.00
+    DD+VOL+TERM+CPS                           ESS=   546  sig=4  GFC=1.00  calm=0.09  COVID=1.00
+    DD+LVIX+ADR+SKEW                          ESS=   543  sig=3  GFC=0.86  calm=0.11  COVID=0.67
+    DD+VOL+TERM+SKEW                          ESS=   520  sig=4  GFC=0.89  calm=0.10  COVID=0.67
+    DD+CS+TERM+CPS                            ESS=   514  sig=4  GFC=1.00  calm=0.09  COVID=0.92
+    VOL+CS+DISP+SKEW                          ESS=   507  sig=4  GFC=0.90  calm=0.22  COVID=0.67
+    DD+DISP+ADR+SKEW                          ESS=   506  sig=4  GFC=0.86  calm=0.11  COVID=0.67
+    DD+CS+LVIX+SKEW                           ESS=   506  sig=4  GFC=0.92  calm=0.13  COVID=0.67
+    VOL+CS+CPS+REL_N                          ESS=   504  sig=4  GFC=1.00  calm=0.00  COVID=0.50
+    VOL+HY_OAS+DISP+SKEW                      ESS=   497  sig=3  GFC=0.97  calm=0.30  COVID=1.00
+    DD+VOL+HY_OAS+DISP                        ESS=   491  sig=4  GFC=0.93  calm=0.22  COVID=1.00
+    VOL+CS+LVIX+ADR                           ESS=   462  sig=3  GFC=1.00  calm=0.25  COVID=0.68
+    DD+VOL+SKEW+REL_N                         ESS=   456  sig=4  GFC=0.90  calm=0.11  COVID=0.67
+    DD+HY_OAS+SKEW+REL_N                      ESS=   445  sig=3  GFC=0.89  calm=0.11  COVID=0.99
+    VOL+LVIX+CPS+SKEW                         ESS=   436  sig=4  GFC=1.00  calm=0.04  COVID=1.00
+    DD+VOL+ADR+SKEW                           ESS=   428  sig=4  GFC=0.87  calm=0.11  COVID=0.67
+    DD+CPS+DISP+REL_N                         ESS=   420  sig=4  GFC=1.00  calm=0.14  COVID=1.00
+    DD+VOL+LVIX+DISP                          ESS=   416  sig=4  GFC=0.86  calm=0.13  COVID=1.00
+    VOL+CS+DISP+ADR                           ESS=   398  sig=3  GFC=0.95  calm=0.24  COVID=1.00
+    DD+CS+DISP+SKEW                           ESS=   366  sig=4  GFC=0.86  calm=0.13  COVID=0.67
+    CS+LVIX+HY_OAS+REL_N                      ESS=   359  sig=4  GFC=0.90  calm=0.19  COVID=0.67
+    DD+TERM+HY_OAS+ADR                        ESS=   353  sig=4  GFC=0.86  calm=0.09  COVID=0.81
+    DD+CPS+HY_OAS+SKEW                        ESS=   315  sig=3  GFC=1.00  calm=0.09  COVID=1.00
+    CPS+HY_OAS+ADR+REL_N                      ESS=   311  sig=2  GFC=1.00  calm=0.00  COVID=0.50
+    LVIX+TERM+CPS+DISP                        ESS=   307  sig=4  GFC=0.93  calm=0.00  COVID=0.98
+    VOL+LVIX+DISP+ADR                         ESS=   295  sig=3  GFC=1.00  calm=0.31  COVID=1.00
+    DD+CS+TERM+SKEW                           ESS=   294  sig=4  GFC=0.87  calm=0.10  COVID=0.67
+    DD+VOL+TERM+DISP                          ESS=   282  sig=3  GFC=0.87  calm=0.09  COVID=1.00
+    CS+LVIX+CPS+HY_OAS                        ESS=   281  sig=3  GFC=1.00  calm=0.26  COVID=0.45
+    CPS+HY_OAS+SKEW+REL_N                     ESS=   278  sig=3  GFC=1.00  calm=0.03  COVID=1.00
+    VOL+CS+HY_OAS+SKEW                        ESS=   277  sig=3  GFC=0.85  calm=0.20  COVID=0.64
+    DD+VOL+LVIX+ADR                           ESS=   265  sig=4  GFC=0.86  calm=0.11  COVID=0.79
+    DD+CS+DISP+ADR                            ESS=   260  sig=4  GFC=0.86  calm=0.10  COVID=0.71
+    DD+CPS+SKEW+REL_N                         ESS=   248  sig=3  GFC=1.00  calm=0.11  COVID=1.00
+    VOL+TERM+CPS+DISP                         ESS=   217  sig=4  GFC=0.94  calm=0.00  COVID=1.00
+    VOL+CS+SKEW+REL_N                         ESS=   206  sig=3  GFC=0.95  calm=0.28  COVID=0.67
+    VOL+CS+TERM+CPS                           ESS=   199  sig=3  GFC=1.00  calm=0.00  COVID=0.53
+    CS+ADR+SKEW+REL_N                         ESS=   193  sig=2  GFC=0.88  calm=0.28  COVID=0.66
+    CS+HY_OAS+DISP+SKEW                       ESS=   182  sig=3  GFC=0.94  calm=0.31  COVID=1.00
+    DD+CS+TERM+ADR                            ESS=   172  sig=4  GFC=0.85  calm=0.10  COVID=0.67
+    DD+VOL+CS+DISP                            ESS=   155  sig=4  GFC=0.86  calm=0.11  COVID=0.98
+    VOL+CPS+SKEW+REL_N                        ESS=   145  sig=4  GFC=1.00  calm=0.27  COVID=1.00
+    DD+VOL+DISP+ADR                           ESS=   131  sig=4  GFC=0.86  calm=0.11  COVID=0.83
+    VOL+DISP+ADR+REL_N                        ESS=   124  sig=3  GFC=0.96  calm=0.34  COVID=1.00
+    LVIX+TERM+HY_OAS+ADR                      ESS=   120  sig=3  GFC=1.00  calm=0.09  COVID=0.69
+    DD+CS+HY_OAS+REL_N                        ESS=   112  sig=4  GFC=0.90  calm=0.09  COVID=0.74
+    DD+CPS+ADR+REL_N                          ESS=   103  sig=4  GFC=1.00  calm=0.10  COVID=0.56
+    DD+LVIX+DISP+SKEW                         ESS=   103  sig=4  GFC=0.86  calm=0.14  COVID=0.67
+    LVIX+CPS+HY_OAS+SKEW                      ESS=   102  sig=3  GFC=1.00  calm=0.03  COVID=1.00
+    CS+CPS+ADR+REL_N                          ESS=    88  sig=2  GFC=1.00  calm=0.00  COVID=0.50
+    DD+CPS+HY_OAS+REL_N                       ESS=    84  sig=4  GFC=1.00  calm=0.09  COVID=0.62
+    VOL+CS+LVIX+CPS                           ESS=    83  sig=4  GFC=1.00  calm=0.00  COVID=0.00
+    VOL+CS+TERM+SKEW                          ESS=    78  sig=3  GFC=0.99  calm=0.28  COVID=0.67
+    DD+LVIX+HY_OAS+ADR                        ESS=    78  sig=3  GFC=0.87  calm=0.16  COVID=0.75
+    VOL+LVIX+DISP+SKEW                        ESS=    70  sig=3  GFC=0.99  calm=0.27  COVID=0.67
+    DD+VOL+CS+TERM                            ESS=    69  sig=4  GFC=0.86  calm=0.27  COVID=0.67
+    DD+HY_OAS+DISP+ADR                        ESS=    65  sig=3  GFC=0.86  calm=0.13  COVID=0.70
+    DD+VOL+LVIX+HY_OAS                        ESS=    61  sig=4  GFC=0.87  calm=0.12  COVID=0.86
+    DD+CS+TERM+REL_N                          ESS=    61  sig=4  GFC=0.85  calm=0.38  COVID=0.67
+    DD+TERM+DISP+ADR                          ESS=    60  sig=3  GFC=0.88  calm=0.09  COVID=0.99
+    DD+VOL+TERM+HY_OAS                        ESS=    58  sig=4  GFC=0.86  calm=0.09  COVID=0.87
+
+  Top 20 by min ESS (regardless of pass/fail):
+    CS+CPS+HY_OAS+DISP                        ESS=  1500  sig=3  GFC=1.00  calm=0.00  COVID=0.45  PASS
+    DD+LVIX+TERM+DISP                         ESS=  1500  sig=4  GFC=1.00  calm=0.09  COVID=1.00  PASS
+    VOL+TERM+CPS+REL_N                        ESS=  1500  sig=3  GFC=0.80  calm=0.48  COVID=1.00  fail
+    DD+TERM+DISP+REL_N                        ESS=  1500  sig=3  GFC=0.86  calm=0.13  COVID=1.00  PASS
+    DD+LVIX+HY_OAS+DISP                       ESS=  1500  sig=4  GFC=0.93  calm=0.23  COVID=1.00  PASS
+    DD+LVIX+TERM+ADR                          ESS=  1500  sig=4  GFC=1.00  calm=0.10  COVID=0.92  PASS
+    VOL+CS+CPS+DISP                           ESS=  1500  sig=3  GFC=1.00  calm=0.00  COVID=0.05  PASS
+    LVIX+TERM+CPS+REL_N                       ESS=  1359  sig=4  GFC=0.82  calm=0.00  COVID=1.00  PASS
+    TERM+CPS+HY_OAS+DISP                      ESS=  1354  sig=2  GFC=0.00  calm=0.45  COVID=0.89  fail
+    CS+CPS+DISP+REL_N                         ESS=  1354  sig=2  GFC=1.00  calm=0.00  COVID=0.49  PASS
+    CS+LVIX+CPS+DISP                          ESS=  1341  sig=2  GFC=1.00  calm=0.25  COVID=0.36  PASS
+    LVIX+TERM+CPS+HY_OAS                      ESS=  1339  sig=3  GFC=0.99  calm=0.00  COVID=0.99  PASS
+    HY_OAS+ADR+SKEW+REL_N                     ESS=  1332  sig=2  GFC=0.95  calm=0.33  COVID=1.00  PASS
+    CS+CPS+DISP+ADR                           ESS=  1321  sig=2  GFC=1.00  calm=0.00  COVID=0.00  PASS
+    VOL+LVIX+HY_OAS+SKEW                      ESS=  1311  sig=4  GFC=1.00  calm=0.34  COVID=1.00  PASS
+    VOL+LVIX+TERM+CPS                         ESS=  1310  sig=4  GFC=0.81  calm=0.00  COVID=0.90  PASS
+    VOL+LVIX+HY_OAS+ADR                       ESS=  1303  sig=3  GFC=0.98  calm=0.27  COVID=0.68  PASS
+    CS+LVIX+CPS+REL_N                         ESS=  1295  sig=3  GFC=1.00  calm=0.25  COVID=0.50  PASS
+    DD+CS+HY_OAS+ADR                          ESS=  1293  sig=4  GFC=0.86  calm=0.09  COVID=0.74  PASS
+    DD+TERM+HY_OAS+SKEW                       ESS=  1292  sig=4  GFC=0.87  calm=0.09  COVID=0.77  PASS
+
+================================================================================
+  PASS 2: Portfolio test — 222 combinations
+================================================================================
+
+  Preparing stock data ...
+
+  [1/222] DD+VOL+CS+LVIX (BASELINE) ... M0:SR=0.791  M1_LR:SR=1.025  M2_XGB:SR=0.852  
+
+  [2/222] DD+VOL+CS+TERM ... M0:SR=0.739  M1_LR:SR=1.025  M2_XGB:SR=0.798  
+
+  [3/222] DD+VOL+CS+CPS ... M0:SR=0.731  M1_LR:SR=1.024  M2_XGB:SR=0.974  
+
+  [4/222] DD+VOL+CS+HY_OAS ... M0:SR=0.739  M1_LR:SR=1.024  M2_XGB:SR=0.837  
+
+  [5/222] DD+VOL+CS+DISP ... M0:SR=0.810  M1_LR:SR=1.026  M2_XGB:SR=0.920  
+
+  [6/222] DD+VOL+CS+ADR ... M0:SR=0.786  M1_LR:SR=1.025  M2_XGB:SR=1.042  
+
+  [7/222] DD+VOL+CS+SKEW ... M0:SR=0.769  M1_LR:SR=1.025  M2_XGB:SR=0.933  
+
+  [8/222] DD+VOL+CS+REL_N ... M0:SR=0.738  M1_LR:SR=1.025  M2_XGB:SR=0.982  
+
+  [9/222] DD+VOL+LVIX+TERM ... M0:SR=0.870  M1_LR:SR=1.026  M2_XGB:SR=1.041  
+
+  [10/222] DD+VOL+LVIX+CPS ... M0:SR=0.812  M1_LR:SR=1.024  M2_XGB:SR=0.891  
+
+  [11/222] DD+VOL+LVIX+HY_OAS ... M0:SR=0.822  M1_LR:SR=1.024  M2_XGB:SR=0.944  
+
+  [12/222] DD+VOL+LVIX+DISP ... M0:SR=0.793  M1_LR:SR=1.025  M2_XGB:SR=1.048  
+
+  [13/222] DD+VOL+LVIX+ADR ... M0:SR=0.808  M1_LR:SR=1.025  M2_XGB:SR=0.961  
+
+  [14/222] DD+VOL+LVIX+SKEW ... M0:SR=0.875  M1_LR:SR=1.025  M2_XGB:SR=1.094  
+
+  [15/222] DD+VOL+TERM+CPS ... M0:SR=0.731  M1_LR:SR=1.024  M2_XGB:SR=0.907  
+
+  [16/222] DD+VOL+TERM+HY_OAS ... M0:SR=0.815  M1_LR:SR=1.025  M2_XGB:SR=0.881  
+
+  [17/222] DD+VOL+TERM+DISP ... M0:SR=0.801  M1_LR:SR=1.025  M2_XGB:SR=0.975  
+
+  [18/222] DD+VOL+TERM+ADR ... M0:SR=0.822  M1_LR:SR=1.024  M2_XGB:SR=0.906  
+
+  [19/222] DD+VOL+TERM+SKEW ... M0:SR=0.808  M1_LR:SR=1.025  M2_XGB:SR=0.813  
+
+  [20/222] DD+VOL+TERM+REL_N ... M0:SR=0.775  M1_LR:SR=1.025  M2_XGB:SR=0.976  
+
+  [21/222] DD+VOL+CPS+HY_OAS ... M0:SR=0.834  M1_LR:SR=1.025  M2_XGB:SR=0.916  
+
+  [22/222] DD+VOL+CPS+ADR ... M0:SR=0.819  M1_LR:SR=1.024  M2_XGB:SR=0.964  
+
+  [23/222] DD+VOL+CPS+SKEW ... M0:SR=0.832  M1_LR:SR=1.024  M2_XGB:SR=0.882  
+
+  [24/222] DD+VOL+CPS+REL_N ... M0:SR=0.780  M1_LR:SR=1.024  M2_XGB:SR=0.841  
+
+  [25/222] DD+VOL+HY_OAS+DISP ... M0:SR=0.793  M1_LR:SR=1.026  M2_XGB:SR=1.007  
+
+  [26/222] DD+VOL+HY_OAS+ADR ... M0:SR=0.853  M1_LR:SR=1.023  M2_XGB:SR=0.980  
+
+  [27/222] DD+VOL+HY_OAS+SKEW ... M0:SR=0.764  M1_LR:SR=1.024  M2_XGB:SR=0.916  
+
+  [28/222] DD+VOL+DISP+ADR ... M0:SR=0.846  M1_LR:SR=1.026  M2_XGB:SR=1.019  
+
+  [29/222] DD+VOL+DISP+SKEW ... M0:SR=0.840  M1_LR:SR=1.025  M2_XGB:SR=0.898  
+
+  [30/222] DD+VOL+DISP+REL_N ... M0:SR=0.692  M1_LR:SR=1.024  M2_XGB:SR=1.131  
+
+  [31/222] DD+VOL+ADR+SKEW ... M0:SR=0.813  M1_LR:SR=1.027  M2_XGB:SR=1.030  
+
+  [32/222] DD+VOL+ADR+REL_N ... M0:SR=0.783  M1_LR:SR=1.025  M2_XGB:SR=1.141  
+
+  [33/222] DD+VOL+SKEW+REL_N ... M0:SR=0.809  M1_LR:SR=1.025  M2_XGB:SR=0.986  
+
+  [34/222] DD+CS+LVIX+TERM ... M0:SR=0.903  M1_LR:SR=1.026  M2_XGB:SR=0.697  
+
+  [35/222] DD+CS+LVIX+CPS ... M0:SR=0.755  M1_LR:SR=1.025  M2_XGB:SR=0.881  
+
+  [36/222] DD+CS+LVIX+HY_OAS ... M0:SR=0.736  M1_LR:SR=1.024  M2_XGB:SR=0.887  
+
+  [37/222] DD+CS+LVIX+ADR ... M0:SR=0.783  M1_LR:SR=1.026  M2_XGB:SR=0.950  
+
+  [38/222] DD+CS+LVIX+SKEW ... M0:SR=0.839  M1_LR:SR=1.024  M2_XGB:SR=1.011  
+
+  [39/222] DD+CS+LVIX+REL_N ... M0:SR=0.799  M1_LR:SR=1.025  M2_XGB:SR=1.002  
+
+  [40/222] DD+CS+TERM+CPS ... M0:SR=0.691  M1_LR:SR=1.024  M2_XGB:SR=0.932  
+
+  [41/222] DD+CS+TERM+HY_OAS ... M0:SR=0.733  M1_LR:SR=1.024  M2_XGB:SR=0.937  
+
+  [42/222] DD+CS+TERM+ADR ... M0:SR=0.743  M1_LR:SR=1.026  M2_XGB:SR=0.980  
+
+  [43/222] DD+CS+TERM+SKEW ... M0:SR=0.744  M1_LR:SR=1.025  M2_XGB:SR=1.026  
+
+  [44/222] DD+CS+TERM+REL_N ... M0:SR=0.751  M1_LR:SR=1.024  M2_XGB:SR=1.019  
+
+  [45/222] DD+CS+CPS+HY_OAS ... M0:SR=0.744  M1_LR:SR=1.025  M2_XGB:SR=0.911  
+
+  [46/222] DD+CS+CPS+ADR ... M0:SR=0.764  M1_LR:SR=1.024  M2_XGB:SR=0.794  
+
+  [47/222] DD+CS+CPS+SKEW ... M0:SR=0.759  M1_LR:SR=1.024  M2_XGB:SR=0.923  
+
+  [48/222] DD+CS+CPS+REL_N ... M0:SR=0.742  M1_LR:SR=1.024  M2_XGB:SR=0.850  
+
+  [49/222] DD+CS+HY_OAS+DISP ... M0:SR=0.772  M1_LR:SR=1.024  M2_XGB:SR=0.915  
+
+  [50/222] DD+CS+HY_OAS+ADR ... M0:SR=0.791  M1_LR:SR=1.024  M2_XGB:SR=0.936  
+
+  [51/222] DD+CS+HY_OAS+SKEW ... M0:SR=0.721  M1_LR:SR=1.025  M2_XGB:SR=0.902  
+
+  [52/222] DD+CS+HY_OAS+REL_N ... M0:SR=0.793  M1_LR:SR=1.025  M2_XGB:SR=0.918  
+
+  [53/222] DD+CS+DISP+ADR ... M0:SR=0.781  M1_LR:SR=1.025  M2_XGB:SR=0.741  
+
+  [54/222] DD+CS+DISP+SKEW ... M0:SR=0.730  M1_LR:SR=1.026  M2_XGB:SR=1.160  
+
+  [55/222] DD+CS+DISP+REL_N ... M0:SR=0.651  M1_LR:SR=1.025  M2_XGB:SR=1.139  
+
+  [56/222] DD+CS+ADR+SKEW ... M0:SR=0.743  M1_LR:SR=1.026  M2_XGB:SR=0.957  
+
+  [57/222] DD+CS+ADR+REL_N ... M0:SR=0.702  M1_LR:SR=1.026  M2_XGB:SR=0.958  
+
+  [58/222] DD+CS+SKEW+REL_N ... M0:SR=0.736  M1_LR:SR=1.025  M2_XGB:SR=1.005  
+
+  [59/222] DD+LVIX+TERM+CPS ... M0:SR=0.840  M1_LR:SR=1.024  M2_XGB:SR=0.953  
+
+  [60/222] DD+LVIX+TERM+DISP ... M0:SR=0.875  M1_LR:SR=1.026  M2_XGB:SR=0.970  
+
+  [61/222] DD+LVIX+TERM+ADR ... M0:SR=0.880  M1_LR:SR=1.026  M2_XGB:SR=0.871  
+
+  [62/222] DD+LVIX+TERM+SKEW ... M0:SR=0.883  M1_LR:SR=1.026  M2_XGB:SR=0.807  
+
+  [63/222] DD+LVIX+TERM+REL_N ... M0:SR=0.872  M1_LR:SR=1.024  M2_XGB:SR=0.941  
+
+  [64/222] DD+LVIX+CPS+HY_OAS ... M0:SR=0.867  M1_LR:SR=1.025  M2_XGB:SR=0.907  
+
+  [65/222] DD+LVIX+CPS+DISP ... M0:SR=0.717  M1_LR:SR=1.025  M2_XGB:SR=0.863  
+
+  [66/222] DD+LVIX+CPS+ADR ... M0:SR=0.824  M1_LR:SR=1.024  M2_XGB:SR=1.005  
+
+  [67/222] DD+LVIX+CPS+SKEW ... M0:SR=0.798  M1_LR:SR=1.024  M2_XGB:SR=0.945  
+
+  [68/222] DD+LVIX+HY_OAS+DISP ... M0:SR=0.734  M1_LR:SR=1.026  M2_XGB:SR=0.896  
+
+  [69/222] DD+LVIX+HY_OAS+ADR ... M0:SR=0.757  M1_LR:SR=1.024  M2_XGB:SR=0.943  
+
+  [70/222] DD+LVIX+HY_OAS+REL_N ... M0:SR=0.888  M1_LR:SR=1.024  M2_XGB:SR=1.005  
+
+  [71/222] DD+LVIX+DISP+ADR ... M0:SR=0.840  M1_LR:SR=1.026  M2_XGB:SR=0.911  
+
+  [72/222] DD+LVIX+DISP+SKEW ... M0:SR=0.837  M1_LR:SR=1.024  M2_XGB:SR=0.857  
+
+  [73/222] DD+LVIX+DISP+REL_N ... M0:SR=0.727  M1_LR:SR=1.025  M2_XGB:SR=0.976  
+
+  [74/222] DD+LVIX+ADR+SKEW ... M0:SR=0.850  M1_LR:SR=1.026  M2_XGB:SR=1.054  
+
+  [75/222] DD+LVIX+SKEW+REL_N ... M0:SR=0.810  M1_LR:SR=1.025  M2_XGB:SR=0.995  
+
+  [76/222] DD+TERM+CPS+HY_OAS ... M0:SR=0.776  M1_LR:SR=1.025  M2_XGB:SR=0.898  
+
+  [77/222] DD+TERM+CPS+DISP ... M0:SR=0.761  M1_LR:SR=1.025  M2_XGB:SR=0.833  
+
+  [78/222] DD+TERM+CPS+ADR ... M0:SR=0.854  M1_LR:SR=1.024  M2_XGB:SR=1.143  
+
+  [79/222] DD+TERM+CPS+SKEW ... M0:SR=0.823  M1_LR:SR=1.023  M2_XGB:SR=0.991  
+
+  [80/222] DD+TERM+CPS+REL_N ... M0:SR=0.681  M1_LR:SR=1.023  M2_XGB:SR=1.158  
+
+  [81/222] DD+TERM+HY_OAS+ADR ... M0:SR=0.806  M1_LR:SR=1.024  M2_XGB:SR=0.894  
+
+  [82/222] DD+TERM+HY_OAS+SKEW ... M0:SR=0.783  M1_LR:SR=1.024  M2_XGB:SR=0.806  
+
+  [83/222] DD+TERM+DISP+ADR ... M0:SR=0.765  M1_LR:SR=1.026  M2_XGB:SR=0.674  
+
+  [84/222] DD+TERM+DISP+SKEW ... M0:SR=0.857  M1_LR:SR=1.024  M2_XGB:SR=1.018  
+
+  [85/222] DD+TERM+DISP+REL_N ... M0:SR=0.710  M1_LR:SR=1.024  M2_XGB:SR=0.941  
+
+  [86/222] DD+TERM+ADR+SKEW ... M0:SR=0.821  M1_LR:SR=1.025  M2_XGB:SR=0.967  
+
+  [87/222] DD+CPS+HY_OAS+ADR ... M0:SR=0.768  M1_LR:SR=1.025  M2_XGB:SR=0.917  
+
+  [88/222] DD+CPS+HY_OAS+SKEW ... M0:SR=0.734  M1_LR:SR=1.025  M2_XGB:SR=0.894  
+
+  [89/222] DD+CPS+HY_OAS+REL_N ... M0:SR=0.721  M1_LR:SR=1.025  M2_XGB:SR=0.774  
+
+  [90/222] DD+CPS+DISP+ADR ... M0:SR=0.784  M1_LR:SR=1.024  M2_XGB:SR=0.737  
+
+  [91/222] DD+CPS+DISP+SKEW ... M0:SR=0.703  M1_LR:SR=1.024  M2_XGB:SR=0.899  
+
+  [92/222] DD+CPS+DISP+REL_N ... M0:SR=0.757  M1_LR:SR=1.025  M2_XGB:SR=0.942  
+
+  [93/222] DD+CPS+ADR+SKEW ... M0:SR=0.807  M1_LR:SR=1.024  M2_XGB:SR=0.938  
+
+  [94/222] DD+CPS+ADR+REL_N ... M0:SR=0.787  M1_LR:SR=1.024  M2_XGB:SR=1.022  
+
+  [95/222] DD+CPS+SKEW+REL_N ... M0:SR=0.822  M1_LR:SR=1.024  M2_XGB:SR=0.902  
+
+  [96/222] DD+HY_OAS+DISP+ADR ... M0:SR=0.762  M1_LR:SR=1.025  M2_XGB:SR=0.947  
+
+  [97/222] DD+HY_OAS+DISP+REL_N ... M0:SR=0.820  M1_LR:SR=1.025  M2_XGB:SR=1.127  
+
+  [98/222] DD+HY_OAS+ADR+SKEW ... M0:SR=0.815  M1_LR:SR=1.024  M2_XGB:SR=0.813  
+
+  [99/222] DD+HY_OAS+ADR+REL_N ... M0:SR=0.768  M1_LR:SR=1.025  M2_XGB:SR=0.936  
+
+  [100/222] DD+HY_OAS+SKEW+REL_N ... M0:SR=0.804  M1_LR:SR=1.025  M2_XGB:SR=0.883  
+
+  [101/222] DD+DISP+ADR+SKEW ... M0:SR=0.797  M1_LR:SR=1.026  M2_XGB:SR=1.087  
+
+  [102/222] DD+DISP+ADR+REL_N ... M0:SR=0.710  M1_LR:SR=1.025  M2_XGB:SR=1.034  
+
+  [103/222] DD+DISP+SKEW+REL_N ... M0:SR=0.760  M1_LR:SR=1.025  M2_XGB:SR=1.127  
+
+  [104/222] DD+ADR+SKEW+REL_N ... M0:SR=0.768  M1_LR:SR=1.023  M2_XGB:SR=0.989  
+
+  [105/222] VOL+CS+LVIX+CPS ... M0:SR=0.716  M1_LR:SR=1.026  M2_XGB:SR=0.803  
+
+  [106/222] VOL+CS+LVIX+HY_OAS ... M0:SR=0.761  M1_LR:SR=1.025  M2_XGB:SR=0.939  
+
+  [107/222] VOL+CS+LVIX+DISP ... M0:SR=0.833  M1_LR:SR=1.025  M2_XGB:SR=0.971  
+
+  [108/222] VOL+CS+LVIX+ADR ... M0:SR=0.867  M1_LR:SR=1.025  M2_XGB:SR=0.754  
+
+  [109/222] VOL+CS+LVIX+SKEW ... M0:SR=0.849  M1_LR:SR=1.025  M2_XGB:SR=1.099  
+
+  [110/222] VOL+CS+LVIX+REL_N ... M0:SR=0.830  M1_LR:SR=1.026  M2_XGB:SR=0.736  
+
+  [111/222] VOL+CS+TERM+CPS ... M0:SR=0.716  M1_LR:SR=1.025  M2_XGB:SR=0.847  
+
+  [112/222] VOL+CS+TERM+SKEW ... M0:SR=0.791  M1_LR:SR=1.024  M2_XGB:SR=0.949  
+
+  [113/222] VOL+CS+CPS+HY_OAS ... M0:SR=0.697  M1_LR:SR=1.024  M2_XGB:SR=0.848  
+
+  [114/222] VOL+CS+CPS+DISP ... M0:SR=0.710  M1_LR:SR=1.025  M2_XGB:SR=0.834  
+
+  [115/222] VOL+CS+CPS+ADR ... M0:SR=0.695  M1_LR:SR=1.025  M2_XGB:SR=0.634  
+
+  [116/222] VOL+CS+CPS+SKEW ... M0:SR=0.693  M1_LR:SR=1.025  M2_XGB:SR=0.759  
+
+  [117/222] VOL+CS+CPS+REL_N ... M0:SR=0.749  M1_LR:SR=1.025  M2_XGB:SR=0.698  
+
+  [118/222] VOL+CS+HY_OAS+DISP ... M0:SR=0.835  M1_LR:SR=1.026  M2_XGB:SR=0.927  
+
+  [119/222] VOL+CS+HY_OAS+ADR ... M0:SR=0.726  M1_LR:SR=1.026  M2_XGB:SR=0.953  
+
+  [120/222] VOL+CS+HY_OAS+SKEW ... M0:SR=0.727  M1_LR:SR=1.025  M2_XGB:SR=0.895  
+
+  [121/222] VOL+CS+DISP+ADR ... M0:SR=0.808  M1_LR:SR=1.024  M2_XGB:SR=0.855  
+
+  [122/222] VOL+CS+DISP+SKEW ... M0:SR=0.778  M1_LR:SR=1.026  M2_XGB:SR=0.802  
+
+  [123/222] VOL+CS+ADR+SKEW ... M0:SR=0.830  M1_LR:SR=1.024  M2_XGB:SR=0.956  
+
+  [124/222] VOL+CS+SKEW+REL_N ... M0:SR=0.747  M1_LR:SR=1.025  M2_XGB:SR=0.820  
+
+  [125/222] VOL+LVIX+TERM+CPS ... M0:SR=0.771  M1_LR:SR=1.027  M2_XGB:SR=0.910  
+
+  [126/222] VOL+LVIX+TERM+DISP ... M0:SR=0.726  M1_LR:SR=1.025  M2_XGB:SR=0.885  
+
+  [127/222] VOL+LVIX+TERM+ADR ... M0:SR=0.897  M1_LR:SR=1.025  M2_XGB:SR=0.622  
+
+  [128/222] VOL+LVIX+CPS+HY_OAS ... M0:SR=0.938  M1_LR:SR=1.025  M2_XGB:SR=0.870  
+
+  [129/222] VOL+LVIX+CPS+DISP ... M0:SR=0.716  M1_LR:SR=1.027  M2_XGB:SR=0.748  
+
+  [130/222] VOL+LVIX+CPS+ADR ... M0:SR=0.694  M1_LR:SR=1.024  M2_XGB:SR=0.910  
+
+  [131/222] VOL+LVIX+CPS+SKEW ... M0:SR=0.854  M1_LR:SR=1.026  M2_XGB:SR=0.814  
+
+  [132/222] VOL+LVIX+HY_OAS+DISP ... M0:SR=0.737  M1_LR:SR=1.027  M2_XGB:SR=0.884  
+
+  [133/222] VOL+LVIX+HY_OAS+ADR ... M0:SR=0.881  M1_LR:SR=1.025  M2_XGB:SR=0.996  
+
+  [134/222] VOL+LVIX+HY_OAS+SKEW ... M0:SR=0.848  M1_LR:SR=1.025  M2_XGB:SR=0.925  
+
+  [135/222] VOL+LVIX+DISP+ADR ... M0:SR=0.733  M1_LR:SR=1.023  M2_XGB:SR=0.861  
+
+  [136/222] VOL+LVIX+DISP+SKEW ... M0:SR=0.858  M1_LR:SR=1.026  M2_XGB:SR=0.838  
+
+  [137/222] VOL+LVIX+DISP+REL_N ... M0:SR=0.768  M1_LR:SR=1.024  M2_XGB:SR=1.059  
+
+  [138/222] VOL+LVIX+ADR+SKEW ... M0:SR=0.948  M1_LR:SR=1.025  M2_XGB:SR=0.820  
+
+  [139/222] VOL+LVIX+ADR+REL_N ... M0:SR=0.830  M1_LR:SR=1.025  M2_XGB:SR=0.939  
+
+  [140/222] VOL+LVIX+SKEW+REL_N ... M0:SR=0.858  M1_LR:SR=1.025  M2_XGB:SR=0.799  
+
+  [141/222] VOL+TERM+CPS+DISP ... M0:SR=0.825  M1_LR:SR=1.028  M2_XGB:SR=0.794  
+
+  [142/222] VOL+TERM+DISP+SKEW ... M0:SR=0.830  M1_LR:SR=1.026  M2_XGB:SR=0.883  
+
+  [143/222] VOL+CPS+HY_OAS+DISP ... M0:SR=0.788  M1_LR:SR=1.025  M2_XGB:SR=0.972  
+
+  [144/222] VOL+CPS+HY_OAS+ADR ... M0:SR=0.889  M1_LR:SR=1.025  M2_XGB:SR=0.986  
+
+  [145/222] VOL+CPS+HY_OAS+SKEW ... M0:SR=0.756  M1_LR:SR=1.025  M2_XGB:SR=0.891  
+
+  [146/222] VOL+CPS+HY_OAS+REL_N ... M0:SR=0.789  M1_LR:SR=1.027  M2_XGB:SR=0.798  
+
+  [147/222] VOL+CPS+DISP+ADR ... M0:SR=0.757  M1_LR:SR=1.026  M2_XGB:SR=0.853  
+
+  [148/222] VOL+CPS+DISP+SKEW ... M0:SR=0.802  M1_LR:SR=1.026  M2_XGB:SR=0.926  
+
+  [149/222] VOL+CPS+DISP+REL_N ... M0:SR=0.714  M1_LR:SR=1.025  M2_XGB:SR=0.767  
+
+  [150/222] VOL+CPS+ADR+REL_N ... M0:SR=0.776  M1_LR:SR=1.024  M2_XGB:SR=1.023  
+
+  [151/222] VOL+CPS+SKEW+REL_N ... M0:SR=0.760  M1_LR:SR=1.025  M2_XGB:SR=0.889  
+
+  [152/222] VOL+HY_OAS+DISP+ADR ... M0:SR=0.734  M1_LR:SR=1.027  M2_XGB:SR=0.929  
+
+  [153/222] VOL+HY_OAS+DISP+SKEW ... M0:SR=0.855  M1_LR:SR=1.026  M2_XGB:SR=1.053  
+
+  [154/222] VOL+HY_OAS+DISP+REL_N ... M0:SR=0.865  M1_LR:SR=1.026  M2_XGB:SR=1.054  
+
+  [155/222] VOL+HY_OAS+ADR+SKEW ... M0:SR=0.887  M1_LR:SR=1.025  M2_XGB:SR=0.915  
+
+  [156/222] VOL+HY_OAS+ADR+REL_N ... M0:SR=0.671  M1_LR:SR=1.026  M2_XGB:SR=0.875  
+
+  [157/222] VOL+HY_OAS+SKEW+REL_N ... M0:SR=0.750  M1_LR:SR=1.026  M2_XGB:SR=0.930  
+
+  [158/222] VOL+DISP+ADR+REL_N ... M0:SR=0.666  M1_LR:SR=1.025  M2_XGB:SR=0.810  
+
+  [159/222] CS+LVIX+CPS+HY_OAS ... M0:SR=0.782  M1_LR:SR=1.024  M2_XGB:SR=0.819  
+
+  [160/222] CS+LVIX+CPS+DISP ... M0:SR=0.826  M1_LR:SR=1.024  M2_XGB:SR=0.858  
+
+  [161/222] CS+LVIX+CPS+ADR ... M0:SR=0.793  M1_LR:SR=1.024  M2_XGB:SR=0.722  
+
+  [162/222] CS+LVIX+CPS+SKEW ... M0:SR=0.782  M1_LR:SR=1.025  M2_XGB:SR=0.796  
+
+  [163/222] CS+LVIX+CPS+REL_N ... M0:SR=0.819  M1_LR:SR=1.024  M2_XGB:SR=0.804  
+
+  [164/222] CS+LVIX+HY_OAS+SKEW ... M0:SR=0.737  M1_LR:SR=1.024  M2_XGB:SR=0.845  
+
+  [165/222] CS+LVIX+HY_OAS+REL_N ... M0:SR=0.847  M1_LR:SR=1.025  M2_XGB:SR=0.897  
+
+  [166/222] CS+LVIX+ADR+SKEW ... M0:SR=0.863  M1_LR:SR=1.024  M2_XGB:SR=0.838  
+
+  [167/222] CS+LVIX+ADR+REL_N ... M0:SR=0.826  M1_LR:SR=1.024  M2_XGB:SR=0.825  
+
+  [168/222] CS+CPS+HY_OAS+DISP ... M0:SR=0.715  M1_LR:SR=1.026  M2_XGB:SR=1.065  
+
+  [169/222] CS+CPS+HY_OAS+ADR ... M0:SR=0.702  M1_LR:SR=1.024  M2_XGB:SR=0.776  
+
+  [170/222] CS+CPS+HY_OAS+SKEW ... M0:SR=0.766  M1_LR:SR=1.025  M2_XGB:SR=0.738  
+
+  [171/222] CS+CPS+DISP+ADR ... M0:SR=0.704  M1_LR:SR=1.025  M2_XGB:SR=0.915  
+
+  [172/222] CS+CPS+DISP+SKEW ... M0:SR=0.681  M1_LR:SR=1.025  M2_XGB:SR=0.832  
+
+  [173/222] CS+CPS+DISP+REL_N ... M0:SR=0.723  M1_LR:SR=1.025  M2_XGB:SR=0.842  
+
+  [174/222] CS+CPS+ADR+SKEW ... M0:SR=0.763  M1_LR:SR=1.024  M2_XGB:SR=0.841  
+
+  [175/222] CS+CPS+ADR+REL_N ... M0:SR=0.707  M1_LR:SR=1.024  M2_XGB:SR=0.707  
+
+  [176/222] CS+CPS+SKEW+REL_N ... M0:SR=0.718  M1_LR:SR=1.025  M2_XGB:SR=1.103  
+
+  [177/222] CS+HY_OAS+DISP+ADR ... M0:SR=0.711  M1_LR:SR=1.027  M2_XGB:SR=0.944  
+
+  [178/222] CS+HY_OAS+DISP+SKEW ... M0:SR=0.801  M1_LR:SR=1.022  M2_XGB:SR=0.822  
+
+  [179/222] CS+HY_OAS+DISP+REL_N ... M0:SR=0.736  M1_LR:SR=1.025  M2_XGB:SR=0.822  
+
+  [180/222] CS+HY_OAS+ADR+SKEW ... M0:SR=0.751  M1_LR:SR=1.023  M2_XGB:SR=0.946  
+
+  [181/222] CS+HY_OAS+ADR+REL_N ... M0:SR=0.790  M1_LR:SR=1.024  M2_XGB:SR=0.998  
+
+  [182/222] CS+HY_OAS+SKEW+REL_N ... M0:SR=0.791  M1_LR:SR=1.024  M2_XGB:SR=0.869  
+
+  [183/222] CS+ADR+SKEW+REL_N ... M0:SR=0.755  M1_LR:SR=1.026  M2_XGB:SR=0.960  
+
+  [184/222] LVIX+TERM+CPS+HY_OAS ... M0:SR=0.761  M1_LR:SR=1.027  M2_XGB:SR=0.862  
+
+  [185/222] LVIX+TERM+CPS+DISP ... M0:SR=0.772  M1_LR:SR=1.028  M2_XGB:SR=0.731  
+
+  [186/222] LVIX+TERM+CPS+ADR ... M0:SR=0.766  M1_LR:SR=1.027  M2_XGB:SR=0.820  
+
+  [187/222] LVIX+TERM+CPS+SKEW ... M0:SR=0.809  M1_LR:SR=1.026  M2_XGB:SR=0.825  
+
+  [188/222] LVIX+TERM+CPS+REL_N ... M0:SR=0.762  M1_LR:SR=1.026  M2_XGB:SR=0.550  
+
+  [189/222] LVIX+TERM+HY_OAS+DISP ... M0:SR=0.664  M1_LR:SR=1.027  M2_XGB:SR=0.860  
+
+  [190/222] LVIX+TERM+HY_OAS+ADR ... M0:SR=0.923  M1_LR:SR=1.027  M2_XGB:SR=0.874  
+
+  [191/222] LVIX+TERM+HY_OAS+REL_N ... M0:SR=0.756  M1_LR:SR=1.027  M2_XGB:SR=0.891  
+
+  [192/222] LVIX+TERM+DISP+ADR ... M0:SR=0.838  M1_LR:SR=1.024  M2_XGB:SR=0.785  
+
+  [193/222] LVIX+TERM+DISP+SKEW ... M0:SR=0.856  M1_LR:SR=1.027  M2_XGB:SR=1.000  
+
+  [194/222] LVIX+TERM+ADR+SKEW ... M0:SR=0.899  M1_LR:SR=1.026  M2_XGB:SR=0.811  
+
+  [195/222] LVIX+TERM+ADR+REL_N ... M0:SR=0.859  M1_LR:SR=1.025  M2_XGB:SR=0.825  
+
+  [196/222] LVIX+CPS+HY_OAS+DISP ... M0:SR=0.783  M1_LR:SR=1.028  M2_XGB:SR=0.712  
+
+  [197/222] LVIX+CPS+HY_OAS+ADR ... M0:SR=0.914  M1_LR:SR=1.029  M2_XGB:SR=0.766  
+
+  [198/222] LVIX+CPS+HY_OAS+SKEW ... M0:SR=0.824  M1_LR:SR=1.027  M2_XGB:SR=0.864  
+
+  [199/222] LVIX+CPS+HY_OAS+REL_N ... M0:SR=0.714  M1_LR:SR=1.026  M2_XGB:SR=0.855  
+
+  [200/222] LVIX+CPS+DISP+ADR ... M0:SR=0.665  M1_LR:SR=1.026  M2_XGB:SR=0.965  
+
+  [201/222] LVIX+CPS+DISP+SKEW ... M0:SR=0.816  M1_LR:SR=1.027  M2_XGB:SR=0.969  
+
+  [202/222] LVIX+CPS+DISP+REL_N ... M0:SR=0.702  M1_LR:SR=1.025  M2_XGB:SR=0.683  
+
+  [203/222] LVIX+CPS+ADR+SKEW ... M0:SR=0.816  M1_LR:SR=1.026  M2_XGB:SR=0.826  
+
+  [204/222] LVIX+CPS+ADR+REL_N ... M0:SR=0.683  M1_LR:SR=1.025  M2_XGB:SR=0.946  
+
+  [205/222] LVIX+CPS+SKEW+REL_N ... M0:SR=0.738  M1_LR:SR=1.025  M2_XGB:SR=0.872  
+
+  [206/222] LVIX+HY_OAS+DISP+ADR ... M0:SR=0.756  M1_LR:SR=1.024  M2_XGB:SR=0.938  
+
+  [207/222] LVIX+HY_OAS+DISP+SKEW ... M0:SR=0.728  M1_LR:SR=1.024  M2_XGB:SR=1.061  
+
+  [208/222] LVIX+HY_OAS+ADR+SKEW ... M0:SR=0.801  M1_LR:SR=1.024  M2_XGB:SR=0.855  
+
+  [209/222] LVIX+DISP+ADR+SKEW ... M0:SR=0.900  M1_LR:SR=1.025  M2_XGB:SR=0.937  
+
+  [210/222] LVIX+DISP+ADR+REL_N ... M0:SR=0.728  M1_LR:SR=1.024  M2_XGB:SR=0.814  
+
+  [211/222] LVIX+DISP+SKEW+REL_N ... M0:SR=0.723  M1_LR:SR=1.024  M2_XGB:SR=0.921  
+
+  [212/222] LVIX+ADR+SKEW+REL_N ... M0:SR=0.824  M1_LR:SR=1.024  M2_XGB:SR=0.910  
+
+  [213/222] CPS+HY_OAS+DISP+ADR ... M0:SR=0.738  M1_LR:SR=1.027  M2_XGB:SR=0.805  
+
+  [214/222] CPS+HY_OAS+DISP+SKEW ... M0:SR=0.779  M1_LR:SR=1.028  M2_XGB:SR=1.010  
+
+  [215/222] CPS+HY_OAS+ADR+REL_N ... M0:SR=0.722  M1_LR:SR=1.025  M2_XGB:SR=0.753  
+
+  [216/222] CPS+HY_OAS+SKEW+REL_N ... M0:SR=0.744  M1_LR:SR=1.025  M2_XGB:SR=0.843  
+
+  [217/222] CPS+DISP+ADR+SKEW ... M0:SR=0.855  M1_LR:SR=1.027  M2_XGB:SR=0.734  
+
+  [218/222] CPS+DISP+ADR+REL_N ... M0:SR=0.850  M1_LR:SR=1.029  M2_XGB:SR=1.048  
+
+  [219/222] HY_OAS+DISP+ADR+REL_N ... M0:SR=0.719  M1_LR:SR=1.025  M2_XGB:SR=0.971  
+
+  [220/222] HY_OAS+DISP+SKEW+REL_N ... M0:SR=0.826  M1_LR:SR=1.027  M2_XGB:SR=0.917  
+
+  [221/222] HY_OAS+ADR+SKEW+REL_N ... M0:SR=0.724  M1_LR:SR=1.027  M2_XGB:SR=0.853  
+
+  [222/222] DISP+ADR+SKEW+REL_N ... M0:SR=0.822  M1_LR:SR=1.024  M2_XGB:SR=0.799  
+
+  Pass 2 complete in 16701s
+
+================================================================================
+  RESULTS SUMMARY
+================================================================================
+
+  Combination                                 M0 SR    M1 SR    M2 SR
+  ----------------------------------------------------------------------
+  DD+CS+DISP+SKEW                             0.730    1.026    1.160
+  DD+TERM+CPS+REL_N                           0.681    1.023    1.158
+  DD+TERM+CPS+ADR                             0.854    1.024    1.143
+  DD+VOL+ADR+REL_N                            0.783    1.025    1.141
+  DD+CS+DISP+REL_N                            0.651    1.025    1.139
+  DD+VOL+DISP+REL_N                           0.692    1.024    1.131
+  DD+HY_OAS+DISP+REL_N                        0.820    1.025    1.127
+  DD+DISP+SKEW+REL_N                          0.760    1.025    1.127
+  CS+CPS+SKEW+REL_N                           0.718    1.025    1.103
+  VOL+CS+LVIX+SKEW                            0.849    1.025    1.099
+  DD+VOL+LVIX+SKEW                            0.875    1.025    1.094
+  DD+DISP+ADR+SKEW                            0.797    1.026    1.087
+  CS+CPS+HY_OAS+DISP                          0.715    1.026    1.065
+  LVIX+HY_OAS+DISP+SKEW                       0.728    1.024    1.061
+  VOL+LVIX+DISP+REL_N                         0.768    1.024    1.059
+  VOL+HY_OAS+DISP+REL_N                       0.865    1.026    1.054
+  DD+LVIX+ADR+SKEW                            0.850    1.026    1.054
+  VOL+HY_OAS+DISP+SKEW                        0.855    1.026    1.053
+  CPS+DISP+ADR+REL_N                          0.850    1.029    1.048
+  DD+VOL+LVIX+DISP                            0.793    1.025    1.048
+  DD+VOL+CS+ADR                               0.786    1.025    1.042
+  DD+VOL+LVIX+TERM                            0.870    1.026    1.041
+  DD+DISP+ADR+REL_N                           0.710    1.025    1.034
+  DD+VOL+ADR+SKEW                             0.813    1.027    1.030
+  DD+CS+TERM+SKEW                             0.744    1.025    1.026
+  VOL+CPS+ADR+REL_N                           0.776    1.024    1.023
+  DD+CPS+ADR+REL_N                            0.787    1.024    1.022
+  DD+CS+TERM+REL_N                            0.751    1.024    1.019
+  DD+VOL+DISP+ADR                             0.846    1.026    1.019
+  DD+TERM+DISP+SKEW                           0.857    1.024    1.018
+  DD+CS+LVIX+SKEW                             0.839    1.024    1.011
+  CPS+HY_OAS+DISP+SKEW                        0.779    1.028    1.010
+  DD+VOL+HY_OAS+DISP                          0.793    1.026    1.007
+  DD+CS+SKEW+REL_N                            0.736    1.025    1.005
+  DD+LVIX+HY_OAS+REL_N                        0.888    1.024    1.005
+  DD+LVIX+CPS+ADR                             0.824    1.024    1.005
+  DD+CS+LVIX+REL_N                            0.799    1.025    1.002
+  LVIX+TERM+DISP+SKEW                         0.856    1.027    1.000
+  CS+HY_OAS+ADR+REL_N                         0.790    1.024    0.998
+  VOL+LVIX+HY_OAS+ADR                         0.881    1.025    0.996
+  DD+LVIX+SKEW+REL_N                          0.810    1.025    0.995
+  DD+TERM+CPS+SKEW                            0.823    1.023    0.991
+  DD+ADR+SKEW+REL_N                           0.768    1.023    0.989
+  DD+VOL+SKEW+REL_N                           0.809    1.025    0.986
+  VOL+CPS+HY_OAS+ADR                          0.889    1.025    0.986
+  DD+VOL+CS+REL_N                             0.738    1.025    0.982
+  DD+VOL+HY_OAS+ADR                           0.853    1.023    0.980
+  DD+CS+TERM+ADR                              0.743    1.026    0.980
+  DD+LVIX+DISP+REL_N                          0.727    1.025    0.976
+  DD+VOL+TERM+REL_N                           0.775    1.025    0.976
+  DD+VOL+TERM+DISP                            0.801    1.025    0.975
+  DD+VOL+CS+CPS                               0.731    1.024    0.974
+  VOL+CPS+HY_OAS+DISP                         0.788    1.025    0.972
+  VOL+CS+LVIX+DISP                            0.833    1.025    0.971
+  HY_OAS+DISP+ADR+REL_N                       0.719    1.025    0.971
+  DD+LVIX+TERM+DISP                           0.875    1.026    0.970
+  LVIX+CPS+DISP+SKEW                          0.816    1.027    0.969
+  DD+TERM+ADR+SKEW                            0.821    1.025    0.967
+  LVIX+CPS+DISP+ADR                           0.665    1.026    0.965
+  DD+VOL+CPS+ADR                              0.819    1.024    0.964
+  DD+VOL+LVIX+ADR                             0.808    1.025    0.961
+  CS+ADR+SKEW+REL_N                           0.755    1.026    0.960
+  DD+CS+ADR+REL_N                             0.702    1.026    0.958
+  DD+CS+ADR+SKEW                              0.743    1.026    0.957
+  VOL+CS+ADR+SKEW                             0.830    1.024    0.956
+  VOL+CS+HY_OAS+ADR                           0.726    1.026    0.953
+  DD+LVIX+TERM+CPS                            0.840    1.024    0.953
+  DD+CS+LVIX+ADR                              0.783    1.026    0.950
+  VOL+CS+TERM+SKEW                            0.791    1.024    0.949
+  DD+HY_OAS+DISP+ADR                          0.762    1.025    0.947
+  LVIX+CPS+ADR+REL_N                          0.683    1.025    0.946
+  CS+HY_OAS+ADR+SKEW                          0.751    1.023    0.946
+  DD+LVIX+CPS+SKEW                            0.798    1.024    0.945
+  DD+VOL+LVIX+HY_OAS                          0.822    1.024    0.944
+  CS+HY_OAS+DISP+ADR                          0.711    1.027    0.944
+  DD+LVIX+HY_OAS+ADR                          0.757    1.024    0.943
+  DD+CPS+DISP+REL_N                           0.757    1.025    0.942
+  DD+TERM+DISP+REL_N                          0.710    1.024    0.941
+  DD+LVIX+TERM+REL_N                          0.872    1.024    0.941
+  VOL+CS+LVIX+HY_OAS                          0.761    1.025    0.939
+  VOL+LVIX+ADR+REL_N                          0.830    1.025    0.939
+  DD+CPS+ADR+SKEW                             0.807    1.024    0.938
+  LVIX+HY_OAS+DISP+ADR                        0.756    1.024    0.938
+  DD+CS+TERM+HY_OAS                           0.733    1.024    0.937
+  LVIX+DISP+ADR+SKEW                          0.900    1.025    0.937
+  DD+HY_OAS+ADR+REL_N                         0.768    1.025    0.936
+  DD+CS+HY_OAS+ADR                            0.791    1.024    0.936
+  DD+VOL+CS+SKEW                              0.769    1.025    0.933
+  DD+CS+TERM+CPS                              0.691    1.024    0.932
+  VOL+HY_OAS+SKEW+REL_N                       0.750    1.026    0.930
+  VOL+HY_OAS+DISP+ADR                         0.734    1.027    0.929
+  VOL+CS+HY_OAS+DISP                          0.835    1.026    0.927
+  VOL+CPS+DISP+SKEW                           0.802    1.026    0.926
+  VOL+LVIX+HY_OAS+SKEW                        0.848    1.025    0.925
+  DD+CS+CPS+SKEW                              0.759    1.024    0.923
+  LVIX+DISP+SKEW+REL_N                        0.723    1.024    0.921
+  DD+VOL+CS+DISP                              0.810    1.026    0.920
+  DD+CS+HY_OAS+REL_N                          0.793    1.025    0.918
+  HY_OAS+DISP+SKEW+REL_N                      0.826    1.027    0.917
+  DD+CPS+HY_OAS+ADR                           0.768    1.025    0.917
+  DD+VOL+HY_OAS+SKEW                          0.764    1.024    0.916
+  DD+VOL+CPS+HY_OAS                           0.834    1.025    0.916
+  VOL+HY_OAS+ADR+SKEW                         0.887    1.025    0.915
+  DD+CS+HY_OAS+DISP                           0.772    1.024    0.915
+  CS+CPS+DISP+ADR                             0.704    1.025    0.915
+  DD+CS+CPS+HY_OAS                            0.744    1.025    0.911
+  DD+LVIX+DISP+ADR                            0.840    1.026    0.911
+  VOL+LVIX+CPS+ADR                            0.694    1.024    0.910
+  VOL+LVIX+TERM+CPS                           0.771    1.027    0.910
+  LVIX+ADR+SKEW+REL_N                         0.824    1.024    0.910
+  DD+VOL+TERM+CPS                             0.731    1.024    0.907
+  DD+LVIX+CPS+HY_OAS                          0.867    1.025    0.907
+  DD+VOL+TERM+ADR                             0.822    1.024    0.906
+  DD+CS+HY_OAS+SKEW                           0.721    1.025    0.902
+  DD+CPS+SKEW+REL_N                           0.822    1.024    0.902
+  DD+CPS+DISP+SKEW                            0.703    1.024    0.899
+  DD+VOL+DISP+SKEW                            0.840    1.025    0.898
+  DD+TERM+CPS+HY_OAS                          0.776    1.025    0.898
+  CS+LVIX+HY_OAS+REL_N                        0.847    1.025    0.897
+  DD+LVIX+HY_OAS+DISP                         0.734    1.026    0.896
+  VOL+CS+HY_OAS+SKEW                          0.727    1.025    0.895
+  DD+TERM+HY_OAS+ADR                          0.806    1.024    0.894
+  DD+CPS+HY_OAS+SKEW                          0.734    1.025    0.894
+  LVIX+TERM+HY_OAS+REL_N                      0.756    1.027    0.891
+  VOL+CPS+HY_OAS+SKEW                         0.756    1.025    0.891
+  DD+VOL+LVIX+CPS                             0.812    1.024    0.891
+  VOL+CPS+SKEW+REL_N                          0.760    1.025    0.889
+  DD+CS+LVIX+HY_OAS                           0.736    1.024    0.887
+  VOL+LVIX+TERM+DISP                          0.726    1.025    0.885
+  VOL+LVIX+HY_OAS+DISP                        0.737    1.027    0.884
+  DD+HY_OAS+SKEW+REL_N                        0.804    1.025    0.883
+  VOL+TERM+DISP+SKEW                          0.830    1.026    0.883
+  DD+VOL+CPS+SKEW                             0.832    1.024    0.882
+  DD+CS+LVIX+CPS                              0.755    1.025    0.881
+  DD+VOL+TERM+HY_OAS                          0.815    1.025    0.881
+  VOL+HY_OAS+ADR+REL_N                        0.671    1.026    0.875
+  LVIX+TERM+HY_OAS+ADR                        0.923    1.027    0.874
+  LVIX+CPS+SKEW+REL_N                         0.738    1.025    0.872
+  DD+LVIX+TERM+ADR                            0.880    1.026    0.871
+  VOL+LVIX+CPS+HY_OAS                         0.938    1.025    0.870
+  CS+HY_OAS+SKEW+REL_N                        0.791    1.024    0.869
+  LVIX+CPS+HY_OAS+SKEW                        0.824    1.027    0.864
+  DD+LVIX+CPS+DISP                            0.717    1.025    0.863
+  LVIX+TERM+CPS+HY_OAS                        0.761    1.027    0.862
+  VOL+LVIX+DISP+ADR                           0.733    1.023    0.861
+  LVIX+TERM+HY_OAS+DISP                       0.664    1.027    0.860
+  CS+LVIX+CPS+DISP                            0.826    1.024    0.858
+  DD+LVIX+DISP+SKEW                           0.837    1.024    0.857
+  LVIX+HY_OAS+ADR+SKEW                        0.801    1.024    0.855
+  VOL+CS+DISP+ADR                             0.808    1.024    0.855
+  LVIX+CPS+HY_OAS+REL_N                       0.714    1.026    0.855
+  VOL+CPS+DISP+ADR                            0.757    1.026    0.853
+  HY_OAS+ADR+SKEW+REL_N                       0.724    1.027    0.853
+  DD+VOL+CS+LVIX (BASELINE)                   0.791    1.025    0.852
+  DD+CS+CPS+REL_N                             0.742    1.024    0.850
+  VOL+CS+CPS+HY_OAS                           0.697    1.024    0.848
+  VOL+CS+TERM+CPS                             0.716    1.025    0.847
+  CS+LVIX+HY_OAS+SKEW                         0.737    1.024    0.845
+  CPS+HY_OAS+SKEW+REL_N                       0.744    1.025    0.843
+  CS+CPS+DISP+REL_N                           0.723    1.025    0.842
+  CS+CPS+ADR+SKEW                             0.763    1.024    0.841
+  DD+VOL+CPS+REL_N                            0.780    1.024    0.841
+  CS+LVIX+ADR+SKEW                            0.863    1.024    0.838
+  VOL+LVIX+DISP+SKEW                          0.858    1.026    0.838
+  DD+VOL+CS+HY_OAS                            0.739    1.024    0.837
+  VOL+CS+CPS+DISP                             0.710    1.025    0.834
+  DD+TERM+CPS+DISP                            0.761    1.025    0.833
+  CS+CPS+DISP+SKEW                            0.681    1.025    0.832
+  LVIX+CPS+ADR+SKEW                           0.816    1.026    0.826
+  LVIX+TERM+CPS+SKEW                          0.809    1.026    0.825
+  CS+LVIX+ADR+REL_N                           0.826    1.024    0.825
+  LVIX+TERM+ADR+REL_N                         0.859    1.025    0.825
+  CS+HY_OAS+DISP+REL_N                        0.736    1.025    0.822
+  CS+HY_OAS+DISP+SKEW                         0.801    1.022    0.822
+  VOL+CS+SKEW+REL_N                           0.747    1.025    0.820
+  VOL+LVIX+ADR+SKEW                           0.948    1.025    0.820
+  LVIX+TERM+CPS+ADR                           0.766    1.027    0.820
+  CS+LVIX+CPS+HY_OAS                          0.782    1.024    0.819
+  LVIX+DISP+ADR+REL_N                         0.728    1.024    0.814
+  VOL+LVIX+CPS+SKEW                           0.854    1.026    0.814
+  DD+HY_OAS+ADR+SKEW                          0.815    1.024    0.813
+  DD+VOL+TERM+SKEW                            0.808    1.025    0.813
+  LVIX+TERM+ADR+SKEW                          0.899    1.026    0.811
+  VOL+DISP+ADR+REL_N                          0.666    1.025    0.810
+  DD+LVIX+TERM+SKEW                           0.883    1.026    0.807
+  DD+TERM+HY_OAS+SKEW                         0.783    1.024    0.806
+  CPS+HY_OAS+DISP+ADR                         0.738    1.027    0.805
+  CS+LVIX+CPS+REL_N                           0.819    1.024    0.804
+  VOL+CS+LVIX+CPS                             0.716    1.026    0.803
+  VOL+CS+DISP+SKEW                            0.778    1.026    0.802
+  VOL+LVIX+SKEW+REL_N                         0.858    1.025    0.799
+  DISP+ADR+SKEW+REL_N                         0.822    1.024    0.799
+  VOL+CPS+HY_OAS+REL_N                        0.789    1.027    0.798
+  DD+VOL+CS+TERM                              0.739    1.025    0.798
+  CS+LVIX+CPS+SKEW                            0.782    1.025    0.796
+  VOL+TERM+CPS+DISP                           0.825    1.028    0.794
+  DD+CS+CPS+ADR                               0.764    1.024    0.794
+  LVIX+TERM+DISP+ADR                          0.838    1.024    0.785
+  CS+CPS+HY_OAS+ADR                           0.702    1.024    0.776
+  DD+CPS+HY_OAS+REL_N                         0.721    1.025    0.774
+  VOL+CPS+DISP+REL_N                          0.714    1.025    0.767
+  LVIX+CPS+HY_OAS+ADR                         0.914    1.029    0.766
+  VOL+CS+CPS+SKEW                             0.693    1.025    0.759
+  VOL+CS+LVIX+ADR                             0.867    1.025    0.754
+  CPS+HY_OAS+ADR+REL_N                        0.722    1.025    0.753
+  VOL+LVIX+CPS+DISP                           0.716    1.027    0.748
+  DD+CS+DISP+ADR                              0.781    1.025    0.741
+  CS+CPS+HY_OAS+SKEW                          0.766    1.025    0.738
+  DD+CPS+DISP+ADR                             0.784    1.024    0.737
+  VOL+CS+LVIX+REL_N                           0.830    1.026    0.736
+  CPS+DISP+ADR+SKEW                           0.855    1.027    0.734
+  LVIX+TERM+CPS+DISP                          0.772    1.028    0.731
+  CS+LVIX+CPS+ADR                             0.793    1.024    0.722
+  LVIX+CPS+HY_OAS+DISP                        0.783    1.028    0.712
+  CS+CPS+ADR+REL_N                            0.707    1.024    0.707
+  VOL+CS+CPS+REL_N                            0.749    1.025    0.698
+  DD+CS+LVIX+TERM                             0.903    1.026    0.697
+  LVIX+CPS+DISP+REL_N                         0.702    1.025    0.683
+  DD+TERM+DISP+ADR                            0.765    1.026    0.674
+  VOL+CS+CPS+ADR                              0.695    1.025    0.634
+  VOL+LVIX+TERM+ADR                           0.897    1.025    0.622
+  LVIX+TERM+CPS+REL_N                         0.762    1.026    0.550
+
+================================================================================
