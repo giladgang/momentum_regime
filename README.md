@@ -126,8 +126,8 @@ The LaTeX build also runs on every push via [.github/workflows/latex.yml](.githu
 @mastersthesis{gilad_thesis,
   author  = {Gilad Gang},
   title   = {Momentum and Regime Shifts},
-  school  = {<institution>},
-  year    = {<year>},
+  school  = {Tilburg University},
+  year    = {2026},
   note    = {See https://github.com/giladgang/thesis_git for the reproducible pipeline.}
 }
 ```
