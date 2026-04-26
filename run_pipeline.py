@@ -201,12 +201,6 @@ def main():
         16: ('scripts/tree_combo_grouped.py',
              'STEP 16: Grouped combo analysis (S/M/I/L horizon interactions by regime)'),
 
-        17: ('scripts/test_2008_oos.py',
-             'STEP 17: GFC out-of-sample test (2008-2009 crisis)'),
-
-        18: ('scripts/expanding_window.py',
-             'STEP 18: Expanding-window HMM re-estimation (app:expanding)'),
-
         19: ('scripts/expanding_window_backtest_parallel.py '
              '--first-retrain-year 1995 --last-retrain-year 2024 '
              '--hmm-seeds 200 --xgb-seeds 50 --workers 6 --tag prod',
