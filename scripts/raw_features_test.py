@@ -121,18 +121,21 @@ def block_bootstrap_sharpe(r, n_boot=10000, block_len=12):
     lo, hi = np.percentile(sharpes, [2.5, 97.5])
     return lo, hi
 
-def newey_west_t(r_strat, r_bench, maxlags=6):
-    """Newey-West t-stat for mean excess return vs benchmark."""
+def newey_west_t(r_strat, r_bench=None, maxlags=6):
+    """Newey-West t-stat for H0: mean return = 0.
+
+    Matches the thesis convention used in table_performance.tex
+    (main_results_analysis.py). For market-neutral L/S strategies the
+    standard test is mean = 0; market exposure is controlled separately
+    in the factor-alpha table, not by ad-hoc subtraction here. The
+    `r_bench` argument is retained for backwards compatibility but
+    ignored."""
     r_strat = pd.Series(r_strat)
-    r_bench = pd.Series(r_bench)
-    common = r_strat.index.intersection(r_bench.index)
-    excess = r_strat.loc[common].values - r_bench.loc[common].values
-    excess = np.asarray(excess, dtype=float)
-    excess = excess[~np.isnan(excess)]
-    if len(excess) < 12:
+    vals = r_strat.dropna().values.astype(float)
+    if len(vals) < 12:
         return np.nan, np.nan
-    X = np.ones((len(excess), 1))
-    model = sm.OLS(excess, X).fit(cov_type='HAC', cov_kwds={'maxlags': maxlags})
+    X = np.ones((len(vals), 1))
+    model = sm.OLS(vals, X).fit(cov_type='HAC', cov_kwds={'maxlags': maxlags})
     return model.tvalues[0], model.pvalues[0]
 
 def sig_stars(p):

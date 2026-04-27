@@ -77,6 +77,22 @@ print(f"XGB seeds:    {args.xgb_seeds}")
 stocks = pd.read_parquet(STOCK_PANEL)
 stocks['date'] = pd.to_datetime(stocks['date'])
 stocks = stocks.sort_values(['secid', 'date']).reset_index(drop=True)
+
+# Prefer Shumway-corrected returns if `apply_shumway_intl.py` has been run
+# (it writes a new `ret_adj` column without overwriting `ret`). Recompute
+# `ret_fwd` from the corrected returns so the cross-sectional model trains
+# and predicts on the corrected series. If `ret_adj` is absent we fall back
+# to the original `ret` (legacy / un-treated panel).
+if 'ret_adj' in stocks.columns:
+    n_changed = int((stocks['ret_adj'] != stocks['ret']).sum()
+                    - (stocks['ret_adj'].isna() & stocks['ret'].isna()).sum())
+    print(f"\n[ 1/5 ] ret_adj column present ({n_changed:,} rows differ "
+          f"from ret); recomputing ret_fwd from ret_adj.")
+    # Recompute ret_fwd from corrected returns. We do NOT overwrite the
+    # original `ret` column — apply_shumway_intl.py preserves it for
+    # diagnostic comparison, and nothing downstream reads `ret` directly
+    # (the model trains/predicts on FEATURES + ret_fwd only).
+    stocks['ret_fwd'] = stocks.groupby('secid')['ret_adj'].shift(-1)
 print(f"\n[ 1/5 ] Loaded stock panel: {len(stocks):,} rows  |  "
       f"{stocks['secid'].nunique():,} securities  |  "
       f"{stocks['date'].min().date()} -> {stocks['date'].max().date()}")

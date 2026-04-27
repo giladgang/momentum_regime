@@ -168,13 +168,17 @@ def full_metrics(r, r_mkt, pi_series):
     else:
         beta = np.nan
 
-    # Newey-West t on raw return (H0: mean = 0)
+    # Newey-West t on raw return (H0: mean = 0). Matches the thesis
+    # convention used in table_performance.tex (main_results_analysis.py).
+    # For market-neutral L/S strategies the standard test is mean = 0; the
+    # market exposure is controlled separately in the factor-alpha table.
     nw = sm.OLS(r.values, np.ones((n, 1))).fit(cov_type='HAC',
                                                  cov_kwds={'maxlags': 6})
     nw_t, nw_p = float(nw.tvalues[0]), float(nw.pvalues[0])
 
-    # Newey-West t on excess return over the market (matches thesis convention
-    # for the published table_performance.tex: see conclusion.tex limitations).
+    # Mean-excess-vs-market t-stat retained for diagnostic comparison only;
+    # NOT used in any published table. Test C/D (factor regression) is the
+    # right way to control for market exposure (see compute_factor_alphas).
     common = r.index.intersection(r_mkt.index)
     if len(common) > 12:
         excess = r.loc[common].values - r_mkt.loc[common].values
@@ -411,8 +415,10 @@ def fmt_beta(b):
     return f'$-${abs(b):.2f}' if b < 0 else f'{b:.2f}'
 
 fund_row = next(r for r in results if r['name'] == 'full_mom_pi_fund')
-# Thesis convention: NW t on r - r_mkt (excess return over market).
-nw_str = f"{fund_row['nw_t_excess']:.2f}{sig_stars(fund_row['nw_p_excess'])}"
+# Thesis convention: raw mean t-stat (H0: mean = 0), matching
+# table_performance.tex. Market exposure is controlled in the factor-alpha
+# table, not by ad-hoc subtraction.
+nw_str = f"{fund_row['nw_t']:.2f}{sig_stars(fund_row['nw_p'])}"
 def fmt_pct(x):
     return f"{x*100:.1f}\\%"
 row = (f"M2: XGB (mom+$\\pi$+fund) & "
