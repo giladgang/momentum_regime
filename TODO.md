@@ -89,9 +89,33 @@ Genuinely new findings or significant reframings. Each item is a writing task. *
   - Data: [`results/xgb_cv_results.csv`](results/xgb_cv_results.csv) (group by fold), [`results/hmm_cv_features.csv`](results/hmm_cv_features.csv)
   - Cross-link to existing §5.4.3 30-year backtest discussion (the dot-com loss documented there is the same failure manifested in real history)
 
-#### N5 — NW t-stat significance jump — SHARPEN existing prose
+#### N5 — NW t-stat significance jump — REFRAME defensive paragraph + sharpen
 
+**More than just a number swap.** The current `latex/conclusion.tex` paragraph **defends** the low t-stat:
+
+> "The Newey-West t-statistic on M2's excess return over the market is **1.83**; this reflects the strategy's near-zero market beta, and the economically meaningful test is the factor model alpha..."
+
+With t=4.37\*\*\* post-Shumway, this defensive framing is no longer needed and reads awkwardly. The paragraph should be **rewritten**, not just have the number swapped.
+
+- [ ] Rewrite the defensive t-stat paragraph in `latex/conclusion.tex` (currently in the limitations/caveats section). New framing: "The Newey-West t-statistic on M2's excess return over the market is 4.37\*\*\* post-Shumway, well above conventional thresholds. The factor-model alphas in Appendix~\ref{app:factor_alphas} confirm this across all five factor specifications (t > 4)."
 - [ ] One-line emphasis wherever the t-stat appears in `latex/main_results.tex`: **t-stat 1.83\* → 4.37\*\*\*** post-Shumway. Marginal → highly significant. Largest single result of the Shumway treatment.
+
+#### N8 — IC paradox — NEW prose (genuinely missing from thesis)
+
+`latex/*.tex` contains **no comparison** between M2's per-stock IC and naive momentum's IC. The IC table exists in the appendix but the paradox is not framed in prose anywhere.
+
+- [ ] Add prose (likely in `latex/main_results.tex` mechanism section): M2 IC = **−0.005 (n.s.)** vs naive momentum IC = **+0.027 (t=3.15\*\*\*)**. M2 has *worse* per-stock IC than naive momentum yet much better portfolio Sharpe. The edge is **portfolio construction** (decile-spread + regime-conditional ranking), NOT improved per-stock prediction.
+  - Data: [`tables/table_ic.tex`](tables/table_ic.tex)
+  - Paired diff M2 − Mom = −0.031 (t = −2.95\*\*\*) — M2 is *significantly worse* at IC by a paired test
+  - Why this matters: distinguishes M2's edge from a "better momentum signal" interpretation. Connects to N7 (negative UMD loading) — same novelty story from a different angle.
+
+#### N9 — Already strong in existing thesis (verify only, no new prose)
+
+Items that the thesis already frames well; just verify post-Shumway numbers updated via Bucket 1:
+
+- [ ] **Panic subtypes** — `latex/main_results.tex` already says "the overall panic Sharpe of 1.56 is driven entirely by recovery months" with all the right numbers. Just verify the −0.49 / +4.42 / Sharpe-2.35 numbers in PROSE_EDITS.md.
+- [ ] **Ridge baseline** — `latex/main_results.tex` 5.3 nonlinearity section already discusses ridge failure. Just verify the −0.58 number lands consistently and the "all alphas give the same answer" claim is preserved.
+- [ ] **Term-structure framing** — `latex/conclusion.tex` already mentions "term-structure reorganisation". Detailed §5.2 figure explanations are already tracked in the "Pre-existing thesis-writing tasks" section below (improve Chapter 5.2 graphs).
 
 #### N6 — Connect 30-year backtest to stress scenario — REFRAME
 
