@@ -169,7 +169,8 @@ def test_expanding_window_integration_small(tmp_path):
     """Run a 2-year expanding window at minimum seeds and verify the output
     shape, continuity, and basic sanity. Takes ~5 min on a fast machine."""
     tag = 'pytest_integration'
-    results_dir = os.path.join(REPO, 'results')
+    # Outputs land in results/thesis/ post-restructure (config.RESULTS_THESIS_DIR).
+    results_dir = os.path.join(REPO, 'results', 'thesis')
     returns_path = os.path.join(results_dir, f'expanding_returns_{tag}.csv')
     pi_path = os.path.join(results_dir, f'expanding_pi_filter_{tag}.csv')
     log_path = os.path.join(results_dir, f'expanding_summary_{tag}.csv')

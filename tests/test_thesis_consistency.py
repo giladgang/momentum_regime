@@ -31,6 +31,7 @@ if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 import config as cfg
+from tests import _expected as EXP
 
 LATEX_DIR = os.path.join(PROJECT_ROOT, "latex")
 TABLES_DIR = os.path.join(PROJECT_ROOT, cfg.TABLES_DIR)
@@ -186,22 +187,22 @@ class TestTableConsistency:
     def test_table_performance_m2_sharpe(self):
         tbl = _read("tables/table_performance.tex")
         val = float(_find_in_table(tbl, "M2: XGB", 3))  # Sharpe column
-        assert val == pytest.approx(1.11, abs=0.01), (
-            f"M2 Sharpe in table_performance = {val}, expected 1.11"
+        assert val == pytest.approx(EXP.M2_SHARPE_FULL, abs=EXP.TOL_SHARPE), (
+            f"M2 Sharpe in table_performance = {val}, expected {EXP.M2_SHARPE_FULL}"
         )
 
     def test_table_performance_m2_ann_ret(self):
         tbl = _read("tables/table_performance.tex")
         val = float(_find_in_table(tbl, "M2: XGB", 1))  # Ann. Ret column
-        assert val == pytest.approx(21.7, abs=0.1), (
-            f"M2 Ann.Ret in table_performance = {val}, expected 21.7"
+        assert val == pytest.approx(EXP.M2_ANN_RET_PCT, abs=EXP.TOL_ANN_PCT), (
+            f"M2 Ann.Ret in table_performance = {val}, expected {EXP.M2_ANN_RET_PCT}"
         )
 
     def test_table_performance_m2_ann_vol(self):
         tbl = _read("tables/table_performance.tex")
         val = float(_find_in_table(tbl, "M2: XGB", 2))  # Ann. Vol column
-        assert val == pytest.approx(19.5, abs=0.1), (
-            f"M2 Ann.Vol in table_performance = {val}, expected 19.5"
+        assert val == pytest.approx(EXP.M2_ANN_VOL_PCT, abs=EXP.TOL_ANN_PCT), (
+            f"M2 Ann.Vol in table_performance = {val}, expected {EXP.M2_ANN_VOL_PCT}"
         )
 
     def test_table_performance_m2_mdd(self):
@@ -216,22 +217,22 @@ class TestTableConsistency:
     def test_table_regime_sharpe_m2_full(self):
         tbl = _read("tables/table_regime_sharpe.tex")
         val = float(_find_in_table(tbl, "M2: XGB", 1))  # Full column
-        assert val == pytest.approx(1.11, abs=0.01), (
-            f"M2 Full Sharpe in table_regime_sharpe = {val}, expected 1.11"
+        assert val == pytest.approx(EXP.M2_SHARPE_FULL, abs=EXP.TOL_SHARPE), (
+            f"M2 Full Sharpe in table_regime_sharpe = {val}, expected {EXP.M2_SHARPE_FULL}"
         )
 
     def test_table_regime_sharpe_m2_calm(self):
         tbl = _read("tables/table_regime_sharpe.tex")
         val = float(_find_in_table(tbl, "M2: XGB", 2))  # Calm column
-        assert val == pytest.approx(0.84, abs=0.01), (
-            f"M2 Calm Sharpe in table_regime_sharpe = {val}, expected 0.84"
+        assert val == pytest.approx(EXP.M2_SHARPE_CALM, abs=EXP.TOL_REGIME_SHARPE), (
+            f"M2 Calm Sharpe in table_regime_sharpe = {val}, expected {EXP.M2_SHARPE_CALM}"
         )
 
     def test_table_regime_sharpe_m2_panic(self):
         tbl = _read("tables/table_regime_sharpe.tex")
         val = float(_find_in_table(tbl, "M2: XGB", 3))  # Panic column
-        assert val == pytest.approx(1.53, abs=0.01), (
-            f"M2 Panic Sharpe in table_regime_sharpe = {val}, expected 1.53"
+        assert val == pytest.approx(EXP.M2_SHARPE_PANIC, abs=EXP.TOL_REGIME_SHARPE), (
+            f"M2 Panic Sharpe in table_regime_sharpe = {val}, expected {EXP.M2_SHARPE_PANIC}"
         )
 
     # --- table_regime_signal_ablation.tex ---
@@ -239,8 +240,8 @@ class TestTableConsistency:
     def test_table_ablation_hmm_sharpe(self):
         tbl = _read("tables/table_regime_signal_ablation.tex")
         val = float(_find_in_table(tbl, "HMM", 3))  # Sharpe column
-        assert val == pytest.approx(1.109, abs=0.01), (
-            f"HMM Sharpe in ablation table = {val}, expected 1.109"
+        assert val == pytest.approx(EXP.ABLATION_HMM_SHARPE, abs=EXP.TOL_ABLATION), (
+            f"HMM Sharpe in ablation table = {val}, expected {EXP.ABLATION_HMM_SHARPE}"
         )
 
     def test_table_ablation_no_signal_sharpe(self):
@@ -277,55 +278,55 @@ class TestTableConsistency:
 
     def test_table_subperiod_m2_values(self):
         tbl = _read("tables/table_subperiod.tex")
-        expected_sharpes = [0.59, 1.04, 1.70]
-        for i, expected in enumerate(expected_sharpes):
+        for i, expected in enumerate(EXP.SUBPERIOD_M2):
             val = float(_find_in_table(tbl, "M2: XGB", i + 1))
-            assert val == pytest.approx(expected, abs=0.01), (
+            assert val == pytest.approx(expected, abs=EXP.TOL_SUBPERIOD), (
                 f"M2 subperiod {i+1} Sharpe = {val}, expected {expected}"
             )
 
     def test_table_subperiod_m2_full(self):
         tbl = _read("tables/table_subperiod.tex")
         val = float(_find_in_table(tbl, "M2: XGB", 4))  # Full column
-        assert val == pytest.approx(1.11, abs=0.01), (
-            f"M2 Full Sharpe in subperiod table = {val}, expected 1.11"
+        assert val == pytest.approx(EXP.M2_SHARPE_FULL, abs=EXP.TOL_SHARPE), (
+            f"M2 Full Sharpe in subperiod table = {val}, expected {EXP.M2_SHARPE_FULL}"
         )
 
     # --- main_results.tex inline numbers match tables ---
 
     def test_main_results_sharpe_inline(self):
         text = _read("latex/main_results.tex")
-        # "annualised Sharpe of 1.11"
-        assert "Sharpe of 1.11" in text or "Sharpe 1.11" in text, (
-            "main_results.tex does not contain 'Sharpe of 1.11' or 'Sharpe 1.11'"
+        # Require an explicit token boundary so this can't pass on
+        # an unrelated "1.110...". Match "Sharpe ... 1.11" with optional
+        # "of" between, and a non-digit boundary after.
+        assert re.search(r"Sharpe(?:\s+of)?\s+1\.11(?!\d)", text), (
+            "main_results.tex does not contain a 'Sharpe ... 1.11' inline claim"
         )
 
     def test_main_results_alpha_inline(self):
         text = _read("latex/main_results.tex")
-        # "six-factor alpha of 24.1%" (post-Shumway recalibrated value)
-        assert "24.1" in text, (
-            "main_results.tex does not contain alpha value 24.1"
+        # six-factor alpha — match "24.1" not followed by a digit
+        assert re.search(r"24\.1(?!\d)", text), (
+            f"main_results.tex does not contain alpha value {EXP.FF6_ALPHA_PCT}"
         )
 
     def test_main_results_alpha_matches_factor_table(self):
         tbl = _read("tables/table_factor_alphas.tex")
-        # FF6 alpha = 24.7
         val = float(_find_in_table(tbl, "FF6", 1))
-        assert val == pytest.approx(24.1, abs=0.1), (
-            f"FF6 alpha in factor_alphas table = {val}, expected 24.1"
+        assert val == pytest.approx(EXP.FF6_ALPHA_PCT, abs=EXP.TOL_ALPHA), (
+            f"FF6 alpha in factor_alphas table = {val}, expected {EXP.FF6_ALPHA_PCT}"
         )
 
     def test_main_results_alpha_tstat_inline(self):
         text = _read("latex/main_results.tex")
-        assert "4.81" in text, (
-            "main_results.tex does not contain alpha t-stat 4.81"
+        assert re.search(r"4\.81(?!\d)", text), (
+            f"main_results.tex does not contain alpha t-stat {EXP.FF6_TSTAT}"
         )
 
     def test_main_results_alpha_tstat_matches_factor_table(self):
         tbl = _read("tables/table_factor_alphas.tex")
         val = float(_find_in_table(tbl, "FF6", 2))  # t(alpha) column
-        assert val == pytest.approx(4.81, abs=0.01), (
-            f"FF6 t(alpha) in factor_alphas table = {val}, expected 4.81"
+        assert val == pytest.approx(EXP.FF6_TSTAT, abs=EXP.TOL_TSTAT), (
+            f"FF6 t(alpha) in factor_alphas table = {val}, expected {EXP.FF6_TSTAT}"
         )
 
     def test_main_results_panic_sharpe_inline(self):
@@ -358,8 +359,9 @@ class TestTableConsistency:
 
     def test_conclusion_sharpe_inline(self):
         text = _read("latex/conclusion.tex")
-        assert "1.11" in text or "Sharpe" in text, (
-            "conclusion.tex does not reference key Sharpe result"
+        # Require an actual numeric reference, not just the word "Sharpe".
+        assert re.search(r"1\.11(?!\d)", text), (
+            "conclusion.tex does not reference Sharpe 1.11"
         )
 
     def test_conclusion_mentions_167_months(self):

@@ -34,6 +34,7 @@ if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 import config as cfg
+from tests import _expected as EXP
 
 LATEX_DIR = os.path.join(PROJECT_ROOT, "latex")
 TABLES_DIR = os.path.join(PROJECT_ROOT, cfg.TABLES_DIR)
@@ -503,8 +504,8 @@ class TestPortfolioReturns:
         for name, ret_series in strats.items():
             if "xgb" in name.lower() or "m2" in name.lower():
                 ann_ret = (1 + ret_series).prod() ** (12 / len(ret_series)) - 1
-                assert ann_ret * 100 == pytest.approx(21.7, abs=0.5), (
-                    f"M2 ann ret = {ann_ret*100:.1f}%, expected 21.9%"
+                assert ann_ret * 100 == pytest.approx(EXP.M2_ANN_RET_PCT, abs=EXP.TOL_ANN_PCT), (
+                    f"M2 ann ret = {ann_ret*100:.2f}%, expected {EXP.M2_ANN_RET_PCT}%"
                 )
                 break
 
@@ -514,8 +515,8 @@ class TestPortfolioReturns:
         for name, ret_series in strats.items():
             if "xgb" in name.lower() or "m2" in name.lower():
                 ann_vol = ret_series.std() * np.sqrt(12)
-                assert ann_vol * 100 == pytest.approx(19.7, abs=0.5), (
-                    f"M2 ann vol = {ann_vol*100:.1f}%, expected 19.7%"
+                assert ann_vol * 100 == pytest.approx(EXP.M2_ANN_VOL_PCT, abs=EXP.TOL_ANN_PCT), (
+                    f"M2 ann vol = {ann_vol*100:.2f}%, expected {EXP.M2_ANN_VOL_PCT}%"
                 )
                 break
 
@@ -757,11 +758,10 @@ class TestCrossTableConsistency:
         val_abl = float(_find_in_table(ablation, "HMM", 1))
         val_jan_baseline = float(_find_in_table(jan, "M2: XGB", 1))
 
-        # Post-Shumway: 21.9% → 21.7% (small downward drift, Shumway-coherent).
-        # The cross-table consistency check is preserved — all tables agree.
-        assert val_perf == pytest.approx(21.7, abs=0.2)
-        assert val_abl == pytest.approx(21.7, abs=0.2)
-        assert val_jan_baseline == pytest.approx(21.7, abs=0.2)
+        # All three tables must agree on M2's annual return.
+        assert val_perf == pytest.approx(EXP.M2_ANN_RET_PCT, abs=EXP.TOL_ANN_PCT)
+        assert val_abl == pytest.approx(EXP.M2_ANN_RET_PCT, abs=EXP.TOL_ANN_PCT)
+        assert val_jan_baseline == pytest.approx(EXP.M2_ANN_RET_PCT, abs=EXP.TOL_ANN_PCT)
 
     def test_m2_vol_across_tables(self):
         perf = _read("tables/table_performance.tex")
@@ -770,9 +770,8 @@ class TestCrossTableConsistency:
         val_perf = float(_find_in_table(perf, "M2: XGB", 2))
         val_abl = float(_find_in_table(ablation, "HMM", 2))
 
-        # Post-Shumway: 19.7% → 19.5% (small drift, Shumway-coherent).
-        assert val_perf == pytest.approx(19.5, abs=0.2)
-        assert val_abl == pytest.approx(19.5, abs=0.2)
+        assert val_perf == pytest.approx(EXP.M2_ANN_VOL_PCT, abs=EXP.TOL_ANN_PCT)
+        assert val_abl == pytest.approx(EXP.M2_ANN_VOL_PCT, abs=EXP.TOL_ANN_PCT)
 
     def test_m2_mdd_across_tables(self):
         perf = _read("tables/table_performance.tex")
@@ -1239,7 +1238,7 @@ class TestReproducibilityArtifacts:
             val = float(row[ret_col[0]].iloc[0])
             if val < 1:
                 val *= 100
-            assert val == pytest.approx(21.9, abs=1.0)
+            assert val == pytest.approx(EXP.DEPTH4_ANN_RET_PCT, abs=EXP.TOL_DEPTH)
 
     def test_risk_aversion_results_exists(self):
         path = os.path.join(PROJECT_ROOT, cfg.RESULTS_DIR, "thesis", "risk_aversion_thesis_results.csv")
@@ -1264,13 +1263,12 @@ class TestFactorAlphas:
     def test_ff6_alpha(self):
         tbl = _read("tables/table_factor_alphas.tex")
         val = float(_find_in_table(tbl, "FF6", 1))
-        # Post-Shumway: 24.7 → 24.1 (~2% drift, Shumway-coherent).
-        assert val == pytest.approx(24.1, abs=0.3)
+        assert val == pytest.approx(EXP.FF6_ALPHA_PCT, abs=EXP.TOL_ALPHA)
 
     def test_ff6_tstat(self):
         tbl = _read("tables/table_factor_alphas.tex")
         val = float(_find_in_table(tbl, "FF6", 2))
-        assert val == pytest.approx(4.78, abs=0.15)
+        assert val == pytest.approx(EXP.FF6_TSTAT, abs=EXP.TOL_TSTAT)
 
     def test_capm_alpha(self):
         tbl = _read("tables/table_factor_alphas.tex")
@@ -1319,14 +1317,9 @@ class TestRobustnessTables:
 
     def test_subperiod_values_match_thesis(self):
         tbl = _read("tables/table_subperiod.tex")
-        # Post-Shumway: sub-period 1 (2011-2015) shifted from 0.62 to 0.59;
-        # other sub-periods may also drift. Tolerance widened from 0.02 to
-        # 0.05 to absorb Shumway-coherent drift while still catching real
-        # regressions.
-        expected = [0.59, 1.03, 1.69]
-        for i, exp in enumerate(expected):
+        for i, exp in enumerate(EXP.SUBPERIOD_M2):
             val = float(_find_in_table(tbl, "M2: XGB", i + 1))
-            assert val == pytest.approx(exp, abs=0.05), (
+            assert val == pytest.approx(exp, abs=EXP.TOL_SUBPERIOD), (
                 f"M2 sub-period {i+1} Sharpe = {val}, expected {exp}"
             )
 

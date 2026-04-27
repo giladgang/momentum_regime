@@ -183,11 +183,13 @@ class TestArtefactSharpes:
             assert np.isfinite(sr), f"Sharpe for {name} is not finite: {sr}"
 
     def test_xgb_sharpe_within_known_band(self, artefacts):
-        """Regression guard: the XGB test-period Sharpe should sit in a
-        reasonable band. If a refactor accidentally corrupts scores, this
-        catches it. Band is intentionally loose to avoid false positives
-        from minor seed-list changes."""
+        """Regression guard: the XGB test-period Sharpe should sit close to
+        the published 1.11. The previous [0.3, 2.5] band tolerated a 70%
+        drop in headline performance and so could not catch a real
+        regression. Tightened to ±0.10 (well above 50-seed ensemble noise)."""
+        from tests import _expected as EXP
         xgb_sharpe = utils.compute_sharpe(artefacts['strategies_lo']['Method 2: XGB'])
-        assert 0.3 < xgb_sharpe < 2.5, \
-            f"XGB Sharpe {xgb_sharpe:.2f} outside plausible band [0.3, 2.5] — " \
-            "artefacts may be corrupted or config changed unexpectedly"
+        lo, hi = EXP.M2_SHARPE_FULL - 0.10, EXP.M2_SHARPE_FULL + 0.10
+        assert lo < xgb_sharpe < hi, \
+            f"XGB Sharpe {xgb_sharpe:.3f} outside band [{lo:.2f}, {hi:.2f}] — " \
+            f"published value is {EXP.M2_SHARPE_FULL}"
