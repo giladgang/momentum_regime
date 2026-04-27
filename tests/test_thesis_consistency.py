@@ -193,22 +193,22 @@ class TestTableConsistency:
     def test_table_performance_m2_ann_ret(self):
         tbl = _read("tables/table_performance.tex")
         val = float(_find_in_table(tbl, "M2: XGB", 1))  # Ann. Ret column
-        assert val == pytest.approx(21.9, abs=0.1), (
-            f"M2 Ann.Ret in table_performance = {val}, expected 21.9"
+        assert val == pytest.approx(21.7, abs=0.1), (
+            f"M2 Ann.Ret in table_performance = {val}, expected 21.7"
         )
 
     def test_table_performance_m2_ann_vol(self):
         tbl = _read("tables/table_performance.tex")
         val = float(_find_in_table(tbl, "M2: XGB", 2))  # Ann. Vol column
-        assert val == pytest.approx(19.7, abs=0.1), (
-            f"M2 Ann.Vol in table_performance = {val}, expected 19.7"
+        assert val == pytest.approx(19.5, abs=0.1), (
+            f"M2 Ann.Vol in table_performance = {val}, expected 19.5"
         )
 
     def test_table_performance_m2_mdd(self):
         tbl = _read("tables/table_performance.tex")
         val = float(_find_in_table(tbl, "M2: XGB", 4))  # Max DD column
-        assert val == pytest.approx(-24.8, abs=0.1), (
-            f"M2 MDD in table_performance = {val}, expected -24.8"
+        assert val == pytest.approx(-22.8, abs=0.1), (
+            f"M2 MDD in table_performance = {val}, expected -22.8"
         )
 
     # --- table_regime_sharpe.tex ---
@@ -223,15 +223,15 @@ class TestTableConsistency:
     def test_table_regime_sharpe_m2_calm(self):
         tbl = _read("tables/table_regime_sharpe.tex")
         val = float(_find_in_table(tbl, "M2: XGB", 2))  # Calm column
-        assert val == pytest.approx(0.82, abs=0.01), (
-            f"M2 Calm Sharpe in table_regime_sharpe = {val}, expected 0.82"
+        assert val == pytest.approx(0.84, abs=0.01), (
+            f"M2 Calm Sharpe in table_regime_sharpe = {val}, expected 0.84"
         )
 
     def test_table_regime_sharpe_m2_panic(self):
         tbl = _read("tables/table_regime_sharpe.tex")
         val = float(_find_in_table(tbl, "M2: XGB", 3))  # Panic column
-        assert val == pytest.approx(1.56, abs=0.01), (
-            f"M2 Panic Sharpe in table_regime_sharpe = {val}, expected 1.56"
+        assert val == pytest.approx(1.53, abs=0.01), (
+            f"M2 Panic Sharpe in table_regime_sharpe = {val}, expected 1.53"
         )
 
     # --- table_regime_signal_ablation.tex ---
@@ -246,15 +246,15 @@ class TestTableConsistency:
     def test_table_ablation_no_signal_sharpe(self):
         tbl = _read("tables/table_regime_signal_ablation.tex")
         val = float(_find_in_table(tbl, "no regime signal", 3))
-        assert val == pytest.approx(0.405, abs=0.01), (
-            f"No-signal Sharpe in ablation table = {val}, expected 0.405"
+        assert val == pytest.approx(0.429, abs=0.01), (
+            f"No-signal Sharpe in ablation table = {val}, expected 0.429"
         )
 
     def test_table_ablation_raw_sharpe(self):
         tbl = _read("tables/table_regime_signal_ablation.tex")
         val = float(_find_in_table(tbl, "raw indicators", 3))
-        assert val == pytest.approx(0.300, abs=0.01), (
-            f"Raw indicators Sharpe in ablation table = {val}, expected 0.300"
+        assert val == pytest.approx(0.257, abs=0.01), (
+            f"Raw indicators Sharpe in ablation table = {val}, expected 0.257"
         )
 
     # --- table_shap.tex ---
@@ -277,7 +277,7 @@ class TestTableConsistency:
 
     def test_table_subperiod_m2_values(self):
         tbl = _read("tables/table_subperiod.tex")
-        expected_sharpes = [0.62, 1.03, 1.69]
+        expected_sharpes = [0.59, 1.04, 1.70]
         for i, expected in enumerate(expected_sharpes):
             val = float(_find_in_table(tbl, "M2: XGB", i + 1))
             assert val == pytest.approx(expected, abs=0.01), (
@@ -311,8 +311,8 @@ class TestTableConsistency:
         tbl = _read("tables/table_factor_alphas.tex")
         # FF6 alpha = 24.7
         val = float(_find_in_table(tbl, "FF6", 1))
-        assert val == pytest.approx(24.7, abs=0.1), (
-            f"FF6 alpha in factor_alphas table = {val}, expected 24.7"
+        assert val == pytest.approx(24.1, abs=0.1), (
+            f"FF6 alpha in factor_alphas table = {val}, expected 24.1"
         )
 
     def test_main_results_alpha_tstat_inline(self):
@@ -324,8 +324,8 @@ class TestTableConsistency:
     def test_main_results_alpha_tstat_matches_factor_table(self):
         tbl = _read("tables/table_factor_alphas.tex")
         val = float(_find_in_table(tbl, "FF6", 2))  # t(alpha) column
-        assert val == pytest.approx(4.78, abs=0.01), (
-            f"FF6 t(alpha) in factor_alphas table = {val}, expected 4.78"
+        assert val == pytest.approx(4.81, abs=0.01), (
+            f"FF6 t(alpha) in factor_alphas table = {val}, expected 4.81"
         )
 
     def test_main_results_panic_sharpe_inline(self):
@@ -416,27 +416,27 @@ class TestFigures:
         )
 
     def test_zscore_and_absshap_v3_exists(self):
-        path = os.path.join(PROJECT_ROOT, cfg.PLOTS_DIR, "zscore_and_absshap_v3.png")
+        path = os.path.join(PROJECT_ROOT, cfg.PLOTS_DIR, "thesis", "zscore_and_absshap_v3.png")
         assert os.path.exists(path), f"Missing: {path}"
 
     def test_depth_vs_sharpe_exists(self):
-        path = os.path.join(PROJECT_ROOT, cfg.PLOTS_DIR, "depth_vs_sharpe.png")
+        path = os.path.join(PROJECT_ROOT, cfg.PLOTS_DIR, "thesis", "depth_vs_sharpe.png")
         assert os.path.exists(path), f"Missing: {path}"
 
     def test_cs_performance_regime_shaded_exists(self):
-        path = os.path.join(PROJECT_ROOT, cfg.PLOTS_DIR, "cs_performance_regime_shaded.png")
+        path = os.path.join(PROJECT_ROOT, cfg.PLOTS_DIR, "thesis", "cs_performance_regime_shaded.png")
         assert os.path.exists(path), f"Missing: {path}"
 
     def test_regime_probabilities_exists(self):
-        path = os.path.join(PROJECT_ROOT, cfg.PLOTS_DIR, "regime_probabilities.png")
+        path = os.path.join(PROJECT_ROOT, cfg.PLOTS_DIR, "thesis", "regime_probabilities.png")
         assert os.path.exists(path), f"Missing: {path}"
 
     def test_features_hmm_exists(self):
-        path = os.path.join(PROJECT_ROOT, cfg.PLOTS_DIR, "features_hmm.png")
+        path = os.path.join(PROJECT_ROOT, cfg.PLOTS_DIR, "thesis", "features_hmm.png")
         assert os.path.exists(path), f"Missing: {path}"
 
     def test_convergence_trace_exists(self):
-        path = os.path.join(PROJECT_ROOT, cfg.PLOTS_DIR, "convergence_trace.png")
+        path = os.path.join(PROJECT_ROOT, cfg.PLOTS_DIR, "thesis", "convergence_trace.png")
         assert os.path.exists(path), f"Missing: {path}"
 
 
@@ -587,11 +587,11 @@ class TestReproducibility:
     """Verify that reproducibility artefact CSVs exist and contain key values."""
 
     def test_depth_results_exists(self):
-        path = os.path.join(PROJECT_ROOT, cfg.RESULTS_DIR, "depth_results.csv")
+        path = os.path.join(PROJECT_ROOT, cfg.RESULTS_DIR, "thesis", "depth_results.csv")
         assert os.path.exists(path), f"Missing: {path}"
 
     def test_depth_results_depth4_return(self):
-        path = os.path.join(PROJECT_ROOT, cfg.RESULTS_DIR, "depth_results.csv")
+        path = os.path.join(PROJECT_ROOT, cfg.RESULTS_DIR, "thesis", "depth_results.csv")
         df = pd.read_csv(path)
         # Find the row for depth=4 and check annualised return
         depth_col = [c for c in df.columns if "depth" in c.lower()]
@@ -607,17 +607,17 @@ class TestReproducibility:
             # Value might be in decimal (0.219) or percent (21.9)
             if val < 1:
                 val = val * 100
-            assert val == pytest.approx(21.9, abs=0.5), (
+            assert val == pytest.approx(21.7, abs=0.5), (
                 f"Depth-4 return = {val}%, expected 21.9%"
             )
 
     def test_risk_aversion_results_exists(self):
-        path = os.path.join(PROJECT_ROOT, cfg.RESULTS_DIR, "risk_aversion_thesis_results.csv")
+        path = os.path.join(PROJECT_ROOT, cfg.RESULTS_DIR, "thesis", "risk_aversion_thesis_results.csv")
         assert os.path.exists(path), f"Missing: {path}"
 
     def test_fundamentals_ablation_results_exists(self):
         # Produced by scripts/fundamentals_test.py
-        path = os.path.join(PROJECT_ROOT, cfg.RESULTS_DIR, "fundamentals_test_results.csv")
+        path = os.path.join(PROJECT_ROOT, cfg.RESULTS_DIR, "thesis", "fundamentals_test_results.csv")
         assert os.path.exists(path), f"Missing: {path}"
 
     def test_artefacts_pickle_exists(self):

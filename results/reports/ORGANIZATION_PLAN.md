@@ -133,4 +133,52 @@ tables/
 
 ## Rollback plan
 
-If anything breaks: `mv results/thesis/* results/ && mv plots/thesis/* plots/ && ...` reverses the move. The `baseline_pre_full_rerun_*` snapshot also captures the pre-migration state.
+**Use `git revert`, NOT the snapshot directly.**
+
+The restructure was committed atomically as `f793e8d`. To undo it:
+
+```bash
+git revert f793e8d
+git push origin main
+```
+
+That single command reverses **everything in lockstep**: data file moves, the
+26 script-path edits, the 5 latex `\includegraphics` updates, and the
+`run_pipeline.py` step additions. All consistent.
+
+### Why NOT to use the snapshot directly
+
+The pre-restructure snapshot at `baseline_pre_restructure_<timestamp>/` is
+**partial**: it contains only the data (`results/`, `tables/`, `plots/`) at
+their pre-restructure paths. It does **not** contain:
+
+- The pre-restructure versions of `scripts/*.py` (the migration auto-edited
+  26 scripts in-place; old-path versions are not on disk anywhere)
+- The pre-restructure versions of `latex/*.tex` and `main.tex` (5 files had
+  `\includegraphics{plots/...}` paths updated)
+- The pre-restructure version of `run_pipeline.py` (no canonical-chain steps)
+
+So if you ran a naïve `cp -R baseline_pre_restructure_<ts>/* .`:
+
+| What gets restored | What stays at NEW state |
+|---|---|
+| ✅ `results/foo.csv` back at root | ❌ scripts still write to `results/thesis/foo.csv` |
+| ✅ `plots/foo.png` back at root | ❌ latex still says `\includegraphics{plots/thesis/foo.png}` |
+| ✅ `tables/foo.tex` back at root | ❌ build_metrics.py still parses with new-layout assumptions |
+
+You'd end up in an inconsistent split-brain state: data at OLD paths, code/latex
+expecting NEW paths. The latex build would break, scripts would write into the
+new tree on next run, and you'd have duplicates.
+
+### The snapshot's actual purpose
+
+It's **belt-and-suspenders insurance** for the data side only — useful if
+`git revert` produces conflicts (e.g., if someone has hand-edited a file
+in the restructured tree). In that case:
+
+1. `git revert f793e8d` and resolve conflicts manually
+2. If totally stuck, `git checkout HEAD~1 -- scripts/ latex/ run_pipeline.py main.tex`
+   to revert just code, THEN `cp -R baseline_pre_restructure_<ts>/results/* results/` etc.
+   to restore data
+
+For all normal cases: **just `git revert f793e8d`**.
