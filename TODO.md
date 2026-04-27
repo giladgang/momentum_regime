@@ -17,45 +17,110 @@
 
 ## 🛑 HARD STOP — thesis edits (awaiting Gilad row-by-row greenlight)
 
-### Step M — US thesis edits (gated)
+Two distinct types of work. Tackle them differently.
 
-- [ ] **Master review**: walk through all 207 items in [`results/THESIS_EDITS_TODO.md`](results/THESIS_EDITS_TODO.md). Tick each row before applying any `latex/*.tex` change.
-- [ ] **Numeric prose updates**: 944 candidates in [`results/PROSE_EDITS.md`](results/PROSE_EDITS.md). Pre-vs-post comparison: [`baseline_pre_shumway_20260426_150517/tables/`](baseline_pre_shumway_20260426_150517/) vs [`tables/`](tables/). Each row reviewed; false positives skipped.
-- [ ] **Edit #1** — `latex/main_results.tex`: new subsection "Leg-level beta dynamics across regimes" using **cross-sectional re-ranking** framing (decision locked from Step E)
-  - Data: [`results/leg_betas_by_regime.csv`](results/leg_betas_by_regime.csv)
-  - Table: [`tables/table_leg_betas.tex`](tables/table_leg_betas.tex)
-  - Figure: [`plots/leg_betas_rolling.pdf`](plots/leg_betas_rolling.pdf)
-  - Detailed sub-items: [`results/THESIS_EDITS_TODO.md`](results/THESIS_EDITS_TODO.md) §C1
-- [ ] **Edit #2** — `latex/literature_review.tex:19`: expand D&M (2016) discussion, distinguish their leg-beta inversion from our re-ranking. Data backing the distinction: same as Edit #1.
+---
+
+### 🔢 BUCKET 1 — Just numbers (slight modifications)
+
+Existing thesis claims, post-Shumway values. **No new sections, no new framing.** Walk the auto-generated checklist; tick or skip each row.
+
+- [ ] **Walk all 944 numeric prose candidates** in [`results/PROSE_EDITS.md`](results/PROSE_EDITS.md)
+  - 40 tables changed × 415 cells × prose mentions
+  - Source: [`baseline_pre_shumway_20260426_150517/tables/`](baseline_pre_shumway_20260426_150517/) (pre) vs [`tables/`](tables/) (post)
+  - Each row is `file:line — "old" → "new"` with surrounding context
+  - Skip false-positive matches (e.g., a number that happens to appear in unrelated prose)
+  - Effort: ~1-2 hours of mechanical ticking
+- [ ] **Headline numbers** (16 high-priority — listed in [`results/THESIS_EDITS_TODO.md`](results/THESIS_EDITS_TODO.md) §A):
+  - M2 Ann.Ret 21.9% → 21.7% | Vol 19.7% → 19.5% | MDD −24.8% → −22.8% | Beta 0.46 → 0.45
+  - Sub-period Sharpes 0.62→0.59, 1.03→1.04, 1.69→1.70
+  - Factor α: CAPM 23.4% (t=4.08), FF3 23.2% (t=4.48), Carhart 24.3% (t=4.75), FF5 22.9% (t=4.62), FF6 24.1% (t=4.81)
+  - Stress baseline MDD −24.8% → −23.0%
+  - Final-$ multiple 15.7× → 15.3×
+  - Sharpe unchanged at 1.11
+- [ ] **NW t-stat — 1.83\* → 4.37\*\*\*** (unique among numeric updates: significance jump from marginal to highly significant — flag in prose)
+- [ ] **Existing claims to verify post-Shumway** (37 sub-sections E1-E37 in [`results/THESIS_EDITS_TODO.md`](results/THESIS_EDITS_TODO.md))
+
+---
+
+### 💡 BUCKET 2 — New ideas to integrate (substantive content)
+
+Genuinely new findings or significant reframings. Each item is a writing task. **The 7 items below are the focus of the thesis edits.**
+
+#### N1 — Global financial cycle (UK + JP) — NEW SECTION
+
+- [ ] Add new "International validation" subsection in `latex/main_results.tex` (or as an own section)
+  - **Drafted prose ready**: [`RESULTS_LOG.md`](RESULTS_LOG.md) §12 — copy-paste and edit
+  - **Data**:
+    - UK: [`results/intl_uk_summary.csv`](results/intl_uk_summary.csv) (regional π, Sharpe +0.631) vs [`results/intl_uk_summary_uspi.csv`](results/intl_uk_summary_uspi.csv) (US π, Sharpe **+0.678**)
+    - JP: [`results/intl_jp_summary.csv`](results/intl_jp_summary.csv) (regional π, +0.435) vs [`results/intl_jp_summary_uspi.csv`](results/intl_jp_summary_uspi.csv) (US π, **+0.525**, MDD halved -33% → -18%)
+  - **Citation**: Rey (2013) — global financial cycle channel
+  - **Caveat 1** — JP M2 (0.52) < JP market (0.86): cite Asness/Moskowitz/Pedersen (2013) on JP momentum weakness
+  - **Caveat 2** — UK M2 (0.68) ~ UK market (0.62): residual L/S exposure of dollar-neutral construction
+  - **Methodology footnote**: BANK_REL replaces CS_z (no Moody's BAA-AAA for UK/JP); 4-feature HMM. See [`INTL_VALIDATION_PLAN.md`](INTL_VALIDATION_PLAN.md)
+  - **Methodology footnote**: strict-mode Shumway-intl applied (UK 219 rows, JP 85)
+
+#### N2 — Cross-sectional re-ranking framing (Edits #1–#4) — REFRAME mechanism
+
+**Decision locked**: M2 mechanism is *not* a clean leg-beta inversion. Both legs stay long-tilted in panic; the L−S β gap widens 0.17 → 0.67 but doesn't flip.
+
+- [ ] **Edit #1** — new subsection "Leg-level beta dynamics across regimes" in `latex/main_results.tex`
+  - Data: [`results/leg_betas_by_regime.csv`](results/leg_betas_by_regime.csv), [`tables/table_leg_betas.tex`](tables/table_leg_betas.tex), [`plots/leg_betas_rolling.pdf`](plots/leg_betas_rolling.pdf)
+- [ ] **Edit #2** — `latex/literature_review.tex:19`: expand Daniel & Moskowitz (2016) discussion, distinguish their leg-beta inversion from our re-ranking
 - [ ] **Edit #3** — `latex/conclusion.tex:53`: sharpen "two channels" → (1) regime-conditional selection (HMM π) + (2) cross-sectional re-ranking by term-structure shape
-  - Channel 1 evidence: [`tables/table_kitchen_sink.tex`](tables/table_kitchen_sink.tex), [`tables/table_regime_signal_ablation.tex`](tables/table_regime_signal_ablation.tex), [`tables/table_placebo.tex`](tables/table_placebo.tex)
-  - Channel 2 evidence: [`results/leg_betas_by_regime.csv`](results/leg_betas_by_regime.csv), [`tables/table_zscore_shap_detail.tex`](tables/table_zscore_shap_detail.tex), [`results/selection_rank_analysis.csv`](results/selection_rank_analysis.csv)
-- [ ] **Edit #4** — `latex/methodology.tex`: π_filter ↔ D&M bear-indicator link (probabilistic-continuous vs binary). Reference [`tables/table_hmm_separation.tex`](tables/table_hmm_separation.tex) for the regime-mean separation magnitudes.
-- [ ] **Edit #5 NEW** — `latex/main_results.tex` or `latex/conclusion.tex` future-work: global financial cycle headline (US π beats regional π in UK + JP)
-  - UK data: [`results/intl_uk_summary.csv`](results/intl_uk_summary.csv), [`results/intl_uk_summary_uspi.csv`](results/intl_uk_summary_uspi.csv)
-  - JP data: [`results/intl_jp_summary.csv`](results/intl_jp_summary.csv), [`results/intl_jp_summary_uspi.csv`](results/intl_jp_summary_uspi.csv)
-  - Drafted prose: [`RESULTS_LOG.md`](RESULTS_LOG.md) §12
-  - Detailed sub-items: [`results/THESIS_EDITS_TODO.md`](results/THESIS_EDITS_TODO.md) §B3
-- [ ] **CV-justified rewrites**: replace test-set-peek language in `latex/methodology.tex` and `latex/appendix.tex`
-  - XGB CV winner: [`results/xgb_cv_winner.json`](results/xgb_cv_winner.json), [`tables/table_xgb_cv.tex`](tables/table_xgb_cv.tex), [`results/xgb_cv_results.csv`](results/xgb_cv_results.csv)
-  - Tables to deprecate: [`tables/table_xgb_hyperparams.tex`](tables/table_xgb_hyperparams.tex)
-- [ ] **HMM feature CV**: remove specification-search caveat in `latex/data_section.tex`
-  - HMM CV winner: [`results/hmm_cv_winner.json`](results/hmm_cv_winner.json), [`tables/table_hmm_cv.tex`](tables/table_hmm_cv.tex), [`results/hmm_cv_features.csv`](results/hmm_cv_features.csv)
-  - Tables to deprecate: [`tables/table_feature_selection.tex`](tables/table_feature_selection.tex)
-- [ ] **Citations to add**: Rey (2013) for §B3 framing | Asness/Moskowitz/Pedersen (2013) for JP weakness | Daniel & Moskowitz (2016) for §C1 distinction | Shumway (1997, 2001) for delisting methodology footnote | Jegadeesh (1990) + Lehmann (1990) for mom_1 reversal-avoidance | Novy-Marx (2012) for mom_8 peak | Lee & Swaminathan (2000) for mom_12 decay
-  - Backing for citations: [`tables/table_zscore_shap_detail.tex`](tables/table_zscore_shap_detail.tex) (z-scores by horizon), [`tables/table_factor_alphas.tex`](tables/table_factor_alphas.tex)
+  - Channel 1: [`tables/table_kitchen_sink.tex`](tables/table_kitchen_sink.tex), [`tables/table_placebo.tex`](tables/table_placebo.tex)
+  - Channel 2: [`results/leg_betas_by_regime.csv`](results/leg_betas_by_regime.csv), [`tables/table_zscore_shap_detail.tex`](tables/table_zscore_shap_detail.tex)
+- [ ] **Edit #4** — `latex/methodology.tex`: π_filter ↔ D&M bear-indicator link (probabilistic/continuous vs binary). Reference [`tables/table_hmm_separation.tex`](tables/table_hmm_separation.tex)
 
-### Step N4 — UK/JP thesis edits (gated, bundled with M)
+#### N3 — CV-justified specifications — STRIKE caveats + future work
 
-- [ ] Add new "International validation" section in `latex/main_results.tex`
-  - Drafted prose: [`RESULTS_LOG.md`](RESULTS_LOG.md) §12
-  - UK summaries: [`results/intl_uk_summary.csv`](results/intl_uk_summary.csv), [`results/intl_uk_summary_uspi.csv`](results/intl_uk_summary_uspi.csv)
-  - JP summaries: [`results/intl_jp_summary.csv`](results/intl_jp_summary.csv), [`results/intl_jp_summary_uspi.csv`](results/intl_jp_summary_uspi.csv)
-  - Monthly returns time series: [`results/intl_uk_returns.csv`](results/intl_uk_returns.csv), [`results/intl_uk_returns_uspi.csv`](results/intl_uk_returns_uspi.csv), [`results/intl_jp_returns.csv`](results/intl_jp_returns.csv), [`results/intl_jp_returns_uspi.csv`](results/intl_jp_returns_uspi.csv)
-- [ ] **JP M2 < market caveat** (Asness et al 2013): JP M2 Sharpe 0.52 < JP market 0.86 — [`results/intl_jp_summary_uspi.csv`](results/intl_jp_summary_uspi.csv) row `method2_xgb` vs row `market`
-- [ ] **UK M2 ~ market caveat** (residual L/S exposure of dollar-neutral construction): UK M2 0.68 vs UK market 0.62 — [`results/intl_uk_summary_uspi.csv`](results/intl_uk_summary_uspi.csv)
-- [ ] **Methodology footnote**: BANK_REL replaces CS_z for international markets (no Moody's BAA-AAA equivalent); 4-feature HMM `[DD_z, DISP_z, REL_N_z, BANK_REL_z]`. Reference [`INTL_VALIDATION_PLAN.md`](INTL_VALIDATION_PLAN.md) for design rationale and [`scripts/hmm_intl.py`](scripts/hmm_intl.py) for implementation
-- [ ] **Methodology footnote**: UK/JP strict-mode Shumway-intl applied (UK 219 rows compounded, JP 85 rows; data: UK [`data/uk_stock_panel.parquet`](data/uk_stock_panel.parquet), JP [`data/jp_stock_panel.parquet`](data/jp_stock_panel.parquet); pre-strict-Shumway baseline at [`baseline_pre_intl_shumway_20260426_221329/`](baseline_pre_intl_shumway_20260426_221329/))
+**Decision locked**: keep production specs (HMM `DD+CS+DISP+REL_N`, XGB `depth=4 lr=0.05 n=500`); CV results live in appendix as robustness backing.
+
+- [ ] Strike "specification-search" caveat in `latex/data_section.tex`
+- [ ] Strike "test-set tuned" caveat in `latex/methodology.tex` and `latex/appendix.tex`
+- [ ] Optional appendix paragraph showing production combo is within fold-noise of CV winner. Cite [`tables/table_xgb_cv.tex`](tables/table_xgb_cv.tex) and [`tables/table_hmm_cv.tex`](tables/table_hmm_cv.tex)
+- [ ] **Edit #6 (future work)** — paragraph in `latex/future_work_full.tex` on rolling/expanding-window CV as more robust feature-selection. Draft prose in [`results/THESIS_EDITS_TODO.md`](results/THESIS_EDITS_TODO.md) §H Edit #6
+- [ ] Note that `tables/table_xgb_hyperparams.tex` and `tables/table_feature_selection.tex` are now deprecated (replaced by CV tables); update any in-text references
+
+#### N4 — Fold-3 dot-com universal failure — NEW caveat
+
+- [ ] Add paragraph in robustness/limitations section
+  - All 36 XGB configs + all HMM combos negative on fold 3 — out-of-distribution generalization failure
+  - Data: [`results/xgb_cv_results.csv`](results/xgb_cv_results.csv) (group by fold), [`results/hmm_cv_features.csv`](results/hmm_cv_features.csv)
+  - Cross-link to existing §5.4.3 30-year backtest discussion (the dot-com loss documented there is the same failure manifested in real history)
+
+#### N5 — NW t-stat significance jump — SHARPEN existing prose
+
+- [ ] One-line emphasis wherever the t-stat appears in `latex/main_results.tex`: **t-stat 1.83\* → 4.37\*\*\*** post-Shumway. Marginal → highly significant. Largest single result of the Shumway treatment.
+
+#### N6 — Connect 30-year backtest to stress scenario — REFRAME
+
+- [ ] Add explicit cross-link between §5.4.3 (30-year backtest) and §5.4 (stress test).
+  - The 36-month dot-com bear (2000-2002, -36% cumulative, MDD -64.8%) is the documented version of the synthetic 24+ month sustained-bear stress scenario.
+  - Hypothetical → real. One paragraph that ties the two analyses together explicitly.
+
+#### N7 — Negative Carhart UMD loading — SHARPEN novelty signal
+
+- [ ] One-paragraph emphasis in `latex/main_results.tex` factor-alpha discussion: M2 has *negative* Carhart UMD loading (−0.20 to −0.22 in Carhart/FF6). M2 is *negatively* correlated with naive momentum despite using momentum features. Strong novelty signal: M2 isn't "more momentum", it's a different cross-sectional bet.
+  - Data: [`tables/table_factor_alphas.tex`](tables/table_factor_alphas.tex)
+
+---
+
+### Citations to add (across N1, N2, N7)
+
+- [ ] **Rey, H. (2013)** — global financial cycle (N1 framing)
+- [ ] **Asness, Moskowitz & Pedersen (2013)** — international momentum (N1 JP caveat)
+- [ ] **Daniel & Moskowitz (2016)** — distinguish their inversion from N2 re-ranking
+- [ ] **Shumway (1997, 2001)** — delisting bias methodology footnote
+- [ ] **Jegadeesh (1990)** + **Lehmann (1990)** — short-term reversal (M5 mechanism prose, mom_1 neutral)
+- [ ] **Novy-Marx (2012)** — intermediate-horizon momentum (mom_8 peak)
+- [ ] **Lee & Swaminathan (2000)** — momentum lifecycle (mom_12 decay)
+
+---
+
+### Detailed reference
+
+The full 207-row checklist with every micro-task and file pointer is in [`results/THESIS_EDITS_TODO.md`](results/THESIS_EDITS_TODO.md). Use it for granular sub-items; use **this** TODO.md for the day-to-day "what to write next" view.
 
 ---
 

@@ -1,24 +1,58 @@
 # THESIS_EDITS_TODO.md
 
-Comprehensive checkbox list of every finding from Phase 0–3 that needs a thesis edit. Each row is independent and reviewable; tick as you go.
+Two distinct types of thesis work after the post-Shumway runs + CV + international validation. Tackle them differently:
 
-**Format**: `☐ [TRIAGE] Finding — *source data* → *thesis target*`
+## ⚡ TWO-BUCKET QUICK REFERENCE
 
-Triage tags:
+### 🔢 BUCKET 1 — Just numbers (slight modifications)
+
+Existing thesis claims with the same prose, just new post-Shumway values. **No new sections, no new framing.** Walk the auto-generated checklist; tick or skip each row.
+
+→ **Where**: [`results/PROSE_EDITS.md`](PROSE_EDITS.md) — 944 candidates, 415 cells across 40 tables
+→ **Detail in this doc**: §A (16 headline numbers), §E (37 existing claims to verify post-Shumway)
+→ **Effort**: mechanical, fast. ~1-2 hours of ticking through the checklist.
+
+Examples: M2 Ann.Ret 21.9% → 21.7%, FF6 α 24.7 → 24.1, MDD -24.8% → -22.8%, every other prose number that shifted.
+
+### 💡 BUCKET 2 — New ideas to integrate (substantive content)
+
+Genuinely new findings or significant reframings. Need fresh prose, sometimes whole new sections. **Each item below is a writing task.**
+
+→ **The 7 items**: §B3 (international), §C1 (re-ranking), §B1+B2 (CV), §D1 (fold-3), §R1 (NW t-stat), §B5-B8 reframe, §E13 (UMD)
+→ **Detail in this doc**: §B (new claims), §C (corrections/reframes), §D (caveats), §H (structural edit bundle)
+→ **Effort**: substantive. Each item is 1-4 paragraphs of new prose with citations.
+
+The seven new ideas — listed once, then detailed below:
+
+| # | Type | What | Where in thesis |
+|---|---|---|---|
+| **N1** | NEW SECTION | Global financial cycle — UK + JP US-π beats regional-π | new subsection in `latex/main_results.tex` |
+| **N2** | REFRAME (mechanism) | Cross-sectional re-ranking, NOT D&M-style leg-beta inversion | Edits #1-#4 (`main_results.tex`, `literature_review.tex:19`, `conclusion.tex:53`, `methodology.tex`) |
+| **N3** | STRIKE CAVEAT | CV-justified specifications (Steps I + J) replace specification-search caveat | strike caveat in `data_section.tex`, `methodology.tex`, `appendix.tex`. Future-work paragraph (Edit #6). |
+| **N4** | NEW CAVEAT | Fold-3 dot-com universal failure — out-of-distribution generalization limit | new paragraph in robustness/limitations |
+| **N5** | SHARPEN | M2 NW t-stat 1.83\* → 4.37\*\*\* — significance upgraded marginal → highly significant | one-line emphasis wherever t-stat appears in `main_results.tex` |
+| **N6** | REFRAME (connect) | The 36-month dot-com loss already in §5.4.3 IS the 24-month sustained-bear stress scenario already in §5.4 | connect them explicitly; one paragraph |
+| **N7** | SHARPEN (novelty) | M2 has *negative* Carhart UMD loading (-0.20) — bets on a different slice than naive momentum | one-paragraph emphasis in `main_results.tex` |
+
+---
+
+## Companion files
+
+- [`results/PROSE_EDITS.md`](PROSE_EDITS.md) — auto-generated 944 line-by-line numeric updates (Bucket 1)
+- [`results/STEP_K_REPORT.md`](STEP_K_REPORT.md) — final report (CV winners + intl + Step F splice)
+- [`results/STEP_F_REPORT.md`](STEP_F_REPORT.md) — first-checkpoint (Shumway diff + leg-betas)
+- [`results/RUN_MANIFEST.md`](RUN_MANIFEST.md) — phase log, bug fixes, parallel refactors
+- [`RESULTS_LOG.md`](../RESULTS_LOG.md) §12 — UK/JP writeup (drafted prose for N1)
+
+## Triage tags below
+
 - **[M]** = Must land (data-driven, advisor pressure)
 - **[S]** = Should land (strengthens the story)
 - **[N]** = Nice to have (methodology/appendix)
 
-Companion files:
-- [`results/PROSE_EDITS.md`](PROSE_EDITS.md) — auto-generated 944 line-by-line numeric updates
-- [`results/STEP_K_REPORT.md`](STEP_K_REPORT.md) — final report (CV winners + intl + Step F splice)
-- [`results/STEP_F_REPORT.md`](STEP_F_REPORT.md) — first-checkpoint (Shumway diff + leg-betas)
-- [`results/RUN_MANIFEST.md`](RUN_MANIFEST.md) — phase log, bug fixes, parallel refactors
-- [`RESULTS_LOG.md`](../RESULTS_LOG.md) §12 — UK/JP writeup
-
 ---
 
-## A. NUMERIC UPDATES — existing claims, post-Shumway values
+## A. NUMERIC UPDATES — Bucket 1 (existing claims, post-Shumway values)
 
 These are auto-flagged in [`PROSE_EDITS.md`](PROSE_EDITS.md). The list below is the *headline* set; the full 944-row checklist is in that file.
 
