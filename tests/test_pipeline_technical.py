@@ -636,15 +636,15 @@ class TestRegimeConditional:
     def test_calm_sharpe(self):
         calm, _ = self._get_regime_returns()
         sharpe = _compute_sharpe(calm)
-        assert sharpe == pytest.approx(0.82, abs=0.05), (
-            f"Calm Sharpe = {sharpe:.2f}, expected 0.82"
+        assert sharpe == pytest.approx(EXP.M2_SHARPE_CALM, abs=EXP.TOL_REGIME_SHARPE), (
+            f"Calm Sharpe = {sharpe:.3f}, expected {EXP.M2_SHARPE_CALM}"
         )
 
     def test_panic_sharpe(self):
         _, panic = self._get_regime_returns()
         sharpe = _compute_sharpe(panic)
-        assert sharpe == pytest.approx(1.56, abs=0.05), (
-            f"Panic Sharpe = {sharpe:.2f}, expected 1.56"
+        assert sharpe == pytest.approx(EXP.M2_SHARPE_PANIC, abs=EXP.TOL_REGIME_SHARPE), (
+            f"Panic Sharpe = {sharpe:.3f}, expected {EXP.M2_SHARPE_PANIC}"
         )
 
     def test_panic_sharpe_exceeds_calm(self):
@@ -843,10 +843,6 @@ class TestThesisTextMatchesTables:
         text = _read("latex/main_results.tex")
         assert "-0.03" in text or "0.03" in text
 
-    @pytest.mark.xfail(
-        reason="Fixed 12-mo MDD has a 0.1pp rounding mismatch between table (72.2) "
-               "and prose (72.3). Cosmetic; not data-driven."
-    )
     def test_main_results_fixed_mom_mdd(self):
         text = _read("latex/main_results.tex")
         tbl = _read("tables/table_performance.tex")
@@ -863,15 +859,15 @@ class TestThesisTextMatchesTables:
         text = _read("latex/main_results.tex")
         tbl = _read("tables/table_regime_signal_ablation.tex")
         val = float(_find_in_table(tbl, "raw indicators", 3))
-        assert "0.30" in text or f"{val}" in text
+        assert f"{val:.2f}" in text or f"{val}" in text
 
     def test_main_results_panic_sharpe(self):
         text = _read("latex/main_results.tex")
-        assert "1.56" in text
+        assert re.search(rf"{EXP.M2_SHARPE_PANIC}(?!\d)", text)
 
     def test_main_results_calm_sharpe(self):
         text = _read("latex/main_results.tex")
-        assert "0.82" in text
+        assert re.search(rf"{EXP.M2_SHARPE_CALM}(?!\d)", text)
 
     def test_main_results_shap_pi_46(self):
         text = _read("latex/main_results.tex")
@@ -927,16 +923,18 @@ class TestThesisTextMatchesTables:
 
     def test_conclusion_stress_12mo_drawdown(self):
         text = _read("latex/conclusion.tex")
-        tbl = _read("tables/table_stress_scenarios.tex")
-        val_str = _find_in_table(tbl, "12 months", 3)
-        assert "51" in text, (
-            f"conclusion.tex should mention 12-month stress MDD (~51%)"
+        # Canonical value comes from tables/table_stress_scenarios.tex,
+        # 12-month row, MDD column. Currently 49%.
+        assert "49" in text, (
+            f"conclusion.tex should mention 12-month stress MDD (~49%)"
         )
 
     def test_conclusion_stress_24mo_drawdown(self):
         text = _read("latex/conclusion.tex")
-        assert "70" in text, (
-            "conclusion.tex should mention 24-month stress MDD (~70%)"
+        # Canonical value: tables/table_stress_scenarios.tex, 24-month
+        # row, MDD column. Currently 69%.
+        assert "69" in text, (
+            "conclusion.tex should mention 24-month stress MDD (~69%)"
         )
 
     def test_conclusion_subperiod_2021_2025(self):

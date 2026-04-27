@@ -331,14 +331,18 @@ class TestTableConsistency:
 
     def test_main_results_panic_sharpe_inline(self):
         text = _read("latex/main_results.tex")
-        assert "1.56" in text, (
-            "main_results.tex does not mention panic Sharpe 1.56"
+        # Section 6.1.3 fund-ablation paragraph cites the baseline panic
+        # Sharpe (M2's panic Sharpe = 1.53 per tab:regime_sharpe).
+        assert re.search(r"1\.53(?!\d)", text), (
+            f"main_results.tex does not mention panic Sharpe {EXP.M2_SHARPE_PANIC}"
         )
 
     def test_main_results_calm_sharpe_inline(self):
         text = _read("latex/main_results.tex")
-        assert "0.82" in text, (
-            "main_results.tex does not mention calm Sharpe 0.82"
+        # Section 6.1.3 fund-ablation paragraph cites the baseline calm
+        # Sharpe (M2's calm Sharpe = 0.84 per tab:regime_sharpe).
+        assert re.search(r"0\.84(?!\d)", text), (
+            f"main_results.tex does not mention calm Sharpe {EXP.M2_SHARPE_CALM}"
         )
 
     def test_main_results_ablation_sharpe_041_inline(self):
