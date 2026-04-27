@@ -224,8 +224,10 @@ print(f"Saved: {os.path.join(TABLES_DIR, 'table_ridge.csv')}")
 
 # Helper to format numbers for LaTeX
 def fmt_pct(v):
-    """Format as percentage with $-$ for negative."""
-    s = f"{abs(v):.1%}"
+    """Format as percentage with $-$ for negative.
+    Emits LaTeX-escaped \\% (not bare %) so the table compiles.
+    """
+    s = f"{abs(v) * 100:.1f}\\%"
     return f"$-${s}" if v < 0 else s
 
 def fmt_sharpe(v):

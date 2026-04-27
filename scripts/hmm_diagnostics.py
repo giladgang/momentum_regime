@@ -531,7 +531,7 @@ for idx, row in st_df.iterrows():
         agr_str = '---'
         corr_str = '---'
     else:
-        agr_str = f"{row['agreement']:.1%}"
+        agr_str = f"{row['agreement'] * 100:.1f}\\%"
         corr_str = f"{row['corr_pi']:.3f}"
 
     # Add midrule before Normal row

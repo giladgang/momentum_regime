@@ -102,8 +102,38 @@ def main():
     os.makedirs(cfg.RESULTS_DIR, exist_ok=True)
     os.makedirs(cfg.ARTEFACTS_DIR, exist_ok=True)
 
-    # Check if HMM results already exist
+    # Pre-flight: verify Shumway delisting treatment has been applied.
+    # The pipeline assumes data/crsp_msf_raw.parquet has a `ret_adj` column
+    # written by scripts/apply_shumway_delisting.py. Without it, the entire
+    # cross-sectional model + factor alphas + stress tests would compute on
+    # raw `ret`, silently inflating returns by ignoring delisting losses.
+    # This check fails fast (<1s) so a fresh WRDS pull cannot accidentally
+    # bypass the Shumway step.
     import pandas as pd
+    try:
+        _crsp_head = pd.read_parquet('data/crsp_msf_raw.parquet').head(1)
+        if 'ret_adj' not in _crsp_head.columns:
+            print('  [ERROR] data/crsp_msf_raw.parquet is missing the `ret_adj` '
+                  'column.\n'
+                  '          The pipeline reads ret_adj (Shumway-corrected '
+                  'returns); without it,\n'
+                  '          downstream artefacts would silently inflate by '
+                  'ignoring delisting losses.\n'
+                  '          Run:\n'
+                  '              python scripts/apply_shumway_delisting.py --force\n'
+                  '          before re-running the pipeline. (Idempotent: re-runs '
+                  'load from\n'
+                  '          .bak_before_shumway, no double-application.)')
+            sys.exit(1)
+        del _crsp_head
+    except FileNotFoundError:
+        print('  [ERROR] data/crsp_msf_raw.parquet not found. Pull it from '
+              'WRDS first, then run\n'
+              '          scripts/apply_shumway_delisting.py before this '
+              'pipeline.')
+        sys.exit(1)
+
+    # Check if HMM results already exist
     try:
         _panel = pd.read_parquet(cfg.PANEL_WITH_REGIMES_PATH)
         hmm_ready = 'pi_filter' in _panel.columns and _panel['pi_filter'].notna().sum() > 100

@@ -558,7 +558,7 @@ for row in stress_rows:
 tex_lines.append(r'\bottomrule')
 tex_lines.append(r'\end{tabular}')
 tex_lines.append(r"\caption{Prolonged bear market simulation. Each row injects a recession during which M2 loses " +
-                 f"{avg_panic_loss:.2%}".replace('-', '') +
+                 f"{avg_panic_loss * 100:.2f}".replace('-', '') + r"\%" +
                  r" per month (its average losing panic-month return). MDD is the worst-case maximum drawdown across all possible insertion points.}")
 tex_lines.append(r'\label{tab:stress_scenarios}')
 tex_lines.append(r'\end{table}')
