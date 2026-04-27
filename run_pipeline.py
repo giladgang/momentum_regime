@@ -102,15 +102,16 @@ def main():
     os.makedirs(cfg.RESULTS_DIR, exist_ok=True)
     os.makedirs(cfg.ARTEFACTS_DIR, exist_ok=True)
 
-    # Pre-flight: verify Shumway delisting treatment has been applied.
-    # The pipeline assumes data/crsp_msf_raw.parquet has a `ret_adj` column
-    # written by scripts/apply_shumway_delisting.py. Without it, the entire
-    # cross-sectional model + factor alphas + stress tests would compute on
-    # raw `ret`, silently inflating returns by ignoring delisting losses.
-    # This check fails fast (<1s) so a fresh WRDS pull cannot accidentally
-    # bypass the Shumway step.
+    # Pre-flight: verify Shumway delisting treatment has been applied IF the
+    # CRSP panel exists. We only fail-fast when the file is present but
+    # missing the `ret_adj` column — that's the silent-inflation scenario
+    # the guard is designed to catch. If the file is absent entirely
+    # (fresh checkout, CI without data, etc.) we let the individual step
+    # scripts emit their own "data not found" errors so users on a clean
+    # repo aren't blocked by this guard. Idempotent: re-runs of
+    # apply_shumway_delisting load from the .bak_before_shumway backup.
     import pandas as pd
-    try:
+    if os.path.exists('data/crsp_msf_raw.parquet'):
         _crsp_head = pd.read_parquet('data/crsp_msf_raw.parquet').head(1)
         if 'ret_adj' not in _crsp_head.columns:
             print('  [ERROR] data/crsp_msf_raw.parquet is missing the `ret_adj` '
@@ -126,12 +127,6 @@ def main():
                   '          .bak_before_shumway, no double-application.)')
             sys.exit(1)
         del _crsp_head
-    except FileNotFoundError:
-        print('  [ERROR] data/crsp_msf_raw.parquet not found. Pull it from '
-              'WRDS first, then run\n'
-              '          scripts/apply_shumway_delisting.py before this '
-              'pipeline.')
-        sys.exit(1)
 
     # Check if HMM results already exist
     try:
