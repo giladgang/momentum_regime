@@ -303,8 +303,8 @@ class TestTableConsistency:
     def test_main_results_alpha_inline(self):
         text = _read("latex/main_results.tex")
         # "six-factor alpha of 24.7%"
-        assert "24.7" in text, (
-            "main_results.tex does not contain alpha value 24.7"
+        assert "24.1" in text, (
+            "main_results.tex does not contain alpha value 24.1"
         )
 
     def test_main_results_alpha_matches_factor_table(self):
@@ -317,8 +317,8 @@ class TestTableConsistency:
 
     def test_main_results_alpha_tstat_inline(self):
         text = _read("latex/main_results.tex")
-        assert "4.78" in text, (
-            "main_results.tex does not contain alpha t-stat 4.78"
+        assert "4.81" in text, (
+            "main_results.tex does not contain alpha t-stat 4.81"
         )
 
     def test_main_results_alpha_tstat_matches_factor_table(self):
@@ -349,9 +349,9 @@ class TestTableConsistency:
 
     def test_main_results_depth4_return_inline(self):
         text = _read("latex/main_results.tex")
-        # "depth~4 (21.9%)"
-        assert "21.9" in text, (
-            "main_results.tex does not mention depth-4 return 21.9%"
+        # "depth~4 (21.7%)"
+        assert "21.7" in text, (
+            "main_results.tex does not mention depth-4 return 21.7%"
         )
 
     # --- conclusion.tex numbers match results ---
@@ -376,8 +376,8 @@ class TestTableConsistency:
 
     def test_introduction_alpha_inline(self):
         text = _read("latex/introduction.tex")
-        assert "24.7" in text, (
-            "introduction.tex does not mention alpha 24.7%"
+        assert "24.1" in text, (
+            "introduction.tex does not mention alpha 24.1%"
         )
 
 

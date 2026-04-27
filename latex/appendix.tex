@@ -172,7 +172,7 @@ To assess whether the main findings are driven by a single favourable sub-period
 
 \input{tables/table_subperiod}
 
-In long-short construction, M2 is the only strategy that produces positive Sharpe ratios in every sub-period (0.62, 1.03, 1.69). M1 collapses in 2016--2020 (Sharpe $-$0.04) and turns negative in 2021--2025 ($-$0.43). Fixed 12-month momentum turns negative after 2015, confirming the momentum crash phenomenon documented by \citet{DanielMoskowitz2016}. M2's strongest performance (1.69) is in 2021--2025, a period characterised by elevated volatility and multiple stress episodes -- precisely the conditions where regime-conditional stock selection adds the most value.
+In long-short construction, M2 is the only strategy that produces positive Sharpe ratios in every sub-period (0.59, 1.04, 1.70). M1 collapses in 2016--2020 (Sharpe $-$0.02) and turns negative in 2021--2025 ($-$0.38). Fixed 12-month momentum turns negative after 2015, confirming the momentum crash phenomenon documented by \citet{DanielMoskowitz2016}. M2's strongest performance (1.70) is in 2021--2025, a period characterised by elevated volatility and multiple stress episodes -- precisely the conditions where regime-conditional stock selection adds the most value.
 
 \subsection{Turnover and Transaction Cost Sensitivity}\label{app:turnover}
 
@@ -256,7 +256,7 @@ To assess the sampling variability of M2's Sharpe ratio and test its outperforma
 
 \input{tables/table_bootstrap}
 
-M2's Sharpe confidence interval is [0.67, 1.54], comfortably above zero, while every benchmark's interval straddles zero. The paired tests reject equality of Sharpe ratios between M2 and each benchmark at $p < 0.025$. Within M2, the panic-period Sharpe exceeds the calm-period Sharpe, though with only 59 panic months the paired difference is marginally significant ($p = 0.074$). These intervals describe sampling variability within the 2011--2025 sample; out-of-sample generalisation is addressed separately by the 30-year expanding-window backtest (Section~\ref{sec:historical_stress}) and the sub-period analysis (Appendix~\ref{app:subperiod}).
+M2's Sharpe confidence interval is [0.67, 1.53], comfortably above zero, while every benchmark's interval straddles zero. The paired tests reject equality of Sharpe ratios between M2 and each benchmark at $p < 0.025$. Within M2, the panic-period Sharpe exceeds the calm-period Sharpe in point estimate (1.54 vs 0.84), but with only 59 panic months the paired difference is not statistically significant ($p = 0.109$); the 95\% interval $[-0.16, 1.59]$ straddles zero. The point-estimate gap is consistent with the regime-conditional selection mechanism described in Section~\ref{sec:regime_results}, but its statistical confirmation would require a longer panic sample. These intervals describe sampling variability within the 2011--2025 sample; out-of-sample generalisation is addressed separately by the 30-year expanding-window backtest (Section~\ref{sec:historical_stress}) and the sub-period analysis (Appendix~\ref{app:subperiod}).
 
 \subsection{Ridge Regression Baseline}\label{app:ridge}
 
