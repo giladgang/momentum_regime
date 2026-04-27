@@ -5,18 +5,18 @@
 \toprule
 Parameter & $\hat{R}$ & Status \\
 \midrule
-$\mu_{\text{calm}}(\text{DD})$ & 1.000 & OK \\
-$\mu_{\text{calm}}(\text{DISP})$ & 1.000 & OK \\
-$\mu_{\text{calm}}(\text{REL\_N})$ & 1.000 & OK \\
-$\mu_{\text{calm}}(\text{CS})$ & 1.000 & OK \\
 $\mu_{\text{panic}}(\text{DD})$ & 1.000 & OK \\
 $\mu_{\text{panic}}(\text{DISP})$ & 1.000 & OK \\
 $\mu_{\text{panic}}(\text{REL\_N})$ & 1.000 & OK \\
 $\mu_{\text{panic}}(\text{CS})$ & 1.000 & OK \\
+$\mu_{\text{calm}}(\text{DD})$ & 1.000 & OK \\
+$\mu_{\text{calm}}(\text{DISP})$ & 1.001 & OK \\
+$\mu_{\text{calm}}(\text{REL\_N})$ & 1.000 & OK \\
+$\mu_{\text{calm}}(\text{CS})$ & 1.000 & OK \\
 $P_{00}$ (calm persistence) & 1.000 & OK \\
 $P_{01}$ (calm $\to$ panic) & 1.000 & OK \\
-$P_{10}$ (panic $\to$ calm) & 1.001 & OK \\
-$P_{11}$ (panic persistence) & 1.001 & OK \\
+$P_{10}$ (panic $\to$ calm) & 1.000 & OK \\
+$P_{11}$ (panic persistence) & 1.000 & OK \\
 \bottomrule
 \end{tabular}
 \caption{Gelman--Rubin $\hat{R}$ statistics for all HMM parameters, computed across 5 independent chains (1{,}500 post-burn-in draws each). All values are below 1.01, well within the convergence threshold of 1.1.}

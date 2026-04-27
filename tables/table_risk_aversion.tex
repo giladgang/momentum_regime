@@ -1,23 +1,22 @@
 \begin{table}[H]
 \centering
-\small
 \begin{tabular}{l l r r}
 \toprule
 Target family & Parameter & Sharpe & $\pi$ share \\
 \midrule
-Baseline ($r$) & --- & 1.11 & 45\% \\
+Baseline ($r$) & --- & 1.11 & 46\% \\
 \midrule
 \multicolumn{4}{l}{\textit{Sharpe-like: $r\,/\,\sigma^a$}} \\[2pt]
- & $a = 0.5$ & 1.02 & 57\% \\
- & $a = 1.0$ & 0.36 & 57\% \\
+ & $a = 0.5$ & 1.04 & 57\% \\
+ & $a = 1.0$ & 0.34 & 56\% \\
 \midrule
 \multicolumn{4}{l}{\textit{Mean-variance: $r - \frac{\gamma}{2}\sigma^2$}} \\[2pt]
- & $\gamma = 0.1$ & 1.07 & 47\% \\
- & $\gamma = 0.2$ & 1.06 & 44\% \\
- & $\gamma = 0.5$ & 0.75 & 35\% \\
+ & $\gamma = 0.1$ & 1.05 & 46\% \\
+ & $\gamma = 0.2$ & 0.97 & 44\% \\
+ & $\gamma = 0.5$ & 0.77 & 35\% \\
 \midrule
 \multicolumn{4}{l}{\textit{Log return: $\log(1+r)$}} \\[2pt]
- & --- & 0.57 & 48\% \\
+ & --- & 0.56 & 49\% \\
 \bottomrule
 \end{tabular}
 \caption{Risk-adjusted training targets and regime signal importance. ``$\pi$ share'' is the regime signal's fraction of total feature importance (remainder is momentum). All variants use 50 XGB seeds on the same sample as the main results.}

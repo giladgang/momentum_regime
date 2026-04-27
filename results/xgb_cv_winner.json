@@ -1,0 +1,17 @@
+{
+  "max_depth": 3,
+  "learning_rate": 0.1,
+  "n_estimators": 200,
+  "mean_val_sharpe": 0.5963038083792722,
+  "fold_std_val_sharpe": 0.8107164512741634,
+  "n_folds": 5,
+  "n_seeds_per_cell": 5,
+  "fee_decimal": 0.001,
+  "per_fold_val_sharpe": {
+    "1": 1.362,
+    "2": 0.451,
+    "3": -0.433,
+    "4": 1.463,
+    "5": 0.138
+  }
+}

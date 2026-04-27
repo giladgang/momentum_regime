@@ -1,0 +1,13 @@
+strategy,leg,regime,beta,se,n_months
+Fixed 12-mo mom,Long,Full,1.086,0.064,167
+Fixed 12-mo mom,Long,Calm,1.086,0.085,108
+Fixed 12-mo mom,Long,Panic,1.070,0.079,59
+Fixed 12-mo mom,Short,Full,1.743,0.111,167
+Fixed 12-mo mom,Short,Calm,1.802,0.207,108
+Fixed 12-mo mom,Short,Panic,1.692,0.128,59
+Method 2: XGB,Long,Full,1.550,0.078,167
+Method 2: XGB,Long,Calm,1.399,0.105,108
+Method 2: XGB,Long,Panic,1.648,0.097,59
+Method 2: XGB,Short,Full,1.095,0.056,167
+Method 2: XGB,Short,Calm,1.225,0.092,108
+Method 2: XGB,Short,Panic,0.981,0.047,59

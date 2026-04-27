@@ -1,0 +1,23 @@
+{
+  "combo": "DD+CS+LVIX+DISP",
+  "features": [
+    "DD",
+    "CS",
+    "LVIX",
+    "DISP"
+  ],
+  "n_features": 4,
+  "mean_val_sharpe": 0.5069913111071113,
+  "fold_std_val_sharpe": 0.6944286818054584,
+  "n_folds": 5,
+  "n_hmm_seeds": 3,
+  "n_xgb_seeds": 5,
+  "fee_decimal": 0.001,
+  "per_fold_val_sharpe": {
+    "1": 1.017,
+    "2": 0.289,
+    "3": -0.467,
+    "4": 1.317,
+    "5": 0.378
+  }
+}
