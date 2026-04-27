@@ -302,7 +302,7 @@ class TestTableConsistency:
 
     def test_main_results_alpha_inline(self):
         text = _read("latex/main_results.tex")
-        # "six-factor alpha of 24.7%"
+        # "six-factor alpha of 24.1%" (post-Shumway recalibrated value)
         assert "24.1" in text, (
             "main_results.tex does not contain alpha value 24.1"
         )

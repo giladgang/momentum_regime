@@ -66,7 +66,7 @@ warnings.filterwarnings('ignore')
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import (TRADING_FEE, TRAIN_END, N_ESTIMATORS, MAX_DEPTH,
                     LEARNING_RATE, SUBSAMPLE, COLSAMPLE, MOM_FEATURES,
-                    HMM_ITERATIONS, HMM_BURNIN)
+                    HMM_ITERATIONS, HMM_BURNIN, CRISIS_WINDOWS)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -199,10 +199,10 @@ def fit_hmm(Z_train, Z_full, train_dates, seed=42,
 
     mu_post = mu_draws.mean(axis=0)
 
-    # Panic identification (hmm_model.py method: sign-correction with crisis windows)
-    crisis_windows = [('2000-03-01', '2002-10-01'), ('2007-10-01', '2009-06-01')]
+    # Panic identification (hmm_model.py method: sign-correction with crisis windows).
+    # CRISIS_WINDOWS sourced from config.py to keep production scripts in sync.
     crisis_mask = np.zeros(T, dtype=bool)
-    for s, e in crisis_windows:
+    for s, e in CRISIS_WINDOWS:
         crisis_mask |= ((train_dates >= np.datetime64(s)) & (train_dates <= np.datetime64(e)))
 
     signs = np.zeros(D)

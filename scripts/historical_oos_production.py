@@ -61,7 +61,8 @@ from xgboost import XGBRegressor
 
 from config import (HMM_FEATURES, HMM_ITERATIONS, HMM_BURNIN, N_ESTIMATORS,
                     MAX_DEPTH, LEARNING_RATE, SUBSAMPLE, COLSAMPLE, MOM_FEATURES,
-                    RESULTS_DIR)
+                    RESULTS_DIR, HMM_PRIOR_M0, HMM_PRIOR_KAPPA0,
+                    HMM_PRIOR_NU0_OFF, HMM_PRIOR_DIRICHLET_ALPHA)
 
 warnings.filterwarnings('ignore')
 
@@ -136,9 +137,11 @@ def fit_hmm(Z_train, Z_full, seed, crisis_mask,
     ])
     P = np.array([[0.9, 0.1], [0.1, 0.9]])
 
-    m0, kappa0, nu0 = np.zeros(D), 0.01, D + 2
-    Psi0 = np.eye(D) * (D + 2 - D - 1)
-    alpha_dir = np.array([[9, 1], [1, 9]])
+    m0 = np.full(D, HMM_PRIOR_M0)
+    kappa0 = HMM_PRIOR_KAPPA0
+    nu0 = D + HMM_PRIOR_NU0_OFF
+    Psi0 = np.eye(D) * (nu0 - D - 1)
+    alpha_dir = np.asarray(HMM_PRIOR_DIRICHLET_ALPHA, dtype=float)
 
     for it in range(n_iter):
         states = ffbs(Z_train, mu, Sigma, P)

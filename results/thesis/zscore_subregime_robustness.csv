@@ -1,0 +1,8 @@
+metric,value
+silhouette_seed42,0.4619955047641383
+cluster_sizes_seed42,17|18|24
+cluster_sizes_seed123,17|18|24
+cluster_sizes_seed456,17|18|24
+cluster_sizes_seed789,17|18|24
+cluster_sizes_seed1011,17|18|24
+cluster_sizes_seed1213,17|18|24

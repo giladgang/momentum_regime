@@ -43,6 +43,15 @@ HMM_PRIOR_NU0_OFF  = 2   # nu_0 = D + HMM_PRIOR_NU0_OFF
 HMM_PRIOR_DIRICHLET_ALPHA = [[9.0, 1.0],
                              [1.0, 9.0]]
 
+# Crisis windows used for the production HMM sign-correction step.
+# Two-window definition (dot-com + GFC) matches hmm_model.py and
+# hmm_feature_selection.py. Expanding-window OOS scripts build their
+# own per-training-window masks and intentionally do not use this list.
+CRISIS_WINDOWS = [
+    ('2000-03-01', '2002-10-01'),
+    ('2007-10-01', '2009-06-01'),
+]
+
 # ═══════════════════════════════════════════════════════════════════════════════
 #  PORTFOLIO SETTINGS
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -157,6 +166,18 @@ TABLES_DIR = 'tables'
 PLOTS_DIR = 'plots'
 RESULTS_DIR = 'results'
 ARTEFACTS_DIR = 'artefacts'
+
+# Subdirectory layout introduced in the production/cv/diagnostic restructure.
+# Production thesis artifacts live in RESULTS_THESIS_DIR / PLOTS_THESIS_DIR.
+# CV outputs (not cited in thesis) live in RESULTS_CV_DIR.
+# Historical OOS sensitivities live in RESULTS_OOS_DIR.
+# Status / drift reports live in RESULTS_REPORTS_DIR.
+RESULTS_THESIS_DIR  = 'results/thesis'
+RESULTS_CV_DIR      = 'results/cv'
+RESULTS_OOS_DIR     = 'results/oos_historical'
+RESULTS_REPORTS_DIR = 'results/reports'
+PLOTS_THESIS_DIR    = 'plots/thesis'
+PLOTS_DIAGNOSTIC_DIR = 'plots/diagnostic'
 
 # ═══════════════════════════════════════════════════════════════════════════════
 #  DATA PATHS

@@ -1,0 +1,37 @@
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{l rrrr}
+\toprule
+Metric & Calm & Mild panic & Transition & Deep crisis \\
+\midrule
+\multicolumn{5}{l}{\emph{Months and performance}} \\
+Months ($n$) & 108 & 24 & 18 & 17 \\
+Mean $\pi^{\text{filter}}$ & 0.02 & 0.96 & 0.95 & 1.00 \\
+Mean monthly return (\%) & 1.22 & 1.96 & 3.77 & 3.18 \\
+Sharpe (annualised) & 0.84 & 1.38 & 1.51 & 1.84 \\
+\midrule
+\multicolumn{5}{l}{\emph{Long-leg z-score}} \\
+$z$ at mom\_1 & 0.03 & 0.17 & -0.12 & -0.77 \\
+$z$ at mom\_8 & 0.39 & 0.48 & -0.06 & -0.92 \\
+$z$ at mom\_12 & 0.16 & 0.37 & -0.17 & -0.94 \\
+$\bar z$ across horizons & 0.22 & 0.37 & -0.13 & -0.87 \\
+\midrule
+\multicolumn{5}{l}{\emph{Long-leg SHAP share}} \\
+$\pi^{\text{filter}}$ & 27.9\% & 34.5\% & 26.3\% & 7.5\% \\
+Momentum (12 horizons) & 72.1\% & 65.5\% & 73.7\% & 92.5\% \\
+\quad mom\_1 & 3.4\% & 3.6\% & 4.3\% & 8.2\% \\
+\quad mom\_8 & 7.3\% & 5.4\% & 5.7\% & 8.0\% \\
+\quad mom\_12 & 12.2\% & 9.2\% & 11.4\% & 13.9\% \\
+\midrule
+\multicolumn{5}{l}{\emph{Short-leg SHAP share}} \\
+$\pi^{\text{filter}}$ & 50.3\% & 53.2\% & 48.2\% & 22.4\% \\
+Momentum (12 horizons) & 49.7\% & 46.8\% & 51.8\% & 77.6\% \\
+\quad mom\_1 & 2.6\% & 4.5\% & 4.2\% & 12.9\% \\
+\quad mom\_8 & 6.4\% & 5.3\% & 5.1\% & 8.7\% \\
+\quad mom\_12 & 5.5\% & 4.7\% & 6.4\% & 7.0\% \\
+\bottomrule
+\end{tabular}
+\caption{Sub-regime decomposition of the HMM-classified panic regime. The 59 panic months are clustered (K-means, $k=3$, random seed 42, silhouette 0.46) on the long-leg 12-horizon cross-sectional z-profile. Cluster sizes are stable across six independent random seeds. SHAP shares are computed on the production XGBoost ensemble (50 seeds, depth~4) and normalised to sum to 100\% within each leg. Monthly returns are net of 10\,bps transaction cost. The HMM filtered probability cannot distinguish the three panic clusters (mean $\pi^{\text{filter}} \geq 0.95$ in all three); what differentiates them is the realised cross-sectional momentum landscape.}
+\label{tab:zscore_subregime}
+\end{table}

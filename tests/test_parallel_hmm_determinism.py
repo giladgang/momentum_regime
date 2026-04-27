@@ -164,8 +164,15 @@ def test_parallel_matches_existing_production_year():
     We pick the most recent fully-completed predict-year so we exercise the
     largest training window (most numerically delicate). The check excludes
     the currently-running year (which won't be in the saved output yet)."""
-    pi_path = os.path.join(REPO, 'results', 'expanding_pi_filter_prod.csv')
-    if not os.path.exists(pi_path):
+    # Probe both new (post-restructure) and legacy paths so the test follows
+    # whichever location the live production run wrote to.
+    pi_path_new = os.path.join(REPO, 'results', 'thesis', 'expanding_pi_filter_prod.csv')
+    pi_path_old = os.path.join(REPO, 'results', 'expanding_pi_filter_prod.csv')
+    if os.path.exists(pi_path_new):
+        pi_path = pi_path_new
+    elif os.path.exists(pi_path_old):
+        pi_path = pi_path_old
+    else:
         pytest.skip("No expanding_pi_filter_prod.csv yet; production must "
                     "have completed at least one year.")
 

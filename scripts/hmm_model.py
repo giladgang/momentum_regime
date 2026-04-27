@@ -63,7 +63,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import (HMM_FEATURES, HMM_SEEDS, HMM_ITERATIONS, HMM_BURNIN,
                     K_STATES, HMM_START, TRAIN_END, PANEL_PATH,
                     HMM_PRIOR_M0, HMM_PRIOR_KAPPA0, HMM_PRIOR_NU0_OFF,
-                    HMM_PRIOR_DIRICHLET_ALPHA)
+                    HMM_PRIOR_DIRICHLET_ALPHA, CRISIS_WINDOWS)
 
 panel = pd.read_parquet(PANEL_PATH)
 
@@ -283,11 +283,11 @@ n_keep   = n_iter - n_burnin  # number of posterior draws saved per seed
 
 import os
 
-# Build crisis mask once (used for panic identification in each seed)
-crisis_windows = [('2000-03-01', '2002-10-01'), ('2007-10-01', '2009-06-01')]
+# Build crisis mask once (used for panic identification in each seed).
+# CRISIS_WINDOWS comes from config.py so all production scripts agree.
 train_dates = train_panel['date'].values
 crisis_mask = np.zeros(T_train, dtype=bool)
-for s, e in crisis_windows:
+for s, e in CRISIS_WINDOWS:
     crisis_mask |= ((train_dates >= np.datetime64(s)) & (train_dates <= np.datetime64(e)))
 
 # Determine sign direction for each feature (data-driven, same for all seeds)
