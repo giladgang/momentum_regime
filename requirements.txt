@@ -1,4 +1,4 @@
-# Python dependencies for momentum_regime_shifts.
+# Python dependencies for momentum_regime (giladgang/momentum_regime on GitHub).
 #
 # Versions pinned to those used to produce the thesis numbers. Install
 # with:

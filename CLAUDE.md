@@ -24,7 +24,7 @@ Code in `scripts/`, results in `results/`, plots in `plots/`, LaTeX tables in
 - `INTL_VALIDATION_PLAN.md` — international replication plan.
 
 ## Git
-- Local folder: `momentum_regime_shifts`. GitHub remote: `giladgang/thesis_git`.
+- Local folder: `momentum_regime_shifts` (descriptive). GitHub remote: `giladgang/momentum_regime`. The old name `thesis_git` is auto-redirected by GitHub forever.
 
 ## Reproducibility
 - Run scripts in the env defined by `requirements.lock`. Don't `pip install` a new

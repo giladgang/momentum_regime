@@ -11,7 +11,7 @@ The headline performance numbers, factor alphas, sub-period stability, and ablat
 ## Repository structure
 
 ```
-momentum_regime_shifts/
+momentum_regime/
 ├── run_pipeline.py        # master orchestrator (~102 ordered steps)
 ├── config.py              # central parameter store (seeds, features, dates, fees)
 ├── main.tex               # thesis entry point
@@ -48,8 +48,8 @@ momentum_regime_shifts/
 Tested on Python 3.12 (macOS, Ubuntu 22.04 CI).
 
 ```bash
-git clone https://github.com/giladgang/thesis_git.git momentum_regime_shifts
-cd momentum_regime_shifts
+git clone https://github.com/giladgang/momentum_regime.git
+cd momentum_regime
 
 python3.12 -m venv .venv
 source .venv/bin/activate
@@ -128,7 +128,7 @@ The LaTeX build also runs on every push via [.github/workflows/latex.yml](.githu
   title   = {Momentum and Regime Shifts},
   school  = {Tilburg University},
   year    = {2026},
-  note    = {See https://github.com/giladgang/thesis_git for the reproducible pipeline.}
+  note    = {See https://github.com/giladgang/momentum_regime for the reproducible pipeline.}
 }
 ```
 

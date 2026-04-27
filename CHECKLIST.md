@@ -65,5 +65,5 @@
 - [ ] Coherence review across all sections
 - [ ] Check all numbers in text match tables
 - [ ] Search for stale references (long-only, VOL_z, old feature names)
-- [ ] Push to thesis_git
+- [ ] Push to `momentum_regime` (GitHub remote)
 - [ ] Send updated draft to Denis
