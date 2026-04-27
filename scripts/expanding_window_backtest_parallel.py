@@ -52,7 +52,7 @@ from xgboost import XGBRegressor
 
 from config import (HMM_FEATURES, HMM_ITERATIONS, HMM_BURNIN, N_ESTIMATORS,
                     MAX_DEPTH, LEARNING_RATE, SUBSAMPLE, COLSAMPLE, MOM_FEATURES,
-                    RESULTS_DIR)
+                    RESULTS_DIR, RESULTS_THESIS_DIR)
 
 from historical_oos_production import fit_hmm, build_ls  # reuse tested code
 
@@ -109,7 +109,7 @@ def main():
     FEATURES = MOM_FEATURES + ['pi_filter']
     N_WORKERS = max(1, min(args.workers, cpu_count()))
 
-    os.makedirs(RESULTS_DIR, exist_ok=True)
+    os.makedirs(RESULTS_THESIS_DIR, exist_ok=True)
 
     print("=" * 70)
     print(f"  EXPANDING-WINDOW BACKTEST (PARALLEL HMM): tag={TAG}")
@@ -151,10 +151,10 @@ def main():
     Z_full = sub[HMM_FEATURES].values.astype(float)
     print(f"  Feature panel: {len(sub)} months, stocks: {len(stocks):,} rows")
 
-    # Output paths
-    ret_path = os.path.join(RESULTS_DIR, f'expanding_returns_{TAG}.csv')
-    pi_path = os.path.join(RESULTS_DIR, f'expanding_pi_filter_{TAG}.csv')
-    log_path = os.path.join(RESULTS_DIR, f'expanding_summary_{TAG}.csv')
+    # Output paths (thesis-canonical layout post-restructure)
+    ret_path = os.path.join(RESULTS_THESIS_DIR, f'expanding_returns_{TAG}.csv')
+    pi_path = os.path.join(RESULTS_THESIS_DIR, f'expanding_pi_filter_{TAG}.csv')
+    log_path = os.path.join(RESULTS_THESIS_DIR, f'expanding_summary_{TAG}.csv')
 
     # Resume support
     completed_years = set()

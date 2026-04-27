@@ -39,9 +39,9 @@ Usage:
         --test-end 2011-01-01 --hmm-seeds 200 --xgb-seeds 50 --tag prod_1990_2004
 
 Outputs (per tag):
-    results/oos_returns_<tag>.csv         -- per-month L/S returns
-    results/oos_subperiods_<tag>.csv      -- sub-period decomposition
-    results/oos_summary_<tag>.csv         -- one-line overall summary
+    results/oos_historical/oos_returns_<tag>.csv      -- per-month L/S returns
+    results/oos_historical/oos_subperiods_<tag>.csv   -- sub-period decomposition
+    results/oos_historical/oos_summary_<tag>.csv      -- one-line overall summary
 """
 
 import argparse
@@ -61,7 +61,7 @@ from xgboost import XGBRegressor
 
 from config import (HMM_FEATURES, HMM_ITERATIONS, HMM_BURNIN, N_ESTIMATORS,
                     MAX_DEPTH, LEARNING_RATE, SUBSAMPLE, COLSAMPLE, MOM_FEATURES,
-                    RESULTS_DIR, HMM_PRIOR_M0, HMM_PRIOR_KAPPA0,
+                    RESULTS_DIR, RESULTS_OOS_DIR, HMM_PRIOR_M0, HMM_PRIOR_KAPPA0,
                     HMM_PRIOR_NU0_OFF, HMM_PRIOR_DIRICHLET_ALPHA)
 
 warnings.filterwarnings('ignore')
@@ -270,7 +270,7 @@ def main():
     TAG = args.tag
 
     FEATURES = MOM_FEATURES + ['pi_filter']
-    os.makedirs(RESULTS_DIR, exist_ok=True)
+    os.makedirs(RESULTS_OOS_DIR, exist_ok=True)
 
     t_start = time.time()
     print("=" * 70)
@@ -405,13 +405,13 @@ def main():
               f"{row['sharpe']:>8.2f} {row['cum'] * 100:>+7.1f}% "
               f"{row['mdd'] * 100:>+7.1f}%")
 
-    # ── [5/5] Save outputs ──
+    # ── [5/5] Save outputs (canonical OOS layout) ──
     print("\n[5/5] Saving outputs ...")
-    returns_path = os.path.join(RESULTS_DIR, f'oos_returns_{TAG}.csv')
+    returns_path = os.path.join(RESULTS_OOS_DIR, f'oos_returns_{TAG}.csv')
     r.to_frame('ret').to_csv(returns_path)
     print(f"  Saved: {returns_path}")
 
-    sub_path = os.path.join(RESULTS_DIR, f'oos_subperiods_{TAG}.csv')
+    sub_path = os.path.join(RESULTS_OOS_DIR, f'oos_subperiods_{TAG}.csv')
     sub_df.to_csv(sub_path, index=False)
     print(f"  Saved: {sub_path}")
 
@@ -423,7 +423,7 @@ def main():
         'xgb_seeds': len(XGB_SEEDS),
         **overall,
     }])
-    summary_path = os.path.join(RESULTS_DIR, f'oos_summary_{TAG}.csv')
+    summary_path = os.path.join(RESULTS_OOS_DIR, f'oos_summary_{TAG}.csv')
     summary.to_csv(summary_path, index=False)
     print(f"  Saved: {summary_path}")
 

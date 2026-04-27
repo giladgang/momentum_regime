@@ -22,10 +22,10 @@ import pandas as pd
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from config import RESULTS_DIR, TABLES_DIR
+from config import RESULTS_THESIS_DIR, TABLES_DIR
 
 
-RETURNS_PATH = os.path.join(RESULTS_DIR, 'expanding_returns_prod.csv')
+RETURNS_PATH = os.path.join(RESULTS_THESIS_DIR, 'expanding_returns_prod.csv')
 TEX_PATH = os.path.join(TABLES_DIR, 'table_expanding_subperiods.tex')
 
 SUBPERIODS = [

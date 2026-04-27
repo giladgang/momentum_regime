@@ -31,9 +31,9 @@ Usage (production, ~17 hrs):
         --hmm-seeds 200 --xgb-seeds 50 --tag prod
 
 Outputs (per tag):
-    results/expanding_returns_<tag>.csv       -- monthly OOS L/S returns
-    results/expanding_pi_filter_<tag>.csv     -- monthly averaged pi_filter
-    results/expanding_summary_<tag>.csv       -- per-retraining diagnostics
+    results/thesis/expanding_returns_<tag>.csv       -- monthly OOS L/S returns
+    results/thesis/expanding_pi_filter_<tag>.csv     -- monthly averaged pi_filter
+    results/thesis/expanding_summary_<tag>.csv       -- per-retraining diagnostics
 """
 
 import argparse
@@ -51,7 +51,7 @@ from xgboost import XGBRegressor
 
 from config import (HMM_FEATURES, HMM_ITERATIONS, HMM_BURNIN, N_ESTIMATORS,
                     MAX_DEPTH, LEARNING_RATE, SUBSAMPLE, COLSAMPLE, MOM_FEATURES,
-                    RESULTS_DIR)
+                    RESULTS_DIR, RESULTS_THESIS_DIR)
 
 from historical_oos_production import fit_hmm, build_ls  # reuse tested code
 
@@ -95,7 +95,7 @@ def main():
     TAG = args.tag
     FEATURES = MOM_FEATURES + ['pi_filter']
 
-    os.makedirs(RESULTS_DIR, exist_ok=True)
+    os.makedirs(RESULTS_THESIS_DIR, exist_ok=True)
 
     print("=" * 70)
     print(f"  EXPANDING-WINDOW BACKTEST: tag={TAG}")
@@ -137,10 +137,10 @@ def main():
 
     print(f"  Feature panel: {len(sub)} months, stocks: {len(stocks):,} rows")
 
-    # Output paths (per tag)
-    ret_path = os.path.join(RESULTS_DIR, f'expanding_returns_{TAG}.csv')
-    pi_path = os.path.join(RESULTS_DIR, f'expanding_pi_filter_{TAG}.csv')
-    log_path = os.path.join(RESULTS_DIR, f'expanding_summary_{TAG}.csv')
+    # Output paths (per tag) — thesis-canonical layout post-restructure
+    ret_path = os.path.join(RESULTS_THESIS_DIR, f'expanding_returns_{TAG}.csv')
+    pi_path = os.path.join(RESULTS_THESIS_DIR, f'expanding_pi_filter_{TAG}.csv')
+    log_path = os.path.join(RESULTS_THESIS_DIR, f'expanding_summary_{TAG}.csv')
 
     # Resume support: a year is considered complete only if it has a row in
     # the summary log. On restart we skip those years and append fresh rows

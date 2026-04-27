@@ -141,7 +141,11 @@ def main():
         print("  (Delete panel_with_regimes.parquet to force re-estimation)")
 
     # Check if 30-year expanding-window backtest results already exist
-    _exp_path = os.path.join(cfg.RESULTS_DIR, 'expanding_returns_prod.csv')
+    # (canonical path is RESULTS_THESIS_DIR; legacy path probed for
+    # back-compat with older runs).
+    _exp_path_new = os.path.join(cfg.RESULTS_THESIS_DIR, 'expanding_returns_prod.csv')
+    _exp_path_old = os.path.join(cfg.RESULTS_DIR, 'expanding_returns_prod.csv')
+    _exp_path = _exp_path_new if os.path.exists(_exp_path_new) else _exp_path_old
     try:
         _exp = pd.read_csv(_exp_path)
         expanding_ready = len(_exp) >= 350  # ~30 years of monthly data
@@ -150,7 +154,7 @@ def main():
         expanding_ready = False
     if expanding_ready:
         print("  Expanding-window backtest results found -- skipping Step 19")
-        print("  (Delete results/expanding_returns_prod.csv to force re-run)")
+        print(f"  (Delete {_exp_path} to force re-run)")
     print()
 
     # ── Pre-flight: fast artefact-independent tests ──────────────────────────
@@ -287,23 +291,27 @@ def main():
              'STEP 33: Render risk-aversion dual-utility plot '
              '(plots/thesis/risk_aversion_dual_util.pdf — depends on Step 32)'),
 
-        # ─ Canonical chain (must run AFTER all generators above)
-        21: ('scripts/build_metrics.py',
-             'STEP 21: Extract canonical metrics from tables/+results/ → results/PRODUCTION_METRICS.json '
+        # ─ Canonical chain (must run AFTER all generators above).
+        # Renumbered 21-24 -> 80-83 so sorted(steps.keys()) places them
+        # strictly after the auxiliary generators (steps 25-33). Earlier
+        # numbering ran them in slots 21-24 which sorted BEFORE 25-33,
+        # so PRODUCTION_METRICS.json lagged by one full pipeline run.
+        80: ('scripts/build_metrics.py',
+             'STEP 80: Extract canonical metrics from tables/+results/ → results/PRODUCTION_METRICS.json '
              '(also writes results/METRICS_DIFF.md showing what changed since last run)'),
 
-        22: ('scripts/build_canonical_macros.py',
-             'STEP 22: Emit latex/canonical_macros.tex from PRODUCTION_METRICS.json '
+        81: ('scripts/build_canonical_macros.py',
+             'STEP 81: Emit latex/canonical_macros.tex from PRODUCTION_METRICS.json '
              '(\\newcommand per metric for use in thesis prose)'),
 
-        23: ('scripts/build_thesis_tables.py',
-             'STEP 23: Render headline thesis tables (table_performance, table_factor_alphas, '
+        82: ('scripts/build_thesis_tables.py',
+             'STEP 82: Render headline thesis tables (table_performance, table_factor_alphas, '
              'table_regime_sharpe, table_panic_subtypes, table_hmm_separation) directly from '
              'PRODUCTION_METRICS.json — single source of truth. Writes .canonical.tex siblings '
              'until rename'),
 
-        24: ('scripts/verify_thesis_consistency.py',
-             'STEP 24: Flag drift between latex prose and PRODUCTION_METRICS.json '
+        83: ('scripts/verify_thesis_consistency.py',
+             'STEP 83: Flag drift between latex prose and PRODUCTION_METRICS.json '
              '(soft check; non-blocking — surfaces hand-typed numbers that need updating)'),
 
         95: ('tests/test_config.py',

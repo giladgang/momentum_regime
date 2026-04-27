@@ -150,8 +150,8 @@ def main():
                 })
 
     df = pd.DataFrame(rows)
-    out_csv = root / cfg.RESULTS_DIR / 'leg_betas_by_regime.csv'
-    out_csv.parent.mkdir(exist_ok=True)
+    out_csv = root / cfg.RESULTS_THESIS_DIR / 'leg_betas_by_regime.csv'
+    out_csv.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(out_csv, index=False, float_format='%.3f')
     print(f"Wrote {out_csv}")
     print(df.to_string(index=False, float_format='%.3f'))

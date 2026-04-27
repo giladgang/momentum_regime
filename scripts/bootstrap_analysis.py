@@ -185,25 +185,28 @@ print(f"  Panic Sharpe: {panic_point:.3f}  [{panic_ci[0]:.3f}, {panic_ci[1]:.3f}
 print(f"  Diff (P-C):   {panic_point - calm_point:.3f}  [{diff_ci[0]:.3f}, {diff_ci[1]:.3f}]  (p={diff_p:.4f})")
 
 
-# ── Save results ──
-os.makedirs('results', exist_ok=True)
+# ── Save results (canonical thesis layout) ──
+os.makedirs(cfg.RESULTS_THESIS_DIR, exist_ok=True)
+ci_path     = os.path.join(cfg.RESULTS_THESIS_DIR, 'bootstrap_sharpe_cis.csv')
+paired_path = os.path.join(cfg.RESULTS_THESIS_DIR, 'bootstrap_paired_tests.csv')
+regime_path = os.path.join(cfg.RESULTS_THESIS_DIR, 'bootstrap_regime.csv')
 ci_df = pd.DataFrame(ci_results)
-ci_df.to_csv('results/thesis/bootstrap_sharpe_cis.csv', index=False)
+ci_df.to_csv(ci_path, index=False)
 paired_df = pd.DataFrame(paired_results)
-paired_df.to_csv('results/thesis/bootstrap_paired_tests.csv', index=False)
+paired_df.to_csv(paired_path, index=False)
 
 regime_df = pd.DataFrame([
     {'regime': 'Calm',  'n_months': len(calm_returns),  'sharpe': calm_point,  'ci_low': calm_ci[0],  'ci_high': calm_ci[1]},
     {'regime': 'Panic', 'n_months': len(panic_returns), 'sharpe': panic_point, 'ci_low': panic_ci[0], 'ci_high': panic_ci[1]},
-    {'regime': 'Panic - Calm', 'n_months': '---', 'sharpe': panic_point - calm_point,
+    {'regime': 'Panic - Calm', 'n_months': 'NA', 'sharpe': panic_point - calm_point,
      'ci_low': diff_ci[0], 'ci_high': diff_ci[1]},
 ])
-regime_df.to_csv('results/thesis/bootstrap_regime.csv', index=False)
+regime_df.to_csv(regime_path, index=False)
 
 print("\nSaved:")
-print("  results/bootstrap_sharpe_cis.csv")
-print("  results/bootstrap_paired_tests.csv")
-print("  results/bootstrap_regime.csv")
+print(f"  {ci_path}")
+print(f"  {paired_path}")
+print(f"  {regime_path}")
 
 
 # ── LaTeX table ──

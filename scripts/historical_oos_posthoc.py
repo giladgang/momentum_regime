@@ -28,9 +28,10 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from config import RESULTS_DIR, TABLES_DIR, MOM_FEATURES
+from config import RESULTS_DIR, RESULTS_OOS_DIR, TABLES_DIR, MOM_FEATURES
 
 os.makedirs(RESULTS_DIR, exist_ok=True)
+os.makedirs(RESULTS_OOS_DIR, exist_ok=True)
 os.makedirs(TABLES_DIR, exist_ok=True)
 
 FEE = 0.001
@@ -99,9 +100,9 @@ print("=" * 70)
 print("  POST-HOC ANALYSIS: Historical OOS sub-period decomposition")
 print("=" * 70)
 
-m2_a = pd.read_csv(os.path.join(RESULTS_DIR, 'oos_returns_prod_1990_1999.csv'),
+m2_a = pd.read_csv(os.path.join(RESULTS_OOS_DIR, 'oos_returns_prod_1990_1999.csv'),
                    index_col='date', parse_dates=True)['ret']
-m2_ap = pd.read_csv(os.path.join(RESULTS_DIR, 'oos_returns_prod_1990_2004.csv'),
+m2_ap = pd.read_csv(os.path.join(RESULTS_OOS_DIR, 'oos_returns_prod_1990_2004.csv'),
                     index_col='date', parse_dates=True)['ret']
 
 print(f"\nA  (1990-1999 train): {len(m2_a)} months, "
@@ -246,7 +247,7 @@ for _, row in df.iterrows():
           f"{row['sharpe']:>8.2f} {ci:>16} {row['cum'] * 100:>+7.1f}% "
           f"{row['mdd'] * 100:>+7.1f}%")
 
-out_path = os.path.join(RESULTS_DIR, 'oos_subperiod_full.csv')
+out_path = os.path.join(RESULTS_OOS_DIR, 'oos_subperiod_full.csv')
 df.to_csv(out_path, index=False)
 print(f"\nSaved: {out_path}")
 
