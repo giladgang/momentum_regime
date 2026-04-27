@@ -4,10 +4,10 @@
 \toprule
  & $\hat{\mu}_{\text{calm}}$ & $\hat{\mu}_{\text{panic}}$ & \multicolumn{1}{c}{$\Delta$} & 95\% CI \\
 \midrule
-DD$_z$ & 0.531 & $-$0.974 & $-$1.506 & [$-$1.797,\,$-$1.226] \\
-DISP$_z$ & $-$0.423 & 0.692 & $+$1.115 & [$+$0.867,\,$+$1.352] \\
-REL\_N$_z$ & 0.524 & $-$0.895 & $-$1.419 & [$-$1.591,\,$-$1.244] \\
-CS$_z$ & $-$0.697 & 0.204 & $+$0.902 & [$+$0.623,\,$+$1.164] \\
+DD$_z$ & 0.531 & $-$0.976 & $-$1.507 & [$-$1.794,\,$-$1.215] \\
+DISP$_z$ & -0.423 & $+$0.689 & $+$1.113 & [$+$0.869,\,$+$1.353] \\
+REL\_N$_z$ & 0.525 & $-$0.895 & $-$1.419 & [$-$1.591,\,$-$1.231] \\
+CS$_z$ & -0.697 & $+$0.203 & $+$0.900 & [$+$0.626,\,$+$1.159] \\
 \bottomrule
 \end{tabular}
 \caption{HMM posterior regime-mean separation.}
@@ -15,5 +15,5 @@ CS$_z$ & $-$0.697 & 0.204 & $+$0.902 & [$+$0.623,\,$+$1.164] \\
 
 \medskip
 \small
-\textbf{Notes:} This table reports posterior mean estimates of regime-conditional feature means from the Bayesian two-state HMM, estimated via Gibbs sampling (2{,}000 iterations, 500 burn-in) on the 1990--2010 training period. All features are standardised to zero mean and unit variance. $\Delta = \hat{\mu}_{\text{panic}} - \hat{\mu}_{\text{calm}}$ is the separation between regimes. The 95\% CI is the Bayesian posterior credible interval for $\Delta$; zero lies outside all intervals, confirming significant regime separation. DD = market drawdown; DISP = log cross-sectional return dispersion; REL\_N = relative market participation; CS = credit spread (BAA$-$AAA).
+\textbf{Notes:} This table reports posterior mean estimates of regime-conditional feature means from the Bayesian two-state HMM, estimated via Gibbs sampling on the 1990--2010 training period. All features are standardised to zero mean and unit variance. $\Delta = \hat{\mu}_{\text{panic}} - \hat{\mu}_{\text{calm}}$ is the separation between regimes. The 95\% CI is the Bayesian posterior credible interval for $\Delta$; zero lies outside all intervals, confirming significant regime separation. DD = market drawdown; DISP = log cross-sectional return dispersion; REL\_N = relative market participation; CS = credit spread (BAA$-$AAA).
 \end{table}

@@ -71,19 +71,23 @@ Genuinely new findings or significant reframings. Each item is a writing task. *
   - Channel 2: [`results/leg_betas_by_regime.csv`](results/leg_betas_by_regime.csv), [`tables/table_zscore_shap_detail.tex`](tables/table_zscore_shap_detail.tex)
 - [ ] **Edit #4** — `latex/methodology.tex`: π_filter ↔ D&M bear-indicator link (probabilistic/continuous vs binary). Reference [`tables/table_hmm_separation.tex`](tables/table_hmm_separation.tex)
 
-#### N3 — CV-justified specifications — STRIKE caveats + future work
+#### N3 — Defer CV-based selection to future work
 
-**Decision locked**: keep production specs (HMM `DD+CS+DISP+REL_N`, XGB `depth=4 lr=0.05 n=500`); CV results live in appendix as robustness backing.
+**Decision locked**: keep production specs (HMM `DD+CS+DISP+REL_N`, XGB `depth=4 lr=0.05 n=500`). **Neither the HMM CV nor the XGB CV result is cited in the thesis** — both are flagged as future research only. The existing "specification-search" / "test-set tuned" caveats in `latex/data_section.tex`, `latex/methodology.tex`, `latex/appendix.tex` STAY IN PLACE as honest acknowledgments. Existing in-thesis tables (`table_xgb_hyperparams.tex`, `table_feature_selection.tex`) and their prose are unchanged by N3 — only post-Shumway numbers refresh via Bucket 1.
 
-- [ ] Strike "specification-search" caveat in `latex/data_section.tex`
-- [ ] Strike "test-set tuned" caveat in `latex/methodology.tex` and `latex/appendix.tex`
-- [ ] Optional appendix paragraph showing production combo is within fold-noise of CV winner. Cite [`tables/table_xgb_cv.tex`](tables/table_xgb_cv.tex) and [`tables/table_hmm_cv.tex`](tables/table_hmm_cv.tex)
-- [ ] **Edit #6 (future work)** — paragraph in `latex/future_work_full.tex` on rolling/expanding-window CV as more robust feature-selection. **Draft prose**:
+- [ ] **Edit #6 (future work — HMM feature selection)** — paragraph in `latex/future_work_full.tex` on CV as more robust HMM feature-selection. **Draft prose** (does NOT reveal CV findings):
 
-  > A more robust HMM feature-selection procedure would replace the test-period-evaluated 4-pass pipeline used here (Section X.Y) with a cross-validation entirely within the training partition — for instance, a 5-fold expanding-window CV on the 1990-2010 panel that never touches the 2011-2025 test data. We implement such a CV as a robustness check (Appendix \ref{app:hmm_cv}); it identifies `DD+CS+LVIX+DISP` as the held-out-validation winner, statistically indistinguishable from our production set within fold-noise. Future research should adopt this as the primary selection method, with rolling-window robustness checks at multiple training-end dates to validate stability of the chosen feature set across regimes.
+  > Future research should replace the test-period-evaluated 4-pass feature-selection pipeline used here (Section~X.Y) with a cross-validation procedure run entirely within the training partition — for instance, a 5-fold expanding-window CV on the 1990-2010 panel that never touches the 2011-2025 test data — combined with rolling-window robustness checks at multiple training-end dates to validate stability of the chosen feature set across regimes.
 
-  Cite [`tables/table_hmm_cv.tex`](tables/table_hmm_cv.tex) and [`results/hmm_cv_winner.json`](results/hmm_cv_winner.json).
-- [ ] Note that `tables/table_xgb_hyperparams.tex` and `tables/table_feature_selection.tex` are now deprecated (replaced by CV tables); update any in-text references
+  No in-thesis citations to specific CV results.
+
+- [ ] **Edit #7 (future work — XGB hyperparameter dissection)** — paragraph in `latex/future_work_full.tex`. **Draft prose**:
+
+  > A natural extension of this work is a systematic dissection of the XGBoost hyperparameter space — sweeping tree depth, learning rate, and ensemble size at fine resolution and comparing not only out-of-sample Sharpe ratios but also the cross-sectional z-scores of long- and short-leg selections across regimes. Such an analysis would test whether the regime-conditional term-structure shape we identify (Section~X.Y) is robust to model-capacity choices, or whether the panic-recovery selection pattern is specific to the production specification. A rolling-window cross-validation across multiple training-end dates would further test stability of the optimum across market regimes.
+
+  No in-thesis citations to specific CV results.
+
+- [ ] CV artefacts (`tables/table_hmm_cv.tex`, `tables/table_xgb_cv.tex`, `results/hmm_cv_*`, `results/xgb_cv_*`) exist on disk for follow-up work but are NOT referenced in any `.tex` file. Verify after Bucket 2 edits that no `\input` or `\ref` to these files leaked in.
 
 #### N4 — Fold-3 dot-com universal failure — NEW caveat
 
@@ -102,15 +106,6 @@ With t=4.37\*\*\* post-Shumway, this defensive framing is no longer needed and r
 
 - [ ] Rewrite the defensive t-stat paragraph in `latex/conclusion.tex` (currently in the limitations/caveats section). New framing: "The Newey-West t-statistic on M2's excess return over the market is 4.37\*\*\* post-Shumway, well above conventional thresholds. The factor-model alphas in Appendix~\ref{app:factor_alphas} confirm this across all five factor specifications (t > 4)."
 - [ ] One-line emphasis wherever the t-stat appears in `latex/main_results.tex`: **t-stat 1.83\* → 4.37\*\*\*** post-Shumway. Marginal → highly significant. Largest single result of the Shumway treatment.
-
-#### N8 — IC paradox — NEW prose (genuinely missing from thesis)
-
-`latex/*.tex` contains **no comparison** between M2's per-stock IC and naive momentum's IC. The IC table exists in the appendix but the paradox is not framed in prose anywhere.
-
-- [ ] Add prose (likely in `latex/main_results.tex` mechanism section): M2 IC = **−0.005 (n.s.)** vs naive momentum IC = **+0.027 (t=3.15\*\*\*)**. M2 has *worse* per-stock IC than naive momentum yet much better portfolio Sharpe. The edge is **portfolio construction** (decile-spread + regime-conditional ranking), NOT improved per-stock prediction.
-  - Data: [`tables/table_ic.tex`](tables/table_ic.tex)
-  - Paired diff M2 − Mom = −0.031 (t = −2.95\*\*\*) — M2 is *significantly worse* at IC by a paired test
-  - Why this matters: distinguishes M2's edge from a "better momentum signal" interpretation. Connects to N7 (negative UMD loading) — same novelty story from a different angle.
 
 #### N9 — Already strong in existing thesis (verify only, no new prose)
 
@@ -159,11 +154,13 @@ The HARD STOP section above is the day-to-day "what to write next" view. The ful
 
 ---
 
-## 🔬 Robustness backing (already pushed to remote)
+## 🔬 CV artefacts (NOT cited in thesis — per N3 decision)
+
+CV results stay out of thesis prose entirely. These exist on disk for follow-up research:
 
 - [`results/xgb_cv_winner.json`](results/xgb_cv_winner.json), [`results/xgb_cv_results.csv`](results/xgb_cv_results.csv), [`tables/table_xgb_cv.tex`](tables/table_xgb_cv.tex) — Step I (XGB CV)
 - [`results/hmm_cv_winner.json`](results/hmm_cv_winner.json), [`results/hmm_cv_features.csv`](results/hmm_cv_features.csv), [`tables/table_hmm_cv.tex`](tables/table_hmm_cv.tex) — Step J (HMM CV)
-- Production combo's CV rank: 47/64 (mean +0.286, fold-std 0.510). Within fold-noise of winner.
+- HMM production combo's CV rank: 47/64 (mean +0.286, fold-std 0.510) — within fold-noise of winner but bottom-half rank; this is why we're not citing it.
 
 ---
 
@@ -217,11 +214,49 @@ Carried over from old project planning; absent from current thesis and from `fut
 
 ---
 
+## ⚙️ Source-of-truth framework (`results/PRODUCTION_METRICS.json`)
+
+A canonical metrics store. Every published thesis number lives here under a named key. Tables, plots, and prose all reference this single source.
+
+**Pipeline:**
+
+```bash
+# After any analysis rerun:
+python scripts/build_metrics.py            # extracts numbers from tables/*.tex + key CSVs → PRODUCTION_METRICS.json
+python scripts/build_canonical_macros.py   # emits latex/canonical_macros.tex (\newcommand per metric)
+python scripts/verify_thesis_consistency.py  # flags drift between latex prose and the JSON
+```
+
+**Files:**
+- [`results/PRODUCTION_METRICS.json`](results/PRODUCTION_METRICS.json) — the canonical store (~200 metrics across 12 sections)
+- [`scripts/_canonical_metrics.py`](scripts/_canonical_metrics.py) — read/write helper (`set_metric`, `get_metric`)
+- [`scripts/build_metrics.py`](scripts/build_metrics.py) — parses `tables/*.tex` + `results/*.csv` into the JSON
+- [`scripts/build_canonical_macros.py`](scripts/build_canonical_macros.py) — emits `latex/canonical_macros.tex`
+- [`scripts/verify_thesis_consistency.py`](scripts/verify_thesis_consistency.py) — flags prose-vs-JSON mismatches
+- [`latex/canonical_macros.tex`](latex/canonical_macros.tex) — auto-generated; do NOT hand-edit
+
+**Usage in thesis prose** (optional but recommended for headline numbers):
+
+```latex
+\input{canonical_macros}   % at the top of main.tex once
+
+The strategy delivers a Sharpe ratio of \mmperfm2sharpe with a Newey-West
+t-statistic of \mmperfm2nwt, well above conventional thresholds.
+```
+
+When numbers update post-rerun, only re-run `build_metrics.py` + `build_canonical_macros.py` — every prose mention of `\mmperfm2sharpe` updates automatically. For numbers still hand-typed, `verify_thesis_consistency.py` flags drift.
+
+---
+
 ## 🛠️ Engineering / testing follow-ups (low priority)
 
 - [ ] Add `pytest.skip` guard to `tests/test_utils.py::TestDataLoaders` so the class is included in `.github/workflows/tests.yml`. Currently excluded because the loader tests depend on data parquets that aren't in git; the skip guard lets the artefact-independent tests in the file run on CI.
   - File to edit: [`tests/test_utils.py`](tests/test_utils.py) (TestDataLoaders class)
   - CI config: [`.github/workflows/tests.yml`](.github/workflows/tests.yml)
+- [ ] Wire `python scripts/build_metrics.py && python scripts/build_canonical_macros.py` into the post-pipeline step (e.g., `run_pipeline.py` final step or Makefile target) so the JSON + macros stay in lockstep with table reruns
+- [ ] Hook `verify_thesis_consistency.py` into the CI workflow to fail PRs that introduce prose-vs-canonical drift
+- [ ] Adopt `\mmperfm2sharpe`-style macros for the headline numbers in [`latex/main_results.tex`](latex/main_results.tex) — Bucket 1 numeric updates become a one-liner rerun afterward
+- [ ] Tighten the verifier's regex patterns in [`scripts/verify_thesis_consistency.py`](scripts/verify_thesis_consistency.py): currently it occasionally matches a nearby unrelated number (e.g. CI bound `[0.67, 1.54]` flagged as M2 Sharpe drift). Section-aware extraction would reduce false positives.
 
 ---
 
@@ -269,12 +304,11 @@ Reference layer for the HARD STOP section. Triage tags: **[M]** = must land, **[
 
 ### §E. Existing claims worth restating / verifying post-Shumway
 
-#### §E0. Deprecated tables — replaced by CV winners
+#### §E0. CV tables NOT cited in thesis (per N3 decision)
 
-- [ ] [M] `tables/table_xgb_hyperparams.tex` is **DEPRECATED** — replaced by [`tables/table_xgb_cv.tex`](tables/table_xgb_cv.tex)
-- [ ] [M] `tables/table_feature_selection.tex` is **DEPRECATED** — replaced by [`tables/table_hmm_cv.tex`](tables/table_hmm_cv.tex)
-- [ ] [N] Companion DEPRECATED CSVs (`hmm_feature_selection_pass{1,2,3}.csv`) kept for audit; not cited
-- [ ] [M] Update references in [`latex/methodology.tex`](latex/methodology.tex) and [`latex/appendix.tex`](latex/appendix.tex) from `table_xgb_hyperparams`/`table_feature_selection` to the new CV tables
+- [ ] [M] `tables/table_hmm_cv.tex` and `tables/table_xgb_cv.tex` exist on disk but are NOT referenced in any `.tex` file. Verify no `\input` or `\ref` leaked in during Bucket 2 edits.
+- [ ] [N] Companion CSVs (`results/hmm_cv_*`, `results/xgb_cv_*`, `results/hmm_feature_selection_pass{1,2,3}.csv`) kept for audit; not cited in thesis.
+- [ ] [M] Existing thesis tables `tables/table_xgb_hyperparams.tex` and `tables/table_feature_selection.tex` STAY in place; verify post-Shumway numeric updates flowed through (covered in §A and Bucket 1 prose walk).
 
 #### §E1–E4. Ablations
 
@@ -315,12 +349,6 @@ Reference layer for the HARD STOP section. Triage tags: **[M]** = must land, **[
 #### §E10. Granger causality
 
 - [ ] [S] π → IC_mom and IC_mom → π **both non-significant** (F<2, p>0.10 lags 1–3) — [`tables/table_granger.tex`](tables/table_granger.tex). Frame: model uses regime + momentum *jointly*, not sequentially
-
-#### §E11. IC paradox (covered in N8 above)
-
-- [ ] [M] M2 IC = −0.005 (n.s.) vs naive momentum IC = +0.027 (t=3.15\*\*\*) — [`tables/table_ic.tex`](tables/table_ic.tex)
-- [ ] [M] Edge is portfolio construction, NOT improved per-stock prediction
-- [ ] [M] Paired diff M2 − Mom = −0.031 (t=−2.95\*\*\*)
 
 #### §E12. Bootstrap inference
 
@@ -385,8 +413,8 @@ Reference layer for the HARD STOP section. Triage tags: **[M]** = must land, **[
 
 #### §E23. HMM feature ablation
 
-- [ ] [S] Subsets of 4-feature HMM input — [`tables/table_hmm_feature_ablation.tex`](tables/table_hmm_feature_ablation.tex). Full 4F baseline 0.97 (in-sample, distinct from Step J's CV)
-- [ ] [S] Note: CV winner supersedes in-sample feature ablation as canonical justification
+- [ ] [S] Subsets of 4-feature HMM input — [`tables/table_hmm_feature_ablation.tex`](tables/table_hmm_feature_ablation.tex). Full 4F baseline 0.97 (in-sample)
+- [ ] [S] In-sample feature ablation REMAINS the canonical justification for the 4-feature HMM input; CV-based selection deferred to N3 Edit #6 future work
 
 #### §E24. Fundamentals factor alphas
 
@@ -471,7 +499,6 @@ Reference layer for the HARD STOP section. Triage tags: **[M]** = must land, **[
 
 ### §F. Methodology / appendix items
 
-- [ ] [N] CV procedure: 5 expanding-window folds on 1990–2010 train, no test-period leakage — [`latex/appendix.tex`](latex/appendix.tex)
 - [ ] [N] HMM Bayesian Gibbs / FFBS sampler details (priors from `config.py`)
 - [ ] [N] Production: 200 HMM × 50 XGB seeds. CV: 3 HMM × 5 XGB (tractability)
 - [ ] [N] Shumway-analogue rule table — [`latex/methodology.tex`](latex/methodology.tex) footnote
@@ -484,18 +511,18 @@ Reference layer for the HARD STOP section. Triage tags: **[M]** = must land, **[
 
 If your advisor presses on these, you have answers ready:
 
-- [ ] "How do you avoid look-ahead in feature selection?" → N3 (CV winner is within fold-noise of production)
-- [ ] "How sensitive is the result to hyperparameters?" → N3, top-5 cluster within fold-noise
+- [ ] "How do you avoid look-ahead in feature selection?" → honest caveat in thesis acknowledges test-set tuning; CV-based selection flagged as future research (N3 Edit #6)
+- [ ] "How sensitive is the result to hyperparameters?" → flagged as future research (N3 Edit #7); thesis uses fixed production specification
 - [ ] "What about transaction costs?" → §E6, profitable to 50bps
 - [ ] "What about K=3 states?" → §E8, K=2 most stable
 - [ ] "What about other risk-aversion targets?" → §E1 + side-note (some MV configs better)
 - [ ] "Does it generalize internationally?" → N1, US π beats regional in UK and JP
 - [ ] "Does it work over a longer history?" → 30-year backtest in completed work, but with significant DD in 2000–2002
 - [ ] "Can it survive a structurally novel regime?" → N4, honest acknowledgement (fold-3 + 2000-2002)
-- [ ] "Is M2 just a better momentum factor?" → N7 (negative UMD) + N8 (worse IC than naive momentum)
+- [ ] "Is M2 just a better momentum factor?" → N7 (negative UMD)
 - [ ] "Why nonlinearity? Why not Ridge?" → §E17 (Ridge gives −0.58 across all α; OLS too)
 - [ ] "Is the panic edge real?" → §E12 (panic−calm marginally sig p=0.07) + §E15 (it's the recovery component, not crashes)
-- [ ] "Why these 4 HMM features?" → N3 CV
+- [ ] "Why these 4 HMM features?" → in-sample feature ablation (§E23) + 4-pass test-period selection acknowledged with caveat; CV-based selection flagged as future research (N3 Edit #6)
 - [ ] "How much does π actually contribute?" → §E1 (1.11 → 0.41 without π) + §E16 (HMM smoothing >> raw indicators)
 
 ---

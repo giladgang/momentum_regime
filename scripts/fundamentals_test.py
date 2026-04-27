@@ -467,3 +467,58 @@ for r in results:
           f"{r['ann_ret']:>6.1%} {r['ann_vol']:>5.1%} {r['mdd']:>6.1%} "
           f"{nw_raw:>7s} {nw_exc:>7s} {r['sharpe_calm']:>6.2f} {r['sharpe_panic']:>6.2f} "
           f"{r['mom_share']:>5.1f} {r['pi_share']:>5.1f} {r['fund_share']:>5.1f}")
+
+# ── table_fundamentals_ablation.tex ────────────────────────────────────────
+LABEL_MAP = {
+    'baseline_mom_pi':  r'Baseline (mom $+\ \pi$)',
+    'full_mom_pi_fund': r'\;\;$+$ 10 fundamentals',
+    'fund_only':        'Fundamentals only',
+    'fund_pi':          r'Fundamentals $+\ \pi$',
+    'mom_fund_no_pi':   r'Momentum $+$ fund.\ (no $\pi$)',
+}
+
+def _fmt_nwt_excess(rr):
+    nwt = rr.get('nw_t_excess', np.nan)
+    nwp = rr.get('nw_p_excess', np.nan)
+    if np.isnan(nwt):
+        return '--'
+    star = sig_stars(nwp)
+    sign = ''
+    val = nwt
+    if val < 0:
+        sign = '$-$'
+        val = abs(val)
+    body = f'{sign}{val:.2f}'
+    if star:
+        body = body + f'$^{{{star}}}$'
+    return body
+
+abl_tex = [
+    r'\begin{table}[H]',
+    r'\centering',
+    r'\small',
+    r'\begin{tabular}{l c c c c c c c}',
+    r'\toprule',
+    r' & Feat. & Sharpe & Calm & Panic & $\beta$ & NW $t$ (exc.) & Fund SHAP \\',
+    r'\midrule',
+]
+for r in results:
+    label = LABEL_MAP.get(r['name'], r['name'])
+    beta = r.get('beta', np.nan)
+    fund = r.get('fund_share', 0.0)
+    abl_tex.append(
+        f"{label:<35s} & {r['n_features']:>2d} & {r['sharpe']:.2f} & "
+        f"{r['sharpe_calm']:.2f} & {r['sharpe_panic']:.2f} & "
+        f"{beta:.2f} & {_fmt_nwt_excess(r):<14s} & {fund:.0f}\\% \\\\"
+    )
+abl_tex += [
+    r'\bottomrule',
+    r'\end{tabular}',
+    r"\caption{Feature-set ablation (50-seed XGBoost ensembles, production hyperparameters). Full Sharpe, calm-period Sharpe, and panic-period Sharpe are reported alongside market beta and the Newey-West $t$-statistic on excess returns over the market (6 lags), matching the convention of Table~\ref{tab:performance}. ``Fund SHAP'' is the share of total SHAP attention absorbed by the ten fundamental features.}",
+    r'\label{tab:fund_ablation}',
+    r'\end{table}',
+    '',
+]
+with open('tables/table_fundamentals_ablation.tex', 'w') as f:
+    f.write('\n'.join(abl_tex))
+print(f"Saved: tables/table_fundamentals_ablation.tex")

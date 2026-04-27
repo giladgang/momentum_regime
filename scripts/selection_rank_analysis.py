@@ -153,6 +153,7 @@ ax.grid(alpha=0.3)
 ax.set_ylim(25, 70)
 plt.tight_layout()
 fig.savefig('plots/chart2_rank_by_horizon_v2.png', dpi=150, bbox_inches='tight')
+fig.savefig('plots/chart2_rank_by_horizon_v2.pdf', bbox_inches='tight')
 plt.close(fig)
 
 # ── Chart 2: L/S with yearly bands ──
@@ -182,10 +183,11 @@ plt.suptitle('Long-short stock selection by momentum horizon and regime\n'
              fontsize=14, fontweight='bold', y=1.02)
 plt.tight_layout()
 fig.savefig('plots/chart_ls_rank_yearly.png', dpi=150, bbox_inches='tight')
+fig.savefig('plots/chart_ls_rank_yearly.pdf', bbox_inches='tight')
 plt.close(fig)
 
-print("Saved: chart2_rank_by_horizon_v2.png")
-print("Saved: chart_ls_rank_yearly.png")
+print("Saved: chart2_rank_by_horizon_v2.png + .pdf")
+print("Saved: chart_ls_rank_yearly.png + .pdf")
 
 # ── Chart 3: Z-score + |SHAP| (4-panel figure for thesis) ──
 print("Computing z-scores and SHAP for term structure figure ...")

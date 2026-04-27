@@ -190,14 +190,70 @@ cs = 1 - ps
 print(f"\n  {'Feature':<15s} {'Panic mean':>11s} {'Calm mean':>10s} {'Delta':>7s} {'95% CI':>16s} {'Sig':>5s}")
 print(f"  {'-'*66}")
 
+sep_rows = []
 for j in range(D):
     panic_mean = result['mu_draws'][:, ps, j].mean()
     calm_mean = result['mu_draws'][:, cs, j].mean()
     delta_draws = result['mu_draws'][:, ps, j] - result['mu_draws'][:, cs, j]
+    delta = panic_mean - calm_mean
     ci_lo, ci_hi = np.percentile(delta_draws, [2.5, 97.5])
     sig = 'YES' if ci_lo > 0 or ci_hi < 0 else 'no'
     print(f"  {HMM_FEATURES[j]:<15s} {panic_mean:>11.3f} {calm_mean:>10.3f} "
-          f"{panic_mean-calm_mean:>7.3f} [{ci_lo:>6.3f}, {ci_hi:>6.3f}] {sig:>5s}")
+          f"{delta:>7.3f} [{ci_lo:>6.3f}, {ci_hi:>6.3f}] {sig:>5s}")
+    sep_rows.append((HMM_FEATURES[j], calm_mean, panic_mean, delta, ci_lo, ci_hi))
+
+# Save table_hmm_separation.tex
+def _fmt_signed(v):
+    return f'$+${v:.3f}' if v >= 0 else f'$-${abs(v):.3f}'
+
+def _fmt_ci(lo, hi):
+    return f'[{_fmt_signed(lo)},\\,{_fmt_signed(hi)}]'
+
+def _feature_label(name):
+    base = name.replace('_z', '')
+    if '_' in base:
+        base = base.replace('_', r'\_')
+    return f'{base}$_z$'
+
+tex_lines = [
+    r'\begin{table}[H]',
+    r'\centering',
+    r'\begin{tabular}{l r r r@{\hspace{1.5em}} c}',
+    r'\toprule',
+    r' & $\hat{\mu}_{\text{calm}}$ & $\hat{\mu}_{\text{panic}}$ & \multicolumn{1}{c}{$\Delta$} & 95\% CI \\',
+    r'\midrule',
+]
+for name, calm, panic, delta, lo, hi in sep_rows:
+    tex_lines.append(
+        f'{_feature_label(name)} & {calm:.3f} & {_fmt_signed(panic)} & '
+        f'{_fmt_signed(delta)} & {_fmt_ci(lo, hi)} \\\\'
+    )
+tex_lines += [
+    r'\bottomrule',
+    r'\end{tabular}',
+    r'\caption{HMM posterior regime-mean separation.}',
+    r'\label{tab:hmm_separation}',
+    r'',
+    r'\medskip',
+    r'\small',
+    r'\textbf{Notes:} This table reports posterior mean estimates of regime-conditional feature means from the Bayesian two-state HMM, estimated via Gibbs sampling on the 1990--2010 training period. All features are standardised to zero mean and unit variance. $\Delta = \hat{\mu}_{\text{panic}} - \hat{\mu}_{\text{calm}}$ is the separation between regimes. The 95\% CI is the Bayesian posterior credible interval for $\Delta$; zero lies outside all intervals, confirming significant regime separation. DD = market drawdown; DISP = log cross-sectional return dispersion; REL\_N = relative market participation; CS = credit spread (BAA$-$AAA).',
+    r'\end{table}',
+    '',
+]
+sep_path = os.path.join(TABLES_DIR, 'table_hmm_separation.tex')
+with open(sep_path, 'w') as f:
+    f.write('\n'.join(tex_lines))
+print(f"  Saved: {sep_path}")
+
+# Also save sep_rows to a CSV for canonical-source consumption
+import csv as _csv
+sep_csv_path = os.path.join('results', 'hmm_separation.csv')
+with open(sep_csv_path, 'w', newline='') as f:
+    w = _csv.writer(f)
+    w.writerow(['feature', 'calm_mean', 'panic_mean', 'delta', 'ci_lo', 'ci_hi'])
+    for row in sep_rows:
+        w.writerow([row[0], f'{row[1]:.6f}', f'{row[2]:.6f}', f'{row[3]:.6f}', f'{row[4]:.6f}', f'{row[5]:.6f}'])
+print(f"  Saved: {sep_csv_path}")
 
 # ═══════════════════════════════════════════════════════════════════
 # 3. STUDENT-T EMISSION TEST

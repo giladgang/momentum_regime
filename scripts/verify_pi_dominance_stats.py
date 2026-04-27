@@ -200,6 +200,7 @@ print(f"\n(2) Long-leg path fraction through pi_filter splits:")
 print(f"    {paths_with_pi:,}/{paths_total:,} = {paths_with_pi/paths_total*100:.1f}%")
 
 # (3)
+regime_shares = {}
 for regime in ('panic', 'calm'):
     w = sum_leaf[regime]['with_pi']
     wo = sum_leaf[regime]['without_pi']
@@ -208,5 +209,27 @@ for regime in ('panic', 'calm'):
     print(f"    pi-splitting trees:       {w:+.2f}")
     print(f"    momentum-only trees:      {wo:+.2f}")
     print(f"    total:                    {total:+.2f}")
+    share = w / total * 100 if abs(total) > 1e-9 else float('nan')
     if abs(total) > 1e-9:
-        print(f"    share from pi-trees:      {w/total*100:.1f}%")
+        print(f"    share from pi-trees:      {share:.1f}%")
+    regime_shares[regime] = {'pi_sum': w, 'mom_sum': wo, 'total': total, 'share_pct': share}
+
+# ── Save canonical CSV ────────────────────────────────────────────────────
+import csv
+import os as _os
+_os.makedirs('results', exist_ok=True)
+with open('results/pi_dominance_stats.csv', 'w', newline='') as f:
+    w = csv.writer(f)
+    w.writerow(['stat', 'value', 'denominator', 'note'])
+    w.writerow(['trees_with_pi_split', n_pi_trees, n_trees,
+                f'50-seed production ensemble ({n_pi_trees/n_trees*100:.1f}%)'])
+    if 50 in XGB_SEEDS:
+        seed50_idx = XGB_SEEDS.index(50)
+        w.writerow(['trees_with_pi_split_seed50', seed_tree_counts[seed50_idx], N_ESTIMATORS,
+                    f'seed 50 alone ({seed_tree_counts[seed50_idx]/N_ESTIMATORS*100:.1f}%)'])
+    w.writerow(['paths_with_pi_long', paths_with_pi, paths_total,
+                f'{paths_with_pi/paths_total*100:.1f}% of long-leg stock paths'])
+    for regime, d in regime_shares.items():
+        w.writerow([f'{regime}_long_pi_share', round(d['share_pct'], 2), 100,
+                    f"{regime} long-leg return from pi-splitting trees"])
+print(f"\nSaved: results/pi_dominance_stats.csv")

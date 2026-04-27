@@ -196,4 +196,34 @@ plt.savefig('plots/seed_convergence.png', dpi=200, bbox_inches='tight',
 plt.close(fig)
 print(f"Saved: plots/seed_convergence.png")
 
+# ── table_seed_convergence.tex ──────────────────────────────────────────────
+os.makedirs('tables', exist_ok=True)
+tex = [
+    r'\begin{table}[H]',
+    r'\centering',
+    r'\small',
+    r'\begin{tabular}{r r r r r r r r r}',
+    r'\toprule',
+    r'$k$ & $n_{\text{sub}}$ & Mean & Median & Std & P25 & P75 & Min & Max \\',
+    r'\midrule',
+]
+for _, row in df.iterrows():
+    tex.append(
+        f"{int(row['k']):<3d} & {int(row['n_subsets']):<2d} & "
+        f"{row['mean']:.3f} & {row['median']:.3f} & {row['std']:.3f} & "
+        f"{row['p25']:.3f} & {row['p75']:.3f} & {row['min']:.3f} & {row['max']:.3f} \\\\"
+    )
+tex += [
+    r'\bottomrule',
+    r'\end{tabular}',
+    r'\caption{XGBoost ensemble seed convergence. For each subset size $k$, we draw $n_{\text{sub}}$ random subsets of $k$ seeds from the full 100-seed pool, average their predictions, and report the resulting out-of-sample L/S Sharpe ratio. Mean Sharpe stabilizes by $k\approx 50$, justifying the production choice; standard deviation across subsets shrinks as $1/\sqrt{k}$.}',
+    r'\label{tab:seed_convergence}',
+    r'\end{table}',
+    '',
+]
+tex_path = 'tables/table_seed_convergence.tex'
+with open(tex_path, 'w') as f:
+    f.write('\n'.join(tex))
+print(f"Saved: {tex_path}")
+
 print("\nDone.")
