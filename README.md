@@ -92,10 +92,9 @@ The full step list is documented inline in [run_pipeline.py](run_pipeline.py) an
 Every published table and figure is traceable to its source script + output CSV:
 
 - [RESULTS_LOG.md](RESULTS_LOG.md) — table-by-table provenance log; the canonical reference for "where does this number come from?"
-- [TODO.md](TODO.md) — current backlog (research, engineering, thesis edits)
+- [TODO.md](TODO.md) — current backlog (research, engineering, thesis edits) and granular thesis-edit detail
 - [NEXT_RUN_PLAN.md](NEXT_RUN_PLAN.md) — active execution runbook (resumable across sessions)
 - [INTL_VALIDATION_PLAN.md](INTL_VALIDATION_PLAN.md) — UK + Japan replication plan
-- [CHECKLIST.md](CHECKLIST.md) — pre-publication hygiene
 
 ## Tests
 

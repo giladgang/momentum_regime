@@ -182,7 +182,7 @@ JP caveat: M2 (0.43-0.52) < market (0.86). Japanese momentum weakness, Asness et
 - `RESULTS_LOG.md` section 12 added with UK/JP writeup
 - `results/STEP_K_REPORT.md` regenerated with full Phase 2 winners + intl results spliced from Step F
 - `results/PROSE_EDITS.md` regenerated: 40 tables changed, 415 cells, 944 prose candidates across `latex/*.tex`
-- `results/THESIS_EDITS_TODO.md` written: comprehensive checkbox list of every finding (~120 items) categorized by triage (M/S/N) with file references for each data source. **Start here for the gated thesis-edit review.**
+- Comprehensive thesis-edit checklist (~207 items) categorized by triage (M/S/N) with file references for each data source — folded into root `TODO.md` §📋 Granular thesis-edit detail (originally `results/THESIS_EDITS_TODO.md`, since consolidated). **Start here for the gated thesis-edit review.**
 
 ## Step G — calibration done (2026-04-26 ~23:35)
 

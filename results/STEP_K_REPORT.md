@@ -160,7 +160,7 @@ Decided manually after reading the table above.
 
 ### Master checklist
 
-**Start here: [`results/THESIS_EDITS_TODO.md`](THESIS_EDITS_TODO.md)** — comprehensive checkbox list (~120 items) of every finding from Phase 0–3 with triage tags (M/S/N) and file references for each data source. Tick as you go.
+**Start here: [`TODO.md`](../TODO.md)** §📋 Granular thesis-edit detail — comprehensive checkbox list (~207 items) of every finding from Phase 0–3 with triage tags (M/S/N) and file references for each data source. Tick as you go. (Originally `results/THESIS_EDITS_TODO.md`, since consolidated into root `TODO.md`.)
 
 ### Numeric prose updates (auto-generated)
 
@@ -168,7 +168,7 @@ See [`results/PROSE_EDITS.md`](PROSE_EDITS.md) for the 944-row line-by-line chec
 
 ### Structural edit bundle (#1–#5)
 
-Per `NEXT_RUN_PLAN.md`, the leg-betas finding (Step E) decides whether the bundle lands as the "clean inversion" framing or the "cross-sectional re-ranking" reframe. **Decision: cross-sectional re-ranking** — M2 long-β > short-β in BOTH regimes, no flip; gap widens 0.17 → 0.67. See [`THESIS_EDITS_TODO.md`](THESIS_EDITS_TODO.md) §C1 and §H for the bundle's full framing.
+Per `NEXT_RUN_PLAN.md`, the leg-betas finding (Step E) decides whether the bundle lands as the "clean inversion" framing or the "cross-sectional re-ranking" reframe. **Decision: cross-sectional re-ranking** — M2 long-β > short-β in BOTH regimes, no flip; gap widens 0.17 → 0.67. See `TODO.md` N2 (Bucket 2) and §📋 §H for the bundle's full framing.
 
 - [ ] **Edit #1** — new "Leg-level beta dynamics across regimes" subsection in `latex/main_results.tex` (or reframe)
 - [ ] **Edit #2** — expand D&M beta in `latex/literature_review.tex:19`
