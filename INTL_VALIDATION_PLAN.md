@@ -47,7 +47,7 @@ the *US-trained* `pi_filter` directly predicts regional momentum crashes
 
 ---
 
-## Current state (as of 2026-04-25 18:15)
+## Current state (last updated 2026-04-26)
 
 ### Done
 
@@ -67,14 +67,43 @@ the *US-trained* `pi_filter` directly predicts regional momentum crashes
 - ✅ `data/jp_market_panel.parquet` — 434 rows, avg banks/month = 124. BANK_REL
   non-null 429/434.
 - ✅ `data/INTL_PANEL_README.md` — schema, build commands, known limitations.
-- ✅ Diagnostic scripts archived: `archive/scripts/wrds_diag_intl.py`,
-  `wrds_diag_shares.py`, `wrds_diag_returns.py`.
 - ✅ Sanity checks: train-period z-scores have mean 0 / std 1 in both regions.
   UK BANK_REL_z peaks at 3.72σ in March 2009 (Lehman aftermath), 1.66σ at
   Brexit June 2016, 4.0–4.9σ across April–July 2011 (Eurozone). JP BANK_REL_z
   peaks at 4.6σ in 2001-02 (NPL crisis nadir) and is correctly NEAR ZERO during
   2008 GFC (Japanese banks didn't underperform in 2008 because of low US
   subprime exposure). Both are economically defensible.
+- ✅ `scripts/hmm_intl.py` written (2026-04-26 15:25). Standalone wrapper that
+  does NOT import `scripts/hmm_model.py` so the regional path can run while a
+  US fit is in flight without triggering the US script's import-time fit.
+- ✅ `scripts/cross_sectional_intl.py` written (2026-04-26 15:38). No
+  fundamentals (mom_1..mom_12 + pi_filter only); unconditional decile
+  breakpoints (no NYSE-equivalent). Optional `--use-us-pi` flag for Test A.
+- ✅ HMM smoke fit done for UK and JP (5 seeds × 500 iter). Outputs:
+  `data/uk_panel_with_regimes.parquet`, `data/jp_panel_with_regimes.parquet`,
+  `data/{uk,jp}_mcmc_draws.npz`. UK pi_filter correctly flags Black Wed 1992,
+  dot-com 2001-02, GFC 2008-09, Eurozone 2011-08, COVID 2020-03. JP pi_filter
+  correctly flags 1990 bubble, 1995 Kobe, 1997-98 LTCB, 2001-03 NPL nadir,
+  GFC, COVID. JP BANK_REL_z sign came out as −1 (driven by 1990 bubble crash
+  where banks outperformed); HMM still correctly identifies 2002 NPL via the
+  joint multivariate likelihood.
+- ✅ First-pass regional cross-sectional model run (UK + JP). Outputs:
+  `results/intl_{uk,jp}_returns.csv`, `results/intl_{uk,jp}_summary.csv`.
+  Headline numbers (smoke seeds — see "Pending" below for production):
+    - UK Method 2 XGB: Sharpe 0.575, ann ret 11.0%, MDD -41% (vs fixed 12-mo
+      Sharpe 0.480, market Sharpe 0.624).
+    - JP Method 2 XGB: Sharpe 0.379, ann ret 4.3%, MDD -31% (vs fixed 12-mo
+      Sharpe 0.076 — JP momentum well-known dead — and market Sharpe 0.857).
+- ✅ First-pass Test A run (UK + JP under US-trained pi_filter):
+  `results/intl_{uk,jp}_returns_uspi.csv`,
+  `results/intl_{uk,jp}_summary_uspi.csv`. Headline:
+    - UK M2 XGB with US pi: **Sharpe 0.674**, ann ret 11.7%, MDD **-23.2%**
+      (vs UK regional pi: 0.575, MDD -41%). US pi BEATS regional pi.
+    - JP M2 XGB with US pi: Sharpe 0.431, ann ret 5.3%, MDD -22.6%
+      (vs JP regional pi: 0.379). US pi marginally better.
+  Both regions show the US-trained pi_filter generalizes — preliminary support
+  for the global financial cycle hypothesis (Rey 2015). Subject to production
+  rerun before any thesis claim.
 
 ### Known minor limitations (documented in INTL_PANEL_README.md)
 
@@ -86,20 +115,84 @@ the *US-trained* `pi_filter` directly predicts regional momentum crashes
 - Survivorship bias inherent to Compustat Global (Asness et al. 2013, Daniel-
   Moskowitz 2016 note the same caveat).
 - `is_bank` uses current SIC, not historical (industry-standard caveat).
+- **Delisting return treatment** — `apply_shumway_delisting.py` is CRSP-specific
+  (uses `dlret`/`dlstcd` columns and codes 500-599). Compustat Global has
+  different delisting fields and conventions; an analogous treatment for
+  Compustat Global is a separate methodology audit, deferred until the
+  US-side Shumway story is settled and reviewed. Track as a follow-up.
 
-### Not yet done
+### Pending
 
-- ❌ Regional HMM fit (UK + JP).
-- ❌ Regional cross-sectional model fit (UK + JP).
-- ❌ Performance reporting (Sharpe, alphas vs CAPM/FF5+Mom).
-- ❌ Comparison: UK/JP momentum decile spread under regional `pi_filter` vs
-  US-derived `pi_filter` (Test A: global financial cycle test).
+- ❌ **Production HMM fit** (200 seeds × 2 regions, ~12-18h on 6 workers).
+  Smoke fits used 5 seeds; production seed count required before quoting any
+  number in the thesis. Must run AFTER US Step D completes (CPU contention).
+- ❌ **Production cross-sectional rerun** (50 XGB seeds × 4 variants: UK
+  regional, UK Test A, JP regional, JP Test A). Smoke runs above used reduced
+  XGB seeding; production seed count gives the seed-stable Sharpe and the
+  factor-model alpha t-stats.
+- ❌ **Factor-alpha tables** for UK/JP (CAPM with regional market index;
+  Asness 2013 international FF if available).
+- ❌ **Compustat Global delisting audit** (analogue to Shumway for CRSP).
+- ❌ Compose UK/JP results section in `RESULTS_LOG.md` AFTER Gilad reviews
+  numbers (`feedback_thesis_edits_await_data`).
 
 ---
 
-## Pending steps with exact commands
+## Timeline integration with the main post-Shumway chain
 
-### Step 1 — Adapt `scripts/hmm_model.py` for regional inputs
+The autonomous queue running on the US side is B → C → D → E → F → G → H →
+I → J → K → L → (M, gated). UK/JP runs as a parallel track that slots in
+once US Step D releases CPU.
+
+| When | UK/JP task | US chain in flight | CPU plan |
+|---|---|---|---|
+| US Step D running | (wait — both tracks need CPU) | D | UK/JP idle |
+| US Step D done | **UK/JP-N1**: kick off production HMM fits (200 seeds × 2 regions, ~12-18h) | E + F (US leg-betas + first report, ~20 min, low CPU) → G + H (~30 min, low CPU) | Run UK/JP HMM in parallel — different parquets, no collision |
+| Continuing | **UK/JP-N1** still running | I (US XGB CV, 2-5h) | Both compete for cores; Step I limited to 50% if UK/JP-N1 active |
+| UK HMM done | **UK/JP-N2 UK**: production CS model + factor alphas | J (US HMM CV, ~30h) | Quick (~30 min); minimal CPU contention |
+| JP HMM done | **UK/JP-N2 JP**: production CS model + factor alphas | J still running | Quick (~30 min) |
+| All done | **UK/JP-N3**: append UK/JP section to `RESULTS_LOG.md` (no `.tex` edit) | K + L (US final report + prose-edit list) | Pure file work |
+| Gated | **UK/JP-N4**: thesis edits for UK/JP findings — bundled with US Step M after Gilad greenlight | M | — |
+
+### Quick-launch commands (run in order after US Step D completes)
+
+```bash
+# UK/JP-N1: production HMM fits (parallel-friendly with US Step E/F/G/H)
+nohup python scripts/hmm_intl.py --region UK --seeds 200 \
+    > logs/hmm_intl_uk_prod.log 2>&1 &
+nohup python scripts/hmm_intl.py --region JP --seeds 200 \
+    > logs/hmm_intl_jp_prod.log 2>&1 &
+
+# UK/JP-N2: production CS + Test A (after each region's HMM finishes)
+python scripts/cross_sectional_intl.py --region UK \
+    > logs/cs_intl_uk_prod.log 2>&1
+python scripts/cross_sectional_intl.py --region UK --use-us-pi \
+    > logs/cs_intl_uk_uspi_prod.log 2>&1
+python scripts/cross_sectional_intl.py --region JP \
+    > logs/cs_intl_jp_prod.log 2>&1
+python scripts/cross_sectional_intl.py --region JP --use-us-pi \
+    > logs/cs_intl_jp_uspi_prod.log 2>&1
+```
+
+### Decision branches after production rerun
+
+After production HMM + CS fits land, two scenarios for the thesis:
+1. **US-pi beats regional pi in BOTH regions** (current smoke pattern) →
+   strongest publishable claim: "global financial cycle channel". Goes into
+   the same Step F/K/L review process as the US story.
+2. **US-pi beats regional pi in only ONE region or neither** → weaker but
+   still publishable: "regional regime+momentum architecture transfers" with a
+   regional-specific caveat. Frame in `latex/conclusion.tex` future-work
+   section instead of as headline.
+
+In either case, no `latex/*.tex` edit until Gilad reviews production numbers
+(memory: `feedback_thesis_edits_await_data`).
+
+---
+
+## Detailed steps (legacy reference — keep for traceability)
+
+### Step 1 — Adapt `scripts/hmm_model.py` for regional inputs ✅ DONE
 
 The production `hmm_model.py` reads `data/panel.parquet` and uses
 `HMM_FEATURES` from `config.py`. For UK/JP we need it to read

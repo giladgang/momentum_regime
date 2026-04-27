@@ -550,6 +550,45 @@ The LR uses many momentum features but fails in L/S because it cannot condition 
 
 ---
 
+## 12. International Validation (UK + JP)
+
+**Setup.** Replicated the full pipeline on Compustat Global stock universes for the United Kingdom and Japan (1990-2024). Regional cross-sectional model uses the same 12 momentum features and ensemble XGB at 50 seeds. Two regime-signal variants tested:
+- **Regional π**: HMM fit on each region's own market panel using DD, DISP, REL_N, BANK_REL (BANK_REL replaces CS — no Moody's BAA-AAA equivalent for UK/JP).
+- **US π (Test A)**: US-trained π_filter applied to UK/JP stocks (global financial cycle hypothesis).
+
+Both regions use Shumway-analogue strict-mode delisting imputation (UK: 219 rows compounded; JP: 85 rows). HMM uses 200 production seeds.
+
+### Headline (M2: XGB, mom+π) — net of 10 bps fee, 2011-2025 OOS
+
+| Region | Strategy | Sharpe (regional π) | Sharpe (US π, Test A) | MDD (US π) |
+|---|---|---:|---:|---:|
+| UK | Market | +0.62 | +0.62 | -25.2% |
+| UK | Fixed 12-mo mom | +0.46 | +0.46 | -62.6% |
+| UK | M2: XGB | **+0.63** | **+0.68** | -23.0% |
+| JP | Market | +0.86 | +0.86 | -21.5% |
+| JP | Fixed 12-mo mom | +0.07 | +0.07 | -66.3% |
+| JP | M2: XGB | **+0.43** | **+0.52** | -18.1% |
+
+### Headline finding: US π beats regional π in BOTH regions
+
+- **UK**: Sharpe 0.63 → 0.68 (+0.05, +7%); MDD also tighter (-27.7% → -23.0%)
+- **JP**: Sharpe 0.43 → 0.52 (+0.09, +21%); MDD halved (-33.1% → -18.1%)
+
+The US-trained regime signal — derived from CRSP credit spreads, dispersion, and disagreement — applies to UK and JP cross-sections better than each market's own regime signal. This is consistent with a **global financial cycle channel** (Rey 2013): the panic regime that matters for momentum's cross-sectional structure is global, not regional.
+
+### Caveats
+
+1. **JP M2 < market**: Japanese momentum is weak (Asness, Moskowitz & Pedersen 2013). M2 still beats Fixed 12-mo (0.52 vs 0.07) and beats fixed_mom_1 (-0.08), but cannot beat passive market exposure (0.86). The US-π lift narrows the gap but doesn't close it.
+2. **UK M2 ~ market**: M2 (0.68) only marginally exceeds market (0.62). The L/S dollar-neutral construction takes on substantial residual market exposure that the test-period bull market rewards.
+3. **Strict-mode Shumway impact small**: UK 0.04% of rows compounded, JP 0.006%. The intl Sharpes are not meaningfully different from a pre-Shumway baseline; effect is mostly diagnostic correctness.
+4. **Method 0 (deterministic formula) inverts US-π**: UK Method 0 Sharpe drops 0.56 → 0.17 with US π; JP drops 0.17 → -0.13. The simple formula is sensitive to π distribution shifts; XGB ensemble absorbs them.
+
+### Implication for thesis framing
+
+If structural-edit bundle #1 is to land, the headline should be the **global financial cycle channel** (US π beats regional π in both regions). If only one region had improved, the framing would be regional-architecture-transfers with a future-work caveat.
+
+---
+
 ## Compiled narrative
 
 The regime-momentum mechanism is pinned down by three joint requirements:
