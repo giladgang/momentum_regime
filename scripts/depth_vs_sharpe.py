@@ -122,6 +122,6 @@ plt.close(fig)
 print("Saved: depth_vs_sharpe.png")
 
 from PIL import Image
-img = Image.open('depth_vs_sharpe.png')
-img.save('depth_vs_sharpe.pdf', 'PDF', resolution=150)
-print("Saved: depth_vs_sharpe.pdf")
+img = Image.open('plots/depth_vs_sharpe.png')
+img.save('plots/depth_vs_sharpe.pdf', 'PDF', resolution=150)
+print("Saved: plots/depth_vs_sharpe.pdf")

@@ -15,7 +15,11 @@ Outputs:
 
 Stock panel columns:
     secid, gvkey, iid, date, year_month, conm, sic, is_bank,
-    prc_close, adj_close, me, log_me, ret, ret_fwd, mom_1..mom_12
+    prc_close, adj_close, me, log_me, ret, ret_fwd,
+    secstat, dldte, dlrsn,     (delisting metadata for Shumway-analogue treatment;
+                                aliased from comp.g_security: dldtei -> dldte,
+                                dlrsni -> dlrsn)
+    mom_1..mom_12
 
 Market panel columns:
     date, mkt_ret, DD, VOL, DISP, REL_N, BANK_REL,
@@ -36,8 +40,19 @@ No fundamentals are pulled (per design choice for international validation).
 """
 import argparse
 import os
+import socket
 import sys
 from datetime import date
+
+# Local DNS resolver fails on Wharton domains; pre-resolved via 8.8.8.8.
+_WRDS_HOST = 'wrds-pgdata.wharton.upenn.edu'
+_WRDS_IP = '165.123.60.118'
+_orig_getaddrinfo = socket.getaddrinfo
+def _patched_getaddrinfo(host, *a, **kw):
+    if host == _WRDS_HOST:
+        host = _WRDS_IP
+    return _orig_getaddrinfo(host, *a, **kw)
+socket.getaddrinfo = _patched_getaddrinfo
 
 import numpy as np
 import pandas as pd
@@ -83,11 +98,20 @@ def fetch_panel_from_wrds():
     # ── STEP 1: Server-side aggregation, last-day-of-month per security ───────
     print(f"\n[ 1/4 ] Pulling monthly close prices + adjustment factors ...", flush=True)
 
+    # Pull `secstat`, `dldtei` (delisting date), and `dlrsni` (delisting
+    # reason code) from `comp.g_security` so `apply_shumway_intl.py` can
+    # apply rule-based Shumway-analogue imputation conditioning on real
+    # delisting metadata. We alias the Compustat-Global names to the
+    # Compustat-NA convention (`dldte`, `dlrsn`) so downstream scripts can
+    # be written against a single field-name vocabulary.
     sql = f"""
     WITH daily AS (
         SELECT s.gvkey, s.iid, s.datadate,
                s.prccd, s.cshoc, s.cshtrd, s.curcdd,
                s.ajexdi, s.trfd,
+               sec.secstat,
+               sec.dldtei AS dldte,
+               sec.dlrsni AS dlrsn,
                DATE_TRUNC('month', s.datadate)::date AS month_start
         FROM comp.g_secd AS s
         JOIN comp.g_security sec ON s.gvkey = sec.gvkey AND s.iid = sec.iid
@@ -114,12 +138,14 @@ def fetch_panel_from_wrds():
            ajexdi      AS ajexdi_close,
            trfd        AS trfd_close,
            cshoc,
+           secstat, dldte, dlrsn,
            n_days,
            month_volume AS volume
     FROM ranked
     WHERE rn_last = 1
     """
-    msf = db.raw_sql(sql, date_cols=['month_start', 'month_end_date'])
+    msf = db.raw_sql(sql, date_cols=['month_start', 'month_end_date',
+                                       'dldte'])
     print(f"  Retrieved {len(msf):,} stock-month rows across "
           f"{msf['gvkey'].nunique():,} unique gvkey", flush=True)
 
@@ -301,7 +327,8 @@ for col in ['DD', 'VOL', 'DISP', 'REL_N', 'BANK_REL']:
 os.makedirs('data', exist_ok=True)
 
 stock_keep = ['secid', 'gvkey', 'iid', 'date', 'year_month', 'conm', 'sic', 'is_bank',
-              'prc_close', 'adj_close', 'me', 'log_me', 'ret', 'ret_fwd'] + \
+              'prc_close', 'adj_close', 'me', 'log_me', 'ret', 'ret_fwd',
+              'secstat', 'dldte', 'dlrsn'] + \
              [f'mom_{k}' for k in range(1, 13)]
 stock_keep = [c for c in stock_keep if c in msf.columns]
 msf_out = (msf[stock_keep]

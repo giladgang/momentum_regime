@@ -83,6 +83,9 @@ def build_leg_returns(test, score_col, fee=cfg.TRADING_FEE):
             'r_short': r_short - fee * ts,
         })
         prev_lw, prev_sw = new_lw, new_sw
+    if not rows:
+        return pd.DataFrame(columns=['r_long', 'r_short'],
+                            index=pd.DatetimeIndex([], name='date'))
     return pd.DataFrame(rows).set_index('date')
 
 
@@ -113,7 +116,7 @@ def main():
     with open(root / cfg.ARTEFACTS_PATH, 'rb') as f:
         art = pickle.load(f)
     test  = art['test'].copy()
-    r_mkt = art['r_mkt'].copy()
+    r_mkt = art['r_mkt'].astype('float64').copy()
     r_mkt.index = pd.to_datetime(r_mkt.index)
 
     # Regime state per month (same cutoff as thesis)
