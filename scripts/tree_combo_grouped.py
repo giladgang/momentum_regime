@@ -255,8 +255,13 @@ for gname, combos in all_results.items():
 with open('tree_combo_grouped_results.pkl', 'wb') as f:
     pickle.dump(all_results, f)
 
-# Excel
-writer = pd.ExcelWriter('tree_combo_grouped_results.xlsx', engine='openpyxl')
+# Excel — optional companion output. Skipped if openpyxl is not installed; we
+# don't let a missing optional dependency block the .tex thesis tables below.
+try:
+    writer = pd.ExcelWriter('tree_combo_grouped_results.xlsx', engine='openpyxl')
+except (ModuleNotFoundError, ImportError):
+    print('  [info] openpyxl not installed — skipping .xlsx companion output')
+    writer = None
 for gname, combos in all_results.items():
     rows = []
     for c in combos:
@@ -265,7 +270,8 @@ for gname, combos in all_results.items():
         for g in c['combo']:
             row[f'{GROUP_NAMES[g]} avg_z'] = round(c['z_info'][g]['mean_z'], 2)
         rows.append(row)
-    pd.DataFrame(rows).to_excel(writer, sheet_name=gname.replace(' ', '_'), index=False)
+    if writer is not None:
+        pd.DataFrame(rows).to_excel(writer, sheet_name=gname.replace(' ', '_'), index=False)
 
 
 # Long-Short difference sheets (Calm and Panic)
@@ -307,7 +313,8 @@ for regime in ['Calm', 'Panic']:
     df['_size'] = df['Combo'].str.count(r'\+') + 1
     df['_combo'] = df['Combo']
     df = df.sort_values(['_size', '_combo']).drop(columns=['_size', '_combo']).reset_index(drop=True)
-    df.to_excel(writer, sheet_name=f'{regime}_L-S', index=False)
+    if writer is not None:
+        df.to_excel(writer, sheet_name=f'{regime}_L-S', index=False)
 
 # Calm-Panic difference sheets (Long and Short)
 for leg in ['Long', 'Short']:
@@ -343,9 +350,11 @@ for leg in ['Long', 'Short']:
     df['_size'] = df['Combo'].str.count(r'\+') + 1
     df['_combo'] = df['Combo']
     df = df.sort_values(['_size', '_combo']).drop(columns=['_size', '_combo']).reset_index(drop=True)
-    df.to_excel(writer, sheet_name=f'{leg}_C-P', index=False)
+    if writer is not None:
+        df.to_excel(writer, sheet_name=f'{leg}_C-P', index=False)
 
-writer.close()
+if writer is not None:
+    writer.close()
 
 print("\nSaved: tree_combo_grouped_results.pkl, tree_combo_grouped_results.xlsx")
 

@@ -242,8 +242,14 @@ def main():
              'STEP 22: Emit latex/canonical_macros.tex from PRODUCTION_METRICS.json '
              '(\\newcommand per metric for use in thesis prose)'),
 
-        23: ('scripts/verify_thesis_consistency.py',
-             'STEP 23: Flag drift between latex prose and PRODUCTION_METRICS.json '
+        23: ('scripts/build_thesis_tables.py',
+             'STEP 23: Render headline thesis tables (table_performance, table_factor_alphas, '
+             'table_regime_sharpe, table_panic_subtypes, table_hmm_separation) directly from '
+             'PRODUCTION_METRICS.json — single source of truth. Writes .canonical.tex siblings '
+             'until rename'),
+
+        24: ('scripts/verify_thesis_consistency.py',
+             'STEP 24: Flag drift between latex prose and PRODUCTION_METRICS.json '
              '(soft check; non-blocking — surfaces hand-typed numbers that need updating)'),
 
         95: ('tests/test_config.py',
