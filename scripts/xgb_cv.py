@@ -133,7 +133,10 @@ def load_panel():
     regimes = pd.read_parquet('data/panel_with_regimes.parquet')[['date', 'pi_filter']]
     regimes['date'] = pd.to_datetime(regimes['date'])
     stocks = stocks.merge(regimes, on='date', how='left')
-    stocks['pi_filter'] = stocks['pi_filter'].ffill()
+    # Group-wise ffill: prevents cross-permno bleed (regime panel begins
+    # 1990-01; pre-1990 rows would otherwise inherit the prior permno's
+    # post-1990 pi_filter).
+    stocks['pi_filter'] = stocks.groupby('permno')['pi_filter'].ffill()
 
     # Momentum features via shifted log-returns
     stocks['_log_ret'] = np.log1p(stocks['ret_adj'].clip(lower=-0.999))

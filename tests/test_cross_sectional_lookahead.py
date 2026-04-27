@@ -138,8 +138,10 @@ class TestTargetIsolation:
 
 class TestPiFilterMerge:
     def test_pi_filter_ffill_only(self, source):
-        # ffill uses past values only; bfill would be lookahead
-        assert "stocks['pi_filter'] = stocks['pi_filter'].ffill()" in source
+        # ffill uses past values only; bfill would be lookahead.
+        # Must be group-wise (keyed on permno) to prevent cross-permno
+        # bleed of pi_filter into pre-1990 rows of an earlier-sorted permno.
+        assert "stocks.groupby('permno')['pi_filter'].ffill()" in source
         assert not re.search(r"pi_filter.*\.bfill\(\)", source), \
             "pi_filter must never be bfill'd — that leaks future regime info"
 

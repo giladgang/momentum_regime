@@ -29,7 +29,16 @@ import config as cfg
 
 N_BOOT = 10000
 BLOCK_LEN = 12
-RNG = np.random.RandomState(42)
+
+# Per-step RNG instances so adding/removing a bootstrap step in the future
+# does not silently shift downstream results. Each logical phase draws
+# from its own seeded generator.
+SEED_INDIVIDUAL = 42  # individual-Sharpe CIs (step 1 + paired step 2 share these)
+SEED_REGIME     = 43  # regime-conditional CIs (step 3)
+RNG_INDIVIDUAL  = np.random.RandomState(SEED_INDIVIDUAL)
+RNG_REGIME      = np.random.RandomState(SEED_REGIME)
+# Backward-compat alias used by helpers; routed to the individual-step RNG.
+RNG = RNG_INDIVIDUAL
 
 # ── Load portfolio returns ──
 print("Loading artefacts ...")
@@ -163,7 +172,7 @@ def bootstrap_ci(r, n_boot=N_BOOT, block_len=BLOCK_LEN):
         # For small samples (panic), use shorter blocks if needed
         bl = min(block_len, max(3, T // 6))
         n_blocks = int(np.ceil(T / bl))
-        starts = RNG.randint(0, T, size=n_blocks)
+        starts = RNG_REGIME.randint(0, T, size=n_blocks)
         idx = np.concatenate([np.arange(s, s + bl) % T for s in starts])[:T]
         sharpes[b] = sharpe(r[idx])
     return sharpes

@@ -63,7 +63,12 @@ regimes = pd.read_parquet('data/panel_with_regimes.parquet')[['date', 'pi_filter
 regimes['date'] = pd.to_datetime(regimes['date'])
 
 stocks = stocks.merge(regimes[['date', 'pi_filter']], on='date', how='left')
-stocks['pi_filter'] = stocks['pi_filter'].ffill()
+# Group-wise ffill: prevents the last permno's pi_filter (typically a 2025
+# value) from bleeding into the next permno's earliest rows when the panel
+# is sorted by ['permno', 'date']. Pre-1990 stocks (regime panel begins
+# 1990-01) would otherwise inherit a fabricated pi_filter through the
+# global ffill.
+stocks['pi_filter'] = stocks.groupby('permno')['pi_filter'].ffill()
 
 print(f"  Stocks: {len(stocks):,} rows  |  {stocks['permno'].nunique():,} permnos  "
       f"|  {stocks['date'].min().date()} → {stocks['date'].max().date()}")

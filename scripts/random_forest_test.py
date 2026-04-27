@@ -43,7 +43,9 @@ stocks = stocks[stocks['prc'].abs() > 1.0].reset_index(drop=True)
 regimes = pd.read_parquet('data/panel_with_regimes.parquet')[['date', 'pi_filter']]
 regimes['date'] = pd.to_datetime(regimes['date'])
 stocks = stocks.merge(regimes, on='date', how='left')
-stocks['pi_filter'] = stocks['pi_filter'].ffill()
+# Group-wise ffill: prevents cross-permno bleed of pi_filter through the
+# permno-major sort order (regime panel begins 1990-01).
+stocks['pi_filter'] = stocks.groupby('permno')['pi_filter'].ffill()
 
 print("Computing momentum ...")
 stocks['_lr'] = np.log1p(stocks['ret_adj'].clip(lower=-0.999))
