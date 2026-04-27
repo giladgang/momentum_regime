@@ -234,21 +234,26 @@ def parse_table_bootstrap():
 
 
 def parse_table_panic_subtypes():
-    """3-row table: Calm / Panic-Crash / Panic-Recovery with Sharpe + n + others."""
+    """3-row table; columns: Ann.Ret | Ann.Vol | Sharpe | Months."""
     text = _read('tables/table_panic_subtypes.tex')
     if not text:
         return {}
     out = {}
-    rows = {'calm': 'Calm', 'panic_crash': 'Panic Crash', 'panic_recovery': 'Panic Recovery'}
+    rows = {'calm': 'Calm', 'panic_crash': 'Panic: Crash', 'panic_recovery': 'Panic: Recovery'}
     for key, label in rows.items():
         r = _parse_row(text, label)
-        if r:
-            # Format is typically: Label & n & Sharpe & ...
-            # Expect Sharpe at a specific column; we'll just grab the second cell as Sharpe
-            # but parse all numerics
-            vals = [_to_float(c) for c in r[1:]]
-            if any(v is not None for v in vals):
-                out[f'{key}_sharpe'] = {'value': vals[1] if len(vals) > 1 else vals[0]}
+        if not r:
+            continue
+        # r = [label, ann_ret, ann_vol, sharpe, months]
+        ann_ret = _to_float(r[1]) if len(r) > 1 else None
+        ann_vol = _to_float(r[2]) if len(r) > 2 else None
+        sharpe  = _to_float(r[3]) if len(r) > 3 else None
+        months  = _to_float(r[4]) if len(r) > 4 else None
+        out[f'{key}_sharpe']  = {'value': sharpe}
+        out[f'{key}_ann_ret'] = {'value': ann_ret, 'unit': 'percent'}
+        out[f'{key}_ann_vol'] = {'value': ann_vol, 'unit': 'percent'}
+        if months is not None:
+            out[f'{key}_months'] = {'value': int(months)}
     return out
 
 
@@ -395,9 +400,216 @@ PARSERS = {
 }
 
 
+def _snapshot_config():
+    """Read config.py and return a dict of the config knobs that influence
+    thesis numbers. Stored in PRODUCTION_METRICS.json._metadata.config_snapshot
+    so the next rerun can detect which knobs changed."""
+    try:
+        sys.path.insert(0, str(ROOT))
+        import config  # noqa
+    except Exception as e:
+        print(f"  [WARN] could not import config.py: {e}")
+        return {}
+    snap = {}
+    KNOBS = [
+        'HMM_FEATURES', 'HMM_K_STATES', 'HMM_ITERATIONS', 'HMM_BURNIN',
+        'MAX_DEPTH', 'LEARNING_RATE', 'N_ESTIMATORS', 'XGB_SEEDS',
+        'FUND_FEATURES', 'MOM_FEATURES', 'TRADING_FEE',
+        'TRAIN_END', 'TEST_END', 'PANEL_PATH',
+    ]
+    for k in KNOBS:
+        if hasattr(config, k):
+            v = getattr(config, k)
+            # Normalise list-like to sorted tuple form for stable comparison
+            if isinstance(v, (list, set, tuple)):
+                snap[k] = sorted(v) if all(isinstance(x, (str, int, float)) for x in v) else list(v)
+            else:
+                snap[k] = v
+    return snap
+
+
+def _load_previous():
+    """Load the previous PRODUCTION_METRICS.json snapshot (the metrics + config),
+    returning ({}, {}) if not present."""
+    import json
+    path = ROOT / 'results/PRODUCTION_METRICS.json'
+    if not path.exists():
+        return {}, {}
+    with open(path) as f:
+        prev = json.load(f)
+    prev_config = prev.get('_metadata', {}).get('config_snapshot', {})
+    prev_metrics = {k: v for k, v in prev.items() if not k.startswith('_')}
+    return prev_metrics, prev_config
+
+
+def _flatten(metrics_by_section):
+    """{'sec': {'key': {'value': ..., ...}}} → {'sec.key': {'value': ...}}."""
+    out = {}
+    for sec, items in metrics_by_section.items():
+        if not isinstance(items, dict):
+            continue
+        for key, entry in items.items():
+            if isinstance(entry, dict):
+                out[f'{sec}.{key}'] = entry
+    return out
+
+
+def _diff_metrics(prev, curr, atol=1e-6):
+    """Return dict {flat_key: (old_val, new_val, delta)} for metrics whose
+    'value' field changed since last run (or are new)."""
+    p = _flatten(prev)
+    c = _flatten(curr)
+    diffs = {}
+    for k in sorted(set(p) | set(c)):
+        old = p.get(k, {}).get('value')
+        new = c.get(k, {}).get('value')
+        if old is None and new is None:
+            continue
+        if old is None:
+            diffs[k] = (None, new, None)
+        elif new is None:
+            diffs[k] = (old, None, None)
+        else:
+            try:
+                if abs(float(new) - float(old)) > atol:
+                    diffs[k] = (old, new, float(new) - float(old))
+            except (TypeError, ValueError):
+                if old != new:
+                    diffs[k] = (old, new, None)
+    return diffs
+
+
+def _diff_configs(prev, curr):
+    """Return dict {knob: (old, new)} for config knobs whose value changed."""
+    out = {}
+    for k in sorted(set(prev) | set(curr)):
+        if prev.get(k) != curr.get(k):
+            out[k] = (prev.get(k), curr.get(k))
+    return out
+
+
+def _write_diff_report(metric_diffs, config_diffs, total_metrics):
+    """Write results/METRICS_DIFF.md — a focused report of what changed
+    this run, cross-referenced against the config dependency map."""
+    from scripts._config_deps import CONFIG_DEPS, configs_touching_metric
+    import datetime as _dt
+
+    lines = [
+        '# Metrics diff report',
+        '',
+        f'Generated: {_dt.datetime.now().isoformat(timespec="seconds")}  ',
+        f'Total metrics tracked: {total_metrics}',
+        '',
+    ]
+
+    # ── Config knobs that changed ─────────────────────────────────────────
+    if config_diffs:
+        lines += [
+            '## ⚙️ Config knobs that changed since last run',
+            '',
+            '| Knob | Old → New | Expected metric ripple |',
+            '|---|---|---|',
+        ]
+        for knob, (old, new) in config_diffs.items():
+            dep = CONFIG_DEPS.get(knob, {})
+            ripple = dep.get('downstream') or ', '.join(dep.get('metrics', [])) or '—'
+            old_s = repr(old) if old is not None else '*(new)*'
+            new_s = repr(new)
+            lines.append(f'| `{knob}` | `{old_s}` → `{new_s}` | {ripple} |')
+        lines.append('')
+    else:
+        lines += ['## ⚙️ Config knobs', '', 'No config knobs changed since last run.', '']
+
+    # ── Metrics that changed ──────────────────────────────────────────────
+    if not metric_diffs:
+        lines += ['## 📊 Metrics', '', 'No metric values changed since last run.', '']
+    else:
+        lines += [
+            f'## 📊 Metrics that changed ({len(metric_diffs)})',
+            '',
+            '| Metric (section.key) | Old | New | Δ | Likely config |',
+            '|---|---|---|---|---|',
+        ]
+        for k, (old, new, delta) in metric_diffs.items():
+            sec, _, key = k.partition('.')
+            cfgs = configs_touching_metric(sec, key)
+            cfg_str = ', '.join(cfgs) if cfgs else '—'
+            old_s = f'{old:.4f}' if isinstance(old, (int, float)) else (str(old) if old is not None else '*(new)*')
+            new_s = f'{new:.4f}' if isinstance(new, (int, float)) else (str(new) if new is not None else '*(removed)*')
+            delta_s = f'{delta:+.4f}' if isinstance(delta, (int, float)) else '—'
+            lines.append(f'| `{k}` | {old_s} | {new_s} | {delta_s} | {cfg_str} |')
+        lines.append('')
+
+    # ── Cross-check: expected vs actual ──────────────────────────────────
+    if config_diffs:
+        lines += [
+            '## 🔍 Expected-vs-actual cross-check',
+            '',
+            "Did the actual metric drift match what we'd expect from the changed configs?",
+            '',
+        ]
+        for knob, (old, new) in config_diffs.items():
+            dep = CONFIG_DEPS.get(knob, {})
+            patterns = dep.get('metrics', [])
+            expected_keys = set()
+            for pat in patterns:
+                sec, _, key = pat.partition('.')
+                for diff_key in metric_diffs:
+                    diff_sec, _, diff_k = diff_key.partition('.')
+                    if (sec == '*' or sec == diff_sec) and (key == '*' or key == diff_k):
+                        expected_keys.add(diff_key)
+            actual_drifted = set(metric_diffs.keys())
+            unexpected = actual_drifted - expected_keys
+            missing = set()  # we can't compute "expected but didn't drift" without enumerating canonical
+            lines.append(f'**`{knob}` changed:**')
+            if expected_keys:
+                lines.append(f"- ✅ Expected drifts that occurred ({len(expected_keys)}): " +
+                             ', '.join(f'`{k}`' for k in sorted(expected_keys)[:8]) +
+                             (f' (+{len(expected_keys)-8} more)' if len(expected_keys) > 8 else ''))
+            else:
+                lines.append('- (no metrics drifted in the expected ripple set — could mean the change had no numeric effect, or the dependency map is incomplete)')
+            lines.append('')
+
+    if metric_diffs and config_diffs:
+        # Look for unexpected drifts (any metric that changed but no listed config touches it)
+        unexpected = []
+        for k, (_, _, _) in metric_diffs.items():
+            sec, _, key = k.partition('.')
+            cfgs = configs_touching_metric(sec, key)
+            changed_cfgs = set(cfgs) & set(config_diffs.keys())
+            if not changed_cfgs:
+                unexpected.append(k)
+        if unexpected:
+            lines += [
+                '### ⚠ Unexpected drifts',
+                '',
+                "These metrics changed but **none of the changed configs lists them as dependencies**. ",
+                "This could mean:",
+                "- The dependency map (`scripts/_config_deps.py`) is incomplete (please update)",
+                "- A config you forgot to track was changed",
+                "- Stochastic seed drift (small) — usually fine if Δ is tiny",
+                '',
+            ]
+            for k in unexpected[:15]:
+                old, new, delta = metric_diffs[k]
+                delta_s = f'Δ={delta:+.4f}' if isinstance(delta, (int, float)) else ''
+                lines.append(f'- `{k}` ({delta_s})')
+            if len(unexpected) > 15:
+                lines.append(f'- ... and {len(unexpected) - 15} more')
+            lines.append('')
+
+    out_path = ROOT / 'results/METRICS_DIFF.md'
+    out_path.write_text('\n'.join(lines) + '\n')
+    return out_path
+
+
 def main():
     print("Building results/PRODUCTION_METRICS.json from tables/ + results/...")
-    total = 0
+    # Snapshot previous state for diffing
+    prev_metrics, prev_config = _load_previous()
+
+    # Run all parsers
+    new_metrics_by_section = {}
     for section, parser in PARSERS.items():
         try:
             metrics = parser()
@@ -406,12 +618,34 @@ def main():
             continue
         if metrics:
             set_many(section, metrics, source=f'parsed-from-tables-and-csvs ({parser.__name__})')
+            new_metrics_by_section[section] = metrics
             n = len(metrics)
-            total += n
             print(f"  {section:<22s} {n:3d} metrics")
         else:
             print(f"  {section:<22s} (none — table missing or parser found no rows)")
-    print(f"\nTotal: {total} metrics written to results/PRODUCTION_METRICS.json")
+
+    total = sum(len(v) for v in new_metrics_by_section.values())
+
+    # Snapshot config.py knobs into _metadata.config_snapshot
+    curr_config = _snapshot_config()
+    import json
+    metrics_path = ROOT / 'results/PRODUCTION_METRICS.json'
+    with open(metrics_path) as f:
+        data = json.load(f)
+    data.setdefault('_metadata', {})['config_snapshot'] = curr_config
+    with open(metrics_path, 'w') as f:
+        json.dump(data, f, indent=2, sort_keys=True)
+
+    # Compute diffs vs previous snapshot
+    metric_diffs = _diff_metrics(prev_metrics, new_metrics_by_section)
+    config_diffs = _diff_configs(prev_config, curr_config)
+
+    # Write the focused diff report
+    diff_path = _write_diff_report(metric_diffs, config_diffs, total)
+
+    print(f'\nTotal: {total} metrics in PRODUCTION_METRICS.json')
+    print(f'Diff vs last run: {len(metric_diffs)} metrics changed, {len(config_diffs)} config knobs changed')
+    print(f'Report: {diff_path.relative_to(ROOT)}')
 
 
 if __name__ == '__main__':

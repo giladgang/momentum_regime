@@ -234,6 +234,18 @@ def main():
         20: ('scripts/build_table_expanding_subperiods.py',
              'STEP 20: Build expanding-window sub-period table (depends on Step 19)'),
 
+        21: ('scripts/build_metrics.py',
+             'STEP 21: Extract canonical metrics from tables/+results/ → results/PRODUCTION_METRICS.json '
+             '(also writes results/METRICS_DIFF.md showing what changed since last run)'),
+
+        22: ('scripts/build_canonical_macros.py',
+             'STEP 22: Emit latex/canonical_macros.tex from PRODUCTION_METRICS.json '
+             '(\\newcommand per metric for use in thesis prose)'),
+
+        23: ('scripts/verify_thesis_consistency.py',
+             'STEP 23: Flag drift between latex prose and PRODUCTION_METRICS.json '
+             '(soft check; non-blocking — surfaces hand-typed numbers that need updating)'),
+
         95: ('tests/test_config.py',
              'STEP 95: Config sanity checks (dates, features, hyperparameters)'),
 

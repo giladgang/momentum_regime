@@ -158,10 +158,11 @@ def full_metrics(r, r_mkt, pi_series):
     mdd = float(((cum - cum.cummax()) / cum.cummax()).min())
     final = float(cum.iloc[-1])
 
-    # Beta vs market
+    # Beta vs market — cast to numpy float64 for statsmodels/np compatibility
     common = r.index.intersection(r_mkt.index)
     if len(common) > 12:
-        a, b = r.loc[common].values, r_mkt.loc[common].values
+        a = np.asarray(r.loc[common].values, dtype=np.float64)
+        b = np.asarray(r_mkt.loc[common].values, dtype=np.float64)
         valid = ~(np.isnan(a) | np.isnan(b))
         cov = np.cov(a[valid], b[valid])
         beta = float(cov[0, 1] / cov[1, 1])
@@ -172,8 +173,9 @@ def full_metrics(r, r_mkt, pi_series):
     # convention used in table_performance.tex (main_results_analysis.py).
     # For market-neutral L/S strategies the standard test is mean = 0; the
     # market exposure is controlled separately in the factor-alpha table.
-    nw = sm.OLS(r.values, np.ones((n, 1))).fit(cov_type='HAC',
-                                                 cov_kwds={'maxlags': 6})
+    nw = sm.OLS(np.asarray(r.values, dtype=np.float64),
+                np.ones((n, 1))).fit(cov_type='HAC',
+                                     cov_kwds={'maxlags': 6})
     nw_t, nw_p = float(nw.tvalues[0]), float(nw.pvalues[0])
 
     # Mean-excess-vs-market t-stat retained for diagnostic comparison only;
@@ -181,7 +183,11 @@ def full_metrics(r, r_mkt, pi_series):
     # right way to control for market exposure (see compute_factor_alphas).
     common = r.index.intersection(r_mkt.index)
     if len(common) > 12:
-        excess = r.loc[common].values - r_mkt.loc[common].values
+        # Cast to numpy float64 — statsmodels OLS does not accept pandas
+        # Float64 extension dtype (raises ValueError on FloatingArray).
+        r_common    = np.asarray(r.loc[common], dtype=np.float64)
+        rmkt_common = np.asarray(r_mkt.loc[common], dtype=np.float64)
+        excess = r_common - rmkt_common
         valid = ~np.isnan(excess)
         nw_ex = sm.OLS(excess[valid], np.ones((valid.sum(), 1))).fit(
             cov_type='HAC', cov_kwds={'maxlags': 6})
@@ -227,7 +233,8 @@ def factor_alphas(r):
                        how='inner')
     if len(merged) < 24:
         return {}
-    y = merged['ret'].values
+    # Cast to numpy float64 — statsmodels OLS rejects pandas Float64 extension dtype.
+    y = np.asarray(merged['ret'].values, dtype=np.float64)
     results = {}
     for mname, cols in [
         ('CAPM', ['Mkt-RF']),
@@ -236,7 +243,7 @@ def factor_alphas(r):
         ('FF5', ['Mkt-RF', 'SMB', 'HML', 'RMW', 'CMA']),
         ('FF6', ['Mkt-RF', 'SMB', 'HML', 'RMW', 'CMA', 'UMD']),
     ]:
-        X = sm.add_constant(merged[cols].values)
+        X = sm.add_constant(np.asarray(merged[cols].values, dtype=np.float64))
         res = sm.OLS(y, X).fit(cov_type='HAC', cov_kwds={'maxlags': 6})
         results[mname] = dict(
             alpha=float(res.params[0] * 12),
