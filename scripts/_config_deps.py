@@ -36,7 +36,7 @@ CONFIG_DEPS = {
         'latex_prose': ['data_section.tex', 'methodology.tex', 'appendix.tex'],
         'description': 'HMM input features. Changing reshapes π_filter → ALL downstream tables.',
     },
-    'HMM_K_STATES': {
+    'K_STATES': {
         'scripts': ['scripts/hmm_model.py', 'scripts/hmm_diagnostics.py'],
         'tables': ['table_multistate_hmm', 'table_hmm_separation'],
         'metrics': ['hmm_separation.*'],

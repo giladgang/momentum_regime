@@ -25,9 +25,11 @@ main.log
 logs/
 artefacts/
 
-# Pre-Shumway / pre-intl-Shumway baseline snapshots (large, kept locally only)
-baseline_pre_shumway_*/
-baseline_pre_intl_shumway_*/
+# Baseline snapshots taken before destructive pipeline operations (large, kept
+# locally only). Catches every baseline_pre_<change>_<timestamp>/ pattern per
+# the CLAUDE.md backup convention — Shumway, intl-Shumway, full-rerun,
+# restructure, and any future variants.
+baseline_pre_*/
 .last_intl_baseline
 
 # CV smoke + pytest-integration artifacts (kept locally, not in git)

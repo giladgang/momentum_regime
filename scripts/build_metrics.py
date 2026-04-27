@@ -412,10 +412,10 @@ def _snapshot_config():
         return {}
     snap = {}
     KNOBS = [
-        'HMM_FEATURES', 'HMM_K_STATES', 'HMM_ITERATIONS', 'HMM_BURNIN',
+        'HMM_FEATURES', 'K_STATES', 'HMM_ITERATIONS', 'HMM_BURNIN',
         'MAX_DEPTH', 'LEARNING_RATE', 'N_ESTIMATORS', 'XGB_SEEDS',
         'FUND_FEATURES', 'MOM_FEATURES', 'TRADING_FEE',
-        'TRAIN_END', 'TEST_END', 'PANEL_PATH',
+        'TRAIN_END', 'PANEL_PATH',
     ]
     for k in KNOBS:
         if hasattr(config, k):

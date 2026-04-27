@@ -55,8 +55,8 @@ No data assets.
 | `plots/features_hmm.png` | figure | `archive/scripts/regenerate_thesis_plots.py` | HMM_FEATURES |
 | `plots/regime_probabilities.png` | figure | `scripts/hmm_model.py` | HMM_FEATURES, HMM_K_STATES |
 | `tables/table_features_summary.tex` | table | `scripts/hmm_model.py` | HMM_FEATURES |
-| `tables/table_feature_selection.tex` | table — DEPRECATED | (not regenerated; replaced by table_hmm_cv per N3 decision) | — |
-| `tables/table_hmm_feature_ablation.tex` | table | (no current generator; per user keep old numbers) | HMM_FEATURES |
+| `tables/table_feature_selection.tex` | table — **frozen at Apr 14 by decision** | Still `\input`-ed in `data_section.tex:73`. NOT regenerated post-Shumway: the 4-pass HMM feature-selection pipeline that produced the table picked DD+CS+DISP+REL_N as the winning combo, which is the production HMM feature set. Rerunning would shift every reported sub-Sharpe but not the qualitative selection. Per the 2026-04-27 decision, prose stays as-is; the CV winner discussion lives in the appendix via `table_hmm_cv`. | — (frozen) |
+| `tables/table_hmm_feature_ablation.tex` | table — **frozen at Apr 12 by decision** | Still `\input`-ed in `data_section.tex:77`. NOT regenerated post-Shumway. Per the 2026-04-27 decision: keep old numbers, don't mention CV in the main body. The qualitative pattern (which features matter most) is preserved. | HMM_FEATURES (frozen) |
 | `tables/table_hmm_separation.tex` | table | `scripts/hmm_diagnostics.py` | HMM_FEATURES |
 
 ### Chapter 6 — Main results (`latex/main_results.tex`)

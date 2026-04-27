@@ -45,12 +45,15 @@ for leg, title in [('long', 'Long leg'), ('short', 'Short leg')]:
     ax.grid(axis='y', alpha=0.3)
 
     plt.tight_layout()
-    fig.savefig(f'plots/shap_signed_{leg}_final.png', dpi=150, bbox_inches='tight')
+    out_png = f'plots/diagnostic/shap_signed_{leg}_final.png'
+    fig.savefig(out_png, dpi=150, bbox_inches='tight')
     plt.close(fig)
-    print(f"Saved: shap_signed_{leg}_final.png")
+    print(f"Saved: {out_png}")
 
 from PIL import Image
 for leg in ['long', 'short']:
-    img = Image.open(f'shap_signed_{leg}_final.png')
-    img.save(f'shap_signed_{leg}_final.pdf', 'PDF', resolution=150)
-print("Saved PDFs")
+    src = f'plots/diagnostic/shap_signed_{leg}_final.png'
+    dst = f'plots/diagnostic/shap_signed_{leg}_final.pdf'
+    img = Image.open(src)
+    img.save(dst, 'PDF', resolution=150)
+    print(f"Saved: {dst}")

@@ -226,6 +226,18 @@ def main():
         16: ('scripts/tree_combo_grouped.py',
              'STEP 16: Grouped combo analysis (S/M/I/L horizon interactions by regime)'),
 
+        # ── Auxiliary thesis-cited generators (added 2026-04-27 after a code
+        # review found these scripts produce numbers cited in the thesis but
+        # weren't in the pipeline, leading to silent staleness on rerun). ──
+
+        17: ('scripts/bootstrap_analysis.py',
+             'STEP 17: Block-bootstrap Sharpe CIs + paired tests + regime-split '
+             '(table_bootstrap.tex + 3 bootstrap_*.csv in §5.1, App.~bootstrap)'),
+
+        18: ('scripts/zscore_time_by_horizon.py',
+             'STEP 18: Monthly z-score by horizon — long, short, longshort '
+             '(3 zscore_*_by_month.csv in results/thesis/, fed into §5.2 figures)'),
+
         19: ('scripts/expanding_window_backtest_parallel.py '
              '--first-retrain-year 1995 --last-retrain-year 2024 '
              '--hmm-seeds 200 --xgb-seeds 50 --workers 6 --tag prod',
@@ -234,6 +246,48 @@ def main():
         20: ('scripts/build_table_expanding_subperiods.py',
              'STEP 20: Build expanding-window sub-period table (depends on Step 19)'),
 
+        # Auxiliary continued — thesis-cited but separate from main_results_analysis
+        # ─ FUNDAMENTALS ABLATION
+        25: ('scripts/fundamentals_test.py',
+             'STEP 25: Fundamentals ablation (5 variants × full metrics) — '
+             'table_fund_alphas.tex, table_fundamentals_ablation.tex, '
+             'table_performance_fund_row.tex, fundamentals_test_results.csv'),
+
+        # ─ TREE / PATH / COMBO ANALYSES
+        26: ('scripts/tree_combo_analysis.py',
+             'STEP 26: Per-stock tree-path combo analysis '
+             '(tree_combo_results.csv — §E19 data backing)'),
+
+        27: ('scripts/verify_pi_dominance_stats.py',
+             'STEP 27: π_filter tree-dominance statistics '
+             '(pi_dominance_stats.csv — §E31 panic-share claims)'),
+
+        # ─ ROBUSTNESS / BENCHMARKS
+        28: ('scripts/random_forest_test.py',
+             'STEP 28: Random-forest baseline (RF underperforms XGB; '
+             'random_forest_results.csv — §E1 ablation backing)'),
+
+        29: ('scripts/january_exclusion.py',
+             'STEP 29: January-exclusion robustness '
+             '(table_january.tex — App.~january)'),
+
+        30: ('scripts/seed_convergence.py',
+             'STEP 30: XGB ensemble seed-convergence sweep '
+             '(seed_convergence.csv + plot + table_seed_convergence.tex)'),
+
+        # ─ RISK AVERSION (CRRA + dual utility)
+        31: ('scripts/risk_aversion_crra.py',
+             'STEP 31: CRRA risk-aversion sweep (risk_aversion_crra_results.csv)'),
+
+        32: ('scripts/two_model_dual_util.py',
+             'STEP 32: Two-model dual-utility comparison '
+             '(two_model_dual_util.csv — feeds §E32 + plot below)'),
+
+        33: ('scripts/plot_crra_dual_util.py',
+             'STEP 33: Render risk-aversion dual-utility plot '
+             '(plots/thesis/risk_aversion_dual_util.pdf — depends on Step 32)'),
+
+        # ─ Canonical chain (must run AFTER all generators above)
         21: ('scripts/build_metrics.py',
              'STEP 21: Extract canonical metrics from tables/+results/ → results/PRODUCTION_METRICS.json '
              '(also writes results/METRICS_DIFF.md showing what changed since last run)'),

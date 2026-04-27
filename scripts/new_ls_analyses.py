@@ -139,9 +139,9 @@ wml_all['sigma2'] = wml_all['r_wml'].rolling(6, min_periods=6).var()
 train_wml = wml_all[wml_all.index < TRAIN_END]
 test_wml = wml_all[wml_all.index >= TRAIN_END].copy()
 
-# D&M managed
-X_bear_tr = sm.add_constant(train_wml['bear'])
-ols = sm.OLS(train_wml['r_wml'], X_bear_tr).fit()
+# D&M managed — cast to numpy float64 (statsmodels rejects pandas Float64 ext dtype)
+X_bear_tr = sm.add_constant(np.asarray(train_wml['bear'].values, dtype=np.float64))
+ols = sm.OLS(np.asarray(train_wml['r_wml'].values, dtype=np.float64), X_bear_tr).fit()
 X_bear_te = sm.add_constant(test_wml['bear'])
 mu = ols.predict(X_bear_te)
 sigma2 = wml_all.loc[test_wml.index, 'sigma2']
@@ -162,7 +162,8 @@ def get_alphas(r, name):
     r_df = r.to_frame('ret')
     r_df.index = r_df.index + pd.offsets.MonthEnd(0)
     merged = r_df.join(ff[['Mkt-RF', 'SMB', 'HML', 'RMW', 'CMA', 'RF', 'UMD']], how='inner')
-    y = merged['ret'].values
+    # Cast to numpy float64 — statsmodels rejects pandas Float64 ext dtype
+    y = np.asarray(merged['ret'].values, dtype=np.float64)
 
     results = {}
     all_factors = ['Mkt-RF', 'SMB', 'HML', 'UMD', 'RMW', 'CMA']
