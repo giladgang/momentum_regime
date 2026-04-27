@@ -19,3 +19,21 @@ __pycache__/
 *.fdb_latexmk
 *.fls
 main.log
+
+# Runtime + session noise
+.claude/
+logs/
+artefacts/
+
+# Pre-Shumway / pre-intl-Shumway baseline snapshots (large, kept locally only)
+baseline_pre_shumway_*/
+baseline_pre_intl_shumway_*/
+.last_intl_baseline
+
+# CV smoke + pytest-integration artifacts (kept locally, not in git)
+results/*_smoke_*.csv
+results/*_smoke.csv
+results/*_pytest_integration.csv
+results/expanding_pi_filter_pytest_integration.csv
+results/expanding_returns_pytest_integration.csv
+results/expanding_summary_pytest_integration.csv
