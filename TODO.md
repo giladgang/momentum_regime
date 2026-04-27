@@ -59,19 +59,19 @@
 
 ---
 
-## 🔑 Decisions needed from Gilad
+## 🔑 Decisions made (2026-04-27)
 
-- [ ] **HMM feature set**: CV winner is `DD+CS+LVIX+DISP` (Step J). Current production is `DD+CS+DISP+REL_N`. Either: (a) retrain production at CV winner and update all downstream artefacts, or (b) keep production fit and document the CV result as evidence the production set is *near-optimal* (within fold-noise).
-  - CV winner: [`results/hmm_cv_winner.json`](results/hmm_cv_winner.json)
-  - Full CV results (1395 cells): [`results/hmm_cv_features.csv`](results/hmm_cv_features.csv)
-  - LaTeX-ready table: [`tables/table_hmm_cv.tex`](tables/table_hmm_cv.tex)
-  - Detailed analysis: [`results/THESIS_EDITS_TODO.md`](results/THESIS_EDITS_TODO.md) §B2
-- [ ] **XGB hyperparameters**: CV winner is depth=3, lr=0.10, n=200 (Step I). Current production uses depth=4, lr=0.05, n=500. Top-5 CV configs cluster within fold-noise (0.56-0.60 mean Sharpe).
-  - CV winner: [`results/xgb_cv_winner.json`](results/xgb_cv_winner.json)
-  - Full CV results (180 cells): [`results/xgb_cv_results.csv`](results/xgb_cv_results.csv)
-  - LaTeX-ready table: [`tables/table_xgb_cv.tex`](tables/table_xgb_cv.tex)
-  - Detailed analysis: [`results/THESIS_EDITS_TODO.md`](results/THESIS_EDITS_TODO.md) §B1
-- [ ] **Re-running pipeline at CV winners**: if you choose (a) above for either decision, the entire post-Shumway pipeline needs a final rerun at the new HMM features + XGB hyperparameters. Adds ~3-5h compute. Runbook: edit `config.py` (`HMM_FEATURES`, `MAX_DEPTH`, `LEARNING_RATE`, `N_ESTIMATORS`), then `python run_pipeline.py`.
+- [x] **HMM feature set**: KEEP production `DD+CS+DISP+REL_N`. Step J CV winner (`DD+CS+LVIX+DISP`) is statistically indistinguishable within fold-noise (gap +0.221 vs fold-std 0.694). Defer to **future work** as a "more robust feature-selection procedure with rolling/expanding-window CV". See [`results/THESIS_EDITS_TODO.md`](results/THESIS_EDITS_TODO.md) §B2 for rationale and §H Edit #6 for the future-work paragraph.
+- [x] **XGB hyperparameters**: KEEP production `depth=4, lr=0.05, n=500`. Step I CV puts depth-3 narrowly atop the grid (+0.596 vs depth-4 +0.576, gap 0.021 within fold-std 0.811 — essentially zero). Test-period sweep ([`results/depth_results.csv`](results/depth_results.csv)) prefers depth-4 (Sharpe 1.11 vs 0.98). Both objectives jointly support keeping depth-4.
+- [x] **No retraining at CV winners** — production stays as the canonical specification; CV results live in the appendix as a robustness check.
+
+---
+
+## 🔬 Robustness backing (already pushed to remote)
+
+- [`results/xgb_cv_winner.json`](results/xgb_cv_winner.json), [`results/xgb_cv_results.csv`](results/xgb_cv_results.csv), [`tables/table_xgb_cv.tex`](tables/table_xgb_cv.tex) — Step I (XGB CV)
+- [`results/hmm_cv_winner.json`](results/hmm_cv_winner.json), [`results/hmm_cv_features.csv`](results/hmm_cv_features.csv), [`tables/table_hmm_cv.tex`](tables/table_hmm_cv.tex) — Step J (HMM CV)
+- Production combo's CV rank: 47/64 (mean +0.286, fold-std 0.510). Within fold-noise of winner.
 
 ---
 

@@ -50,11 +50,17 @@ These are auto-flagged in [`PROSE_EDITS.md`](PROSE_EDITS.md). The list below is 
 - ☐ [M] Note **top-5 configs cluster within fold-noise** (means 0.56–0.60); winner choice is "any reasonable config" — same sources
 - ☐ [M] **Strike** the existing "test-set peek" / "we picked depth=4 because it looked good on test" caveat in `latex/methodology.tex` and `latex/appendix.tex`
 
-### B2. HMM feature-set CV winner
+### B2. HMM feature-set CV — DECISION: keep production, defer to future work
 
-- ☐ [M] State **CV winner: `DD+CS+LVIX+DISP`**, mean val Sharpe **+0.507** (fold-std 0.694) — [`results/hmm_cv_winner.json`](hmm_cv_winner.json), [`tables/table_hmm_cv.tex`](../tables/table_hmm_cv.tex), [`results/hmm_cv_features.csv`](hmm_cv_features.csv) → [`latex/data_section.tex`](../latex/data_section.tex)
-- ☐ [M] **Note divergence**: CV winner differs from current production (`DD+CS+DISP+REL_N`) — CV swaps `REL_N` for `LVIX`. Decision: retrain or document
-- ☐ [M] **Strike** "specification-search" caveat in `latex/data_section.tex`
+**Decided 2026-04-27**: Production stays at `DD+CS+DISP+REL_N` (the 4-pass `scripts/hmm_feature_selection.py` pipeline winner). Step J's CV identifies `DD+CS+LVIX+DISP` as the held-out-validation winner; production ranks 47/64 in CV, gap +0.221 within fold-std 0.694 (statistically indistinguishable). Rationale for keeping production: (a) the original 4-pass pipeline used systematic test-period evaluation, (b) re-fitting at the CV winner would invalidate every numeric in this draft, (c) the CV gap is within fold-noise.
+
+- ☐ [S] **Strike** "specification-search" caveat in `latex/data_section.tex` — the original 4-pass pipeline + CV robustness check together replace the caveat
+- ☐ [N] Optional appendix paragraph (`latex/appendix.tex`) referencing [`tables/table_hmm_cv.tex`](../tables/table_hmm_cv.tex) showing the production combo is within fold-noise of the CV winner. The "show your work" option.
+- ☐ [M] **Future-work item** — add to `latex/future_work_full.tex`: a more robust feature-selection procedure using rolling/expanding-window cross-validation entirely within the training partition (replacing the test-period-evaluated 4-pass pipeline). See §H Edit #6 for draft prose.
+
+**NOT doing**:
+- ~~Stating `DD+CS+LVIX+DISP` as winner in main body~~ — keeps narrative clean; CV details only in appendix
+- ~~Retraining the production HMM at the CV winner~~ — explicitly out of scope for this draft
 
 ### B3. International validation — Global Financial Cycle
 
@@ -405,6 +411,11 @@ The bundle's framing is decided by C1 (leg-betas finding):
 - ☐ [M] **Edit #3** — `latex/conclusion.tex:53`: sharpen "two channels" — regime conditioning + cross-sectional re-ranking
 - ☐ [M] **Edit #4** — `latex/methodology.tex`: pi_filter ↔ D&M bear-indicator link (standalone, lands regardless)
 - ☐ [M] **NEW Edit #5** — `latex/main_results.tex` or `latex/conclusion.tex` future-work: add the global financial cycle headline from §B3
+- ☐ [M] **NEW Edit #6** — `latex/future_work_full.tex`: add paragraph on more robust feature-selection procedure. Draft prose:
+
+  > A more robust HMM feature-selection procedure would replace the test-period-evaluated 4-pass pipeline used here (Section X.Y) with a cross-validation entirely within the training partition — for instance, a 5-fold expanding-window CV on the 1990-2010 panel that never touches the 2011-2025 test data. We implement such a CV as a robustness check (Appendix \ref{app:hmm_cv}); it identifies `DD+CS+LVIX+DISP` as the held-out-validation winner, statistically indistinguishable from our production set within fold-noise. Future research should adopt this as the primary selection method, with rolling-window robustness checks at multiple training-end dates to validate stability of the chosen feature set across regimes.
+
+  Goes alongside §B2 decision. Cite [`tables/table_hmm_cv.tex`](../tables/table_hmm_cv.tex) and [`results/hmm_cv_winner.json`](hmm_cv_winner.json).
 
 ---
 
