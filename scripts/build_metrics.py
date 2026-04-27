@@ -177,7 +177,7 @@ def parse_table_bootstrap():
     """Reads from results/bootstrap_*.csv (written by bootstrap_analysis.py)."""
     import csv
     out = {}
-    cis_path = ROOT / 'results/bootstrap_sharpe_cis.csv'
+    cis_path = ROOT / 'results/thesis/bootstrap_sharpe_cis.csv'
     if cis_path.exists():
         with open(cis_path) as f:
             for row in csv.DictReader(f):
@@ -198,7 +198,7 @@ def parse_table_bootstrap():
                     'ci_lo': _to_float(row.get('ci_low', '')),
                     'ci_hi': _to_float(row.get('ci_high', '')),
                 }
-    paired_path = ROOT / 'results/bootstrap_paired_tests.csv'
+    paired_path = ROOT / 'results/thesis/bootstrap_paired_tests.csv'
     if paired_path.exists():
         with open(paired_path) as f:
             for row in csv.DictReader(f):
@@ -218,7 +218,7 @@ def parse_table_bootstrap():
                     'ci_hi': _to_float(row.get('diff_ci_high', '')),
                     'p':     _to_float(row.get('p_value', '')),
                 }
-    regime_path = ROOT / 'results/bootstrap_regime.csv'
+    regime_path = ROOT / 'results/thesis/bootstrap_regime.csv'
     if regime_path.exists():
         with open(regime_path) as f:
             for row in csv.DictReader(f):
@@ -276,7 +276,7 @@ def parse_table_hmm_separation():
     """Reads from results/hmm_separation.csv (written by hmm_diagnostics.py)."""
     import csv
     out = {}
-    path = ROOT / 'results/hmm_separation.csv'
+    path = ROOT / 'results/thesis/hmm_separation.csv'
     if path.exists():
         with open(path) as f:
             for row in csv.DictReader(f):
@@ -320,7 +320,7 @@ def parse_table_january():
 def parse_table_seed_convergence():
     """Read directly from results/seed_convergence.csv."""
     import csv
-    path = ROOT / 'results/seed_convergence.csv'
+    path = ROOT / 'results/thesis/seed_convergence.csv'
     if not path.exists():
         return {}
     out = {}
@@ -359,7 +359,7 @@ def parse_intl_summary():
     for region, suffix in [('uk', 'uk_regional'), ('jp', 'jp_regional'),
                            ('uk', 'uk_uspi'),    ('jp', 'jp_uspi')]:
         is_uspi = suffix.endswith('_uspi')
-        path = ROOT / f"results/intl_{region}_summary{'_uspi' if is_uspi else ''}.csv"
+        path = ROOT / f"results/thesis/intl_{region}_summary{'_uspi' if is_uspi else ''}.csv"
         if not path.exists():
             continue
         with open(path) as f:
@@ -598,7 +598,7 @@ def _write_diff_report(metric_diffs, config_diffs, total_metrics):
                 lines.append(f'- ... and {len(unexpected) - 15} more')
             lines.append('')
 
-    out_path = ROOT / 'results/METRICS_DIFF.md'
+    out_path = ROOT / 'results/reports/METRICS_DIFF.md'
     out_path.write_text('\n'.join(lines) + '\n')
     return out_path
 

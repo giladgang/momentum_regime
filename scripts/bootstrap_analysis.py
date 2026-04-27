@@ -188,9 +188,9 @@ print(f"  Diff (P-C):   {panic_point - calm_point:.3f}  [{diff_ci[0]:.3f}, {diff
 # ── Save results ──
 os.makedirs('results', exist_ok=True)
 ci_df = pd.DataFrame(ci_results)
-ci_df.to_csv('results/bootstrap_sharpe_cis.csv', index=False)
+ci_df.to_csv('results/thesis/bootstrap_sharpe_cis.csv', index=False)
 paired_df = pd.DataFrame(paired_results)
-paired_df.to_csv('results/bootstrap_paired_tests.csv', index=False)
+paired_df.to_csv('results/thesis/bootstrap_paired_tests.csv', index=False)
 
 regime_df = pd.DataFrame([
     {'regime': 'Calm',  'n_months': len(calm_returns),  'sharpe': calm_point,  'ci_low': calm_ci[0],  'ci_high': calm_ci[1]},
@@ -198,7 +198,7 @@ regime_df = pd.DataFrame([
     {'regime': 'Panic - Calm', 'n_months': '---', 'sharpe': panic_point - calm_point,
      'ci_low': diff_ci[0], 'ci_high': diff_ci[1]},
 ])
-regime_df.to_csv('results/bootstrap_regime.csv', index=False)
+regime_df.to_csv('results/thesis/bootstrap_regime.csv', index=False)
 
 print("\nSaved:")
 print("  results/bootstrap_sharpe_cis.csv")

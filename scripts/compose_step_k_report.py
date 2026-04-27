@@ -124,7 +124,7 @@ def _format_intl_summary(region):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--baseline-dir', required=True)
-    parser.add_argument('--output', default='results/STEP_K_REPORT.md')
+    parser.add_argument('--output', default='results/reports/STEP_K_REPORT.md')
     args = parser.parse_args()
 
     baseline = Path(args.baseline_dir)

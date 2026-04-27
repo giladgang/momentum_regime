@@ -66,7 +66,7 @@ long_df = pd.DataFrame(long_rows).sort_values('date').reset_index(drop=True)
 short_df = pd.DataFrame(short_rows).sort_values('date').reset_index(drop=True)
 spread_df = pd.DataFrame(spread_rows).sort_values('date').reset_index(drop=True)
 
-short_df.to_csv('results/zscore_short_by_month.csv', index=False, float_format='%.4f')
+short_df.to_csv('results/thesis/zscore_short_by_month.csv', index=False, float_format='%.4f')
 print(f"Saved: results/zscore_short_by_month.csv  ({len(short_df)} rows)")
 
 # ── Merge pi_filter for the line panel ──

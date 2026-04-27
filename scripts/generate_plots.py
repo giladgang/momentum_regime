@@ -154,7 +154,7 @@ ax.grid(True, alpha=0.3)
 ax.set_yscale('log')
 ax.axhline(1, color='black', linewidth=0.5, linestyle=':')
 plt.tight_layout()
-fig.savefig('plots/cs_performance_regime_shaded.png', dpi=150)
+fig.savefig('plots/thesis/cs_performance_regime_shaded.png', dpi=150)
 plt.close(fig)
 print("  Saved: cs_performance_regime_shaded.png")
 

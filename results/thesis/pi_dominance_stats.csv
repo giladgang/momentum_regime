@@ -1,0 +1,6 @@
+stat,value,denominator,note
+trees_with_pi_split,18470,25000,50-seed production ensemble (73.9%)
+trees_with_pi_split_seed50,384,500,seed 50 alone (76.8%)
+paths_with_pi_long,1176985347,2139975000,55.0% of long-leg stock paths
+panic_long_pi_share,64.67,100,panic long-leg return from pi-splitting trees
+calm_long_pi_share,17.63,100,calm long-leg return from pi-splitting trees

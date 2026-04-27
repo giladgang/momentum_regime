@@ -95,7 +95,7 @@
       ]
     },
     "data_source": "post-Shumway, 1990-2010 train, 2011-2025 test",
-    "last_updated": "2026-04-27T18:30:35",
+    "last_updated": "2026-04-27T20:13:05",
     "schema_version": 1
   },
   "bootstrap": {
@@ -103,35 +103,35 @@
       "ci_hi": 0.5859503854032166,
       "ci_lo": -0.43159415334367224,
       "source_script": "parsed-from-tables-and-csvs (parse_table_bootstrap)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.06495228753200069
     },
     "fixed_1_sharpe": {
       "ci_hi": 0.7338909810295705,
       "ci_lo": -0.2050479566468373,
       "source_script": "parsed-from-tables-and-csvs (parse_table_bootstrap)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.26397662610565914
     },
     "m0_sharpe": {
       "ci_hi": 0.590018442839694,
       "ci_lo": -0.3596356482437816,
       "source_script": "parsed-from-tables-and-csvs (parse_table_bootstrap)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.11243594538864563
     },
     "m1_sharpe": {
       "ci_hi": 0.4220743985672905,
       "ci_lo": -0.4113271310185389,
       "source_script": "parsed-from-tables-and-csvs (parse_table_bootstrap)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.011917219310536999
     },
     "m2_sharpe": {
       "ci_hi": 1.5294138406215423,
       "ci_lo": 0.6733231465178651,
       "source_script": "parsed-from-tables-and-csvs (parse_table_bootstrap)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 1.110004783317007
     },
     "m2_vs_fixed_1": {
@@ -139,7 +139,7 @@
       "ci_lo": 0.1375898954119174,
       "p": 0.0206,
       "source_script": "parsed-from-tables-and-csvs (parse_table_bootstrap)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.8460281572113479
     },
     "m2_vs_fixed_12": {
@@ -147,7 +147,7 @@
       "ci_lo": 0.30341290440647395,
       "p": 0.0048,
       "source_script": "parsed-from-tables-and-csvs (parse_table_bootstrap)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 1.0450524957850063
     },
     "m2_vs_m0": {
@@ -155,7 +155,7 @@
       "ci_lo": 0.2561882158516181,
       "p": 0.0076,
       "source_script": "parsed-from-tables-and-csvs (parse_table_bootstrap)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.9975688379283614
     },
     "m2_vs_m1": {
@@ -163,7 +163,7 @@
       "ci_lo": 0.45797978981383175,
       "p": 0.0006,
       "source_script": "parsed-from-tables-and-csvs (parse_table_bootstrap)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 1.121922002627544
     }
   },
@@ -172,142 +172,142 @@
       "source_script": "parsed-from-tables-and-csvs (parse_table_factor_alphas)",
       "t": 4.08,
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 23.4
     },
     "carhart_alpha": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_factor_alphas)",
       "t": 4.75,
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 24.3
     },
     "ff3_alpha": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_factor_alphas)",
       "t": 4.48,
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 23.2
     },
     "ff5_alpha": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_factor_alphas)",
       "t": 4.62,
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 22.9
     },
     "ff6_alpha": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_factor_alphas)",
       "t": 4.81,
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 24.1
     }
   },
   "fund_alphas": {
     "fund_capm_alpha": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_fund_alphas)",
-      "t": 2.97,
+      "t": 3.04,
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
-      "value": 18.2
+      "updated": "2026-04-27T20:13:05",
+      "value": 17.6
     },
     "fund_carhart_alpha": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_fund_alphas)",
-      "t": 3.25,
+      "t": 3.22,
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 18.2
     },
     "fund_ff3_alpha": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_fund_alphas)",
-      "t": 3.11,
+      "t": 3.12,
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
-      "value": 17.2
+      "updated": "2026-04-27T20:13:05",
+      "value": 17.1
     },
     "fund_ff5_alpha": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_fund_alphas)",
-      "t": 3.0,
+      "t": 3.02,
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
-      "value": 16.3
+      "updated": "2026-04-27T20:13:05",
+      "value": 16.4
     },
     "fund_ff6_alpha": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_fund_alphas)",
-      "t": 3.18,
+      "t": 3.17,
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
-      "value": 17.6
+      "updated": "2026-04-27T20:13:05",
+      "value": 17.7
     }
   },
   "hmm_separation": {
     "cs_calm": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_hmm_separation)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.696833
     },
     "cs_delta": {
       "ci_hi": 1.158956,
       "ci_lo": 0.626022,
       "source_script": "parsed-from-tables-and-csvs (parse_table_hmm_separation)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.899758
     },
     "cs_panic": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_hmm_separation)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.202926
     },
     "dd_calm": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_hmm_separation)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.530781
     },
     "dd_delta": {
       "ci_hi": -1.215143,
       "ci_lo": -1.793967,
       "source_script": "parsed-from-tables-and-csvs (parse_table_hmm_separation)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -1.507201
     },
     "dd_panic": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_hmm_separation)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.97642
     },
     "disp_calm": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_hmm_separation)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.423331
     },
     "disp_delta": {
       "ci_hi": 1.353264,
       "ci_lo": 0.868917,
       "source_script": "parsed-from-tables-and-csvs (parse_table_hmm_separation)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 1.112735
     },
     "disp_panic": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_hmm_separation)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.689404
     },
     "rel_n_calm": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_hmm_separation)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.524603
     },
     "rel_n_delta": {
       "ci_hi": -1.230973,
       "ci_lo": -1.591363,
       "source_script": "parsed-from-tables-and-csvs (parse_table_hmm_separation)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -1.419446
     },
     "rel_n_panic": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_hmm_separation)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.894844
     }
   },
@@ -315,369 +315,369 @@
     "m2_ic": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_ic)",
       "t": 0.0752,
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.0045
     }
   },
   "international": {
     "jp_regional_fixed_12_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.004695092344822349
     },
     "jp_regional_fixed_12_max_dd": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.6633605103243454
     },
     "jp_regional_fixed_12_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.07076202668234315
     },
     "jp_regional_fixed_1_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.022158560591009846
     },
     "jp_regional_fixed_1_max_dd": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.5246506128563481
     },
     "jp_regional_fixed_1_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.07848177585019102
     },
     "jp_regional_m0_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.014370011492901513
     },
     "jp_regional_m0_max_dd": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.5685667144886608
     },
     "jp_regional_m0_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.1691664427397835
     },
     "jp_regional_m1_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.015230635976257068
     },
     "jp_regional_m1_max_dd": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.46872600903060707
     },
     "jp_regional_m1_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.03671833198337535
     },
     "jp_regional_m2_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.0534284590256473
     },
     "jp_regional_m2_max_dd": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.3306868258768995
     },
     "jp_regional_m2_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.43489612845941034
     },
     "jp_regional_market_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.12311571638168028
     },
     "jp_regional_market_max_dd": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.21512678421291592
     },
     "jp_regional_market_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.8577014385836953
     },
     "jp_uspi_fixed_12_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.004695092344822349
     },
     "jp_uspi_fixed_12_max_dd": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.6633605103243454
     },
     "jp_uspi_fixed_12_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.07076202668234315
     },
     "jp_uspi_fixed_1_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.022158560591009846
     },
     "jp_uspi_fixed_1_max_dd": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.5246506128563481
     },
     "jp_uspi_fixed_1_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.07848177585019102
     },
     "jp_uspi_m0_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.03947718303686676
     },
     "jp_uspi_m0_max_dd": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.6800936220825216
     },
     "jp_uspi_m0_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.13419001670749583
     },
     "jp_uspi_m1_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.021132496261068945
     },
     "jp_uspi_m1_max_dd": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.47071286828046094
     },
     "jp_uspi_m1_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.08533731466610502
     },
     "jp_uspi_m2_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.0683545365716649
     },
     "jp_uspi_m2_max_dd": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.18071791498768316
     },
     "jp_uspi_m2_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.5247930405684231
     },
     "jp_uspi_market_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.12311571638168028
     },
     "jp_uspi_market_max_dd": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.21512678421291592
     },
     "jp_uspi_market_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.8577014385836953
     },
     "uk_regional_fixed_12_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.0933363365041775
     },
     "uk_regional_fixed_12_max_dd": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.6255017240082276
     },
     "uk_regional_fixed_12_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.454949268183756
     },
     "uk_regional_fixed_1_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.010609975350037937
     },
     "uk_regional_fixed_1_max_dd": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.5144088628686876
     },
     "uk_regional_fixed_1_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.04366992555802749
     },
     "uk_regional_m0_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.11882697834045408
     },
     "uk_regional_m0_max_dd": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.5420556912015123
     },
     "uk_regional_m0_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.5618779360302278
     },
     "uk_regional_m1_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.08844722559365636
     },
     "uk_regional_m1_max_dd": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.6820498824673263
     },
     "uk_regional_m1_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.4520105976325627
     },
     "uk_regional_m2_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.1199165168246481
     },
     "uk_regional_m2_max_dd": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.27671600792268913
     },
     "uk_regional_m2_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.6305276581528779
     },
     "uk_regional_market_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.06708238216949414
     },
     "uk_regional_market_max_dd": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.25162528949740803
     },
     "uk_regional_market_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.6205301183664502
     },
     "uk_uspi_fixed_12_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.0933363365041775
     },
     "uk_uspi_fixed_12_max_dd": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.6255017240082276
     },
     "uk_uspi_fixed_12_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.454949268183756
     },
     "uk_uspi_fixed_1_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.010609975350037937
     },
     "uk_uspi_fixed_1_max_dd": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.5144088628686876
     },
     "uk_uspi_fixed_1_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.04366992555802749
     },
     "uk_uspi_m0_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.009450761589841594
     },
     "uk_uspi_m0_max_dd": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.6952362363653113
     },
     "uk_uspi_m0_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.17142930491586778
     },
     "uk_uspi_m1_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.08299264924580396
     },
     "uk_uspi_m1_max_dd": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.680171752782383
     },
     "uk_uspi_m1_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.4346712277435476
     },
     "uk_uspi_m2_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.11519402898759412
     },
     "uk_uspi_m2_max_dd": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.23000633182990926
     },
     "uk_uspi_m2_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.6775804750333756
     },
     "uk_uspi_market_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.06708238216949414
     },
     "uk_uspi_market_max_dd": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.25162528949740803
     },
     "uk_uspi_market_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_intl_summary)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.6205301183664502
     }
   },
@@ -685,45 +685,45 @@
     "m2_excl_jan_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_january)",
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 20.9
     },
     "m2_excl_jan_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_january)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 1.06
     },
     "m2_full_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_january)",
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 21.7
     },
     "m2_full_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_january)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 1.11
     },
     "mom12_excl_jan_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_january)",
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.1
     },
     "mom12_excl_jan_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_january)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.14
     },
     "mom12_full_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_january)",
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -1.9
     },
     "mom12_full_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_january)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.06
     }
   },
@@ -731,230 +731,230 @@
     "fixed_12_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -1.9
     },
     "fixed_12_ann_vol": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 26.1
     },
     "fixed_12_beta": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.66
     },
     "fixed_12_final_dollar": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.8
     },
     "fixed_12_max_dd": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -72.2
     },
     "fixed_12_nw_t": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.24
     },
     "fixed_12_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.06
     },
     "fixed_1_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 3.1
     },
     "fixed_1_ann_vol": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 17.6
     },
     "fixed_1_beta": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.34
     },
     "fixed_1_final_dollar": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 1.5
     },
     "fixed_1_max_dd": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -30.2
     },
     "fixed_1_nw_t": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 1.08
     },
     "fixed_1_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.26
     },
     "m0_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.2
     },
     "m0_ann_vol": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 23.6
     },
     "m0_beta": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.59
     },
     "m0_final_dollar": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 1.0
     },
     "m0_max_dd": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -63.8
     },
     "m0_nw_t": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.43
     },
     "m0_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.11
     },
     "m1_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -1.3
     },
     "m1_ann_vol": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 15.2
     },
     "m1_beta": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.05
     },
     "m1_final_dollar": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.8
     },
     "m1_max_dd": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -42.4
     },
     "m1_nw_t": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.04
     },
     "m1_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.01
     },
     "m2_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 21.7
     },
     "m2_ann_vol": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 19.5
     },
     "m2_beta": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.45
     },
     "m2_final_dollar": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 15.3
     },
     "m2_max_dd": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -22.8
     },
     "m2_nw_t": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
       "stars": "***",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 4.37
     },
     "m2_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 1.11
     },
     "market_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 11.9
     },
     "market_ann_vol": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 14.6
     },
     "market_beta": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 1.0
     },
     "market_final_dollar": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 4.8
     },
     "market_max_dd": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -24.7
     },
     "market_nw_t": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": null
     },
     "market_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_performance)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.84
     }
   },
@@ -962,159 +962,159 @@
     "calm_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_panic_subtypes)",
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 13.9
     },
     "calm_ann_vol": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_panic_subtypes)",
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 17.5
     },
     "calm_months": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_panic_subtypes)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 108
     },
     "calm_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_panic_subtypes)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.84
     },
     "panic_crash_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_panic_subtypes)",
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -9.9
     },
     "panic_crash_ann_vol": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_panic_subtypes)",
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 18.3
     },
     "panic_crash_months": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_panic_subtypes)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 18
     },
     "panic_crash_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_panic_subtypes)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.48
     },
     "panic_recovery_ann_ret": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_panic_subtypes)",
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 64.7
     },
     "panic_recovery_ann_vol": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_panic_subtypes)",
       "unit": "percent",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 22.1
     },
     "panic_recovery_months": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_panic_subtypes)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 41
     },
     "panic_recovery_sharpe": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_panic_subtypes)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 2.4
     }
   },
   "regime_sharpe": {
     "fixed_12_calm": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_regime_sharpe)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.08
     },
     "fixed_12_full": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_regime_sharpe)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.06
     },
     "fixed_12_panic": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_regime_sharpe)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.05
     },
     "fixed_1_calm": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_regime_sharpe)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.52
     },
     "fixed_1_full": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_regime_sharpe)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.26
     },
     "fixed_1_panic": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_regime_sharpe)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.01
     },
     "m0_calm": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_regime_sharpe)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.18
     },
     "m0_full": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_regime_sharpe)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.11
     },
     "m0_panic": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_regime_sharpe)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.01
     },
     "m1_calm": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_regime_sharpe)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.29
     },
     "m1_full": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_regime_sharpe)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.01
     },
     "m1_panic": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_regime_sharpe)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.39
     },
     "m2_calm": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_regime_sharpe)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.84
     },
     "m2_full": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_regime_sharpe)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 1.11
     },
     "m2_panic": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_regime_sharpe)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 1.53
     },
     "market_calm": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_regime_sharpe)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.64
     },
     "market_full": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_regime_sharpe)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.84
     },
     "market_panic": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_regime_sharpe)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 1.13
     }
   },
@@ -1124,7 +1124,7 @@
       "p75": 1.0901,
       "source_script": "parsed-from-tables-and-csvs (parse_table_seed_convergence)",
       "std": 0.0777,
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 1.0399
     },
     "k_10": {
@@ -1132,7 +1132,7 @@
       "p75": 1.0659,
       "source_script": "parsed-from-tables-and-csvs (parse_table_seed_convergence)",
       "std": 0.0361,
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 1.0531
     },
     "k_100": {
@@ -1140,7 +1140,7 @@
       "p75": 1.1184,
       "source_script": "parsed-from-tables-and-csvs (parse_table_seed_convergence)",
       "std": 0.0,
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 1.1184
     },
     "k_15": {
@@ -1148,7 +1148,7 @@
       "p75": 1.0967,
       "source_script": "parsed-from-tables-and-csvs (parse_table_seed_convergence)",
       "std": 0.0294,
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 1.0755
     },
     "k_2": {
@@ -1156,7 +1156,7 @@
       "p75": 1.1031,
       "source_script": "parsed-from-tables-and-csvs (parse_table_seed_convergence)",
       "std": 0.0691,
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 1.0619
     },
     "k_20": {
@@ -1164,7 +1164,7 @@
       "p75": 1.0902,
       "source_script": "parsed-from-tables-and-csvs (parse_table_seed_convergence)",
       "std": 0.0218,
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 1.0782
     },
     "k_3": {
@@ -1172,7 +1172,7 @@
       "p75": 1.0755,
       "source_script": "parsed-from-tables-and-csvs (parse_table_seed_convergence)",
       "std": 0.0428,
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 1.0487
     },
     "k_30": {
@@ -1180,7 +1180,7 @@
       "p75": 1.1095,
       "source_script": "parsed-from-tables-and-csvs (parse_table_seed_convergence)",
       "std": 0.025,
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 1.0885
     },
     "k_5": {
@@ -1188,7 +1188,7 @@
       "p75": 1.0834,
       "source_script": "parsed-from-tables-and-csvs (parse_table_seed_convergence)",
       "std": 0.0472,
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 1.0424
     },
     "k_50": {
@@ -1196,7 +1196,7 @@
       "p75": 1.1014,
       "source_script": "parsed-from-tables-and-csvs (parse_table_seed_convergence)",
       "std": 0.0152,
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 1.0927
     },
     "k_75": {
@@ -1204,89 +1204,89 @@
       "p75": 1.1053,
       "source_script": "parsed-from-tables-and-csvs (parse_table_seed_convergence)",
       "std": 0.0122,
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 1.0978
     }
   },
   "subperiod": {
     "fixed_12_2011_2015": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_subperiod)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.74
     },
     "fixed_12_2016_2020": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_subperiod)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.2
     },
     "fixed_12_2021_2025": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_subperiod)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.11
     },
     "fixed_12_full": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_subperiod)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.06
     },
     "m1_2011_2015": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_subperiod)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.47
     },
     "m1_2016_2020": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_subperiod)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.02
     },
     "m1_2021_2025": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_subperiod)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.38
     },
     "m1_full": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_subperiod)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": -0.01
     },
     "m2_2011_2015": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_subperiod)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.59
     },
     "m2_2016_2020": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_subperiod)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 1.04
     },
     "m2_2021_2025": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_subperiod)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 1.7
     },
     "m2_full": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_subperiod)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 1.11
     },
     "market_2011_2015": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_subperiod)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.72
     },
     "market_2016_2020": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_subperiod)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 1.04
     },
     "market_2021_2025": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_subperiod)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.73
     },
     "market_full": {
       "source_script": "parsed-from-tables-and-csvs (parse_table_subperiod)",
-      "updated": "2026-04-27T18:30:35",
+      "updated": "2026-04-27T20:13:05",
       "value": 0.84
     }
   }

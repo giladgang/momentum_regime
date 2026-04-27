@@ -259,7 +259,7 @@ for gname, combos in all_results.items():
             'avg_z_scores': z_str,
         })
 os.makedirs('results', exist_ok=True)
-pd.DataFrame(rows).to_csv('results/tree_combo_results.csv', index=False, float_format='%.4f')
+pd.DataFrame(rows).to_csv('results/thesis/tree_combo_results.csv', index=False, float_format='%.4f')
 
 print("\nSaved: results/tree_combo_results.csv (and tree_combo_results.pkl in cwd)")
 print("Done.")

@@ -293,9 +293,9 @@ def eval_xgb_ensemble(stocks, pi_df, train_end, val_start, val_end,
 # Main loop
 # ═══════════════════════════════════════════════════════════════════════════════
 
-RESULTS_PATH = 'results/hmm_cv_features.csv'
+RESULTS_PATH = 'results/cv/hmm_cv_features.csv'
 SMOKE_RESULTS_PATH = 'results/hmm_cv_smoke.csv'
-WINNER_PATH = 'results/hmm_cv_winner.json'
+WINNER_PATH = 'results/cv/hmm_cv_winner.json'
 TABLE_PATH = 'tables/table_hmm_cv.tex'
 
 # One row per (combo, fold, hmm_seed). All XGB seeds are baked into the

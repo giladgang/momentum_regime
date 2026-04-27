@@ -109,7 +109,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--baseline-dir', required=True)
     parser.add_argument('--output',
-                        default='results/STEP_F_REPORT.md')
+                        default='results/reports/STEP_F_REPORT.md')
     args = parser.parse_args()
 
     base = Path(args.baseline_dir)

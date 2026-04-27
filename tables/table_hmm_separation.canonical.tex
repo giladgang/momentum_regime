@@ -1,0 +1,19 @@
+\begin{table}[H]
+\centering
+\begin{tabular}{l r r r@{\hspace{1.5em}} c}
+\toprule
+ & $\hat{\mu}_{\text{calm}}$ & $\hat{\mu}_{\text{panic}}$ & \multicolumn{1}{c}{$\Delta$} & 95\% CI \\
+\midrule
+CS$_z$ & $-$0.697 & $+$0.203 & $+$0.900 & [$+$0.626,\,$+$1.159] \\
+DD$_z$ & 0.531 & $-$0.976 & $-$1.507 & [$-$1.794,\,$-$1.215] \\
+DISP$_z$ & $-$0.423 & $+$0.689 & $+$1.113 & [$+$0.869,\,$+$1.353] \\
+REL$_z$ & -- & -- & -- & [--,\,--] \\
+\bottomrule
+\end{tabular}
+\caption{HMM posterior regime-mean separation.}
+\label{tab:hmm_separation}
+
+\medskip
+\small
+\textbf{Notes:} Posterior mean estimates of regime-conditional feature means from the Bayesian two-state HMM, estimated via Gibbs sampling on the 1990--2010 training period. All features are standardised. $\Delta = \hat{\mu}_{\text{panic}} - \hat{\mu}_{\text{calm}}$. The 95\% CI is the Bayesian posterior credible interval for $\Delta$; zero lies outside all intervals, confirming significant regime separation. DD = market drawdown; DISP = log cross-sectional return dispersion; REL\_N = relative market participation; CS = credit spread (BAA$-$AAA).
+\end{table}

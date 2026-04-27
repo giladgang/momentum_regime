@@ -18,8 +18,8 @@ import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-long_df = pd.read_csv('results/zscore_long_by_month.csv', parse_dates=['date'])
-short_df = pd.read_csv('results/zscore_short_by_month.csv', parse_dates=['date'])
+long_df = pd.read_csv('results/thesis/zscore_long_by_month.csv', parse_dates=['date'])
+short_df = pd.read_csv('results/thesis/zscore_short_by_month.csv', parse_dates=['date'])
 
 panel = pd.read_parquet('data/panel_with_regimes.parquet')
 panel['date'] = pd.to_datetime(panel['date'])

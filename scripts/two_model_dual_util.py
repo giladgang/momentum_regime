@@ -202,5 +202,5 @@ for g in GAMMAS:
           f"{sL:>8.3f} {sS:>8.3f} {sS/sL:>6.2f} {nL:>5.0f} {nS:>5.0f} {ovp:>5.1f}")
 
 res_df = pd.DataFrame(results)
-res_df.to_csv('results/two_model_dual_util.csv', index=False, float_format='%.4f')
+res_df.to_csv('results/thesis/two_model_dual_util.csv', index=False, float_format='%.4f')
 print("\nSaved: results/two_model_dual_util.csv")

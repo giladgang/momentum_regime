@@ -509,7 +509,7 @@ axes[D].legend(fontsize=8, loc='upper right')
 
 fig.suptitle('Trace plots - dashed line = end of burn-in', fontsize=11)
 plt.tight_layout()
-fig.savefig('plots/convergence_trace.png', dpi=150)
+fig.savefig('plots/thesis/convergence_trace.png', dpi=150)
 plt.close(fig)
 print("Saved: convergence_trace.png")
 
@@ -696,7 +696,7 @@ ax.set_xlabel('Date')
 ax.set_xlim(dates.min(), dates.max())
 
 plt.tight_layout()
-fig.savefig('plots/regime_probabilities.png', dpi=150)
+fig.savefig('plots/thesis/regime_probabilities.png', dpi=150)
 plt.close(fig)
 
 # Plot B: raw features coloured by regime — split into two charts

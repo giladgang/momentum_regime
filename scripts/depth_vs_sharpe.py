@@ -81,7 +81,7 @@ for depth in depths_list:
 
 # Save results
 df = pd.DataFrame(results)
-df.to_csv('results/depth_results.csv', index=False)
+df.to_csv('results/thesis/depth_results.csv', index=False)
 print("Saved: depth_results.csv")
 
 returns = df['ann_ret'].values
@@ -117,11 +117,11 @@ ax.set_ylim(0, max(returns) + 5)
 ax.grid(axis='y', alpha=0.3)
 
 plt.tight_layout()
-fig.savefig('plots/depth_vs_sharpe.png', dpi=150, bbox_inches='tight')
+fig.savefig('plots/thesis/depth_vs_sharpe.png', dpi=150, bbox_inches='tight')
 plt.close(fig)
 print("Saved: depth_vs_sharpe.png")
 
 from PIL import Image
-img = Image.open('plots/depth_vs_sharpe.png')
+img = Image.open('plots/thesis/depth_vs_sharpe.png')
 img.save('plots/depth_vs_sharpe.pdf', 'PDF', resolution=150)
 print("Saved: plots/depth_vs_sharpe.pdf")

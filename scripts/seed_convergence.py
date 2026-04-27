@@ -147,7 +147,7 @@ for k in K_GRID:
 
 df = pd.DataFrame(rows)
 os.makedirs('results', exist_ok=True)
-df.to_csv('results/seed_convergence.csv', index=False, float_format='%.4f')
+df.to_csv('results/thesis/seed_convergence.csv', index=False, float_format='%.4f')
 print(f"\nSaved: results/seed_convergence.csv")
 
 # ══════════════════════════════════════════════════════════════════════════════

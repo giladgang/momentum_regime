@@ -164,7 +164,7 @@ for i_gamma, gamma in enumerate(GAMMAS):
     print(f"  Top 5 SHAP: {agg.head(5).to_dict()}")
 
 res_df = pd.DataFrame(results)
-res_df.to_csv('results/risk_aversion_crra_results.csv', index=False, float_format='%.4f')
+res_df.to_csv('results/thesis/risk_aversion_crra_results.csv', index=False, float_format='%.4f')
 print("\nSummary:")
 print(res_df.to_string(index=False))
 

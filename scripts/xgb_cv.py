@@ -220,9 +220,9 @@ def run_cell(train_df, val_df, *, max_depth, learning_rate, n_estimators,
 # Main loop with incremental checkpointing
 # ═══════════════════════════════════════════════════════════════════════════════
 
-RESULTS_PATH = 'results/xgb_cv_results.csv'
-SMOKE_RESULTS_PATH = 'results/xgb_cv_smoke.csv'
-WINNER_PATH = 'results/xgb_cv_winner.json'
+RESULTS_PATH = 'results/cv/xgb_cv_results.csv'
+SMOKE_RESULTS_PATH = 'results/cv/xgb_cv_smoke.csv'
+WINNER_PATH = 'results/cv/xgb_cv_winner.json'
 TABLE_PATH = 'tables/table_xgb_cv.tex'
 
 # One row per (depth, lr, n_estimators, fold). `n_seeds` records how many

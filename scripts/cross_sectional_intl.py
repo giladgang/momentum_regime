@@ -63,8 +63,8 @@ suffix = '_uspi' if args.use_us_pi else ''
 STOCK_PANEL  = f'data/{REGION.lower()}_stock_panel.parquet'
 REGIONAL_REG = f'data/{REGION.lower()}_panel_with_regimes.parquet'
 US_REG       = 'data/panel_with_regimes.parquet'
-OUT_RETURNS  = f'results/intl_{REGION.lower()}_returns{suffix}.csv'
-OUT_SUMMARY  = f'results/intl_{REGION.lower()}_summary{suffix}.csv'
+OUT_RETURNS  = f'results/thesis/intl_{REGION.lower()}_returns{suffix}.csv'
+OUT_SUMMARY  = f'results/thesis/intl_{REGION.lower()}_summary{suffix}.csv'
 
 print(f"=== Regional cross-sectional model: {REGION} "
       f"({'US pi_filter (Test A)' if args.use_us_pi else 'regional pi_filter'}) ===")

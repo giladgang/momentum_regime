@@ -373,7 +373,7 @@ def persist(results):
     rows = [{k: v for k, v in r.items()
              if k not in ('returns', 'turnover_series', 'alphas')}
             for r in results]
-    pd.DataFrame(rows).to_csv('results/fundamentals_test_results.csv', index=False)
+    pd.DataFrame(rows).to_csv('results/thesis/fundamentals_test_results.csv', index=False)
 
     # Returns + turnover + alphas pickle
     artifact = {
@@ -386,7 +386,7 @@ def persist(results):
     }
     artifact['r_mkt'] = r_mkt
     artifact['pi_monthly'] = pi_monthly
-    with open('results/fundamentals_returns.pkl', 'wb') as f:
+    with open('results/thesis/fundamentals_returns.pkl', 'wb') as f:
         pickle.dump(artifact, f)
 
 

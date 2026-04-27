@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-df = pd.read_csv('results/two_model_dual_util.csv')
+df = pd.read_csv('results/thesis/two_model_dual_util.csv')
 print(f"Loaded {len(df)} gamma points from results/two_model_dual_util.csv")
 
 # Restrict to the useful range (gamma <= 1) for the thesis figure.
@@ -70,7 +70,7 @@ fig.suptitle(r'Risk-Aversion Sweep: Sharpe, Return, Volatility, Drawdown '
              fontsize=14, fontweight='bold', y=0.995)
 
 plt.tight_layout(rect=[0, 0, 1, 0.975])
-plt.savefig('plots/risk_aversion_dual_util.pdf', bbox_inches='tight',
+plt.savefig('plots/thesis/risk_aversion_dual_util.pdf', bbox_inches='tight',
             facecolor='white', edgecolor='none')
 plt.savefig('plots/risk_aversion_dual_util.png', dpi=200, bbox_inches='tight',
             facecolor='white', edgecolor='none')

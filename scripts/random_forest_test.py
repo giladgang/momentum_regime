@@ -218,7 +218,7 @@ results.append(train_rf_ensemble(
 ))
 
 df_results = pd.DataFrame(results)
-df_results.to_csv('results/random_forest_results.csv', index=False)
+df_results.to_csv('results/thesis/random_forest_results.csv', index=False)
 
 print("\n" + "=" * 60)
 print("  SUMMARY")

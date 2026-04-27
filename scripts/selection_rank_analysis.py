@@ -108,7 +108,7 @@ for h in horizons:
             })
 
 df = pd.DataFrame(rows)
-df.to_csv('results/selection_rank_analysis.csv', index=False, float_format='%.1f')
+df.to_csv('results/thesis/selection_rank_analysis.csv', index=False, float_format='%.1f')
 print(f"Saved: selection_rank_analysis.csv ({len(df)} rows)")
 
 # ── Print summary ──
@@ -279,7 +279,7 @@ for i, regime_val in enumerate(['Calm', 'Panic']):
 plt.suptitle('Momentum term structure by regime: stock selection and feature importance',
              fontsize=14, fontweight='bold', y=1.02)
 plt.tight_layout()
-fig.savefig('plots/zscore_and_absshap_v3.png', dpi=150, bbox_inches='tight')
+fig.savefig('plots/thesis/zscore_and_absshap_v3.png', dpi=150, bbox_inches='tight')
 plt.close(fig)
 print("Saved: zscore_and_absshap_v3.png")
 

@@ -180,7 +180,7 @@ for i, (name, y_target) in enumerate(targets):
 
 # ── Save results ──
 res_df = pd.DataFrame(results)
-res_df.to_csv('results/risk_aversion_thesis_results.csv', index=False, float_format='%.4f')
+res_df.to_csv('results/thesis/risk_aversion_thesis_results.csv', index=False, float_format='%.4f')
 
 print("\n\n" + "=" * 60)
 print("  RESULTS SUMMARY")

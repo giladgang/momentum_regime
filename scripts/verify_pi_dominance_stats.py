@@ -218,7 +218,7 @@ for regime in ('panic', 'calm'):
 import csv
 import os as _os
 _os.makedirs('results', exist_ok=True)
-with open('results/pi_dominance_stats.csv', 'w', newline='') as f:
+with open('results/thesis/pi_dominance_stats.csv', 'w', newline='') as f:
     w = csv.writer(f)
     w.writerow(['stat', 'value', 'denominator', 'note'])
     w.writerow(['trees_with_pi_split', n_pi_trees, n_trees,

@@ -53,7 +53,7 @@ for date, grp in test.groupby('date'):
     rows.append(row)
 
 df = pd.DataFrame(rows).sort_values('date').reset_index(drop=True)
-out_path = 'results/zscore_long_by_month.csv'
+out_path = 'results/thesis/zscore_long_by_month.csv'
 df.to_csv(out_path, index=False, float_format='%.4f')
 print(f"Saved: {out_path}  ({len(df)} rows x {len(horizons)} horizons)")
 print(df.head())

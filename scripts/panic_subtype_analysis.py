@@ -264,7 +264,7 @@ for i, (subtype, title) in enumerate(panel_configs):
 plt.suptitle('Momentum term structure: Calm vs Panic sub-types',
              fontsize=14, fontweight='bold', y=1.02)
 plt.tight_layout()
-fig.savefig('plots/zscore_panic_subtypes.png', dpi=150, bbox_inches='tight')
+fig.savefig('plots/thesis/zscore_panic_subtypes.png', dpi=150, bbox_inches='tight')
 fig.savefig('plots/zscore_panic_subtypes.pdf', bbox_inches='tight')
 plt.close(fig)
 print("\nSaved: plots/zscore_panic_subtypes.png, .pdf")

@@ -55,7 +55,7 @@ for date, grp in test.groupby('date'):
     rows.append(row)
 
 df = pd.DataFrame(rows).sort_values('date').reset_index(drop=True)
-df.to_csv('results/zscore_longshort_by_month.csv', index=False, float_format='%.4f')
+df.to_csv('results/thesis/zscore_longshort_by_month.csv', index=False, float_format='%.4f')
 print(f"Saved: results/zscore_longshort_by_month.csv  ({len(df)} rows)")
 
 # ── Merge pi_filter for the left panel ──
