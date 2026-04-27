@@ -174,7 +174,7 @@ def load_panel():
 # per-month ranking noise, giving a tighter metric.
 
 def run_cell(train_df, val_df, *, max_depth, learning_rate, n_estimators,
-             seeds, fee):
+             seeds, fee, xgb_n_jobs=None):
     """Train a SEEDED ENSEMBLE of XGB regressors on train_df, average
     their predictions, form one long-short portfolio, return
     (net-of-fee Sharpe, n_val_months).
@@ -187,19 +187,25 @@ def run_cell(train_df, val_df, *, max_depth, learning_rate, n_estimators,
     fee : float
         Transaction fee passed to long_short_port. Production value is
         config.TRADING_FEE (10 bps).
+    xgb_n_jobs : int or None
+        Pass 1 when called from a worker process to avoid nested-thread
+        oversubscription; None lets XGBoost use all cores (default).
     """
     X_train = train_df[CS_FEATURES].values.astype(float)
     y_train = train_df['ret_fwd'].values.astype(float)
     X_val = val_df[CS_FEATURES].values.astype(float)
 
+    xgb_kwargs = dict(
+        n_estimators=n_estimators, max_depth=max_depth,
+        learning_rate=learning_rate, subsample=SUBSAMPLE,
+        colsample_bytree=COLSAMPLE, tree_method='hist', verbosity=0,
+    )
+    if xgb_n_jobs is not None:
+        xgb_kwargs['n_jobs'] = xgb_n_jobs
+
     preds = np.zeros(len(X_val))
     for seed in seeds:
-        model = XGBRegressor(
-            n_estimators=n_estimators, max_depth=max_depth,
-            learning_rate=learning_rate, subsample=SUBSAMPLE,
-            colsample_bytree=COLSAMPLE, tree_method='hist',
-            random_state=seed, verbosity=0,
-        )
+        model = XGBRegressor(random_state=seed, **xgb_kwargs)
         model.fit(X_train, y_train)
         preds += model.predict(X_val)
     preds /= len(seeds)
@@ -304,6 +310,61 @@ def save_winner_json(summary, out_path, per_fold_for_winner, fee, n_seeds):
         json.dump(winner, f, indent=2)
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# Worker-process plumbing for `--workers > 1`
+# ═══════════════════════════════════════════════════════════════════════════════
+# Same template as hmm_cv.py: each worker loads the panel once at startup
+# (initializer), then processes (depth, lr, n_estimators, fold) cells in
+# parallel via Pool.imap_unordered. We pin threads to 1 inside workers so 6
+# workers x XGB calls don't oversubscribe the 8 cores.
+
+_PANEL_DF = None
+
+
+def _init_worker_xgb():
+    import os as _os
+    _os.environ['OMP_NUM_THREADS'] = '1'
+    _os.environ['MKL_NUM_THREADS'] = '1'
+    _os.environ['OPENBLAS_NUM_THREADS'] = '1'
+    global _PANEL_DF
+    _PANEL_DF = load_panel()
+
+
+def _execute_cell_xgb(df, payload, xgb_n_jobs=None):
+    """Run one (depth, lr, n_estimators, fold) cell.
+
+    Returns (status, row, msg) where status is 'ok'/'short_val'.
+    """
+    (max_depth, learning_rate, n_estimators, fold_id,
+     train_end, val_start, val_end, seeds_list, fee, n_seeds) = payload
+
+    train = df[df['date'] < train_end]
+    val = df[(df['date'] >= val_start) & (df['date'] < val_end)]
+    n_val_unique = val['date'].nunique()
+    if n_val_unique < MIN_VAL_MONTHS:
+        return ('short_val', None,
+                f'only {n_val_unique} val months, need {MIN_VAL_MONTHS}')
+
+    t0 = time.time()
+    sharpe, n_months = run_cell(
+        train, val,
+        max_depth=max_depth, learning_rate=learning_rate,
+        n_estimators=n_estimators, seeds=seeds_list, fee=fee,
+        xgb_n_jobs=xgb_n_jobs,
+    )
+    dt = time.time() - t0
+
+    row = [max_depth, learning_rate, n_estimators, fold_id,
+           n_seeds, fee, sharpe, n_months, dt]
+    return ('ok', row, None)
+
+
+def _run_cell_xgb_worker(payload):
+    global _PANEL_DF
+    status, row, msg = _execute_cell_xgb(_PANEL_DF, payload, xgb_n_jobs=1)
+    return (payload, status, row, msg)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--smoke', action='store_true',
@@ -319,6 +380,9 @@ def main():
                              'Defaults: results/xgb_cv_results.csv for full '
                              'runs, results/xgb_cv_smoke.csv for --smoke. '
                              'Smoke NEVER overwrites full results.')
+    parser.add_argument('--workers', type=int, default=1,
+                        help='Number of worker processes (default 1 = serial; '
+                             'recommended 6 on an 8-core machine).')
     args = parser.parse_args()
 
     # Safety: smoke runs must not overwrite full-run results.
@@ -349,56 +413,88 @@ def main():
     print(f'  Resuming:   {len(done)} cells already done, '
           f'{total_cells - len(done)} remaining\n')
 
-    print('  Loading panel ...')
-    df = load_panel()
-    print(f'  Panel: {len(df):,} rows, {df["date"].min().date()} '
-          f'→ {df["date"].max().date()}\n')
+    use_parallel = args.workers > 1
+    if use_parallel:
+        print(f'  Workers:          {args.workers}  (parallel)')
+    else:
+        print(f'  Workers:          1  (serial)')
 
-    t_start = time.time()
-    cell_idx = 0
+    if not use_parallel:
+        print('  Loading panel ...')
+        df = load_panel()
+        print(f'  Panel: {len(df):,} rows, {df["date"].min().date()} '
+              f'→ {df["date"].max().date()}\n')
+
+    # Build flat list of work units (cells), filtering against `done`.
+    work_units = []
     for max_depth in grid['max_depth']:
         for learning_rate in grid['learning_rate']:
             for n_estimators in grid['n_estimators']:
                 for fold_id, train_end, val_start, val_end in folds:
-                    cell_idx += 1
                     key = (max_depth, learning_rate, n_estimators, fold_id)
                     if key in done:
                         continue
+                    work_units.append((
+                        max_depth, learning_rate, n_estimators, fold_id,
+                        train_end, val_start, val_end,
+                        seeds_list, args.fee, n_seeds,
+                    ))
 
-                    train = df[df['date'] < train_end]
-                    val = df[(df['date'] >= val_start) & (df['date'] < val_end)]
-                    n_val_unique = val['date'].nunique()
-                    if n_val_unique < MIN_VAL_MONTHS:
-                        print(f'  [{cell_idx:4d}/{total_cells:4d}] '
-                              f'd={max_depth} lr={learning_rate} n={n_estimators} '
-                              f'fold={fold_id}  SKIPPED '
-                              f'(only {n_val_unique} val months, need {MIN_VAL_MONTHS})')
-                        continue
+    if not work_units:
+        print('  All cells already complete; nothing to run.\n')
 
-                    t0 = time.time()
-                    sharpe, n_months = run_cell(
-                        train, val,
-                        max_depth=max_depth, learning_rate=learning_rate,
-                        n_estimators=n_estimators, seeds=seeds_list, fee=args.fee,
-                    )
-                    dt = time.time() - t0
+    t_start = time.time()
+    n_done = 0
+    n_short_val = 0
 
-                    row = [max_depth, learning_rate, n_estimators, fold_id,
-                           n_seeds, args.fee, sharpe, n_months, dt]
-                    append_row(args.output, row)
+    def _record(payload, status, row, msg):
+        nonlocal n_done, n_short_val
+        max_depth, learning_rate, n_estimators, fold_id = payload[:4]
+        if status == 'short_val':
+            n_short_val += 1
+            print(f'  [!] d={max_depth} lr={learning_rate} '
+                  f'n={n_estimators} fold={fold_id}  SKIPPED ({msg})')
+            return
+        if row is not None:
+            append_row(args.output, row)
+        if status == 'ok':
+            n_done += 1
+            sharpe = row[6]
+            dt = row[8]
+            elapsed = time.time() - t_start
+            total_progress = n_done + n_short_val
+            print(f'  [{total_progress:4d}/{len(work_units):4d}] '
+                  f'd={max_depth} lr={learning_rate} n={n_estimators} '
+                  f'fold={fold_id}  Sharpe={sharpe:+.3f}  '
+                  f'({dt:.1f}s, {elapsed/60:.1f}m total)')
 
-                    total_elapsed = time.time() - t_start
-                    print(f'  [{cell_idx:4d}/{total_cells:4d}] '
-                          f'd={max_depth} lr={learning_rate} n={n_estimators} '
-                          f'fold={fold_id}  Sharpe={sharpe:+.3f}  '
-                          f'({dt:.1f}s, {total_elapsed/60:.1f}m total)')
+    if use_parallel:
+        from multiprocessing import get_context
+        ctx = get_context('spawn')
+        with ctx.Pool(processes=args.workers,
+                      initializer=_init_worker_xgb) as pool:
+            for payload, status, row, msg in pool.imap_unordered(
+                    _run_cell_xgb_worker, work_units, chunksize=1):
+                _record(payload, status, row, msg)
+    else:
+        for payload in work_units:
+            status, row, msg = _execute_cell_xgb(df, payload, xgb_n_jobs=None)
+            _record(payload, status, row, msg)
 
     print('\n' + '=' * 70)
     print('  DONE')
     print('=' * 70)
+    print(f'  ok:           {n_done}')
+    print(f'  short_val:    {n_short_val}')
 
     # ── Summary: aggregate across folds per hyperparameter combo ─────────────
+    if not os.path.exists(args.output):
+        print('\n  No rows written; skipping summary.')
+        return
     results = pd.read_csv(args.output)
+    if results.empty or 'val_sharpe' not in results.columns:
+        print('\n  Empty results CSV; skipping summary.')
+        return
     summary = (results.groupby(['max_depth', 'learning_rate', 'n_estimators'])
                       ['val_sharpe'].agg(['mean', 'std', 'count'])
                       .sort_values('mean', ascending=False))

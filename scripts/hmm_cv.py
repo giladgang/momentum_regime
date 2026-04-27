@@ -141,11 +141,17 @@ def enumerate_combinations():
 # ═══════════════════════════════════════════════════════════════════════════════
 
 def load_hmm_panel():
-    """Load raw HMM feature panel (one row per month)."""
+    """Load raw HMM feature panel (one row per month).
+
+    Important: we do NOT dropna here. GDP_g is quarterly so a global
+    dropna would silently restrict every combo to ~136 quarterly rows
+    even when the combo does not include GDP_g. Per-combo dropna is
+    applied inside zscore_train() based on the features actually used.
+    """
     panel = pd.read_parquet('data/panel_with_regimes.parquet')
     panel['date'] = pd.to_datetime(panel['date'])
     keep = ['date'] + CANDIDATES
-    panel = panel[keep].dropna().sort_values('date').reset_index(drop=True)
+    panel = panel[keep].sort_values('date').reset_index(drop=True)
     return panel
 
 
@@ -189,15 +195,20 @@ def load_stock_panel():
 
 def zscore_train(panel, features, train_end):
     """Z-score `features` using statistics from the train partition only.
-    Returns a DataFrame with <feature>_z columns alongside date."""
-    train_mask = panel['date'] < pd.Timestamp(train_end)
-    out = panel[['date']].copy()
+    Returns a DataFrame with <feature>_z columns alongside date.
+
+    Drops rows where any of the requested `features` are NaN (per-combo
+    masking — load_hmm_panel intentionally keeps all rows).
+    """
+    sub = panel.dropna(subset=list(features) + ['date']).reset_index(drop=True)
+    train_mask = sub['date'] < pd.Timestamp(train_end)
+    out = sub[['date']].copy()
     for f in features:
-        mu = panel.loc[train_mask, f].mean()
-        sd = panel.loc[train_mask, f].std()
+        mu = sub.loc[train_mask, f].mean()
+        sd = sub.loc[train_mask, f].std()
         if sd == 0 or not np.isfinite(sd):
             sd = 1.0
-        out[f + '_z'] = (panel[f] - mu) / sd
+        out[f + '_z'] = (sub[f] - mu) / sd
     return out
 
 
@@ -225,7 +236,7 @@ def fit_pi_filter(panel_z, features_z, train_end, seed, n_iter, n_burnin):
 
 
 def eval_xgb_ensemble(stocks, pi_df, train_end, val_start, val_end,
-                      xgb_seeds, fee, n_estimators=None):
+                      xgb_seeds, fee, n_estimators=None, xgb_n_jobs=None):
     """Merge pi_filter into stocks, train an ENSEMBLE of XGB regressors
     on training months, average their predictions, form ONE long-short
     portfolio, return (net-of-fee Sharpe, n_val_months).
@@ -233,6 +244,10 @@ def eval_xgb_ensemble(stocks, pi_df, train_end, val_start, val_end,
     Mirrors production (scripts/cross_sectional_model.py §9): predictions
     are averaged BEFORE ranking stocks into deciles; one Sharpe per
     (combo, fold, hmm_seed) cell.
+
+    `xgb_n_jobs`: pass 1 when called from a worker process (avoids
+    nested-thread oversubscription); leave None for serial runs to use
+    XGBoost's default (all cores).
     """
     merged = stocks.merge(pi_df, on='date', how='left')
     merged['pi_filter'] = merged['pi_filter'].ffill()
@@ -252,14 +267,18 @@ def eval_xgb_ensemble(stocks, pi_df, train_end, val_start, val_end,
     y_train = train['ret_fwd'].values.astype(float)
     X_val = val[feats].values.astype(float)
 
+    xgb_kwargs = dict(
+        n_estimators=n_estimators or N_ESTIMATORS,
+        max_depth=MAX_DEPTH, learning_rate=LEARNING_RATE,
+        subsample=SUBSAMPLE, colsample_bytree=COLSAMPLE,
+        tree_method='hist', verbosity=0,
+    )
+    if xgb_n_jobs is not None:
+        xgb_kwargs['n_jobs'] = xgb_n_jobs
+
     preds = np.zeros(len(X_val))
     for seed in xgb_seeds:
-        model = XGBRegressor(
-            n_estimators=n_estimators or N_ESTIMATORS,
-            max_depth=MAX_DEPTH, learning_rate=LEARNING_RATE,
-            subsample=SUBSAMPLE, colsample_bytree=COLSAMPLE,
-            tree_method='hist', random_state=seed, verbosity=0,
-        )
+        model = XGBRegressor(random_state=seed, **xgb_kwargs)
         model.fit(X_train, y_train)
         preds += model.predict(X_val)
     preds /= len(xgb_seeds)
@@ -365,6 +384,88 @@ def save_winner_json(summary, out_path, per_fold_for_winner, hmm_seeds,
         json.dump(winner, f, indent=2)
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# Worker-process plumbing for `--workers > 1`
+# ═══════════════════════════════════════════════════════════════════════════════
+# Each worker process loads its own copy of the HMM panel + stock panel once
+# at startup (initializer). Cells are then dispatched via Pool.imap_unordered
+# and execute in parallel. We pin OMP / BLAS threads to 1 inside workers so 6
+# workers × per-cell XGB calls don't oversubscribe the 8 cores.
+
+_PANEL = None
+_STOCKS = None
+
+
+def _init_worker():
+    """Pool initializer: pin threads, load panels into module globals."""
+    import os as _os
+    _os.environ['OMP_NUM_THREADS'] = '1'
+    _os.environ['MKL_NUM_THREADS'] = '1'
+    _os.environ['OPENBLAS_NUM_THREADS'] = '1'
+    global _PANEL, _STOCKS
+    _PANEL = load_hmm_panel()
+    _STOCKS = load_stock_panel()
+
+
+def _execute_cell(panel, stocks, payload, xgb_n_jobs=None):
+    """Run one (combo, fold, hmm_seed) cell.
+
+    Returns one of:
+      ('ok',         row_list, None)
+      ('short_val',  None,     reason_str)
+      ('hmm_failed', row_list_with_nan_sharpe, error_str)
+
+    Used by both serial and worker paths so behavior is identical.
+    """
+    (combo, feats_z, fold_id, train_end, val_start, val_end,
+     hmm_seed, xgb_seed_list, fee, n_estimators,
+     hmm_iter, hmm_burnin) = payload
+
+    panel_z = zscore_train(panel, list(combo), train_end)
+    val_months = (
+        (panel_z['date'] >= pd.Timestamp(val_start))
+        & (panel_z['date'] < pd.Timestamp(val_end))
+    ).sum()
+    if val_months < MIN_VAL_MONTHS:
+        return ('short_val', None, f'only {val_months} val months')
+
+    t_hmm = time.time()
+    try:
+        pi_df = fit_pi_filter(panel_z, feats_z, train_end,
+                              seed=hmm_seed,
+                              n_iter=hmm_iter, n_burnin=hmm_burnin)
+    except Exception as e:
+        return ('hmm_failed',
+                [combo_key(combo), len(combo), fold_id, hmm_seed,
+                 len(xgb_seed_list), fee,
+                 np.nan, 0, time.time() - t_hmm, 0.0],
+                str(e))
+    hmm_dt = time.time() - t_hmm
+
+    t_xgb = time.time()
+    sharpe, n_months = eval_xgb_ensemble(
+        stocks, pi_df, train_end, val_start, val_end,
+        xgb_seeds=xgb_seed_list, fee=fee,
+        n_estimators=n_estimators, xgb_n_jobs=xgb_n_jobs,
+    )
+    xgb_dt = time.time() - t_xgb
+
+    return ('ok',
+            [combo_key(combo), len(combo), fold_id, hmm_seed,
+             len(xgb_seed_list), fee,
+             sharpe, n_months, hmm_dt, xgb_dt],
+            None)
+
+
+def _run_cell_worker(payload):
+    """Top-level worker entry. Reads panels from globals set by _init_worker.
+    Returns (payload, status, row, msg) so the parent can pair the result
+    with its work-unit (imap_unordered yields out-of-order)."""
+    global _PANEL, _STOCKS
+    status, row, msg = _execute_cell(_PANEL, _STOCKS, payload, xgb_n_jobs=1)
+    return (payload, status, row, msg)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--smoke', action='store_true',
@@ -385,6 +486,10 @@ def main():
                              'Defaults: results/hmm_cv_features.csv for full '
                              'runs, results/hmm_cv_smoke.csv for --smoke. '
                              'Smoke NEVER overwrites full results.')
+    parser.add_argument('--workers', type=int, default=1,
+                        help='Number of worker processes for parallel execution '
+                             '(default 1 = serial; recommended 6 on an 8-core '
+                             'machine to leave 2 cores free).')
     args = parser.parse_args()
 
     # Safety: smoke runs must not overwrite full-run results.
@@ -427,88 +532,119 @@ def main():
     print(f'  Resuming:   {len(done)} cells already done, '
           f'{total_cells - len(done)} remaining\n')
 
-    print('  Loading HMM panel ...')
-    panel = load_hmm_panel()
-    print(f'  HMM panel: {len(panel)} months  '
-          f'{panel["date"].min().date()} → {panel["date"].max().date()}')
+    use_parallel = args.workers > 1
+    if use_parallel:
+        print(f'  Workers:           {args.workers}  (parallel)')
+    else:
+        print(f'  Workers:           1  (serial)')
 
-    print('  Loading stock panel ...')
-    stocks = load_stock_panel()
-    print(f'  Stocks: {len(stocks):,} rows, {stocks["permno"].nunique():,} permnos\n')
+    if not use_parallel:
+        print('  Loading HMM panel ...')
+        panel = load_hmm_panel()
+        print(f'  HMM panel: {len(panel)} months  '
+              f'{panel["date"].min().date()} → {panel["date"].max().date()}')
 
-    t_start = time.time()
-    cell_idx = 0
+        print('  Loading stock panel ...')
+        stocks = load_stock_panel()
+        print(f'  Stocks: {len(stocks):,} rows, '
+              f'{stocks["permno"].nunique():,} permnos\n')
+
+    # Build the flat list of work units (cells), filtering against `done`.
+    # Order: combo, fold, hmm_seed (matches the original triple-nested loop).
+    work_units = []
     for combo in combos:
         feats_z = [f + '_z' for f in combo]
-
         for fold_id, train_end, val_start, val_end in folds:
-            panel_z = zscore_train(panel, list(combo), train_end)
-
-            # Validation-window size guard (same dates used by eval_xgb)
-            val_months = (
-                (panel_z['date'] >= pd.Timestamp(val_start))
-                & (panel_z['date'] < pd.Timestamp(val_end))
-            ).sum()
-            if val_months < MIN_VAL_MONTHS:
-                print(f'  [!] {combo_key(combo):<30s} fold={fold_id}  '
-                      f'SKIPPED (only {val_months} val months)')
-                continue
-
             for hmm_seed in range(args.hmm_seeds):
-                cell_idx += 1
                 key = (combo_key(combo), fold_id, hmm_seed)
                 if key in done:
                     continue
+                work_units.append((
+                    combo, feats_z, fold_id, train_end, val_start, val_end,
+                    hmm_seed, xgb_seed_list, args.fee, args.n_estimators,
+                    args.hmm_iter, args.hmm_burnin,
+                ))
 
-                # Fit HMM once per (combo, fold, hmm_seed) — expensive
-                t_hmm = time.time()
-                try:
-                    pi_df = fit_pi_filter(panel_z, feats_z, train_end,
-                                          seed=hmm_seed,
-                                          n_iter=args.hmm_iter,
-                                          n_burnin=args.hmm_burnin)
-                except Exception as e:
-                    print(f'  [!] HMM fit failed for {combo_key(combo)} '
-                          f'fold={fold_id} hmm_seed={hmm_seed}: {e}')
-                    append_row(args.output, [
-                        combo_key(combo), len(combo), fold_id, hmm_seed,
-                        args.xgb_seeds, args.fee,
-                        np.nan, 0, time.time() - t_hmm, 0.0,
-                    ])
-                    continue
-                hmm_dt = time.time() - t_hmm
+    if not work_units:
+        print('  All cells already complete; nothing to run.\n')
 
-                # Ensemble XGB evaluation (one Sharpe, matches production)
-                t_xgb = time.time()
-                sharpe, n_months = eval_xgb_ensemble(
-                    stocks, pi_df, train_end, val_start, val_end,
-                    xgb_seeds=xgb_seed_list, fee=args.fee,
-                    n_estimators=args.n_estimators,
-                )
-                xgb_dt = time.time() - t_xgb
+    t_start = time.time()
+    n_done = 0
+    n_short_val = 0
+    n_hmm_failed = 0
+    fail_log = []  # (combo, fold, hmm_seed, reason)
 
-                append_row(args.output, [
-                    combo_key(combo), len(combo), fold_id, hmm_seed,
-                    args.xgb_seeds, args.fee,
-                    sharpe, n_months, hmm_dt, xgb_dt,
-                ])
+    def _record(payload, status, row, msg):
+        nonlocal n_done, n_short_val, n_hmm_failed
+        combo = payload[0]
+        fold_id = payload[2]
+        hmm_seed = payload[6]
+        if status == 'short_val':
+            n_short_val += 1
+            print(f'  [!] {combo_key(combo):<30s} fold={fold_id}  '
+                  f'SKIPPED ({msg})')
+            return
+        if status == 'hmm_failed':
+            n_hmm_failed += 1
+            print(f'  [!] HMM fit failed for {combo_key(combo)} '
+                  f'fold={fold_id} hmm_seed={hmm_seed}: {msg}')
+            fail_log.append((combo_key(combo), fold_id, hmm_seed, msg))
+        # write the row whether ok or hmm_failed (NaN row preserves resume key)
+        if row is not None:
+            append_row(args.output, row)
+        if status == 'ok':
+            n_done += 1
+            sharpe, n_months, hmm_dt, xgb_dt = row[6], row[7], row[8], row[9]
+            elapsed = time.time() - t_start
+            total_progress = n_done + n_short_val + n_hmm_failed
+            print(f'  [{total_progress:5d}/{len(work_units):5d}] '
+                  f'{combo_key(combo):<30s} '
+                  f'fold={fold_id} hmm={hmm_seed}  '
+                  f'Sharpe={sharpe:+.3f}  '
+                  f'(HMM {hmm_dt:.0f}s + XGB-ens {xgb_dt:.1f}s, '
+                  f'{elapsed/60:.1f}m total)')
 
-                total_elapsed = time.time() - t_start
-                print(f'  [{cell_idx:5d}/{total_cells:5d}] '
-                      f'{combo_key(combo):<30s} '
-                      f'fold={fold_id} hmm={hmm_seed}  '
-                      f'Sharpe={sharpe:+.3f}  '
-                      f'(HMM {hmm_dt:.0f}s + XGB-ens {xgb_dt:.1f}s, '
-                      f'{total_elapsed/60:.1f}m total)')
+    if use_parallel:
+        # Pool initializer loads panels once per worker. We do NOT load them
+        # in the main process here — that would double memory usage.
+        from multiprocessing import get_context
+        ctx = get_context('spawn')  # macOS / safe default
+        with ctx.Pool(processes=args.workers, initializer=_init_worker) as pool:
+            # Worker returns (payload, status, row, msg); imap_unordered
+            # yields results in completion order, but each result carries its
+            # own payload so we don't need to align with the input list.
+            for payload, status, row, msg in pool.imap_unordered(
+                    _run_cell_worker, work_units, chunksize=1):
+                _record(payload, status, row, msg)
+    else:
+        for payload in work_units:
+            status, row, msg = _execute_cell(panel, stocks, payload,
+                                             xgb_n_jobs=None)
+            _record(payload, status, row, msg)
 
     print('\n' + '=' * 70)
     print('  DONE')
     print('=' * 70)
+    print(f'  ok:           {n_done}')
+    print(f'  short_val:    {n_short_val}')
+    print(f'  hmm_failed:   {n_hmm_failed}')
+    if fail_log:
+        print('\n  HMM failures:')
+        for combo, fold_id, seed, msg in fail_log[:20]:
+            print(f'    {combo}  fold={fold_id} seed={seed}: {msg}')
+        if len(fail_log) > 20:
+            print(f'    ... and {len(fail_log) - 20} more')
 
     # ── Summary: average across HMM seeds within each fold, then across
     # folds per combination. This matches what production reports: the
     # ensemble portfolio's Sharpe, stable across regime-signal sampling noise.
+    if not os.path.exists(args.output):
+        print('\n  No rows written; skipping summary.')
+        return
     results = pd.read_csv(args.output)
+    if results.empty or 'val_sharpe' not in results.columns:
+        print('\n  Empty results CSV; skipping summary.')
+        return
     per_fold = (results.groupby(['combo', 'fold'])['val_sharpe']
                        .mean().reset_index())
     summary = (per_fold.groupby('combo')['val_sharpe']

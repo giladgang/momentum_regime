@@ -51,6 +51,10 @@ parser.add_argument('--burnin', type=int, default=500,
                     help='Burnin iterations to discard (production = 500).')
 parser.add_argument('--smoke', action='store_true',
                     help='Smoke test: 5 seeds, 500 iter, 100 burnin (~1-2 min).')
+parser.add_argument('--workers', type=int, default=1,
+                    help='Parallel worker processes for the seed loop '
+                         '(default 1 = serial). On 8-core machine use 6 to '
+                         'leave 2 cores free.')
 args = parser.parse_args()
 
 if args.smoke:
@@ -220,18 +224,21 @@ def forward_filter(Z, mu, Sigma, P):
 SEEDS = list(range(1, args.seeds + 1))
 n_iter, n_burnin = args.iterations, args.burnin
 n_keep = n_iter - n_burnin
+n_test_draws = 100 if args.smoke else 200
 
-pi_filter_accum       = np.zeros(T_full)
-pi_smooth_train_accum = np.zeros(T_train)
-pi_smooth_test_accum  = np.zeros(T_test)
 
-state_draws = mu_draws = Sigma_draws = P_draws = None
-panic_first = calm_first = None
+def _run_one_seed(seed_payload):
+    """Run a single Gibbs seed end-to-end. Returns a dict suitable for
+    aggregation. Used by both serial and parallel paths.
 
-print(f"\nRunning {len(SEEDS)} seeds x {n_iter} iter ({n_burnin} burnin) ...")
-
-for seed_idx, seed in enumerate(SEEDS):
-    print(f"\n  Seed {seed_idx+1}/{len(SEEDS)} (seed={seed}) ...", flush=True)
+    Reads module globals (Z_train, Z_test, Z_full, signs, K, D, T_train,
+    T_test, T_full, n_iter, n_burnin, n_test_draws, n_keep). When called
+    from a fork()-based Pool, those globals were set up in the parent
+    before fork; child inherits them.
+    """
+    seed_idx, seed, save_full_draws, verbose = seed_payload
+    if verbose:
+        print(f"\n  Seed {seed_idx+1}/{len(SEEDS)} (seed={seed}) ...", flush=True)
     states, mu, Sigma, P = init_sampler(seed)
 
     sd = np.zeros((n_keep, T_train), dtype=int)
@@ -240,8 +247,8 @@ for seed_idx, seed in enumerate(SEEDS):
     Pd = np.zeros((n_keep, K, K))
 
     for m in range(n_iter):
-        if n_iter <= 200 or m % max(1, n_iter // 4) == 0:
-            print(f"    iter {m}/{n_iter}", flush=True)
+        if verbose and (n_iter <= 200 or m % max(1, n_iter // 4) == 0):
+            print(f"    [seed={seed}] iter {m}/{n_iter}", flush=True)
         states = ffbs(Z_train, mu, Sigma, P)
         for k in range(K):
             mu[k], Sigma[k] = sample_niw(Z_train, states, k, mu[k], Sigma[k])
@@ -264,31 +271,88 @@ for seed_idx, seed in enumerate(SEEDS):
 
     filtered_seed = forward_filter(Z_full, mu_post_seed, Sigma_post_seed, P_post_seed)
     pi_filter_seed = filtered_seed[:, panic_seed]
-    pi_filter_accum += pi_filter_seed
 
     pi_smooth_train_seed = (sd == panic_seed).mean(axis=0)
-    pi_smooth_train_accum += pi_smooth_train_seed
 
     last_train = pi_filter_seed[T_train - 1]
     init_prior = np.zeros(K)
     init_prior[panic_seed] = last_train
     init_prior[calm_seed]  = 1.0 - last_train
-    n_test_draws = 100 if args.smoke else 200
     smooth_test_seed = np.zeros((n_test_draws, T_test), dtype=int)
     for i in range(n_test_draws):
-        smooth_test_seed[i] = ffbs(Z_test, mu_post_seed, Sigma_post_seed, P_post_seed,
-                                   init_prior=init_prior)
-    pi_smooth_test_accum += (smooth_test_seed == panic_seed).mean(axis=0)
+        smooth_test_seed[i] = ffbs(Z_test, mu_post_seed, Sigma_post_seed,
+                                   P_post_seed, init_prior=init_prior)
+    pi_smooth_test_seed = (smooth_test_seed == panic_seed).mean(axis=0)
 
-    print(f"    panic=state {panic_seed}  score0={score0:.3f} score1={score1:.3f}", flush=True)
+    if verbose:
+        print(f"    [seed={seed}] panic=state {panic_seed}  "
+              f"score0={score0:.3f} score1={score1:.3f}", flush=True)
 
-    if seed_idx == 0:
-        state_draws = sd
-        mu_draws    = md
-        Sigma_draws = Sd
-        P_draws     = Pd
-        panic_first = panic_seed
-        calm_first  = calm_seed
+    return {
+        'seed_idx': seed_idx,
+        'seed': seed,
+        'panic_seed': panic_seed,
+        'calm_seed': calm_seed,
+        'pi_filter_seed': pi_filter_seed,
+        'pi_smooth_train_seed': pi_smooth_train_seed,
+        'pi_smooth_test_seed': pi_smooth_test_seed,
+        # Full draws only for the first seed (used for diagnostics output)
+        'sd': sd if save_full_draws else None,
+        'md': md if save_full_draws else None,
+        'Sd': Sd if save_full_draws else None,
+        'Pd': Pd if save_full_draws else None,
+    }
+
+
+pi_filter_accum       = np.zeros(T_full)
+pi_smooth_train_accum = np.zeros(T_train)
+pi_smooth_test_accum  = np.zeros(T_test)
+
+state_draws = mu_draws = Sigma_draws = P_draws = None
+panic_first = calm_first = None
+
+
+def _accumulate(result):
+    global pi_filter_accum, pi_smooth_train_accum, pi_smooth_test_accum
+    global state_draws, mu_draws, Sigma_draws, P_draws
+    global panic_first, calm_first
+    pi_filter_accum       += result['pi_filter_seed']
+    pi_smooth_train_accum += result['pi_smooth_train_seed']
+    pi_smooth_test_accum  += result['pi_smooth_test_seed']
+    if result['seed_idx'] == 0:
+        state_draws = result['sd']
+        mu_draws    = result['md']
+        Sigma_draws = result['Sd']
+        P_draws     = result['Pd']
+        panic_first = result['panic_seed']
+        calm_first  = result['calm_seed']
+
+
+print(f"\nRunning {len(SEEDS)} seeds x {n_iter} iter ({n_burnin} burnin) "
+      f"with {args.workers} worker(s) ...")
+
+# First seed always saves full draws for the npz diagnostics file; later
+# seeds only return summary fields. Verbose printing only for serial mode
+# (interleaved parallel output is hard to read).
+verbose = (args.workers == 1)
+seed_payloads = [(idx, seed, idx == 0, verbose)
+                 for idx, seed in enumerate(SEEDS)]
+
+if args.workers > 1:
+    from multiprocessing import get_context
+    ctx = get_context('fork')  # fork inherits module globals — required
+    print(f"  [parallel] dispatching {len(SEEDS)} seeds across "
+          f"{args.workers} workers ...", flush=True)
+    n_done = 0
+    with ctx.Pool(processes=args.workers) as pool:
+        for result in pool.imap_unordered(_run_one_seed, seed_payloads):
+            _accumulate(result)
+            n_done += 1
+            print(f"  [{n_done:3d}/{len(SEEDS)}] seed={result['seed']} "
+                  f"panic=state {result['panic_seed']}", flush=True)
+else:
+    for payload in seed_payloads:
+        _accumulate(_run_one_seed(payload))
 
 # ── Aggregate across seeds ──────────────────────────────────────────────────
 
