@@ -1,11 +1,28 @@
 """
-hmm_feature_selection.py
-========================
-Systematic HMM feature selection pipeline for the momentum regime shifts thesis.
+hmm_feature_selection_intl.py
+=============================
+International (UK + JP) HMM feature selection pipeline.
 
-This script selects the optimal 4 features for the 2-state Bayesian HMM by running
-a multi-pass pipeline that progressively filters candidates and increases computational
-rigor at each stage.
+Adaptation of scripts/hmm_feature_selection.py for the international panels:
+- 5-feature candidate pool (DD_z, VOL_z, DISP_z, REL_N_z, BANK_REL_z) with DD_z required
+  (vs 9 features for US; BANK_REL_z replaces CS_z because no Moody's BAA-AAA equivalent exists
+  for UK or Japan).
+- 15 combinations of size 1-4 (vs 93 for US).
+- Region-aware market panel, stock panel, validation periods, and output paths.
+- Same 4-pass methodology as the US version: quality screen -> portfolio test ->
+  definitive validation -> economic validation.
+
+POLICY: User picks the final feature combination per region after reviewing ALL pass
+outputs. The script does NOT enforce an automatic winner; it produces ranked tables and
+diagnostic stats (Pass 2 portfolio Sharpes, Pass 3 stability+sub-period breakdown,
+Pass 4 BIC + crisis-detection metrics) which the user reviews together to make the call.
+This mirrors how the US production set DD+CS+DISP+REL_N was chosen: after reviewing the
+4-pass outputs Gilad picked the combo, not the script.
+
+Run all 4 passes for each region; do not auto-pick. The user picks at the end.
+
+Selects the regional feature combination by running a multi-pass pipeline that
+progressively filters candidates and increases computational rigor at each stage.
 
 Pipeline Overview:
     Pass 1: HMM Quality Screen (fast, 1 seed per combo)
@@ -35,20 +52,29 @@ Pipeline Overview:
         - Purpose: ensure the winner makes economic sense
 
 Usage:
-    python scripts/hmm_feature_selection.py                  # run full pipeline
-    python scripts/hmm_feature_selection.py --pass 1         # run only Pass 1
-    python scripts/hmm_feature_selection.py --pass 2         # run only Pass 2 (requires Pass 1 results)
-    python scripts/hmm_feature_selection.py --pass 3         # run only Pass 3 (requires Pass 2 results)
+    # Required: --region {UK|JP}. Default --pass 0 runs all four passes sequentially.
+    python scripts/hmm_feature_selection_intl.py --region UK            # full 4-pass for UK
+    python scripts/hmm_feature_selection_intl.py --region JP            # full 4-pass for JP
+    python scripts/hmm_feature_selection_intl.py --region UK --pass 1   # Pass 1 only
+    python scripts/hmm_feature_selection_intl.py --region UK --pass 2   # Pass 2 only (needs Pass 1)
+    python scripts/hmm_feature_selection_intl.py --region UK --pass 3   # Pass 3 only (needs Pass 2)
 
 Configuration:
-    All parameters (features, seeds, thresholds) are imported from config.py.
-    Edit config.py to change the feature pool, number of seeds, quality gates, etc.
+    Most parameters (seeds, thresholds, momentum features, training cutoff) come from
+    config.py. The international FEATURE_POOL and per-region VALIDATION_PERIODS are
+    defined as module-level constants in this file.
 
-Output:
-    - hmm_feature_selection_pass1.csv   (all combos with quality metrics)
-    - hmm_feature_selection_pass2.csv   (surviving combos with Sharpe ratios)
-    - hmm_feature_selection_pass3.csv   (top 3 with definitive results)
-    - Console output with full results at each stage
+Output (per region, written to results/thesis/):
+    - intl_<region>_hmm_feature_selection_pass1.csv  (15 combos with quality metrics)
+    - intl_<region>_hmm_feature_selection_pass2.csv  (Pass 1 survivors ranked by M2 Sharpe)
+    - intl_<region>_hmm_feature_selection_pass3.csv  (top combos with stability + sub-period)
+    - intl_<region>_hmm_feature_selection_pass4.csv  (BIC, crisis-detection, LRT)
+
+Final feature pick:
+    The user reviews the four output CSVs (M2 Sharpe ranking, per-seed stability,
+    sub-period robustness, economic validation metrics) and selects the regional
+    feature combination manually. The script does NOT auto-select a winner -- this
+    is intentional and mirrors how the US production set was chosen.
 """
 
 import numpy as np
@@ -850,7 +876,7 @@ def main():
     parser.add_argument('--region', choices=['UK', 'JP'], required=True,
                         help='International market: UK or JP')
     parser.add_argument('--pass', type=int, default=0, dest='run_pass',
-                        help='Run only this pass (0=all, 1/2/3)')
+                        help='Run only this pass (0=all, 1/2/3/4)')
     args = parser.parse_args()
 
     # Promote --region to module-level global, set region-specific validation
@@ -864,6 +890,7 @@ def main():
 
     pass1_path = f'results/thesis/intl_{REGION.lower()}_hmm_feature_selection_pass1.csv'
     pass2_path = f'results/thesis/intl_{REGION.lower()}_hmm_feature_selection_pass2.csv'
+    pass3_path = f'results/thesis/intl_{REGION.lower()}_hmm_feature_selection_pass3.csv'
 
     # Pass 1: always run if requested OR if a later pass needs its output
     if args.run_pass in (0, 1):
@@ -894,6 +921,19 @@ def main():
                     'sh_xgb': r['sh_xgb']}
                    for _, r in df.head(TOP_N_FOR_PASS3).iterrows()]
         final = run_pass3(panel, train_stocks, test_stocks, top)
+        if args.run_pass == 3:
+            elapsed = time.time() - t_total
+            print(f"\nPass 3 complete. Total time: {elapsed/60:.1f} minutes")
+            return
+
+    # Pass 4: load Pass 3 output if not already in memory, then run if requested
+    if args.run_pass in (0, 4):
+        if args.run_pass == 4:
+            df = pd.read_csv(pass3_path)
+            final = [{'name': r['name'], 'combo': eval(r['combo']),
+                      'sharpe': r['sharpe']}
+                     for _, r in df.iterrows()]
+        run_pass4(panel, train_stocks, test_stocks, final)
 
     elapsed = time.time() - t_total
     print(f"\nTotal pipeline time: {elapsed/60:.1f} minutes")
