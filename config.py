@@ -78,6 +78,11 @@ LEARNING_RATE = 0.05
 SUBSAMPLE = 0.8
 COLSAMPLE = 0.8
 
+# Per-XGB-fit thread cap. Ensemble loops are serial across seeds, so each
+# fit gets these threads. Capped at 6 to leave 2 cores free for the OS
+# and the user's other work on an 8-core machine.
+XGB_N_JOBS = 6
+
 # ═══════════════════════════════════════════════════════════════════════════════
 #  FEATURE SETTINGS
 # ═══════════════════════════════════════════════════════════════════════════════

@@ -41,8 +41,8 @@ import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import (PORTFOLIO_TYPE, TRADING_FEE as CFG_TRADING_FEE, TRAIN_END,
                     XGB_SEEDS, N_ESTIMATORS, MAX_DEPTH, LEARNING_RATE,
-                    SUBSAMPLE, COLSAMPLE, USE_FUNDAMENTALS, MOM_FEATURES,
-                    FUND_FEATURES, CS_FEATURES, STOCK_DATA_PATH,
+                    SUBSAMPLE, COLSAMPLE, XGB_N_JOBS, USE_FUNDAMENTALS,
+                    MOM_FEATURES, FUND_FEATURES, CS_FEATURES, STOCK_DATA_PATH,
                     PANEL_WITH_REGIMES_PATH, ARTEFACTS_PATH)
 from src.utils import metrics
 
@@ -399,7 +399,8 @@ for xgb_seed in XGB_SEEDS:
     xgb_i = XGBRegressor(n_estimators=N_ESTIMATORS, max_depth=MAX_DEPTH,
                           learning_rate=LEARNING_RATE, subsample=SUBSAMPLE,
                           colsample_bytree=COLSAMPLE, tree_method='hist',
-                          random_state=xgb_seed, verbosity=0)
+                          random_state=xgb_seed, verbosity=0,
+                          n_jobs=XGB_N_JOBS)
     xgb_i.fit(X_train, y_train)
     xgb_predictions += xgb_i.predict(X_test)
 xgb_predictions /= len(XGB_SEEDS)
