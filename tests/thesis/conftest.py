@@ -105,6 +105,8 @@ def find_in_table(table_text: str, row_substr: str, col_index: int) -> str:
                 raw = cols[col_index]
                 raw = raw.replace("$-$", "-").replace(r"\%", "").replace("%", "")
                 raw = raw.replace("$", "").strip()
+                # Strip trailing significance stars (*, **, ***) common in t-stat columns.
+                raw = raw.rstrip("*").strip()
                 return raw
     return ""
 

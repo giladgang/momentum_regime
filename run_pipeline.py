@@ -82,14 +82,10 @@ def main():
             "--repro-smoke notes:\n"
             "  Reduces ensemble sizes (HMM_SEEDS=1..5, HMM_ITERATIONS=200, XGB_SEEDS=1..5)\n"
             "  and skips the 12-18 hr expanding-window backtest (Step 19) and the\n"
-            "  _chain_phase2 chain. The MOMENTUM_OUTPUT_ROOT env var is exported so\n"
-            "  any script that reads it can redirect its outputs.\n"
-            "\n"
-            "  IMPORTANT: today config.py has no MOMENTUM_OUTPUT_ROOT plumbing, so\n"
-            "  child scripts will still write to results/, tables/, plots/,\n"
-            "  artefacts/ unless they themselves read the env var. The flag is the\n"
-            "  scaffold; full output isolation is a follow-up that requires editing\n"
-            "  config.py to read MOMENTUM_OUTPUT_ROOT and prefix every output path.\n"
+            "  _chain_phase2 chain. The MOMENTUM_OUTPUT_ROOT env var is exported,\n"
+            "  and config.py reads it at import time to redirect every output path\n"
+            "  (RESULTS_*, PLOTS_*, TABLES_DIR, ARTEFACTS_*, PANEL_*) under that\n"
+            "  root. Pure data inputs (CRSP raw, FF factors) are not redirected.\n"
             "\n"
             "  Used by tests/thesis/test_e2e_smoke.py and tests/thesis/\n"
             "  make_smoke_fixture.py. Target wall time: < 30 min.\n"
@@ -111,39 +107,24 @@ def main():
     )
     args = parser.parse_args()
 
-    # ── --repro-smoke: override config in-process ────────────────────────────
-    # Least-invasive mechanism: mutate the imported `config` module's
-    # attributes BEFORE any pipeline step imports it. This way no script
-    # needs to be aware of the smoke mode — they read cfg.* like always.
-    # Output redirection: prefix RESULTS_*/PLOTS_*/ARTEFACTS_DIR with
-    # MOMENTUM_OUTPUT_ROOT (env var) when set; defaults to ./results_smoke
-    # in --repro-smoke mode so production trees are never touched.
+    # ── --repro-smoke: set env var BEFORE importing config ──────────────────
+    # config.py reads MOMENTUM_OUTPUT_ROOT at import time and silently
+    # re-roots every output path under it. Subprocesses inherit the env
+    # var and re-import config with the same redirection, so smoke runs
+    # never touch production results/, tables/, plots/, artefacts/.
     if args.repro_smoke:
-        import config as cfg
         out_root = os.environ.get('MOMENTUM_OUTPUT_ROOT')
         if not out_root:
             out_root = os.path.join(os.getcwd(), 'results_smoke')
             os.environ['MOMENTUM_OUTPUT_ROOT'] = out_root
         os.makedirs(out_root, exist_ok=True)
 
+        import config as cfg
         cfg.HMM_SEEDS = list(range(1, 6))
         cfg.HMM_ITERATIONS = 200
         cfg.XGB_SEEDS = list(range(1, 6))
-        # Sub-period rerun bounds; not all scripts honour these but we set them
-        # for those that do.
         cfg.FIRST_RETRAIN_YEAR = 2020
         cfg.LAST_RETRAIN_YEAR = 2022
-
-        # Redirect every output dir under MOMENTUM_OUTPUT_ROOT.
-        for attr in ('TABLES_DIR', 'PLOTS_DIR', 'RESULTS_DIR', 'ARTEFACTS_DIR',
-                     'RESULTS_THESIS_DIR', 'RESULTS_CV_DIR',
-                     'RESULTS_OOS_DIR', 'RESULTS_REPORTS_DIR',
-                     'PLOTS_THESIS_DIR', 'PLOTS_DIAGNOSTIC_DIR'):
-            if hasattr(cfg, attr):
-                old = getattr(cfg, attr)
-                # Strip leading "results/", "plots/", etc., then re-prefix
-                rel = old.lstrip('./')
-                setattr(cfg, attr, os.path.join(out_root, rel))
 
         print('=' * 70)
         print('  --repro-smoke MODE')

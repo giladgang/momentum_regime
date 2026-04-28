@@ -167,32 +167,52 @@ N_PLACEBO_RUNS = 5
 #  OUTPUT SETTINGS
 # ═══════════════════════════════════════════════════════════════════════════════
 
-TABLES_DIR = 'tables'
-PLOTS_DIR = 'plots'
-RESULTS_DIR = 'results'
-ARTEFACTS_DIR = 'artefacts'
+import os as _os
+
+# When MOMENTUM_OUTPUT_ROOT is set in the environment (e.g. by run_pipeline.py
+# --repro-smoke or by tests/thesis/make_smoke_fixture.py), every output path
+# below is silently re-rooted under it. Pure data inputs (CRSP raw, FF factors,
+# extra HMM features) are NOT redirected. This lets smoke runs and tests
+# isolate from production results without scripts needing to know about the mode.
+_OUTPUT_ROOT = _os.environ.get('MOMENTUM_OUTPUT_ROOT')
+
+
+def _o(path: str) -> str:
+    if _OUTPUT_ROOT and not _os.path.isabs(path):
+        return _os.path.join(_OUTPUT_ROOT, path)
+    return path
+
+
+TABLES_DIR = _o('tables')
+PLOTS_DIR = _o('plots')
+RESULTS_DIR = _o('results')
+ARTEFACTS_DIR = _o('artefacts')
 
 # Subdirectory layout introduced in the production/cv/diagnostic restructure.
 # Production thesis artifacts live in RESULTS_THESIS_DIR / PLOTS_THESIS_DIR.
 # CV outputs (not cited in thesis) live in RESULTS_CV_DIR.
 # Historical OOS sensitivities live in RESULTS_OOS_DIR.
 # Status / drift reports live in RESULTS_REPORTS_DIR.
-RESULTS_THESIS_DIR  = 'results/thesis'
-RESULTS_CV_DIR      = 'results/cv'
-RESULTS_OOS_DIR     = 'results/oos_historical'
-RESULTS_REPORTS_DIR = 'results/reports'
-PLOTS_THESIS_DIR    = 'plots/thesis'
-PLOTS_DIAGNOSTIC_DIR = 'plots/diagnostic'
+RESULTS_THESIS_DIR  = _o('results/thesis')
+RESULTS_CV_DIR      = _o('results/cv')
+RESULTS_OOS_DIR     = _o('results/oos_historical')
+RESULTS_REPORTS_DIR = _o('results/reports')
+PLOTS_THESIS_DIR    = _o('plots/thesis')
+PLOTS_DIAGNOSTIC_DIR = _o('plots/diagnostic')
 
 # ═══════════════════════════════════════════════════════════════════════════════
 #  DATA PATHS
 # ═══════════════════════════════════════════════════════════════════════════════
 
-PANEL_PATH = 'data/panel.parquet'
-PANEL_WITH_REGIMES_PATH = 'data/panel_with_regimes.parquet'
+# Pipeline-built artefacts (honor MOMENTUM_OUTPUT_ROOT so smoke runs build
+# fresh copies under the smoke root instead of overwriting production).
+PANEL_PATH = _o('data/panel.parquet')
+PANEL_WITH_REGIMES_PATH = _o('data/panel_with_regimes.parquet')
+ARTEFACTS_PATH = _o('artefacts/cs_artefacts_data.pkl')
+XGB_MODEL_PATH = _o('artefacts/cs_artefacts_xgb.pkl')
+LR_MODEL_PATH = _o('artefacts/cs_artefacts_lr.pkl')
+
+# Pure data inputs (read-only; never redirected, even in smoke mode).
 STOCK_DATA_PATH = 'data/crsp_msf_raw.parquet'
-ARTEFACTS_PATH = 'artefacts/cs_artefacts_data.pkl'
-XGB_MODEL_PATH = 'artefacts/cs_artefacts_xgb.pkl'
-LR_MODEL_PATH = 'artefacts/cs_artefacts_lr.pkl'
 FF_FACTORS_PATH = 'data/ff_factors.parquet'
 EXTRA_HMM_FEATURES_PATH = 'data/extra_hmm_features.pkl'

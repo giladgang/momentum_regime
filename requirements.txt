@@ -38,3 +38,4 @@ pluggy==1.6.0
 # scripts; thesis numbers can be reproduced without it using the
 # committed panel.parquet / crsp_msf_raw.parquet.
 wrds==3.5.0
+PyYAML==6.0.3

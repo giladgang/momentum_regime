@@ -366,6 +366,220 @@ def build_source(hint: dict | None) -> dict | None:
     return out
 
 
+# ─── Per-section selector/column resolvers ──────────────────────────────────
+# Each resolver returns (selector_dict_or_None, column_or_None) for a given
+# (key, leaf) pair. Returning (None, None) means the entry stays source: null.
+
+# Strategy → CSV "strategy" column (bootstrap)
+_BOOTSTRAP_STRAT = {
+    "fixed_12": "Fixed 12-mo mom",
+    "fixed_1": "Fixed 1-mo mom",
+    "m0": "M0 (Formula)",
+    "m1": "M1 (LR)",
+    "m2": "M2 (XGB)",
+}
+_BOOTSTRAP_LEAF_COL = {"value": "point_sharpe", "ci_lo": "ci_low", "ci_hi": "ci_high"}
+
+# Bootstrap paired-tests (m2_vs_<benchmark>) live in a different CSV
+_BOOTSTRAP_PAIRED_BENCH = {
+    "m2_vs_m1": "M1 (LR)",
+    "m2_vs_m0": "M0 (Formula)",
+    "m2_vs_fixed_12": "Fixed 12-mo mom",
+    "m2_vs_fixed_1": "Fixed 1-mo mom",
+}
+_BOOTSTRAP_PAIRED_LEAF_COL = {
+    "value": "point_diff",
+    "ci_lo": "diff_ci_low",
+    "ci_hi": "diff_ci_high",
+    "p": "p_value",
+}
+
+# Strategy → tex row_substr (m2_perf, regime_sharpe, subperiod)
+_TEX_STRAT = {
+    "fixed_12": "Fixed 12-mo",
+    "fixed_1": "Fixed 1-mo",
+    "m0": "M0: Formula",
+    "m1": "M1: LR",
+    "m2": "M2: XGB",
+    "market": "Market",
+}
+# m2_perf metric → 0-based column index (after row label)
+_M2_PERF_METRIC_COL = {
+    "ann_ret": 1, "ann_vol": 2, "sharpe": 3, "max_dd": 4,
+    "beta": 5, "nw_t": 6, "final_dollar": 7,
+}
+# regime_sharpe regime → column
+_REGIME_COL = {"full": 1, "calm": 2, "panic": 3}
+# subperiod period → column
+_SUBPERIOD_COL = {"2011_2015": 1, "2016_2020": 2, "2021_2025": 3, "full": 4}
+
+# panic_subtypes
+_PANIC_SUBTYPE_ROW = {
+    "calm": "Calm",
+    "panic_crash": "Panic: Crash",
+    "panic_recovery": "Panic: Recovery",
+}
+_PANIC_METRIC_COL = {"ann_ret": 1, "ann_vol": 2, "sharpe": 3, "months": 4}
+
+# factor_alphas / fund_alphas
+_FACTOR_MODEL_ROW = {
+    "capm_alpha": "CAPM",
+    "ff3_alpha": "FF3",
+    "carhart_alpha": "Carhart",
+    "ff5_alpha": "FF5",
+    "ff6_alpha": "FF6",
+}
+_FUND_MODEL_ROW = {
+    "fund_capm_alpha": "CAPM",
+    "fund_ff3_alpha": "FF3",
+    "fund_carhart_alpha": "Carhart",
+    "fund_ff5_alpha": "FF5",
+    "fund_ff6_alpha": "FF6",
+}
+_ALPHA_LEAF_COL = {"value": 1, "t": 2}
+
+# hmm_separation: feature row + metric column
+_HMM_FEATURE_ROW = {"cs": "CS_z", "dd": "DD_z", "disp": "DISP_z", "rel_n": "REL_N_z"}
+_HMM_METRIC_COL = {"calm": "calm_mean", "panic": "panic_mean", "delta": "delta"}
+_HMM_LEAF_COL = {"value": None, "ci_lo": "ci_lo", "ci_hi": "ci_hi"}  # value uses metric col
+
+# ic: only m2_ic
+_IC_ROW = {"m2_ic": "M2: XGB"}
+# IC: only `value` is unambiguous. PRODUCTION_METRICS.json labels the Std
+# column (col 2) as `t`, but the actual NW t-stat is col 3. Until that JSON
+# label bug is resolved, we don't auto-generate the t entry — the test would
+# either pass against the wrong column or fail. See IMPLEMENTATION_NOTES.
+_IC_LEAF_COL = {"value": 1}
+
+# seed_convergence: row by k, column by leaf
+_SEED_LEAF_COL = {"value": "mean", "p25": "p25", "p75": "p75",
+                  "std": "std", "min": "min", "max": "max"}
+
+
+def resolve_source(section: str, key: str, leaf: str) -> tuple[dict | None, object]:
+    """Return (selector_dict, column) for a (section, key, leaf) tuple.
+    Returns (None, None) when no mapping is known."""
+    if section == "bootstrap":
+        # m2_vs_<benchmark>: paired comparison in a different CSV
+        if key in _BOOTSTRAP_PAIRED_BENCH:
+            col = _BOOTSTRAP_PAIRED_LEAF_COL.get(leaf)
+            if col is None:
+                return None, None
+            return {"_csv_override": "results/thesis/bootstrap_paired_tests.csv",
+                    "benchmark": _BOOTSTRAP_PAIRED_BENCH[key]}, col
+        # key like "m2_sharpe", "fixed_12_sharpe"
+        for prefix, row_val in _BOOTSTRAP_STRAT.items():
+            if key.startswith(prefix + "_"):
+                col = _BOOTSTRAP_LEAF_COL.get(leaf)
+                if col is None:
+                    return None, None
+                return {"strategy": row_val}, col
+        return None, None
+
+    if section == "m2_perf":
+        for prefix, row_substr in _TEX_STRAT.items():
+            if key.startswith(prefix + "_"):
+                metric = key[len(prefix) + 1:]
+                col = _M2_PERF_METRIC_COL.get(metric)
+                if col is None:
+                    return None, None
+                if leaf == "value":
+                    return {"row_substr": row_substr}, col
+                # No t/p/ci on m2_perf table directly
+                return None, None
+        return None, None
+
+    if section == "regime_sharpe":
+        for prefix, row_substr in _TEX_STRAT.items():
+            if key.startswith(prefix + "_"):
+                regime = key[len(prefix) + 1:]
+                col = _REGIME_COL.get(regime)
+                if col is None or leaf != "value":
+                    return None, None
+                return {"row_substr": row_substr}, col
+        return None, None
+
+    if section == "subperiod":
+        for prefix, row_substr in _TEX_STRAT.items():
+            if key.startswith(prefix + "_"):
+                period = key[len(prefix) + 1:]
+                col = _SUBPERIOD_COL.get(period)
+                if col is None or leaf != "value":
+                    return None, None
+                return {"row_substr": row_substr}, col
+        return None, None
+
+    if section == "panic_subtypes":
+        for prefix, row_substr in _PANIC_SUBTYPE_ROW.items():
+            if key.startswith(prefix + "_"):
+                metric = key[len(prefix) + 1:]
+                col = _PANIC_METRIC_COL.get(metric)
+                if col is None or leaf != "value":
+                    return None, None
+                return {"row_substr": row_substr}, col
+        return None, None
+
+    if section == "factor_alphas":
+        row = _FACTOR_MODEL_ROW.get(key)
+        if row is None:
+            return None, None
+        col = _ALPHA_LEAF_COL.get(leaf)
+        if col is None:
+            return None, None
+        return {"row_substr": row}, col
+
+    if section == "fund_alphas":
+        row = _FUND_MODEL_ROW.get(key)
+        if row is None:
+            return None, None
+        col = _ALPHA_LEAF_COL.get(leaf)
+        if col is None:
+            return None, None
+        return {"row_substr": row}, col
+
+    if section == "hmm_separation":
+        # key like "cs_calm", "dd_delta"
+        for prefix, feat in _HMM_FEATURE_ROW.items():
+            if key.startswith(prefix + "_"):
+                metric = key[len(prefix) + 1:]
+                if leaf == "value":
+                    col = _HMM_METRIC_COL.get(metric)
+                    if col is None:
+                        return None, None
+                    return {"feature": feat}, col
+                if leaf in ("ci_lo", "ci_hi") and metric == "delta":
+                    return {"feature": feat}, leaf
+                return None, None
+        return None, None
+
+    if section == "ic":
+        row = _IC_ROW.get(key)
+        if row is None:
+            return None, None
+        col = _IC_LEAF_COL.get(leaf)
+        if col is None:
+            return None, None
+        return {"row_substr": row}, col
+
+    if section == "seed_convergence":
+        # key like "k_1", "k_10"
+        if key.startswith("k_"):
+            try:
+                k_val = int(key[2:])
+            except ValueError:
+                return None, None
+            col = _SEED_LEAF_COL.get(leaf)
+            if col is None:
+                return None, None
+            return {"k": k_val}, col
+        return None, None
+
+    # january: skipped — has duplicate row labels across "Full" / "Excluding January"
+    # sections that need a custom selector. Tracked in IMPLEMENTATION_NOTES.md.
+    # international: 72 entries across regions, multi-CSV — left as null per spec.
+    return None, None
+
+
 def gen_from_metrics(metrics: dict, tex_files: dict[str, str], existing_ids: set[str]) -> list[dict]:
     entries = []
     for section, sec_v in metrics.items():
@@ -397,9 +611,22 @@ def gen_from_metrics(metrics: dict, tex_files: dict[str, str], existing_ids: set
                     ("unit", _infer_unit(rec, leaf)),
                     ("tolerance", default_tolerance(leaf, v, section)),
                 ])
-                # Section gets a CSV/TEX hint; selector is best-effort null.
-                src_hint = {"csv": hint.get("csv")} if hint.get("csv") else None
-                e["source"] = build_source(src_hint)
+                # Per-section selector/column resolver (gives null when unknown).
+                sel, col = resolve_source(section, key, leaf)
+                if sel is not None and col is not None:
+                    # Selector may carry a `_csv_override` to point at a different CSV.
+                    csv_path = sel.pop("_csv_override", None) or hint.get("csv")
+                    if csv_path:
+                        src_hint = {
+                            "csv": csv_path,
+                            "selector": sel,
+                            "column": col,
+                        }
+                        e["source"] = build_source(src_hint)
+                    else:
+                        e["source"] = None
+                else:
+                    e["source"] = None
                 e["cites"] = find_cites(float(v), tex_files)
                 if leaf != "value":
                     e["pair"] = base_id

@@ -1,5 +1,5 @@
 # Manifest Generation Report
-Generated: 2026-04-28T18:53:13.270953+00:00
+Generated: 2026-04-28T21:47:50.953283+00:00
 Total entries: 513
 
 ## By origin
@@ -19,7 +19,7 @@ Total entries: 513
 - seed: 22
 - subperiod: 32
 
-## Source: null (324 entries — manual followup needed)
+## Source: null (333 entries — manual followup needed)
 - `macro_factoralphascapmalpha`
 - `macro_factoralphascapmalphat`
 - `macro_factoralphascarhartalpha`
@@ -83,6 +83,7 @@ Total entries: 513
 - `macro_hmmseparationrelndelta`
 - `macro_hmmseparationrelndeltacihi`
 - `macro_hmmseparationrelndeltacilo`
+- `ic_m2_ic_t`
 - `international_jp_regional_fixed_12_ann_ret`
 - `international_jp_regional_fixed_12_max_dd`
 - `international_jp_regional_fixed_12_sharpe`
@@ -219,8 +220,7 @@ Total entries: 513
 - `macro_internationalukuspim0maxdd`
 - `macro_internationalukuspim0sharpe`
 - `macro_internationalukuspim1annret`
-- `macro_internationalukuspim1maxdd`
-- ...and 124 more
+- ...and 133 more
 
 ## Empty cites (50 entries — manual followup needed)
 - `bootstrap_m0_sharpe_ci_lo`
