@@ -298,6 +298,12 @@ def main():
              'zscore_subregime_summary.csv + robustness sidecar). '
              'Depends on Step 18 (zscore_*_by_month) + Step 25 (fundamentals_returns)'),
 
+        35: ('scripts/zscore_subregime_xgb_seed_robustness.py',
+             'STEP 35: Sub-regime clustering robustness to XGB seed choice. '
+             'Trains a disjoint 50-seed XGB ensemble and re-clusters; reports ARI '
+             'vs production clustering (zscore_subregime_xgb_seed_robustness.csv). '
+             'Heavy step (~5 min, 50 XGB fits); supports the §5.2.3 robustness claim'),
+
         # ─ Canonical chain (must run AFTER all generators above).
         # Renumbered 21-24 -> 80-83 so sorted(steps.keys()) places them
         # strictly after the auxiliary generators (steps 25-33). Earlier
