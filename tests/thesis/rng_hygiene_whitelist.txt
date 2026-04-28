@@ -1,0 +1,9 @@
+# Scripts whitelisted from the module-level RNG-seeding check.
+# Format:  <relative_path>  # rationale
+# One entry per line; #-prefixed lines and blank lines ignored.
+#
+# Add a script here only after confirming that the module-level seed call
+# is genuinely safe (e.g. it's a self-contained CLI script with no other
+# importers, and the seed pin is part of the documented experiment).
+
+# (none yet)
