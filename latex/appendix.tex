@@ -289,6 +289,22 @@ Tables~\ref{tab:combo_long_cp} and~\ref{tab:combo_short_cp} report the calm-minu
 \input{tables/table_combo_short_cp}
 
 
+\subsection{Sub-Regime Decomposition of Panic}\label{app:zscore_subregime}
+
+The panic regime ($\pi_t^{\text{filter}} \geq 0.5$, 59 months) is internally heterogeneous. Section~\ref{sec:panic} decomposed it by concurrent market direction (crash versus recovery); a complementary view clusters panic months by the realised cross-sectional momentum landscape itself. Applying $K$-means with $k = 3$ to the long-leg 12-horizon $z$-profile of each panic month (silhouette 0.46, cluster sizes stable at $(17, 18, 24)$ across six independent random seeds; full robustness statistics in \texttt{results/thesis/zscore\_subregime\_robustness.csv}) yields three sub-regimes that the HMM filter cannot itself distinguish: deep crisis, transition, and mild panic.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{plots/thesis/zscore_subregimes.png}
+    \caption{Long- and short-leg cross-sectional $z$-profiles by sub-regime. Calm is shown alongside the three panic sub-regimes obtained by $K$-means clustering of long-leg $z$-profiles ($k = 3$, random seed 42).}
+    \label{fig:zscore_subregimes}
+\end{figure}
+
+\input{tables/table_subregime_shap}
+
+The sub-regimes are differentiated by the realised cross-sectional momentum landscape rather than by the HMM filter's regime probability ($\bar\pi^{\text{filter}} \in \{0.95, 0.96, 1.00\}$ across the three). The conditional Sharpes reported in the table are post-hoc, in-sample diagnostics, not investable strategy returns: sub-regime labels are determined after the fact from the realised $z$-profile.
+
+
 \section{Label Switching: Sign Correction Procedure}\label{app:label_switching}
 
 Because the four HMM features respond to stress in different directions, the expected direction of each feature during stress is determined empirically. For each feature $j$, the 95th percentile is computed separately on training months falling within known crisis windows (the dot-com bust of 2000--2002 and the Global Financial Crisis of 2007--2009) and on all remaining training months:

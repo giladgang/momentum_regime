@@ -291,6 +291,13 @@ def main():
              'STEP 33: Render risk-aversion dual-utility plot '
              '(plots/thesis/risk_aversion_dual_util.pdf — depends on Step 32)'),
 
+        # ─ Z-SCORE SUB-REGIME DECOMPOSITION (App. zscore_subregime)
+        34: ('scripts/zscore_subregime_analysis.py',
+             'STEP 34: K-means sub-regime decomposition of panic months '
+             '(table_subregime_shap.tex + zscore_subregimes.{png,pdf} + '
+             'zscore_subregime_summary.csv + robustness sidecar). '
+             'Depends on Step 18 (zscore_*_by_month) + Step 25 (fundamentals_returns)'),
+
         # ─ Canonical chain (must run AFTER all generators above).
         # Renumbered 21-24 -> 80-83 so sorted(steps.keys()) places them
         # strictly after the auxiliary generators (steps 25-33). Earlier
