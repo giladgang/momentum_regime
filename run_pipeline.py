@@ -191,10 +191,10 @@ def main():
         3: ('scripts/main_results_analysis.py',
             'STEP 3: Generate main results tables'),
 
-        4: ('tests/robustness_checks.py',
+        4: ('scripts/robustness_checks.py',
             'STEP 4: Run robustness checks'),
 
-        5: ('tests/test_external_validity.py',
+        5: ('scripts/external_validity.py',
             'STEP 5: Run external validity tests'),
 
         6: ('scripts/hmm_diagnostics.py',

@@ -1,6 +1,6 @@
 """
-test_external_validity.py
-=========================
+external_validity.py
+====================
 Four validation batteries:
 1. Alternative train/test splits (2005, 2008, 2015)
 2. Expanding-window rolling re-estimation

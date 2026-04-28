@@ -276,8 +276,16 @@ def long_short_port(df_test, score_col, fee=TRADING_FEE):
         if len(nyse) < 10:
             continue
         lo, hi = nyse.quantile(0.10), nyse.quantile(0.90)
+        # Degenerate-quantile guard: in sparse months lo == hi can put
+        # the same stock in both legs (turnover doubles, signal noise).
+        if lo >= hi:
+            continue
         longs  = grp[grp[score_col] >= hi]
         shorts = grp[grp[score_col] <= lo]
+        # Drop NaN ME before weighting so a single missing value cannot
+        # propagate NaN into the monthly return.
+        longs  = longs.dropna(subset=['me'])
+        shorts = shorts.dropna(subset=['me'])
         if longs['me'].sum() == 0 or shorts['me'].sum() == 0:
             continue
         lme = longs['me'].sum()

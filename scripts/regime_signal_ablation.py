@@ -1,6 +1,6 @@
 """
-test_regime_signal_ablation.py
-==============================
+regime_signal_ablation.py
+=========================
 Key ablation: does the HMM regime signal (pi_filter) add value over the
 GHM market-state variable, or over no regime signal at all?
 
