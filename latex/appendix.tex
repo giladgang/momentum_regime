@@ -258,6 +258,14 @@ To assess the sampling variability of M2's Sharpe ratio and test its outperforma
 
 M2's Sharpe confidence interval is [0.67, 1.53], comfortably above zero, while every benchmark's interval straddles zero. The paired tests reject equality of Sharpe ratios between M2 and each benchmark at $p < 0.025$. Within M2, the panic-period Sharpe exceeds the calm-period Sharpe in point estimate (1.54 vs 0.84), but with only 59 panic months the paired difference is not statistically significant ($p = 0.109$); the 95\% interval $[-0.16, 1.59]$ straddles zero. The point-estimate gap is consistent with the regime-conditional selection mechanism described in Section~\ref{sec:regime_results}, but its statistical confirmation would require a longer panic sample. These intervals describe sampling variability within the 2011--2025 sample; out-of-sample generalisation is addressed separately by the 30-year expanding-window backtest (Section~\ref{sec:historical_stress}) and the sub-period analysis (Appendix~\ref{app:subperiod}).
 
+\subsection{Leg-Level CAPM Betas by Regime}\label{app:leg_betas}
+
+The D\&M comparison in Section~\ref{sec:dm_comparison} characterises M2's contribution as stock selection rather than exposure scaling. A direct test of this framing is to compute leg-level CAPM betas separately by regime: if M2 reorganises which stocks it holds across regimes (cross-sectional re-ranking), the long-leg and short-leg betas should shift between calm and panic in opposite directions; if instead M2 mechanically scales exposure, both legs' betas should move together.
+
+\input{tables/table_leg_betas}
+
+The pattern in Table~\ref{tab:leg_betas} is consistent with the cross-sectional re-ranking interpretation. M2's long-leg beta rises from 1.40 in calm to 1.65 in panic (\emph{tilt amplification}: in panic, the long leg holds names with higher market sensitivity), while the short-leg beta falls from 1.22 to 0.98. Fixed 12-month momentum, by contrast, holds both leg-level betas roughly stable across regimes (long: 1.09 calm, 1.07 panic; short: 1.80 calm, 1.69 panic), consistent with the unconditional rank-based construction. The difference is direct evidence that the regime signal acts on \emph{which} stocks are held rather than on \emph{how much}.
+
 \subsection{Ridge Regression Baseline}\label{app:ridge}
 
 To isolate the effect of linearity from the choice of training target, a Ridge regression is estimated on the same 13 standardised features as M1 and M2, predicting continuous forward returns (the same target as XGBoost). Table~\ref{tab:ridge} reports results across a range of regularisation strengths.
