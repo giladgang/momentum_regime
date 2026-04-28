@@ -7,7 +7,7 @@ All strategies are evaluated out-of-sample on 2011--2025 (167 months), using the
 
 \subsubsection{Strategy Comparison}
 
-Table~\ref{tab:performance} reports the out-of-sample performance of all strategies.\footnote{All Sharpe ratios are computed using raw returns rather than excess returns above the risk-free rate. Since the same convention is applied to every strategy, relative comparisons are unaffected. The risk-free rate averaged roughly 2\% annualised over the 2011--2025 window, so absolute Sharpe ratios are overstated by approximately 0.05--0.10.}
+Table~\ref{tab:performance} reports the out-of-sample performance of all strategies.\footnote{All Sharpe ratios are computed using raw returns rather than excess returns above the risk-free rate. Since the same convention is applied to every strategy, relative comparisons are unaffected. The risk-free rate averaged roughly 2\% annualised over the 2011--2025 window, so absolute Sharpe ratios are overstated by approximately 0.05--0.10. Sharpe is computed from the arithmetic monthly mean annualised by $\sqrt{12}$, while annualised returns reported elsewhere are compound (geometric); under high volatility the two definitions of average return differ, so Sharpe should not be inferred from a table by dividing annualised return by annualised volatility (e.g.\ at depth~1, the reported Sharpe is $0.53$ but $8.7\% / 19.4\% = 0.45$).}
 
 \input{tables/table_performance}
 
