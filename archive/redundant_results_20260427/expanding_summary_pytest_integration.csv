@@ -1,0 +1,2 @@
+predict_year,train_months,crisis_months_in_train,xgb_train_rows,xgb_test_rows,n_portfolio_months,mean_pi_predicted_year,ann_sharpe_year,elapsed_s
+2010,229,61,1117520,43494,12,0.46857072468068206,1.4616730732586607,503.95881509780884
