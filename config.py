@@ -206,13 +206,18 @@ PLOTS_DIAGNOSTIC_DIR = _o('plots/diagnostic')
 
 # Pipeline-built artefacts (honor MOMENTUM_OUTPUT_ROOT so smoke runs build
 # fresh copies under the smoke root instead of overwriting production).
-PANEL_PATH = _o('data/panel.parquet')
-PANEL_WITH_REGIMES_PATH = _o('data/panel_with_regimes.parquet')
 ARTEFACTS_PATH = _o('artefacts/cs_artefacts_data.pkl')
 XGB_MODEL_PATH = _o('artefacts/cs_artefacts_xgb.pkl')
 LR_MODEL_PATH = _o('artefacts/cs_artefacts_lr.pkl')
 
 # Pure data inputs (read-only; never redirected, even in smoke mode).
+# panel.parquet is built offline from CRSP+Compustat (not by run_pipeline).
+# panel_with_regimes.parquet is technically a Step-1 output, but in smoke
+# mode Step 1 is skipped when it already exists (hmm_ready check), so the
+# smoke run reuses the production HMM panel — the smoke fixture's purpose
+# is to validate cross-sectional + downstream determinism, not HMM.
+PANEL_PATH = 'data/panel.parquet'
+PANEL_WITH_REGIMES_PATH = 'data/panel_with_regimes.parquet'
 STOCK_DATA_PATH = 'data/crsp_msf_raw.parquet'
 FF_FACTORS_PATH = 'data/ff_factors.parquet'
 EXTRA_HMM_FEATURES_PATH = 'data/extra_hmm_features.pkl'

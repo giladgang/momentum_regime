@@ -81,11 +81,15 @@ def main():
         epilog=(
             "--repro-smoke notes:\n"
             "  Reduces ensemble sizes (HMM_SEEDS=1..5, HMM_ITERATIONS=200, XGB_SEEDS=1..5)\n"
-            "  and skips the 12-18 hr expanding-window backtest (Step 19) and the\n"
-            "  _chain_phase2 chain. The MOMENTUM_OUTPUT_ROOT env var is exported,\n"
-            "  and config.py reads it at import time to redirect every output path\n"
-            "  (RESULTS_*, PLOTS_*, TABLES_DIR, ARTEFACTS_*, PANEL_*) under that\n"
-            "  root. Pure data inputs (CRSP raw, FF factors) are not redirected.\n"
+            "  and skips Step 19 (12-18hr expanding-window backtest) and Step 83 (drift\n"
+            "  check, which expects production-scale numbers). Steps 80-82 still run so\n"
+            "  PRODUCTION_METRICS.json + canonical_macros are produced consistent with\n"
+            "  the reduced ensemble.\n"
+            "\n"
+            "  The MOMENTUM_OUTPUT_ROOT env var is exported, and config.py reads it at\n"
+            "  import time to redirect every output path (RESULTS_*, PLOTS_*, TABLES_DIR,\n"
+            "  ARTEFACTS_*, PANEL_*) under that root. Pure data inputs (CRSP raw, FF\n"
+            "  factors) are not redirected.\n"
             "\n"
             "  Used by tests/thesis/test_e2e_smoke.py and tests/thesis/\n"
             "  make_smoke_fixture.py. Target wall time: < 30 min.\n"
@@ -427,10 +431,13 @@ def main():
     else:
         # Run all steps in order
         for step_num in sorted(steps.keys()):
-            # In --repro-smoke mode skip the long expanding-window backtest
-            # (Step 19) and the _chain_phase2 chain (steps 80-83) entirely
-            # — these are too heavy to run as a smoke check.
-            if args.repro_smoke and (step_num == 19 or step_num >= 80):
+            # In --repro-smoke mode skip Step 19 (12-18hr expanding-window
+            # backtest) and Step 83 (drift check, expected to fail under
+            # reduced-ensemble settings). Steps 80-82 (build_metrics,
+            # canonical_macros, canonical_tables) MUST run so the smoke
+            # fixture can pick up PRODUCTION_METRICS.json + canonical
+            # macros consistent with the smoke run.
+            if args.repro_smoke and (step_num == 19 or step_num == 83):
                 print(f"\n  SKIPPING Step {step_num} (--repro-smoke)")
                 continue
             # Skip HMM if results already exist

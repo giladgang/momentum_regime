@@ -298,6 +298,12 @@ class TestPaths:
         assert len(set(dirs)) == len(dirs), "Output dirs must be distinct"
 
     def test_data_paths_are_relative_strings(self):
+        # When MOMENTUM_OUTPUT_ROOT is set (--repro-smoke / make_smoke_fixture)
+        # config.py legitimately re-roots output paths to absolute paths under
+        # the smoke output dir. The relative-path invariant only holds in the
+        # default (unredirected) mode.
+        if os.environ.get('MOMENTUM_OUTPUT_ROOT'):
+            pytest.skip("MOMENTUM_OUTPUT_ROOT set; output paths absolute by design")
         paths = (cfg.PANEL_PATH, cfg.PANEL_WITH_REGIMES_PATH, cfg.STOCK_DATA_PATH,
                  cfg.ARTEFACTS_PATH, cfg.XGB_MODEL_PATH, cfg.LR_MODEL_PATH,
                  cfg.FF_FACTORS_PATH, cfg.EXTRA_HMM_FEATURES_PATH)
@@ -306,6 +312,9 @@ class TestPaths:
             assert not os.path.isabs(p), f"{p} should be relative to repo root"
 
     def test_artefacts_path_under_artefacts_dir(self):
+        # Relative-mode invariant: ARTEFACTS_PATH lives inside ARTEFACTS_DIR.
+        # In MOMENTUM_OUTPUT_ROOT mode both are prefixed identically so the
+        # startswith relationship still holds — no skip needed.
         assert cfg.ARTEFACTS_PATH.startswith(cfg.ARTEFACTS_DIR + '/')
         assert cfg.XGB_MODEL_PATH.startswith(cfg.ARTEFACTS_DIR + '/')
         assert cfg.LR_MODEL_PATH.startswith(cfg.ARTEFACTS_DIR + '/')
