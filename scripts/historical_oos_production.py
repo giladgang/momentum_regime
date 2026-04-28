@@ -201,8 +201,13 @@ def build_ls(df_test, score_col):
         if len(nyse) < 10:
             continue
         lo, hi = nyse.quantile(0.10), nyse.quantile(0.90)
+        # Degenerate quantile guard (rare; sparse months only).
+        if lo >= hi:
+            continue
         longs = grp[grp[score_col] >= hi]
         shorts = grp[grp[score_col] <= lo]
+        longs  = longs.dropna(subset=['me'])
+        shorts = shorts.dropna(subset=['me'])
         if longs['me'].sum() == 0 or shorts['me'].sum() == 0:
             continue
         lw = (longs.set_index('permno')['me'] / longs['me'].sum()).to_dict()

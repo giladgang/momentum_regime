@@ -74,8 +74,12 @@ def long_short_port(df_test, score_col, fee=None):
         if len(nyse) < 10:
             continue
         lo, hi = nyse.quantile(0.10), nyse.quantile(0.90)
+        if lo >= hi:
+            continue
         longs = grp[grp[score_col] >= hi]
         shorts = grp[grp[score_col] <= lo]
+        longs  = longs.dropna(subset=['me'])
+        shorts = shorts.dropna(subset=['me'])
         if longs['me'].sum() == 0 or shorts['me'].sum() == 0:
             continue
         lme = longs['me'].sum()
