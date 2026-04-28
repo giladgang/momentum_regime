@@ -39,3 +39,9 @@ results/*_pytest_integration.csv
 results/expanding_pi_filter_pytest_integration.csv
 results/expanding_returns_pytest_integration.csv
 results/expanding_summary_pytest_integration.csv
+
+# Thesis verification suite — generated artifacts (commit only fixtures via PROVENANCE)
+tests/thesis/coverage_report.md
+tests/thesis/fixtures/smoke_baseline.json
+tests/thesis/fixtures/smoke_artefacts.pkl
+results_smoke/
