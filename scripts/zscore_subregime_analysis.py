@@ -164,6 +164,17 @@ def shap_share(ptype, leg):
     s = abs_shap[idx].mean(axis=0)
     return 100 * s / s.sum()
 
+
+def shap_share_all(ptype):
+    """SHAP share (%) per feature for ALL stock-months in a sub-regime,
+    irrespective of leg assignment. Aggregates that decompose the published
+    panic SHAP figure of 42% reported in main_results.tex."""
+    idx = (test_aligned['ptype'] == ptype).values
+    if idx.sum() == 0:
+        return None
+    s = abs_shap[idx].mean(axis=0)
+    return 100 * s / s.sum()
+
 # ----------------------------------------------------------------------
 # Build summary table (rows = metrics, cols = sub-regimes)
 # ----------------------------------------------------------------------
@@ -175,6 +186,7 @@ for sr in SUBREGIMES:
 
     sh_long  = shap_share(sr, 'long')
     sh_short = shap_share(sr, 'short')
+    sh_all   = shap_share_all(sr)
 
     rows.append({
         'subregime': sr,
@@ -191,16 +203,23 @@ for sr in SUBREGIMES:
         'short_z_mom8':  short_z[7],
         'short_z_mom12': short_z[11],
         'short_z_mean':  short_z.mean(),
+        'agg_pi_shap_pct':  sh_all[PI_IDX]              if sh_all   is not None else np.nan,
+        'agg_mom_shap_pct': sh_all[MOM_IDXS].sum()      if sh_all   is not None else np.nan,
+        # Pi and "Momentum total" rows are share of TOTAL SHAP (matches the
+        # published 42% / 50% panic / calm pi figures in main_results.tex
+        # line 57). Individual horizon rows (mom_1, mom_8, mom_12) are share of
+        # MOMENTUM-ONLY SHAP, matching the convention in tab:zscore_shap_detail
+        # and the published "10.1% / 5.0% mom_1 short" reconciliation at line 98.
         'long_pi_shap_pct':  sh_long[PI_IDX]            if sh_long  is not None else np.nan,
         'long_mom_shap_pct': sh_long[MOM_IDXS].sum()    if sh_long  is not None else np.nan,
-        'long_mom1_shap_pct':  sh_long[MOM_IDXS[0]]     if sh_long  is not None else np.nan,
-        'long_mom8_shap_pct':  sh_long[MOM_IDXS[7]]     if sh_long  is not None else np.nan,
-        'long_mom12_shap_pct': sh_long[MOM_IDXS[11]]    if sh_long  is not None else np.nan,
+        'long_mom1_shap_pct':  100*sh_long[MOM_IDXS[0]]/sh_long[MOM_IDXS].sum()    if sh_long  is not None else np.nan,
+        'long_mom8_shap_pct':  100*sh_long[MOM_IDXS[7]]/sh_long[MOM_IDXS].sum()    if sh_long  is not None else np.nan,
+        'long_mom12_shap_pct': 100*sh_long[MOM_IDXS[11]]/sh_long[MOM_IDXS].sum()   if sh_long  is not None else np.nan,
         'short_pi_shap_pct':  sh_short[PI_IDX]          if sh_short is not None else np.nan,
         'short_mom_shap_pct': sh_short[MOM_IDXS].sum()  if sh_short is not None else np.nan,
-        'short_mom1_shap_pct':  sh_short[MOM_IDXS[0]]   if sh_short is not None else np.nan,
-        'short_mom8_shap_pct':  sh_short[MOM_IDXS[7]]   if sh_short is not None else np.nan,
-        'short_mom12_shap_pct': sh_short[MOM_IDXS[11]]  if sh_short is not None else np.nan,
+        'short_mom1_shap_pct':  100*sh_short[MOM_IDXS[0]]/sh_short[MOM_IDXS].sum()    if sh_short is not None else np.nan,
+        'short_mom8_shap_pct':  100*sh_short[MOM_IDXS[7]]/sh_short[MOM_IDXS].sum()    if sh_short is not None else np.nan,
+        'short_mom12_shap_pct': 100*sh_short[MOM_IDXS[11]]/sh_short[MOM_IDXS].sum()   if sh_short is not None else np.nan,
     })
 summary = pd.DataFrame(rows).set_index('subregime').loc[SUBREGIMES]
 summary.to_csv(f'{RES_DIR}/zscore_subregime_summary.csv', float_format='%.4f')
@@ -274,6 +293,60 @@ print(f'Saved: {PLOT_DIR}/zscore_subregimes.png')
 print(f'Saved: {PLOT_DIR}/zscore_subregimes.pdf')
 
 # ----------------------------------------------------------------------
+# 1x3 figure: within-cluster dispersion (panic months only, long leg)
+# Each panel shows every member-month profile + cluster centroid + calm reference.
+# Demonstrates clustering quality (within-cluster cohesion) visually.
+# ----------------------------------------------------------------------
+PANIC_ORDER = ['mild_panic', 'transition', 'deep_crisis']
+CLUSTER_COLORS = {
+    'mild_panic':  '#2ca02c',  # green
+    'transition':  '#ff7f0e',  # orange
+    'deep_crisis': '#d62728',  # red
+}
+calm_centroid = L[L['ptype'] == 'calm'][COLS].mean().values
+
+fig2, axes2 = plt.subplots(1, 3, figsize=(14, 4.5), sharex=True, sharey=True)
+for ax, sr in zip(axes2, PANIC_ORDER):
+    member_profiles = L[L['ptype'] == sr][COLS].values     # (n_months x 12)
+    centroid = member_profiles.mean(axis=0)
+    color = CLUSTER_COLORS[sr]
+
+    ax.axhline(0, color='gray', linewidth=0.5, alpha=0.5)
+    # individual months — thin, low alpha
+    for row in member_profiles:
+        ax.plot(HORIZONS, row, color=color, linewidth=0.7, alpha=0.35)
+    # cluster centroid — heavy
+    ax.plot(HORIZONS, centroid, color=color, linewidth=2.5,
+            marker='o', markersize=6, label=f'{PRETTY[sr]} centroid')
+    # calm centroid — dashed reference
+    ax.plot(HORIZONS, calm_centroid, color='black', linewidth=1.4,
+            linestyle='--', alpha=0.7, label='Calm centroid (reference)')
+
+    n = len(member_profiles)
+    sharpe = summary.loc[sr, 'sharpe_ann']
+    ax.set_title(f'{PRETTY[sr]} (n={n}, Sharpe={sharpe:.2f})',
+                 fontsize=11, pad=6)
+    ax.set_xticks(HORIZONS)
+    ax.set_xlim(0.5, 12.5)
+    ax.grid(axis='y', alpha=0.3)
+    ax.legend(loc='upper left', fontsize=8, frameon=False)
+
+axes2[0].set_ylabel('Long-leg cross-sectional z-score', fontsize=10)
+for ax in axes2:
+    ax.set_xlabel('Momentum lookback (months)', fontsize=10)
+
+fig2.suptitle('Within-cluster dispersion of panic-month long-leg z-profiles',
+              fontsize=12, fontweight='bold', y=1.02)
+fig2.tight_layout()
+fig2.savefig(f'{PLOT_DIR}/zscore_subregime_dispersion.png',
+             dpi=200, bbox_inches='tight')
+fig2.savefig(f'{PLOT_DIR}/zscore_subregime_dispersion.pdf',
+             bbox_inches='tight')
+plt.close(fig2)
+print(f'Saved: {PLOT_DIR}/zscore_subregime_dispersion.png')
+print(f'Saved: {PLOT_DIR}/zscore_subregime_dispersion.pdf')
+
+# ----------------------------------------------------------------------
 # LaTeX table: summary by sub-regime
 # ----------------------------------------------------------------------
 def fmt(x, fmt_str='{:.2f}'):
@@ -301,6 +374,11 @@ rows_tex.append(' & '.join(['$z$ at mom\\_1'] + [fmt(summary.loc[s, 'long_z_mom1
 rows_tex.append(' & '.join(['$z$ at mom\\_8'] + [fmt(summary.loc[s, 'long_z_mom8']) for s in SUBREGIMES]) + r' \\')
 rows_tex.append(' & '.join(['$z$ at mom\\_12'] + [fmt(summary.loc[s, 'long_z_mom12']) for s in SUBREGIMES]) + r' \\')
 rows_tex.append(' & '.join(['$\\bar z$ across horizons'] + [fmt(summary.loc[s, 'long_z_mean']) for s in SUBREGIMES]) + r' \\')
+
+rows_tex.append(r'\midrule')
+rows_tex.append(r'\multicolumn{5}{l}{\emph{Aggregate SHAP share (all stock-months)}} \\')
+rows_tex.append(' & '.join([r'$\pi^{\text{filter}}$'] + [fmt_pct(summary.loc[s, 'agg_pi_shap_pct']) for s in SUBREGIMES]) + r' \\')
+rows_tex.append(' & '.join(['Momentum (12 horizons)'] + [fmt_pct(summary.loc[s, 'agg_mom_shap_pct']) for s in SUBREGIMES]) + r' \\')
 
 rows_tex.append(r'\midrule')
 rows_tex.append(r'\multicolumn{5}{l}{\emph{Long-leg SHAP share}} \\')
@@ -331,7 +409,7 @@ table_tex = '\n'.join([
     *rows_tex,
     r'\bottomrule',
     r'\end{tabular}',
-    r"\caption{Sub-regime decomposition of the HMM-classified panic regime. The 59 panic months are clustered (K-means, $k=3$, random seed 42, silhouette 0.46) on the long-leg 12-horizon cross-sectional z-profile. Cluster sizes are stable across six independent random seeds. SHAP shares are computed on the production XGBoost ensemble (50 seeds, depth~4) and normalised to sum to 100\% within each leg. Monthly returns are net of 10\,bps transaction cost. \emph{Conditional Sharpes are post-hoc, in-sample diagnostics, not investable strategy returns: sub-regime labels are determined after the fact from each month's realised z-profile.} The HMM filtered probability cannot distinguish the three panic clusters (mean $\pi^{\text{filter}} \geq 0.95$ in all three); what differentiates them is the realised cross-sectional momentum landscape.}",
+    r"\caption{Sub-regime decomposition of the HMM-classified panic regime. The 59 panic months are clustered (K-means, $k=3$, random seed 42, silhouette 0.46) on the long-leg 12-horizon cross-sectional z-profile. Cluster sizes are stable across six independent random seeds. SHAP shares from the production XGBoost ensemble (50 seeds, depth~4): the $\pi^{\text{filter}}$ and ``Momentum (12 horizons)'' rows are share of total SHAP and sum to 100\% within each leg block; individual horizon rows (mom\_1, mom\_8, mom\_12) are share of momentum-only SHAP, matching the convention in Table~\ref{tab:zscore_shap_detail}. Monthly returns are net of 10\,bps transaction cost. \emph{Conditional Sharpes are post-hoc, in-sample diagnostics, not investable strategy returns: sub-regime labels are determined after the fact from each month's realised z-profile.} The HMM filtered probability cannot distinguish the three panic clusters (mean $\pi^{\text{filter}} \geq 0.95$ in all three); what differentiates them is the realised cross-sectional momentum landscape.}",
     r'\label{tab:zscore_subregime}',
     r'\end{table}',
     '',

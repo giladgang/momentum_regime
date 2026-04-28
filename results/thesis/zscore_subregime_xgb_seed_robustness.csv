@@ -1,0 +1,11 @@
+metric,value
+n_panic_months,59
+cluster_sizes_production,17|18|24
+cluster_sizes_robustness,17|19|23
+ARI_prod_vs_robust,0.9457
+pct_months_same_cluster,98.31
+silhouette_production,0.462
+silhouette_robustness,0.4521
+centroid_shift_L2_deep_crisis,0.0137
+centroid_shift_L2_transition,0.0421
+centroid_shift_L2_mild_panic,0.0292

@@ -256,7 +256,7 @@ To assess the sampling variability of M2's Sharpe ratio and test its outperforma
 
 \input{tables/table_bootstrap}
 
-M2's Sharpe confidence interval is [0.67, 1.53], comfortably above zero, while every benchmark's interval straddles zero. The paired tests reject equality of Sharpe ratios between M2 and each benchmark at $p < 0.025$. Within M2, the panic-period Sharpe exceeds the calm-period Sharpe in point estimate (1.54 vs 0.84), but with only 59 panic months the paired difference is not statistically significant ($p = 0.109$); the 95\% interval $[-0.16, 1.59]$ straddles zero. The point-estimate gap is consistent with the regime-conditional selection mechanism described in Section~\ref{sec:regime_results}, but its statistical confirmation would require a longer panic sample. These intervals describe sampling variability within the 2011--2025 sample; out-of-sample generalisation is addressed separately by the 30-year expanding-window backtest (Section~\ref{sec:historical_stress}) and the sub-period analysis (Appendix~\ref{app:subperiod}).
+M2's Sharpe confidence interval is [0.67, 1.53], comfortably above zero, while every benchmark's interval straddles zero. The paired tests reject equality of Sharpe ratios between M2 and each benchmark at $p < 0.025$. Within M2, the panic-period Sharpe exceeds the calm-period Sharpe in point estimate (1.53 vs 0.84), but with only 59 panic months the paired difference is not statistically significant ($p = 0.109$); the 95\% interval $[-0.16, 1.59]$ straddles zero. The point-estimate gap is consistent with the regime-conditional selection mechanism described in Section~\ref{sec:regime_results}, but its statistical confirmation would require a longer panic sample. These intervals describe sampling variability within the 2011--2025 sample; out-of-sample generalisation is addressed separately by the 30-year expanding-window backtest (Section~\ref{sec:historical_stress}) and the sub-period analysis (Appendix~\ref{app:subperiod}).
 
 \subsection{Leg-Level CAPM Betas by Regime}\label{app:leg_betas}
 
@@ -295,22 +295,6 @@ Tables~\ref{tab:combo_long_cp} and~\ref{tab:combo_short_cp} report the calm-minu
 \input{tables/table_combo_long_cp}
 
 \input{tables/table_combo_short_cp}
-
-
-\subsection{Sub-Regime Decomposition of Panic}\label{app:zscore_subregime}
-
-The panic regime ($\pi_t^{\text{filter}} \geq 0.5$, 59 months) is internally heterogeneous. Section~\ref{sec:panic} decomposed it by concurrent market direction (crash versus recovery); a complementary view clusters panic months by the realised cross-sectional momentum landscape itself. Applying $K$-means with $k = 3$ to the long-leg 12-horizon $z$-profile of each panic month (silhouette 0.46, cluster sizes stable at $(17, 18, 24)$ across six independent random seeds; full robustness statistics in \texttt{results/thesis/zscore\_subregime\_robustness.csv}) yields three sub-regimes that the HMM filter cannot itself distinguish: deep crisis, transition, and mild panic.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{plots/thesis/zscore_subregimes.png}
-    \caption{Long- and short-leg cross-sectional $z$-profiles by sub-regime. Calm is shown alongside the three panic sub-regimes obtained by $K$-means clustering of long-leg $z$-profiles ($k = 3$, random seed 42).}
-    \label{fig:zscore_subregimes}
-\end{figure}
-
-\input{tables/table_subregime_shap}
-
-The sub-regimes are differentiated by the realised cross-sectional momentum landscape rather than by the HMM filter's regime probability ($\bar\pi^{\text{filter}} \in \{0.95, 0.96, 1.00\}$ across the three). The conditional Sharpes reported in the table are post-hoc, in-sample diagnostics, not investable strategy returns: sub-regime labels are determined after the fact from the realised $z$-profile.
 
 
 \section{Label Switching: Sign Correction Procedure}\label{app:label_switching}

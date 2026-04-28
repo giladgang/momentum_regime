@@ -238,6 +238,18 @@ t-statistic of \mmperfm2nwt, well above conventional thresholds.
 
 ---
 
+## 🔍 Consistency audits — not yet performed
+
+Spawned from the 2026-04-28 audit pass after §5.2.3 integration. The numeric/cross-reference/label/em-dash audit was completed (3 fixes applied: abstract & mgmt summary FF6 alpha 24.7→24.1, t=4.78→4.81; appendix.tex:259 panic Sharpe 1.54→1.53). The items below were out of scope of that audit and remain unchecked.
+
+- [ ] **Every appendix-table cell vs source CSV** — high-risk-cells were spot-checked but full cell-by-cell verification was not done. ~40 tables × ~10-30 cells each. Effort: hours; would benefit from a scripted compare against `tables/*.csv` source files where they exist.
+- [ ] **Every methodology-section equation** — math content was not audited (different domain). Verify each formula against its derivation and the corresponding code in `scripts/`.
+- [ ] **Literature review claims vs cited papers** — claims attributed to specific papers should be checked against the cited source. Out of scope for numeric-consistency; needs a literature pass.
+- [ ] **Spelling / grammar** — different audit kind; not run. Recommend a final proofread pass before submission.
+- [ ] **Comma vs Oxford comma consistency** — style; not numeric. Pick a convention and apply uniformly.
+
+---
+
 ## 🏗️ Architecture refactors (post-thesis only; deferred)
 
 Each requires a bit-exact regression check (`md5 tables/*.tex plots/*.png results/*.csv` before/after, plus `pytest tests/test_reproducibility.py`) on a feature branch before merge. Not safe during the thesis sprint.
