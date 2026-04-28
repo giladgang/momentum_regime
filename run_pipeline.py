@@ -75,10 +75,89 @@ def run_pytest(test_path, description):
 
 def main():
     import argparse
-    parser = argparse.ArgumentParser(description='Run momentum regime shifts pipeline')
+    parser = argparse.ArgumentParser(
+        description='Run momentum regime shifts pipeline',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=(
+            "--repro-smoke notes:\n"
+            "  Reduces ensemble sizes (HMM_SEEDS=1..5, HMM_ITERATIONS=200, XGB_SEEDS=1..5)\n"
+            "  and skips the 12-18 hr expanding-window backtest (Step 19) and the\n"
+            "  _chain_phase2 chain. The MOMENTUM_OUTPUT_ROOT env var is exported so\n"
+            "  any script that reads it can redirect its outputs.\n"
+            "\n"
+            "  IMPORTANT: today config.py has no MOMENTUM_OUTPUT_ROOT plumbing, so\n"
+            "  child scripts will still write to results/, tables/, plots/,\n"
+            "  artefacts/ unless they themselves read the env var. The flag is the\n"
+            "  scaffold; full output isolation is a follow-up that requires editing\n"
+            "  config.py to read MOMENTUM_OUTPUT_ROOT and prefix every output path.\n"
+            "\n"
+            "  Used by tests/thesis/test_e2e_smoke.py and tests/thesis/\n"
+            "  make_smoke_fixture.py. Target wall time: < 30 min.\n"
+        ),
+    )
     parser.add_argument('--step', type=int, default=0,
                         help='Run only this step (0 = all)')
+    parser.add_argument(
+        '--repro-smoke',
+        action='store_true',
+        help=(
+            'Reduced-size run for smoke-testing the pipeline. Overrides config to '
+            'HMM_SEEDS=1..5, HMM_ITERATIONS=200, XGB_SEEDS=1..5, '
+            'FIRST_RETRAIN_YEAR=2020, LAST_RETRAIN_YEAR=2022. Skips the 30-yr '
+            'expanding-window backtest. Honors MOMENTUM_OUTPUT_ROOT env var (or '
+            'sets it to ./results_smoke if unset) so production outputs are not '
+            'overwritten. The flag emits its config diff to stdout before running.'
+        ),
+    )
     args = parser.parse_args()
+
+    # ── --repro-smoke: override config in-process ────────────────────────────
+    # Least-invasive mechanism: mutate the imported `config` module's
+    # attributes BEFORE any pipeline step imports it. This way no script
+    # needs to be aware of the smoke mode — they read cfg.* like always.
+    # Output redirection: prefix RESULTS_*/PLOTS_*/ARTEFACTS_DIR with
+    # MOMENTUM_OUTPUT_ROOT (env var) when set; defaults to ./results_smoke
+    # in --repro-smoke mode so production trees are never touched.
+    if args.repro_smoke:
+        import config as cfg
+        out_root = os.environ.get('MOMENTUM_OUTPUT_ROOT')
+        if not out_root:
+            out_root = os.path.join(os.getcwd(), 'results_smoke')
+            os.environ['MOMENTUM_OUTPUT_ROOT'] = out_root
+        os.makedirs(out_root, exist_ok=True)
+
+        cfg.HMM_SEEDS = list(range(1, 6))
+        cfg.HMM_ITERATIONS = 200
+        cfg.XGB_SEEDS = list(range(1, 6))
+        # Sub-period rerun bounds; not all scripts honour these but we set them
+        # for those that do.
+        cfg.FIRST_RETRAIN_YEAR = 2020
+        cfg.LAST_RETRAIN_YEAR = 2022
+
+        # Redirect every output dir under MOMENTUM_OUTPUT_ROOT.
+        for attr in ('TABLES_DIR', 'PLOTS_DIR', 'RESULTS_DIR', 'ARTEFACTS_DIR',
+                     'RESULTS_THESIS_DIR', 'RESULTS_CV_DIR',
+                     'RESULTS_OOS_DIR', 'RESULTS_REPORTS_DIR',
+                     'PLOTS_THESIS_DIR', 'PLOTS_DIAGNOSTIC_DIR'):
+            if hasattr(cfg, attr):
+                old = getattr(cfg, attr)
+                # Strip leading "results/", "plots/", etc., then re-prefix
+                rel = old.lstrip('./')
+                setattr(cfg, attr, os.path.join(out_root, rel))
+
+        print('=' * 70)
+        print('  --repro-smoke MODE')
+        print('=' * 70)
+        print(f'  output root:    {out_root}')
+        print(f'  HMM_SEEDS:      {cfg.HMM_SEEDS}')
+        print(f'  HMM_ITERATIONS: {cfg.HMM_ITERATIONS}')
+        print(f'  XGB_SEEDS:      {cfg.XGB_SEEDS}')
+        print(f'  RESULTS_DIR:    {cfg.RESULTS_DIR}')
+        print(f'  TABLES_DIR:     {cfg.TABLES_DIR}')
+        print(f'  ARTEFACTS_DIR:  {cfg.ARTEFACTS_DIR}')
+        print('  Step 19 (expanding-window) and the _chain_phase2 chain are skipped.')
+        print('=' * 70)
+        print()
 
     # Import config to print current settings
     import config as cfg
@@ -367,6 +446,12 @@ def main():
     else:
         # Run all steps in order
         for step_num in sorted(steps.keys()):
+            # In --repro-smoke mode skip the long expanding-window backtest
+            # (Step 19) and the _chain_phase2 chain (steps 80-83) entirely
+            # — these are too heavy to run as a smoke check.
+            if args.repro_smoke and (step_num == 19 or step_num >= 80):
+                print(f"\n  SKIPPING Step {step_num} (--repro-smoke)")
+                continue
             # Skip HMM if results already exist
             if step_num == 1 and hmm_ready:
                 print(f"\n  SKIPPING Step 1 (HMM already estimated)")
