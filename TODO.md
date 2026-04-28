@@ -89,13 +89,6 @@ Genuinely new findings or significant reframings. Each item is a writing task. *
 
 - [ ] CV artefacts (`tables/table_hmm_cv.tex`, `tables/table_xgb_cv.tex`, `results/hmm_cv_*`, `results/xgb_cv_*`) exist on disk for follow-up work but are NOT referenced in any `.tex` file. Verify after Bucket 2 edits that no `\input` or `\ref` to these files leaked in.
 
-#### N4 — Fold-3 dot-com universal failure — NEW caveat
-
-- [ ] Add paragraph in robustness/limitations section
-  - All 36 XGB configs + all HMM combos negative on fold 3 — out-of-distribution generalization failure
-  - Data: [`results/xgb_cv_results.csv`](results/xgb_cv_results.csv) (group by fold), [`results/hmm_cv_features.csv`](results/hmm_cv_features.csv)
-  - Cross-link to existing §5.4.3 30-year backtest discussion (the dot-com loss documented there is the same failure manifested in real history)
-
 #### N5 — NW t-stat significance jump — REFRAME defensive paragraph + sharpen
 
 **More than just a number swap.** The current `latex/conclusion.tex` paragraph **defends** the low t-stat:
@@ -121,14 +114,9 @@ Items that the thesis already frames well; just verify post-Shumway numbers upda
   - The 36-month dot-com bear (2000-2002, -36% cumulative, MDD -64.8%) is the documented version of the synthetic 24+ month sustained-bear stress scenario.
   - Hypothetical → real. One paragraph that ties the two analyses together explicitly.
 
-#### N7 — Negative Carhart UMD loading — SHARPEN novelty signal
-
-- [ ] One-paragraph emphasis in `latex/main_results.tex` factor-alpha discussion: M2 has *negative* Carhart UMD loading (−0.20 to −0.22 in Carhart/FF6). M2 is *negatively* correlated with naive momentum despite using momentum features. Strong novelty signal: M2 isn't "more momentum", it's a different cross-sectional bet.
-  - Data: [`tables/table_factor_alphas.tex`](tables/table_factor_alphas.tex)
-
 ---
 
-### Citations to add (across N1, N2, N7)
+### Citations to add (across N1, N2)
 
 - [ ] **Rey, H. (2013)** — global financial cycle (N1 framing)
 - [ ] **Asness, Moskowitz & Pedersen (2013)** — international momentum (N1 JP caveat)
@@ -348,7 +336,7 @@ Reference layer for the HARD STOP section. Triage tags: **[M]** = must land, **[
 - [ ] [S] Panic − Calm: 0.75 [−0.08,1.60], **p=0.074\*** (panic outperformance only marginally significant)
 - [ ] [M] **Paired tests vs benchmarks**: M2 vs M1 **p=0.001**, vs M0 **p=0.010**, vs Fixed 12-mo **p=0.006**, vs Fixed 1-mo **p=0.024** — [`results/bootstrap_paired_tests.csv`](results/bootstrap_paired_tests.csv)
 
-#### §E13. Factor loadings (covered in N7 above)
+#### §E13. Factor loadings
 
 - [ ] [M] M2 has NEGATIVE UMD loading (−0.20 to −0.22) — bets on a different slice
 - [ ] [M] Negative HML (−0.17 to −0.31): growth-tilted; Mkt-RF ≈ −0.15: defensive
@@ -509,8 +497,8 @@ If your advisor presses on these, you have answers ready:
 - [ ] "What about other risk-aversion targets?" → §E1 + side-note (some MV configs better)
 - [ ] "Does it generalize internationally?" → N1, US π beats regional in UK and JP
 - [ ] "Does it work over a longer history?" → 30-year backtest in completed work, but with significant DD in 2000–2002
-- [ ] "Can it survive a structurally novel regime?" → N4, honest acknowledgement (fold-3 + 2000-2002)
-- [ ] "Is M2 just a better momentum factor?" → N7 (negative UMD)
+- [ ] "Can it survive a structurally novel regime?" → §5.4.3 dot-com paragraph (-64.8% DD over 32 months) + Test period scope caveat in conclusion.tex — historical realisation of the reversal-failure vulnerability
+- [ ] "Is M2 just a better momentum factor?" → "panic long leg is a term-structure-wide loser portfolio" (§5.2.4 Discussion); negative UMD loading is the factor-side reflection of that, not an independent signal
 - [ ] "Why nonlinearity? Why not Ridge?" → §E17 (Ridge gives −0.58 across all α; OLS too)
 - [ ] "Is the panic edge real?" → §E12 (panic−calm marginally sig p=0.07) + §E15 (it's the recovery component, not crashes)
 - [ ] "Why these 4 HMM features?" → in-sample feature ablation (§E23) + 4-pass test-period selection acknowledged with caveat; CV-based selection flagged as future research (N3 Edit #6)
