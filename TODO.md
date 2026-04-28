@@ -1,6 +1,6 @@
 # Thesis TODO
 
-**Last updated**: 2026-04-27 (post-Phase-3 composition complete; awaiting Gilad row-by-row thesis-edit review).
+**Last updated**: 2026-04-27 (post-Phase-3 composition complete; N8 IC paradox dropped from thesis; N3 reframed — both HMM and XGB CV deferred to future research only, no thesis citation; awaiting Gilad row-by-row thesis-edit review).
 
 ## Companion files
 
@@ -148,9 +148,10 @@ The HARD STOP section above is the day-to-day "what to write next" view. The ful
 
 ## 🔑 Decisions made (2026-04-27)
 
-- [x] **HMM feature set**: KEEP production `DD+CS+DISP+REL_N`. Step J CV winner (`DD+CS+LVIX+DISP`) is statistically indistinguishable within fold-noise (gap +0.221 vs fold-std 0.694). Defer to **future work** as a "more robust feature-selection procedure with rolling/expanding-window CV"; rationale and draft prose are in N3 above.
-- [x] **XGB hyperparameters**: KEEP production `depth=4, lr=0.05, n=500`. Step I CV puts depth-3 narrowly atop the grid (+0.596 vs depth-4 +0.576, gap 0.021 within fold-std 0.811 — essentially zero). Test-period sweep ([`results/depth_results.csv`](results/depth_results.csv)) prefers depth-4 (Sharpe 1.11 vs 0.98). Both objectives jointly support keeping depth-4.
-- [x] **No retraining at CV winners** — production stays as the canonical specification; CV results live in the appendix as a robustness check.
+- [x] **HMM feature set**: KEEP production `DD+CS+DISP+REL_N`. Step J CV winner (`DD+CS+LVIX+DISP`) is statistically indistinguishable within fold-noise (gap +0.221 vs fold-std 0.694), but production ranks 47/64 — bottom-half placement is too defensive to cite in thesis. Deferred to future work (N3 Edit #6).
+- [x] **XGB hyperparameters**: KEEP production `depth=4, lr=0.05, n=500`. Step I CV puts depth-3 narrowly atop the grid (+0.596 vs depth-4 +0.576, gap 0.021 within fold-std 0.811 — essentially zero). Test-period sweep ([`results/depth_results.csv`](results/depth_results.csv)) prefers depth-4 (Sharpe 1.11 vs 0.98). Both objectives jointly support keeping depth-4. Deferred to future work with z-score-across-regimes angle (N3 Edit #7).
+- [x] **No retraining at CV winners** — production stays as the canonical specification.
+- [x] **CV results NOT cited in thesis** — both HMM and XGB CV stay out of thesis prose entirely. Future research only. Existing "specification-search" / "test-set tuned" caveats stay in place as honest acknowledgments. See 🔬 CV artefacts section below for what stays on disk.
 
 ---
 
@@ -214,28 +215,21 @@ Carried over from old project planning; absent from current thesis and from `fut
 
 ---
 
-## ⚙️ Source-of-truth framework (`results/PRODUCTION_METRICS.json`)
+## ⚙️ Source-of-truth framework — BUILT and wired into pipeline
 
-A canonical metrics store. Every published thesis number lives here under a named key. Tables, plots, and prose all reference this single source.
+Canonical metrics store. Every published thesis number lives under a named key. Wired into [`run_pipeline.py`](run_pipeline.py) as steps 21 ([`build_metrics.py`](scripts/build_metrics.py)), 22 ([`build_canonical_macros.py`](scripts/build_canonical_macros.py)), 24 ([`verify_thesis_consistency.py`](scripts/verify_thesis_consistency.py)) — runs automatically after every full pipeline.
 
-**Pipeline:**
-
-```bash
-# After any analysis rerun:
-python scripts/build_metrics.py            # extracts numbers from tables/*.tex + key CSVs → PRODUCTION_METRICS.json
-python scripts/build_canonical_macros.py   # emits latex/canonical_macros.tex (\newcommand per metric)
-python scripts/verify_thesis_consistency.py  # flags drift between latex prose and the JSON
-```
-
-**Files:**
-- [`results/PRODUCTION_METRICS.json`](results/PRODUCTION_METRICS.json) — the canonical store (~200 metrics across 12 sections)
+**Files (all built):**
+- [`results/PRODUCTION_METRICS.json`](results/PRODUCTION_METRICS.json) — canonical store (~200 metrics across 12 sections)
 - [`scripts/_canonical_metrics.py`](scripts/_canonical_metrics.py) — read/write helper (`set_metric`, `get_metric`)
-- [`scripts/build_metrics.py`](scripts/build_metrics.py) — parses `tables/*.tex` + `results/*.csv` into the JSON
+- [`scripts/build_metrics.py`](scripts/build_metrics.py) — parses `tables/*.tex` + `results/*.csv` → JSON
 - [`scripts/build_canonical_macros.py`](scripts/build_canonical_macros.py) — emits `latex/canonical_macros.tex`
 - [`scripts/verify_thesis_consistency.py`](scripts/verify_thesis_consistency.py) — flags prose-vs-JSON mismatches
 - [`latex/canonical_macros.tex`](latex/canonical_macros.tex) — auto-generated; do NOT hand-edit
 
-**Usage in thesis prose** (optional but recommended for headline numbers):
+**Open follow-ups** (tracked in 🛠️ Engineering follow-ups below): CI hook, thesis macro adoption, verifier regex.
+
+**Usage when macros adopted:**
 
 ```latex
 \input{canonical_macros}   % at the top of main.tex once
@@ -244,8 +238,6 @@ The strategy delivers a Sharpe ratio of \mmperfm2sharpe with a Newey-West
 t-statistic of \mmperfm2nwt, well above conventional thresholds.
 ```
 
-When numbers update post-rerun, only re-run `build_metrics.py` + `build_canonical_macros.py` — every prose mention of `\mmperfm2sharpe` updates automatically. For numbers still hand-typed, `verify_thesis_consistency.py` flags drift.
-
 ---
 
 ## 🛠️ Engineering / testing follow-ups (low priority)
@@ -253,7 +245,6 @@ When numbers update post-rerun, only re-run `build_metrics.py` + `build_canonica
 - [ ] Add `pytest.skip` guard to `tests/test_utils.py::TestDataLoaders` so the class is included in `.github/workflows/tests.yml`. Currently excluded because the loader tests depend on data parquets that aren't in git; the skip guard lets the artefact-independent tests in the file run on CI.
   - File to edit: [`tests/test_utils.py`](tests/test_utils.py) (TestDataLoaders class)
   - CI config: [`.github/workflows/tests.yml`](.github/workflows/tests.yml)
-- [ ] Wire `python scripts/build_metrics.py && python scripts/build_canonical_macros.py` into the post-pipeline step (e.g., `run_pipeline.py` final step or Makefile target) so the JSON + macros stay in lockstep with table reruns
 - [ ] Hook `verify_thesis_consistency.py` into the CI workflow to fail PRs that introduce prose-vs-canonical drift
 - [ ] Adopt `\mmperfm2sharpe`-style macros for the headline numbers in [`latex/main_results.tex`](latex/main_results.tex) — Bucket 1 numeric updates become a one-liner rerun afterward
 - [ ] Tighten the verifier's regex patterns in [`scripts/verify_thesis_consistency.py`](scripts/verify_thesis_consistency.py): currently it occasionally matches a nearby unrelated number (e.g. CI bound `[0.67, 1.54]` flagged as M2 Sharpe drift). Section-aware extraction would reduce false positives.
@@ -500,7 +491,7 @@ Reference layer for the HARD STOP section. Triage tags: **[M]** = must land, **[
 ### §F. Methodology / appendix items
 
 - [ ] [N] HMM Bayesian Gibbs / FFBS sampler details (priors from `config.py`)
-- [ ] [N] Production: 200 HMM × 50 XGB seeds. CV: 3 HMM × 5 XGB (tractability)
+- [ ] [N] Production: 200 HMM × 50 XGB seeds
 - [ ] [N] Shumway-analogue rule table — [`latex/methodology.tex`](latex/methodology.tex) footnote
 - [ ] [N] UK/JP method: BANK_REL replaces CS_z (no Moody's BAA-AAA international); 4-feature HMM `DD+DISP+REL_N+BANK_REL`
 - [ ] [N] Compustat Global field aliasing: `dldtei`→`dldte`, `dlrsni`→`dlrsn`
@@ -591,6 +582,12 @@ If your advisor presses on these, you have answers ready:
 - [x] 207 reviewable thesis-edit checkboxes with file references for each data source — folded into §📋 Granular thesis-edit detail in this file (originally `results/THESIS_EDITS_TODO.md`, now consolidated)
 - [x] [`results/STEP_F_REPORT.md`](results/STEP_F_REPORT.md), [`results/STEP_K_REPORT.md`](results/STEP_K_REPORT.md), [`results/PROSE_EDITS.md`](results/PROSE_EDITS.md)
 - [x] [`baseline_pre_intl_shumway_20260426_221329/`](baseline_pre_intl_shumway_20260426_221329/) — pre-strict-Shumway snapshot of UK/JP panels (248 MB)
+
+#### Source-of-truth framework built (2026-04-27)
+
+- [x] [`results/PRODUCTION_METRICS.json`](results/PRODUCTION_METRICS.json) canonical store + helpers ([`scripts/_canonical_metrics.py`](scripts/_canonical_metrics.py), [`scripts/build_metrics.py`](scripts/build_metrics.py), [`scripts/build_canonical_macros.py`](scripts/build_canonical_macros.py), [`scripts/verify_thesis_consistency.py`](scripts/verify_thesis_consistency.py)) + [`latex/canonical_macros.tex`](latex/canonical_macros.tex)
+- [x] Wired into [`run_pipeline.py`](run_pipeline.py) as steps 21 (build_metrics), 22 (build_canonical_macros), 24 (verify_thesis_consistency) — runs after every full pipeline
+- [x] Open follow-ups remain in 🛠️ Engineering (CI hook, macro adoption, regex tightening) — out of scope for this session
 
 ---
 
