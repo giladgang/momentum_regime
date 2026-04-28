@@ -46,7 +46,7 @@ These ablations support the interpretation that $\pi_t^{\text{filter}}$ is a con
 
 \subsection{The Regime-Momentum Interaction}\label{sec:regime_results}
 
-M2 uses momentum differently across regimes (Table~\ref{tab:regime_sharpe}): Sharpe 1.53 in panic against 0.84 in calm. The regime signal adds the most value precisely when the model switches from continuation to reversal. Where exposure-scaling methods reduce positions during stress to limit losses, M2 leans into panic by reconstructing the portfolio to exploit the reversal (Section~\ref{sec:dm_comparison}).
+M2 uses momentum differently across regimes (Table~\ref{tab:regime_sharpe}): Sharpe 1.53 in panic against 0.84 in calm. The regime signal adds the most value precisely when the model switches from continuation to reversal. Where exposure-scaling methods reduce positions during stress to limit losses, M2 leans into panic by reconstructing the portfolio to exploit the reversal (Section~\ref{sec:dm_comparison}). This composition-side mechanism leaves a measurable signature on the legs' market betas: M2's long-leg $\beta$ rises from 1.40 in calm to 1.65 in panic while the short-leg $\beta$ falls from 1.22 to 0.98 (Appendix~\ref{app:leg_betas}). The cross-leg spread $\beta_L - \beta_S$ widens from 0.18 to 0.67 but never inverts -- both legs remain positive-$\beta$ in panic, in contrast to the leg-beta inversion that drives traditional momentum's crashes \citep{DanielMoskowitz2016}.
 
 \input{tables/table_regime_sharpe}
 
