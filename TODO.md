@@ -59,17 +59,16 @@ Genuinely new findings or significant reframings. Each item is a writing task. *
   - **Methodology footnote**: BANK_REL replaces CS_z (no Moody's BAA-AAA for UK/JP); 4-feature HMM. See [`INTL_VALIDATION_PLAN.md`](INTL_VALIDATION_PLAN.md)
   - **Methodology footnote**: strict-mode Shumway-intl applied (UK 219 rows, JP 85)
 
-#### N2 — Cross-sectional re-ranking framing (Edits #1–#4) — REFRAME mechanism
+#### N2 — Cross-sectional re-ranking framing — DONE
 
-**Decision locked**: M2 mechanism is *not* a clean leg-beta inversion. Both legs stay long-tilted in panic; the L−S β gap widens 0.17 → 0.67 but doesn't flip.
+**Decision locked**: M2 mechanism is *not* a clean leg-beta inversion. Both legs stay long-tilted in panic; the L−S β gap widens 0.18 → 0.67 but doesn't flip.
 
-- [ ] **Edit #1** — new subsection "Leg-level beta dynamics across regimes" in `latex/main_results.tex`
-  - Data: [`results/leg_betas_by_regime.csv`](results/leg_betas_by_regime.csv), [`tables/table_leg_betas.tex`](tables/table_leg_betas.tex), [`plots/leg_betas_rolling.pdf`](plots/leg_betas_rolling.pdf)
-- [ ] **Edit #2** — `latex/literature_review.tex:19`: expand Daniel & Moskowitz (2016) discussion, distinguish their leg-beta inversion from our re-ranking
-- [ ] **Edit #3** — `latex/conclusion.tex:53`: sharpen "two channels" → (1) regime-conditional selection (HMM π) + (2) cross-sectional re-ranking by term-structure shape
-  - Channel 1: [`tables/table_kitchen_sink.tex`](tables/table_kitchen_sink.tex), [`tables/table_placebo.tex`](tables/table_placebo.tex)
-  - Channel 2: [`results/leg_betas_by_regime.csv`](results/leg_betas_by_regime.csv), [`tables/table_zscore_shap_detail.tex`](tables/table_zscore_shap_detail.tex)
-- [ ] **Edit #4** — `latex/methodology.tex`: π_filter ↔ D&M bear-indicator link (probabilistic/continuous vs binary). Reference [`tables/table_hmm_separation.tex`](tables/table_hmm_separation.tex)
+**Implementation**: option L1 — extend existing prose rather than create new subsubsections. Appendix `app:leg_betas` remains canonical home for the leg-betas table and full discussion.
+
+- [x] **Edit #1** ([`latex/main_results.tex:49`](latex/main_results.tex#L49)): extended the regime-Sharpe paragraph with leg-beta evidence (long β 1.40→1.65, short β 1.22→0.98, L−S spread 0.18→0.67, no inversion) and leg-beta-inversion-absent claim. Cross-references `app:leg_betas`. (commit f04056c)
+- [x] **Edit #2** ([`latex/literature_review.tex:19`](latex/literature_review.tex#L19)): forward-pointer sentence appended to existing D&M paragraph — "complementary composition-side route... leg-beta inversion does not occur (Appendix~\ref{app:leg_betas})". (commit f04056c)
+- [x] **Edit #3** ([`latex/conclusion.tex:4`](latex/conclusion.tex#L4) lead paragraph): sharpened "stock-selection channel" → "two distinct channels" — (1) continuous probabilistic π_filter vs binary bear-indicators, (2) re-rank composition vs scale exposure.
+- [~] **Edit #4** (methodology.tex): DROPPED. The probabilistic-vs-binary contrast lands in Edits #2 (lit review) and #3 (conclusion); a fourth mention in methodology would repeat the same sentence verbatim. Methodology stays focused on definition and computation per Gilad's call.
 
 #### N3 — Defer CV-based selection to future work
 
