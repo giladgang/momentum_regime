@@ -1,0 +1,5 @@
+regime,cluster,n,output_depth,sharpe_point,sharpe_lo95,sharpe_hi95,ci_excludes_zero,n_reps_valid
+calm,cluster_1,42,-0.1838,1.1742,0.2118,1.9136,True,5000
+calm,cluster_2,66,0.4771,0.576,-0.0956,1.3682,False,5000
+panic,cluster_1,21,-0.7692,1.8103,0.8719,2.9782,True,5000
+panic,cluster_2,38,0.2116,1.4082,0.6426,2.3634,True,5000

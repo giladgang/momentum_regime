@@ -1,0 +1,15 @@
+regime,seed,sorted_sizes
+calm,42,"(42, 66)"
+calm,123,"(42, 66)"
+calm,456,"(42, 66)"
+calm,789,"(42, 66)"
+calm,1011,"(42, 66)"
+calm,1213,"(42, 66)"
+calm,mean_pairwise_ari,1.0
+panic,42,"(21, 38)"
+panic,123,"(22, 37)"
+panic,456,"(22, 37)"
+panic,789,"(22, 37)"
+panic,1011,"(22, 37)"
+panic,1213,"(22, 37)"
+panic,mean_pairwise_ari,0.9773
