@@ -1,0 +1,3 @@
+name,cluster,n,n_panic,panic_share,mean_pi,mean_short,mean_mid,mean_long,std_short,std_mid,std_long,mean_ret_pct,sharpe,hit_rate
+cluster_1,0,52,27,0.52,0.532,-0.011,0.029,0.11,0.261,0.476,0.686,2.638,1.45,0.635
+cluster_2,1,115,32,0.28,0.28,0.052,0.109,0.148,0.253,0.45,0.597,1.419,0.93,0.6
