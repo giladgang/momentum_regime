@@ -1,0 +1,4 @@
+rule_id,n_stockmonths,n_plurality_months,mean_pi,panic_share,sharpe,sharpe_lo95,sharpe_hi95,ci_excludes_zero,centroid_mom_1,centroid_mom_2,centroid_mom_3,centroid_mom_4,centroid_mom_5,centroid_mom_6,centroid_mom_7,centroid_mom_8,centroid_mom_9,centroid_mom_10,centroid_mom_11,centroid_mom_12,centroid_pi_filter
+0,20064,44,0.895,0.891,1.324,0.757,2.158,True,0.1244,0.1857,0.2013,0.2274,0.2492,0.3017,0.3393,0.3829,0.3996,0.3917,0.3954,0.342,0.8949
+1,51763,104,0.011,0.0,0.707,0.135,1.262,True,0.0221,0.0603,0.0879,0.119,0.1735,0.2369,0.2931,0.3476,0.359,0.3561,0.3637,0.3261,0.0114
+2,13772,19,0.99,1.0,2.274,1.438,3.371,True,-0.2112,-0.2686,-0.3358,-0.3948,-0.4471,-0.4928,-0.5361,-0.5752,-0.5979,-0.6089,-0.6211,-0.6356,0.9902

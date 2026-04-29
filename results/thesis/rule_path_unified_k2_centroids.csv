@@ -1,0 +1,3 @@
+rule_id,n_stockmonths,n_plurality_months,mean_pi,panic_share,sharpe,sharpe_lo95,sharpe_hi95,ci_excludes_zero,centroid_mom_1,centroid_mom_2,centroid_mom_3,centroid_mom_4,centroid_mom_5,centroid_mom_6,centroid_mom_7,centroid_mom_8,centroid_mom_9,centroid_mom_10,centroid_mom_11,centroid_mom_12,centroid_pi_filter
+0,33836,63,0.934,0.936,1.634,1.115,2.428,True,-0.0122,0.0008,-0.0173,-0.0258,-0.0342,-0.0217,-0.017,-0.0071,-0.0064,-0.0155,-0.0184,-0.0559,0.9337
+1,51763,104,0.011,0.0,0.707,0.135,1.262,True,0.0221,0.0603,0.0879,0.119,0.1735,0.2369,0.2931,0.3476,0.359,0.3561,0.3637,0.3261,0.0114
