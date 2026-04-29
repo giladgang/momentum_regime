@@ -13,18 +13,19 @@ dominate Euclidean distance, low-impact late trees barely contribute.
 Also extracts leaves_dense (leaf indices) for the dominant-splits
 analysis in phase 3 (tracing tree paths back to feature/threshold pairs).
 
-Checkpointing: saves every SAVE_EVERY trees. If interrupted, restarting
-the script resumes from the last completed tree.
+No checkpointing: save once at the end. np.savez_compressed on the
+(n_long, 25000) matrix takes ~77 sec; checkpointing every 500 trees
+would dominate runtime. Single-shot save keeps total runtime under
+10 min. If interrupted, restart from zero (acceptable: 8 min extract).
 
 Output:
 - artefacts/leaf_signatures.npz with keys:
     'leaf_values'        float32 (n_long, 25000)  per-tree contributions
-    'leaves_raw'         int32   (n_long, 25000)  raw leaf node ids
-    'leaves_dense'       int32   (n_long, 25000)  dense [0, n_leaves_t) indices
-    'n_leaves_per_tree'  int32   (25000,)
+    'leaves_raw'         int16   (n_long, 25000)  raw leaf node ids
+    'leaves_dense'       int8    (n_long, 25000)  dense [0, n_leaves_t) indices
+    'n_leaves_per_tree'  int16   (25000,)
     'date'               datetime64 (n_long,)
     'permno'             int64   (n_long,)
-    'last_tree_completed' int     scalar
 """
 import os
 import pickle
@@ -44,7 +45,7 @@ from leaf_clustering_helpers import (
 ARTEFACTS = 'artefacts/cs_artefacts_data.pkl'
 TREES_PATH = 'artefacts/pi_verify_trees_seeds50.pkl'
 OUT_PATH = 'artefacts/leaf_signatures.npz'
-SAVE_EVERY = 500   # checkpoint after every N trees
+PRINT_EVERY = 1000   # progress print every N trees
 
 
 def main():
@@ -75,53 +76,38 @@ def main():
     print(f'  long-leg stock-months: {n_long}')
 
     # ---- Pre-compute leaf metadata ----
-    print('Precomputing leaf counts and remaps...')
+    print('Precomputing leaf counts and remaps...', flush=True)
     n_leaves_per_tree = np.array(
         [count_leaves(t['tree']) for t in trees_wrapped],
-        dtype=np.int32,
+        dtype=np.int16,
     )
     remaps = [leaf_id_remap(t['tree']) for t in trees_wrapped]
 
-    # ---- Resume-or-init ----
-    if os.path.exists(OUT_PATH):
-        d = np.load(OUT_PATH, allow_pickle=False)
-        if (
-            d['leaf_values'].shape == (n_long, n_trees)
-            and 'last_tree_completed' in d.files
-        ):
-            leaf_values = d['leaf_values'].copy()
-            leaves_raw = d['leaves_raw'].copy()
-            leaves_dense = d['leaves_dense'].copy()
-            last_completed = int(d['last_tree_completed'])
-            print(f'Resuming: trees 0..{last_completed} already done. '
-                  f'Continuing from tree {last_completed + 1}.')
-        else:
-            print(f'Existing {OUT_PATH} has wrong shape; starting from scratch.')
-            leaf_values = np.zeros((n_long, n_trees), dtype=np.float32)
-            leaves_raw = np.zeros((n_long, n_trees), dtype=np.int32)
-            leaves_dense = np.zeros((n_long, n_trees), dtype=np.int32)
-            last_completed = -1
-    else:
-        leaf_values = np.zeros((n_long, n_trees), dtype=np.float32)
-        leaves_raw = np.zeros((n_long, n_trees), dtype=np.int32)
-        leaves_dense = np.zeros((n_long, n_trees), dtype=np.int32)
-        last_completed = -1
+    # ---- Allocate result matrices (compact dtypes, Fortran order) ----
+    # leaf_values float32: ~8.5 GB
+    # leaves_raw  int16:  ~4.3 GB (XGBoost node ids fit easily in int16)
+    # leaves_dense int8:  ~2.1 GB (depth-4 trees have <=16 leaves)
+    #
+    # CRITICAL: order='F' (column-major). The hot loop writes one full
+    # column per tree (M[:, ti] = ...). With row-major (C) layout, each
+    # such write touches 85599 cache lines that are 25000*itemsize bytes
+    # apart — measured at 2.3 writes/sec, total 30+ min. With column-
+    # major (F) layout, each column is contiguous and writes go at
+    # 2900+ /sec (1300x faster, total ~3 min).
+    leaf_values = np.zeros((n_long, n_trees), dtype=np.float32, order='F')
+    leaves_raw = np.zeros((n_long, n_trees), dtype=np.int16, order='F')
+    leaves_dense = np.zeros((n_long, n_trees), dtype=np.int8, order='F')
 
     # ---- Date / permno arrays ----
     date_arr = df.iloc[long_idx]['date'].values.astype('datetime64[ns]')
     permno_arr = df.iloc[long_idx]['permno'].values.astype(np.int64)
 
-    # ---- Extract ----
-    if last_completed + 1 >= n_trees:
-        print('All trees already extracted. Nothing to do.')
-        return
-
-    print(f'Extracting trees {last_completed + 1}..{n_trees - 1}...')
+    # ---- Extract (no checkpointing — single save at end) ----
+    print(f'Extracting {n_trees} trees...', flush=True)
     t0 = time.time()
-    last_save = time.time()
-    X_long = X[long_idx]   # subset once
+    X_long = X[long_idx]
 
-    for ti in range(last_completed + 1, n_trees):
+    for ti in range(n_trees):
         tree_dict = trees_wrapped[ti]['tree']
         remap = remaps[ti]
 
@@ -129,47 +115,49 @@ def main():
         raw_leaves = route_all_stocks_through_tree(X_long, tree_dict, features)
         leaves_raw[:, ti] = raw_leaves
 
-        # Per-stock leaf value lookup (vectorised via dict comprehension)
+        # Per-stock leaf-value lookup
         leaf_value_map = {
             nid: float(node['value'])
             for nid, node in tree_dict.items() if node.get('leaf', False)
         }
-        leaves_dense[:, ti] = np.array([remap[int(nid)] for nid in raw_leaves],
-                                       dtype=np.int32)
-        leaf_values[:, ti] = np.array([leaf_value_map[int(nid)] for nid in raw_leaves],
-                                      dtype=np.float32)
+        # Vectorised lookup via numpy
+        unique_leaves = np.unique(raw_leaves)
+        for ul in unique_leaves:
+            mask = raw_leaves == ul
+            leaves_dense[mask, ti] = remap[int(ul)]
+            leaf_values[mask, ti] = leaf_value_map[int(ul)]
 
-        if (ti + 1) % SAVE_EVERY == 0 or ti == n_trees - 1:
-            np.savez_compressed(
-                OUT_PATH,
-                leaf_values=leaf_values,
-                leaves_raw=leaves_raw,
-                leaves_dense=leaves_dense,
-                n_leaves_per_tree=n_leaves_per_tree,
-                date=date_arr,
-                permno=permno_arr,
-                last_tree_completed=np.array(ti, dtype=np.int64),
-            )
+        if (ti + 1) % PRINT_EVERY == 0 or ti == n_trees - 1:
             elapsed = time.time() - t0
-            since_last = time.time() - last_save
-            last_save = time.time()
             done = ti + 1
-            todo = n_trees - done
-            rate = done / max(elapsed, 1e-6) if last_completed < 0 else (done - last_completed - 1) / max(elapsed, 1e-6)
-            eta = todo / max(rate, 1e-6)
-            print(f'  checkpoint at tree {ti + 1}/{n_trees}  '
-                  f'elapsed {elapsed:.0f}s  +{since_last:.0f}s since last  '
-                  f'ETA {eta:.0f}s')
+            rate = done / max(elapsed, 1e-6)
+            eta = (n_trees - done) / max(rate, 1e-6)
+            print(f'  tree {done}/{n_trees}  '
+                  f'elapsed {elapsed:.0f}s  rate {rate:.1f}/s  '
+                  f'ETA {eta:.0f}s', flush=True)
 
-    # ---- Final summary ----
+    # ---- Single save at end ----
+    print(f'\nSaving to {OUT_PATH} (compressed save takes ~80s)...', flush=True)
+    t_save = time.time()
+    np.savez_compressed(
+        OUT_PATH,
+        leaf_values=leaf_values,
+        leaves_raw=leaves_raw,
+        leaves_dense=leaves_dense,
+        n_leaves_per_tree=n_leaves_per_tree,
+        date=date_arr,
+        permno=permno_arr,
+    )
+    print(f'  saved in {time.time()-t_save:.0f}s', flush=True)
+
+    # ---- Summary ----
     col_std = leaf_values.std(axis=0)
-    print(f'\nDone. leaf_values shape: {leaf_values.shape}')
+    print(f'\nDone. leaf_values shape: {leaf_values.shape}', flush=True)
     print(f'  per-tree std: min={col_std.min():.5f}, '
           f'median={np.median(col_std):.5f}, '
-          f'max={col_std.max():.5f}')
-    print(f'  zero-variance trees (every long stock got same value): '
-          f'{(col_std == 0).sum()}')
-    print(f'  total leaves across ensemble: {n_leaves_per_tree.sum()}')
+          f'max={col_std.max():.5f}', flush=True)
+    print(f'  zero-variance trees: {(col_std == 0).sum()}', flush=True)
+    print(f'  total leaves across ensemble: {n_leaves_per_tree.sum()}', flush=True)
 
 
 if __name__ == '__main__':
