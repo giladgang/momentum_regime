@@ -24,7 +24,6 @@ import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.decomposition import TruncatedSVD
 from sklearn.metrics import adjusted_rand_score
-from sklearn.preprocessing import StandardScaler
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from leaf_clustering_helpers import silhouette_sparse_subsample
@@ -49,21 +48,38 @@ def main():
     n = LV.shape[0]
     print(f'  leaf-value matrix: {LV.shape}')
 
-    # ---- Drop zero-variance trees and standardise ----
-    col_std = LV.std(axis=0)
+    # ---- Compute per-column std; drop zero-variance trees if any ----
+    col_std = LV.std(axis=0).astype(np.float32)
     keep = col_std > 0
-    print(f'  dropping {(~keep).sum()} zero-variance trees, '
-          f'keeping {keep.sum()}')
-    LVk = LV[:, keep]
-    print(f'  standardising {LVk.shape[1]} columns...')
-    LVk_std = StandardScaler().fit_transform(LVk)
+    n_zero = int((~keep).sum())
+    print(f'  zero-variance trees: {n_zero} (all kept if 0)', flush=True)
+
+    # If there are zero-variance trees, drop them. Otherwise reuse LV
+    # in-place to avoid an 8.5 GB copy (which paged on this machine).
+    if n_zero > 0:
+        print(f'  copying to drop {n_zero} zero-variance columns...',
+              flush=True)
+        LVk = np.ascontiguousarray(LV[:, keep], dtype=np.float32)
+        del LV
+        col_std_keep = col_std[keep]
+    else:
+        LVk = LV   # reuse — no copy
+        col_std_keep = col_std
+
+    # ---- Standardise in-place (vectorised broadcast, float32) ----
+    print(f'  standardising {LVk.shape[1]} columns in-place (vectorised)...',
+          flush=True)
+    col_mean = LVk.mean(axis=0).astype(np.float32)
+    LVk -= col_mean[np.newaxis, :]
+    LVk /= col_std_keep[np.newaxis, :]
 
     # ---- PCA reduction ----
-    print(f'  TruncatedSVD to {PCA_DIM} components...')
+    print(f'  TruncatedSVD to {PCA_DIM} components...', flush=True)
     svd = TruncatedSVD(n_components=PCA_DIM, random_state=RNG_SEED)
-    Z = svd.fit_transform(LVk_std)
+    Z = svd.fit_transform(LVk)
+    del LVk  # free the standardised matrix; Z is much smaller (n x 50)
     print(f'  PCA explained variance ratio sum: '
-          f'{svd.explained_variance_ratio_.sum():.3f}')
+          f'{svd.explained_variance_ratio_.sum():.3f}', flush=True)
 
     # ---- Sweep k with stability gating ----
     sweep_rows = []

@@ -1,0 +1,9 @@
+metric,value
+k=2_mean_silhouette,0.4467
+k=2_mean_ari,1.0
+k=2_stable,True
+k=2_sizes_seed42,"(33836, 51763)"
+k=3_mean_silhouette,0.4227
+k=3_mean_ari,0.9999
+k=3_stable,True
+k=3_sizes_seed42,"(13772, 20064, 51763)"

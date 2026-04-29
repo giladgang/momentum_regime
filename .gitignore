@@ -45,3 +45,4 @@ tests/thesis/coverage_report.md
 tests/thesis/fixtures/smoke_baseline.json
 tests/thesis/fixtures/smoke_artefacts.pkl
 results_smoke/
+artefacts/leaf_signatures.npz
