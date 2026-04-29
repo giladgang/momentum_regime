@@ -1,0 +1,20 @@
+metric,value
+k,3
+n_calm_months,108
+n_panic_months,59
+silhouette_calm_seed42,0.2952
+silhouette_panic_seed42,0.2728
+ARI_calm_landscape_vs_calm_output,0.1038
+ARI_panic_landscape_vs_panic_output,0.1829
+calm_cluster_sizes_seed42,"(8, 49, 51)"
+calm_cluster_sizes_seed123,"(8, 49, 51)"
+calm_cluster_sizes_seed456,"(8, 49, 51)"
+calm_cluster_sizes_seed789,"(8, 49, 51)"
+calm_cluster_sizes_seed1011,"(8, 49, 51)"
+calm_cluster_sizes_seed1213,"(8, 49, 51)"
+panic_cluster_sizes_seed42,"(10, 24, 25)"
+panic_cluster_sizes_seed123,"(10, 24, 25)"
+panic_cluster_sizes_seed456,"(10, 24, 25)"
+panic_cluster_sizes_seed789,"(10, 24, 25)"
+panic_cluster_sizes_seed1011,"(10, 24, 25)"
+panic_cluster_sizes_seed1213,"(10, 24, 25)"
