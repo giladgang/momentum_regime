@@ -11,6 +11,8 @@ from leaf_clustering_helpers import (
     route_stock_through_tree,
     hamming_distance_matrix,
     one_hot_encode_leaves,
+    count_leaves,
+    leaf_id_remap,
 )
 
 
@@ -120,3 +122,49 @@ def test_one_hot_encode_leaves_row_sum_equals_n_trees():
     X = one_hot_encode_leaves(L, n_leaves_per_tree)
     row_sums = np.asarray(X.sum(axis=1)).flatten()
     assert (row_sums == 3).all()  # 3 trees -> 3 ones per row
+
+
+# ----------------------------------------------------------------------
+# count_leaves and leaf_id_remap
+# ----------------------------------------------------------------------
+def test_count_leaves_simple():
+    tree = {
+        0: {'leaf': False, 'feature': 'a', 'threshold': 0, 'yes': 1, 'no': 2},
+        1: {'leaf': True, 'value': 1},
+        2: {'leaf': True, 'value': 2},
+    }
+    assert count_leaves(tree) == 2
+
+
+def test_count_leaves_root_only_leaf():
+    assert count_leaves({0: {'leaf': True, 'value': 0}}) == 1
+
+
+def test_count_leaves_deeper_tree():
+    tree = {
+        0: {'leaf': False, 'feature': 'a', 'threshold': 0, 'yes': 1, 'no': 2},
+        1: {'leaf': False, 'feature': 'b', 'threshold': 5, 'yes': 3, 'no': 4},
+        2: {'leaf': True, 'value': 1},
+        3: {'leaf': True, 'value': 2},
+        4: {'leaf': True, 'value': 3},
+    }
+    assert count_leaves(tree) == 3
+
+
+def test_leaf_id_remap_assigns_dense_indices():
+    # Tree where leaf node ids are non-contiguous: 1, 4, 6
+    tree = {
+        0: {'leaf': False, 'feature': 'a', 'threshold': 0, 'yes': 1, 'no': 2},
+        1: {'leaf': True, 'value': 1},
+        2: {'leaf': False, 'feature': 'a', 'threshold': 1, 'yes': 4, 'no': 6},
+        4: {'leaf': True, 'value': 2},
+        6: {'leaf': True, 'value': 3},
+    }
+    remap = leaf_id_remap(tree)
+    assert sorted(remap.values()) == [0, 1, 2]
+    assert set(remap.keys()) == {1, 4, 6}
+
+
+def test_leaf_id_remap_root_only_leaf():
+    remap = leaf_id_remap({0: {'leaf': True, 'value': 0}})
+    assert remap == {0: 0}

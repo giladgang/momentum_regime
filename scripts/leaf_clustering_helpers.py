@@ -4,6 +4,8 @@ Functions:
   route_stock_through_tree(x, tree_dict, feature_names) -> leaf_node_id
   hamming_distance_matrix(L) -> pairwise normalised Hamming distances
   one_hot_encode_leaves(L, n_leaves_per_tree) -> sparse one-hot matrix
+  count_leaves(tree_dict) -> int
+  leaf_id_remap(tree_dict) -> dict mapping raw node ids to dense [0, n) indices
 """
 import numpy as np
 from scipy import sparse
@@ -40,6 +42,22 @@ def route_stock_through_tree(x, tree_dict, feature_names):
         col = name_to_idx[node['feature']]
         nid = node['yes'] if x[col] < node['threshold'] else node['no']
     return nid
+
+
+def count_leaves(tree_dict):
+    """Number of leaf nodes in a tree-dict."""
+    return sum(1 for n in tree_dict.values() if n.get('leaf', False))
+
+
+def leaf_id_remap(tree_dict):
+    """Map raw leaf node ids to dense [0, n_leaves) indices.
+
+    XGBoost tree node ids are not contiguous because internal nodes also
+    consume ids. Returns ``{raw_node_id: dense_idx}`` for use with
+    ``one_hot_encode_leaves``.
+    """
+    leaves = sorted(nid for nid, n in tree_dict.items() if n.get('leaf', False))
+    return {nid: i for i, nid in enumerate(leaves)}
 
 
 def one_hot_encode_leaves(L, n_leaves_per_tree):
