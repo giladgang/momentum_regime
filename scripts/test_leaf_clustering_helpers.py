@@ -14,6 +14,7 @@ from leaf_clustering_helpers import (
     one_hot_encode_leaves,
     count_leaves,
     leaf_id_remap,
+    silhouette_sparse_subsample,
 )
 
 
@@ -210,3 +211,49 @@ def test_route_all_stocks_threshold_boundary():
     assert leaves[0] == 1   # 0.5 < 1.0  -> yes
     assert leaves[1] == 2   # 1.0 == 1.0 -> no (not strictly less)
     assert leaves[2] == 2   # 1.5 > 1.0  -> no
+
+
+# ----------------------------------------------------------------------
+# silhouette_sparse_subsample
+# ----------------------------------------------------------------------
+def test_silhouette_sparse_subsample_returns_float_in_range():
+    rng = np.random.default_rng(0)
+    X = rng.standard_normal((100, 5))
+    from sklearn.cluster import KMeans
+    km = KMeans(n_clusters=2, random_state=0, n_init=10).fit(X)
+    sil = silhouette_sparse_subsample(X, km.labels_, n_samples=50, seed=42)
+    assert isinstance(sil, float)
+    assert -1.0 <= sil <= 1.0
+
+
+def test_silhouette_sparse_subsample_well_separated_blobs():
+    # Two clearly separated 5-d blobs — silhouette should be > 0.5.
+    rng = np.random.default_rng(0)
+    A = rng.standard_normal((50, 5)) + np.array([10, 0, 0, 0, 0])
+    B = rng.standard_normal((50, 5)) + np.array([-10, 0, 0, 0, 0])
+    X = np.vstack([A, B])
+    labels = np.array([0] * 50 + [1] * 50)
+    sil = silhouette_sparse_subsample(X, labels, n_samples=80, seed=42)
+    assert sil > 0.5
+
+
+def test_silhouette_sparse_subsample_is_deterministic_for_same_seed():
+    rng = np.random.default_rng(0)
+    X = rng.standard_normal((100, 5))
+    from sklearn.cluster import KMeans
+    km = KMeans(n_clusters=3, random_state=0, n_init=10).fit(X)
+    s1 = silhouette_sparse_subsample(X, km.labels_, n_samples=50, seed=42)
+    s2 = silhouette_sparse_subsample(X, km.labels_, n_samples=50, seed=42)
+    assert s1 == s2
+
+
+def test_silhouette_sparse_subsample_handles_n_samples_geq_n():
+    # If n_samples >= n, should compute silhouette on all rows (no subsample).
+    rng = np.random.default_rng(0)
+    X = rng.standard_normal((30, 4))
+    from sklearn.cluster import KMeans
+    km = KMeans(n_clusters=2, random_state=0, n_init=10).fit(X)
+    sil_full = silhouette_sparse_subsample(X, km.labels_, n_samples=1000, seed=42)
+    from sklearn.metrics import silhouette_score
+    sil_ref = float(silhouette_score(X, km.labels_, metric='euclidean'))
+    assert sil_full == pytest.approx(sil_ref)

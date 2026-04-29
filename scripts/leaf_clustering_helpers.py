@@ -7,9 +7,12 @@ Functions:
   one_hot_encode_leaves(L, n_leaves_per_tree) -> sparse one-hot matrix
   count_leaves(tree_dict) -> int
   leaf_id_remap(tree_dict) -> dict mapping raw node ids to dense [0, n) indices
+  silhouette_sparse_subsample(X, labels, n_samples, seed) -> float
 """
 import numpy as np
 from scipy import sparse
+from sklearn.metrics import silhouette_score
+from sklearn.utils import check_random_state
 
 
 def route_stock_through_tree(x, tree_dict, feature_names):
@@ -83,6 +86,31 @@ def route_all_stocks_through_tree(X, tree_dict, feature_names):
         if len(no_idx) > 0:
             active.append((node['no'], no_idx))
     return leaves
+
+
+def silhouette_sparse_subsample(X, labels, n_samples, seed=0):
+    """Silhouette score on a random subsample of rows (memory-friendly).
+
+    Parameters
+    ----------
+    X : array shape (n, d) — sparse or dense
+    labels : array (n,)
+    n_samples : int
+        Subsample size. If >= n, computes silhouette on all rows.
+    seed : int
+
+    Returns
+    -------
+    float in [-1, 1]
+    """
+    rng = check_random_state(seed)
+    n = X.shape[0]
+    if n_samples >= n:
+        return float(silhouette_score(X, labels, metric='euclidean'))
+    idx = rng.choice(n, size=n_samples, replace=False)
+    return float(silhouette_score(
+        X[idx], np.asarray(labels)[idx], metric='euclidean'
+    ))
 
 
 def count_leaves(tree_dict):
