@@ -7,7 +7,7 @@ Run with:
 import numpy as np
 import pytest
 
-from leaf_clustering_helpers import route_stock_through_tree
+from leaf_clustering_helpers import route_stock_through_tree, hamming_distance_matrix
 
 
 # ----------------------------------------------------------------------
@@ -57,3 +57,31 @@ def test_route_stock_threshold_boundary_exact_value():
     }
     # exact match: x[0] == 1.0 is NOT < 1.0, so goes 'no' (node 2)
     assert route_stock_through_tree(np.array([1.0]), tree, ['f0']) == 2
+
+
+# ----------------------------------------------------------------------
+# hamming_distance_matrix
+# ----------------------------------------------------------------------
+def test_hamming_distance_matrix_shape():
+    L = np.array([[1, 2, 3], [1, 2, 4], [5, 5, 5]])  # 3 rows x 3 trees
+    D = hamming_distance_matrix(L)
+    assert D.shape == (3, 3)
+
+
+def test_hamming_distance_matrix_values():
+    L = np.array([[1, 2, 3], [1, 2, 4], [5, 5, 5]])
+    D = hamming_distance_matrix(L)
+    # row 0 vs row 1: 1 mismatch out of 3 -> 1/3
+    # row 0 vs row 2: 3 mismatches out of 3 -> 1
+    # row 1 vs row 2: 3 mismatches out of 3 -> 1
+    assert D[0, 0] == pytest.approx(0.0)
+    assert D[0, 1] == pytest.approx(1 / 3)
+    assert D[0, 2] == pytest.approx(1.0)
+    assert D[1, 2] == pytest.approx(1.0)
+    assert D[1, 0] == D[0, 1]  # symmetric
+
+
+def test_hamming_distance_zero_for_identical_rows():
+    L = np.tile([1, 2, 3, 4], (5, 1))
+    D = hamming_distance_matrix(L)
+    assert (D == 0).all()

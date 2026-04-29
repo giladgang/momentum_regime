@@ -2,6 +2,7 @@
 
 Functions:
   route_stock_through_tree(x, tree_dict, feature_names) -> leaf_node_id
+  hamming_distance_matrix(L) -> pairwise normalised Hamming distances
 """
 import numpy as np
 
@@ -37,3 +38,25 @@ def route_stock_through_tree(x, tree_dict, feature_names):
         col = name_to_idx[node['feature']]
         nid = node['yes'] if x[col] < node['threshold'] else node['no']
     return nid
+
+
+def hamming_distance_matrix(L):
+    """Pairwise normalised Hamming distance between rows of L.
+
+    Parameters
+    ----------
+    L : array shape (n, k)
+        Integer leaf-index matrix (n stock-months, k trees).
+
+    Returns
+    -------
+    array (n, n)
+        D[i, j] = mean of (L[i] != L[j]) over k trees.
+        Symmetric, with zeros on the diagonal, values in [0, 1].
+    """
+    L = np.asarray(L)
+    n, _ = L.shape
+    D = np.zeros((n, n), dtype=float)
+    for i in range(n):
+        D[i] = (L != L[i]).mean(axis=1)
+    return D
