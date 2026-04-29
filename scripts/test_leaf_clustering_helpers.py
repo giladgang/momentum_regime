@@ -7,7 +7,11 @@ Run with:
 import numpy as np
 import pytest
 
-from leaf_clustering_helpers import route_stock_through_tree, hamming_distance_matrix
+from leaf_clustering_helpers import (
+    route_stock_through_tree,
+    hamming_distance_matrix,
+    one_hot_encode_leaves,
+)
 
 
 # ----------------------------------------------------------------------
@@ -85,3 +89,34 @@ def test_hamming_distance_zero_for_identical_rows():
     L = np.tile([1, 2, 3, 4], (5, 1))
     D = hamming_distance_matrix(L)
     assert (D == 0).all()
+
+
+# ----------------------------------------------------------------------
+# one_hot_encode_leaves
+# ----------------------------------------------------------------------
+def test_one_hot_encode_leaves_shape():
+    L = np.array([[0, 0], [1, 0], [2, 1]])
+    n_leaves_per_tree = [3, 2]
+    X = one_hot_encode_leaves(L, n_leaves_per_tree)
+    assert X.shape == (3, sum(n_leaves_per_tree))
+
+
+def test_one_hot_encode_leaves_correctness():
+    L = np.array([[0, 0], [1, 0], [2, 1]])
+    n_leaves_per_tree = [3, 2]
+    X = one_hot_encode_leaves(L, n_leaves_per_tree).toarray()
+    # Row 0: leaf 0 in tree 0 -> col 0; leaf 0 in tree 1 -> col 3
+    assert (X[0] == np.array([1, 0, 0, 1, 0])).all()
+    # Row 1: leaf 1 in tree 0 -> col 1; leaf 0 in tree 1 -> col 3
+    assert (X[1] == np.array([0, 1, 0, 1, 0])).all()
+    # Row 2: leaf 2 in tree 0 -> col 2; leaf 1 in tree 1 -> col 4
+    assert (X[2] == np.array([0, 0, 1, 0, 1])).all()
+
+
+def test_one_hot_encode_leaves_row_sum_equals_n_trees():
+    # Each row should have exactly k 1's (one leaf per tree).
+    L = np.array([[0, 0, 0], [1, 1, 1], [2, 2, 2]])
+    n_leaves_per_tree = [3, 4, 5]
+    X = one_hot_encode_leaves(L, n_leaves_per_tree)
+    row_sums = np.asarray(X.sum(axis=1)).flatten()
+    assert (row_sums == 3).all()  # 3 trees -> 3 ones per row
