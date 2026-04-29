@@ -81,18 +81,19 @@ def main():
         epilog=(
             "--repro-smoke notes:\n"
             "  Reduces ensemble sizes (HMM_SEEDS=1..5, HMM_ITERATIONS=200, XGB_SEEDS=1..5)\n"
-            "  and skips Step 19 (12-18hr expanding-window backtest) and Step 83 (drift\n"
-            "  check, which expects production-scale numbers). Steps 80-82 still run so\n"
-            "  PRODUCTION_METRICS.json + canonical_macros are produced consistent with\n"
-            "  the reduced ensemble.\n"
+            "  and runs ONLY the steps required to produce the smoke fixture: Step 2\n"
+            "  (cross-sectional model -> cs_artefacts_data.pkl), Step 3 (main results\n"
+            "  tables), and Steps 80-82 (build_metrics, canonical_macros, canonical\n"
+            "  tables -> PRODUCTION_METRICS.json). Step 1 (HMM) is skipped via the\n"
+            "  hmm_ready check when panel_with_regimes.parquet exists. Everything\n"
+            "  else (robustness, external validity, plots, CRRA, drift) is skipped.\n"
             "\n"
             "  The MOMENTUM_OUTPUT_ROOT env var is exported, and config.py reads it at\n"
-            "  import time to redirect every output path (RESULTS_*, PLOTS_*, TABLES_DIR,\n"
-            "  ARTEFACTS_*, PANEL_*) under that root. Pure data inputs (CRSP raw, FF\n"
-            "  factors) are not redirected.\n"
+            "  import time to redirect output dirs + artefact paths under that root.\n"
+            "  Pure data inputs (CRSP raw, FF factors, panel.parquet) are not redirected.\n"
             "\n"
             "  Used by tests/thesis/test_e2e_smoke.py and tests/thesis/\n"
-            "  make_smoke_fixture.py. Target wall time: < 30 min.\n"
+            "  make_smoke_fixture.py. Target wall time: < 35 min.\n"
         ),
     )
     parser.add_argument('--step', type=int, default=0,
@@ -429,16 +430,24 @@ def main():
         else:
             print(f"  Unknown step {args.step}. Valid steps: {sorted(steps.keys())}")
     else:
+        # In --repro-smoke mode keep ONLY the steps strictly required to
+        # produce the smoke fixture: Step 2 (cross-sectional model -> the
+        # cs_artefacts_data.pkl the fixture compares), Step 3 (main results
+        # tables -> the bulk of the inputs build_metrics.py reads), and
+        # Steps 80-82 (build canonical metrics + macros + tables -> emit
+        # PRODUCTION_METRICS.json the fixture compares).
+        #
+        # Skipped: Step 1 (HMM, reuse production via hmm_ready),
+        # Step 4 (robustness_checks — Step 4 CHECK 7 K=5 multi-state HMM
+        # has been observed to hang the run for 2+ hr), Steps 5-35
+        # (supplementary analyses: external validity, plots, CRRA, etc.
+        # — not needed to seed the fixture), Step 19 (expanding-window),
+        # Step 83 (drift check expected to fail under reduced ensemble).
+        SMOKE_KEEP_STEPS = {2, 3, 80, 81, 82}
         # Run all steps in order
         for step_num in sorted(steps.keys()):
-            # In --repro-smoke mode skip Step 19 (12-18hr expanding-window
-            # backtest) and Step 83 (drift check, expected to fail under
-            # reduced-ensemble settings). Steps 80-82 (build_metrics,
-            # canonical_macros, canonical_tables) MUST run so the smoke
-            # fixture can pick up PRODUCTION_METRICS.json + canonical
-            # macros consistent with the smoke run.
-            if args.repro_smoke and (step_num == 19 or step_num == 83):
-                print(f"\n  SKIPPING Step {step_num} (--repro-smoke)")
+            if args.repro_smoke and step_num not in SMOKE_KEEP_STEPS:
+                print(f"\n  SKIPPING Step {step_num} (--repro-smoke; only {sorted(SMOKE_KEEP_STEPS)} run)")
                 continue
             # Skip HMM if results already exist
             if step_num == 1 and hmm_ready:

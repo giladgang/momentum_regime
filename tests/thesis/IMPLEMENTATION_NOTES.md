@@ -30,10 +30,27 @@ Layer-by-layer outcome:
   numbers that would benefit from migration to `\m...` macros.
   Optional Phase-2 work; flip to error mode via `THESIS_GATE=strict`
   once `latex/main_results.tex` is migrated.
-- **Layer 4 (e2e smoke):** scaffold complete, **fixtures still need to
-  be generated locally** (see step 4 below). Test skips cleanly when
-  fixtures are absent.
-- **Layer 5 (hygiene):** 7 / 8 pass, 1 fails (real signal — see step 5).
+- **Layer 4 (e2e smoke):** scaffold complete but **disabled by default**
+  pending a pipeline-wide path-discipline audit. The smoke design
+  relied on `MOMENTUM_OUTPUT_ROOT` redirection in `config.py`, but on
+  2026-04-29 a `make_smoke_fixture.py` run revealed that 335 of 510+
+  output writes across 96 of 105 `scripts/*.py` files hardcode paths
+  as string literals (e.g. `'artefacts/cs_artefacts_data.pkl'`,
+  `'tables/foo.tex'`) instead of reading from `cfg.*`. Hardcoded
+  writes silently bypass the env-var redirection and clobber
+  production. Restoration required ~12 min of pipeline reruns. Until
+  path discipline is enforced (see Layer 5b), do not attempt to
+  generate the smoke fixture. The test file remains so the harness
+  exists; it skips when fixtures absent.
+- **Layer 5 (hygiene):** 7 / 8 pass after the 2026-04-29 pickle refresh.
+- **Layer 5b (path discipline, NEW 2026-04-29):** AST-scans every
+  `scripts/*.py` for hardcoded output paths that bypass `cfg.*`.
+  Currently FAILS with 335 offenders in 96 scripts — that's the
+  long-tail audit that needs to happen before Layer 4 can be
+  re-enabled. Whitelist via
+  `tests/thesis/path_discipline_whitelist.txt` for cases where a
+  hardcoded read-only reference is genuinely safe. Added in response
+  to the 2026-04-29 smoke-clobber incident.
 
 ## What the completion pass did (2026-04-29)
 

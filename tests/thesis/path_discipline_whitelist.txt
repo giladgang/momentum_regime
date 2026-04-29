@@ -1,0 +1,17 @@
+# Whitelist for tests/thesis/test_path_discipline.py.
+#
+# Format:
+#   <relative_script_path>:<line_number>  # rationale
+#
+# Each line tags a single offender at exactly that line. Lines starting
+# with `#` are comments. Add an entry only after confirming that:
+#   1. The hardcoded path is intentional (e.g. references production
+#      data that should NEVER be rerouted, even in smoke mode), AND
+#   2. There is no cleaner way using cfg.*, AND
+#   3. The script doesn't actually WRITE to that path under smoke /
+#      fixture / CI conditions (read-only references are usually safe).
+#
+# Prefer fixing the script over whitelisting. The test fail is loud
+# precisely so these slow accumulating.
+
+# (none yet — populate as offenders are triaged)
