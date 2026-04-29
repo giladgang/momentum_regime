@@ -67,7 +67,13 @@ INPUT  = f'data/{REGION.lower()}_market_panel.parquet'
 OUT_PANEL = f'data/{REGION.lower()}_panel_with_regimes.parquet'
 OUT_MCMC  = f'data/{REGION.lower()}_mcmc_draws.npz'
 
-REGION_FEATURES = ['DD_z', 'DISP_z', 'REL_N_z', 'BANK_REL_z']
+REGION_FEATURES = ['DD_z', 'VOL_z', 'REL_N_z']
+# Note: chosen by Gilad on 2026-04-29 after running the 4-pass intl feature
+# selection (scripts/hmm_feature_selection_intl.py). Same combo for both
+# UK and JP -- highest Pass 4 mean stability per region. Replaces the
+# pre-CV transplanted template (DD+DISP+REL_N+BANK_REL) which failed
+# Pass 1 quality screen (UK ESS=14, JP ESS=4 -- poor MCMC convergence).
+# Manifests: results/thesis/intl_<region>_hmm_chosen_features.json.
 
 # Region-specific crisis windows (used only for panic-state sign correction
 # during training — the Gibbs sampler itself is unsupervised).
