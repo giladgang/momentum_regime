@@ -1,0 +1,29 @@
+{
+  "region": "UK",
+  "features": [
+    "DD_z",
+    "VOL_z",
+    "REL_N_z"
+  ],
+  "name": "DD+VOL+REL_N",
+  "rationale": "Picked by Gilad on 2026-04-29 after reviewing all 4 pass outputs. DD+VOL+REL_N has the highest Pass 4 mean stability for both UK and JP, providing clean methodological symmetry across regions. Replaces the pre-CV transplanted template (DD+DISP+REL_N+BANK_REL) which failed Pass 1 quality screen (ESS=14 UK, ESS=4 JP -- poor MCMC convergence).",
+  "picked_at": "2026-04-29T13:50:27.987658",
+  "metrics": {
+    "pass2_sharpe_xgb": 0.4861428743623883,
+    "pass3_sharpe": 0.558335854035292,
+    "pass3_stab_mean": 0.6864946573374318,
+    "pass3_stab_std": 0.1527382932968142,
+    "pass3_stability": "UNSTABLE",
+    "pass4_mean": 0.6765440579499751,
+    "pass4_std": 0.1012977781746431,
+    "pass4_min": 0.5450614767756409,
+    "pass4_max": 0.8472186069252466,
+    "pass4_stability": "MODERATE"
+  },
+  "sources": {
+    "pass1_csv": "results/thesis/intl_uk_hmm_feature_selection_pass1.csv",
+    "pass2_csv": "results/thesis/intl_uk_hmm_feature_selection_pass2.csv",
+    "pass3_csv": "results/thesis/intl_uk_hmm_feature_selection_pass3.csv",
+    "pass4_csv": "results/thesis/intl_uk_hmm_feature_selection_pass4.csv"
+  }
+}

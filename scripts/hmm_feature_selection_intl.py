@@ -776,11 +776,54 @@ def run_pass4(panel, train_stocks, test_stocks, top_combos):
     print(f"  Each experiment: 3 random HMM seeds averaged + 1 XGB seed")
     print("=" * 80)
 
+    # Output paths + resume support: load completed combos from existing CSV
+    # (prefer official Pass 4 output, fall back to PARTIAL if a prior run was
+    # interrupted and only the log-scraped partial CSV survived).
+    out_path_p4 = f'results/thesis/intl_{REGION.lower()}_hmm_feature_selection_pass4.csv'
+    partial_path = f'results/thesis/intl_{REGION.lower()}_hmm_feature_selection_pass4_PARTIAL.csv'
+    os.makedirs('results/thesis', exist_ok=True)
+
     results = []
+    completed_names = set()
+    resume_path = None
+    if os.path.exists(out_path_p4):
+        resume_path = out_path_p4
+    elif os.path.exists(partial_path):
+        resume_path = partial_path
+
+    if resume_path:
+        print(f"\n  Resume: loading existing results from {resume_path}")
+        existing = pd.read_csv(resume_path)
+        for _, row in existing.iterrows():
+            completed_names.add(row['name'])
+            # Reconstruct 'combo' from top_combos lookup (PARTIAL csv lacks this column)
+            match = next((c for c in top_combos if c['name'] == row['name']), None)
+            if match is not None:
+                combo_val = match['combo']
+            elif 'combo' in existing.columns:
+                combo_val = eval(row['combo'])
+            else:
+                combo_val = []
+            results.append({
+                'name': row['name'],
+                'combo': combo_val,
+                'mean': float(row['mean']),
+                'std': float(row['std']),
+                'min': float(row['min']),
+                'max': float(row['max']),
+                'all_sharpes': [],  # not preserved across runs
+            })
+        print(f"  Loaded {len(completed_names)} completed combos; "
+              f"{len(top_combos) - len(completed_names)} remain to run")
 
     for combo_info in top_combos:
         feat_list = combo_info['combo']
         short_name = combo_info['name']
+
+        if short_name in completed_names:
+            print(f"\n  === {short_name} === SKIPPED (already in {os.path.basename(resume_path)})")
+            continue
+
         print(f"\n  === {short_name} ===")
 
         sub = panel[['date'] + feat_list].dropna().reset_index(drop=True)
@@ -848,6 +891,12 @@ def run_pass4(panel, train_stocks, test_stocks, top_combos):
             'mean': mean_sh, 'std': std_sh, 'min': min_sh, 'max': max_sh,
             'all_sharpes': experiment_sharpes,
         })
+
+        # Incremental save after each combo so an interruption preserves progress.
+        # all_sharpes (list) is dropped to keep the CSV format simple.
+        df_so_far = pd.DataFrame([{k: v for k, v in r.items() if k != 'all_sharpes'} for r in results])
+        df_so_far.to_csv(out_path_p4, index=False)
+        print(f"    Incremental save: {out_path_p4} ({len(results)}/{len(top_combos)} combos)")
 
     # Summary
     print("\n" + "=" * 80)
