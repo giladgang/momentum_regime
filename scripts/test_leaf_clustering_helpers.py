@@ -9,6 +9,7 @@ import pytest
 
 from leaf_clustering_helpers import (
     route_stock_through_tree,
+    route_all_stocks_through_tree,
     hamming_distance_matrix,
     one_hot_encode_leaves,
     count_leaves,
@@ -168,3 +169,44 @@ def test_leaf_id_remap_assigns_dense_indices():
 def test_leaf_id_remap_root_only_leaf():
     remap = leaf_id_remap({0: {'leaf': True, 'value': 0}})
     assert remap == {0: 0}
+
+
+# ----------------------------------------------------------------------
+# route_all_stocks_through_tree
+# ----------------------------------------------------------------------
+def test_route_all_stocks_matches_per_stock():
+    # Vectorised batch routing must match per-stock routing on every row.
+    tree = {
+        0: {'leaf': False, 'feature': 'a', 'threshold': 0.0, 'yes': 1, 'no': 2},
+        1: {'leaf': False, 'feature': 'b', 'threshold': 5.0, 'yes': 3, 'no': 4},
+        2: {'leaf': True, 'value': 1.0},
+        3: {'leaf': True, 'value': 2.0},
+        4: {'leaf': True, 'value': 3.0},
+    }
+    fn = ['a', 'b']
+    rng = np.random.default_rng(0)
+    X = rng.standard_normal((100, 2)) * 5  # spread across all branches
+    expected = np.array([route_stock_through_tree(X[i], tree, fn) for i in range(100)])
+    actual = route_all_stocks_through_tree(X, tree, fn)
+    assert (actual == expected).all()
+
+
+def test_route_all_stocks_root_only_leaf():
+    # Tree that's just a root leaf — every stock should land at node 0.
+    X = np.random.default_rng(0).standard_normal((20, 3))
+    leaves = route_all_stocks_through_tree(X, {0: {'leaf': True, 'value': 0.5}}, ['a', 'b', 'c'])
+    assert (leaves == 0).all()
+
+
+def test_route_all_stocks_threshold_boundary():
+    # x < threshold -> yes, x >= threshold -> no. Exact-match goes 'no'.
+    tree = {
+        0: {'leaf': False, 'feature': 'a', 'threshold': 1.0, 'yes': 1, 'no': 2},
+        1: {'leaf': True, 'value': -1.0},
+        2: {'leaf': True, 'value': +1.0},
+    }
+    X = np.array([[0.5], [1.0], [1.5]])
+    leaves = route_all_stocks_through_tree(X, tree, ['a'])
+    assert leaves[0] == 1   # 0.5 < 1.0  -> yes
+    assert leaves[1] == 2   # 1.0 == 1.0 -> no (not strictly less)
+    assert leaves[2] == 2   # 1.5 > 1.0  -> no

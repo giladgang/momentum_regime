@@ -2,6 +2,7 @@
 
 Functions:
   route_stock_through_tree(x, tree_dict, feature_names) -> leaf_node_id
+  route_all_stocks_through_tree(X, tree_dict, feature_names) -> array of leaf ids
   hamming_distance_matrix(L) -> pairwise normalised Hamming distances
   one_hot_encode_leaves(L, n_leaves_per_tree) -> sparse one-hot matrix
   count_leaves(tree_dict) -> int
@@ -42,6 +43,46 @@ def route_stock_through_tree(x, tree_dict, feature_names):
         col = name_to_idx[node['feature']]
         nid = node['yes'] if x[col] < node['threshold'] else node['no']
     return nid
+
+
+def route_all_stocks_through_tree(X, tree_dict, feature_names):
+    """Vectorised: route all rows of X through one tree, return leaf ids.
+
+    Equivalent to ``[route_stock_through_tree(X[i], tree_dict, feature_names)
+    for i in range(X.shape[0])]`` but uses numpy vectorised comparisons,
+    which is ~10-50x faster on large samples.
+
+    Parameters
+    ----------
+    X : array shape (n, n_features)
+    tree_dict : dict (XGBoost tree-dict, inner — caller unwraps)
+    feature_names : list of str
+
+    Returns
+    -------
+    array (n,) of int  Leaf node ids each stock landed in.
+    """
+    name_to_idx = {n: i for i, n in enumerate(feature_names)}
+    n = X.shape[0]
+    leaves = np.zeros(n, dtype=np.int32)
+    # Active stocks at each frontier node — start all at root (node 0)
+    active = [(0, np.arange(n))]
+    while active:
+        nid, idx = active.pop()
+        node = tree_dict[nid]
+        if node.get('leaf', False):
+            leaves[idx] = nid
+            continue
+        col = name_to_idx[node['feature']]
+        thr = node['threshold']
+        mask = X[idx, col] < thr
+        yes_idx = idx[mask]
+        no_idx = idx[~mask]
+        if len(yes_idx) > 0:
+            active.append((node['yes'], yes_idx))
+        if len(no_idx) > 0:
+            active.append((node['no'], no_idx))
+    return leaves
 
 
 def count_leaves(tree_dict):
