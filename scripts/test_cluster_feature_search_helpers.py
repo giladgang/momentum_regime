@@ -42,3 +42,41 @@ def test_pi_panic_freq_custom_threshold():
     pi = pd.Series([0.6] * 13, index=dates)
     assert pi_panic_freq(pi, dates[-1], n_months=12, threshold=0.5) == pytest.approx(1.0)
     assert pi_panic_freq(pi, dates[-1], n_months=12, threshold=0.7) == pytest.approx(0.0)
+
+
+from cluster_feature_search_helpers import past_strategy_sharpe
+
+
+def test_past_strategy_sharpe_zero_std_returns_nan():
+    dates = pd.date_range('2020-01-31', periods=13, freq='ME')
+    rets = pd.Series([0.01] * 13, index=dates)
+    result = past_strategy_sharpe(rets, dates[-1], n_months=12)
+    assert pd.isna(result)
+
+
+def test_past_strategy_sharpe_known_value():
+    dates = pd.date_range('2020-01-31', periods=13, freq='ME')
+    rng = np.random.default_rng(0)
+    rets = pd.Series(rng.normal(0.01, 0.05, 13), index=dates)
+    window = rets.iloc[:12]
+    expected = (window.mean() / window.std(ddof=1)) * np.sqrt(12)
+    result = past_strategy_sharpe(rets, dates[-1], n_months=12)
+    assert result == pytest.approx(expected)
+
+
+def test_past_strategy_sharpe_excludes_current():
+    dates = pd.date_range('2020-01-31', periods=13, freq='ME')
+    # 12 months of small variance + huge spike at current
+    rng = np.random.default_rng(1)
+    rets = pd.Series(np.r_[rng.normal(0.01, 0.02, 12), 10.0], index=dates)
+    window = rets.iloc[:12]
+    expected = (window.mean() / window.std(ddof=1)) * np.sqrt(12)
+    result = past_strategy_sharpe(rets, dates[-1], n_months=12)
+    assert result == pytest.approx(expected)
+
+
+def test_past_strategy_sharpe_insufficient_history():
+    dates = pd.date_range('2020-01-31', periods=5, freq='ME')
+    rets = pd.Series(np.random.default_rng(2).standard_normal(5), index=dates)
+    result = past_strategy_sharpe(rets, dates[-1], n_months=12)
+    assert pd.isna(result)

@@ -31,3 +31,25 @@ def pi_panic_freq(pi_series, date, n_months, threshold=0.5):
         return float('nan')
     window = pi_series.iloc[pos - n_months:pos]
     return float((window > threshold).mean())
+
+
+def past_strategy_sharpe(returns_series, date, n_months):
+    """Annualised Sharpe over past n_months months (excluding `date`).
+
+    Uses sample std (ddof=1) and sqrt(12) annualisation, matching the
+    project's bootstrap_helpers convention.
+
+    Returns
+    -------
+    float Sharpe ratio or NaN if insufficient history or zero std.
+    """
+    if date not in returns_series.index:
+        return float('nan')
+    pos = returns_series.index.get_loc(date)
+    if pos < n_months:
+        return float('nan')
+    window = returns_series.iloc[pos - n_months:pos]
+    sd = window.std(ddof=1)
+    if np.isclose(sd, 0) or not np.isfinite(sd):
+        return float('nan')
+    return float((window.mean() / sd) * np.sqrt(12))
