@@ -1,0 +1,5 @@
+l2_within_regime,calm.0,calm.1,panic.0,panic.1
+calm-l2.0,56,10,0,0
+calm-l2.1,8,34,0,0
+panic-l2.0,0,0,37,1
+panic-l2.1,0,0,1,20
