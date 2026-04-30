@@ -83,6 +83,7 @@ def test_past_strategy_sharpe_insufficient_history():
 
 
 from cluster_feature_search_helpers import cross_section_skew
+from cluster_feature_search_helpers import picked_stock_fingerprint
 
 
 def test_cross_section_skew_returns_dataframe():
@@ -119,3 +120,73 @@ def test_cross_section_skew_positive_for_right_tail():
     panel = pd.DataFrame(rows)
     skew = cross_section_skew(panel, ['mom_1'])
     assert skew['mom_1'].iloc[0] > 0
+
+
+def test_picked_stock_fingerprint_columns_and_index():
+    # 2 months, full panel of 5 stocks; pick 3 of 5 each month.
+    dates = pd.date_range('2020-01-31', periods=2, freq='ME')
+    rng = np.random.default_rng(0)
+    panel_rows = []
+    for d in dates:
+        for permno in range(5):
+            row = {'date': d, 'permno': permno}
+            for h in range(1, 13):
+                row[f'mom_{h}'] = rng.standard_normal()
+            panel_rows.append(row)
+    panel = pd.DataFrame(panel_rows)
+    picks = pd.DataFrame([
+        {'date': d, 'permno': permno}
+        for d in dates for permno in [0, 1, 2]
+    ])
+    mom_cols = [f'mom_{h}' for h in range(1, 13)]
+    fp = picked_stock_fingerprint(picks, panel, mom_cols)
+    assert list(fp.index) == list(dates)
+    expected_cols = (
+        [f'pick_mom_{h}' for h in range(1, 13)]
+        + ['pick_disp_short', 'pick_disp_mid', 'pick_disp_long']
+    )
+    assert list(fp.columns) == expected_cols
+
+
+def test_picked_stock_fingerprint_mean_correct():
+    # Single month, 3 picks, known mom values.
+    d = pd.Timestamp('2020-01-31')
+    panel = pd.DataFrame([
+        {'date': d, 'permno': 0, **{f'mom_{h}': 1.0 for h in range(1, 13)}},
+        {'date': d, 'permno': 1, **{f'mom_{h}': 2.0 for h in range(1, 13)}},
+        {'date': d, 'permno': 2, **{f'mom_{h}': 3.0 for h in range(1, 13)}},
+        {'date': d, 'permno': 3, **{f'mom_{h}': 99.0 for h in range(1, 13)}},  # not picked
+    ])
+    picks = pd.DataFrame([{'date': d, 'permno': p} for p in [0, 1, 2]])
+    mom_cols = [f'mom_{h}' for h in range(1, 13)]
+    fp = picked_stock_fingerprint(picks, panel, mom_cols)
+    # Mean of picks at every horizon = 2.0
+    for h in range(1, 13):
+        assert fp[f'pick_mom_{h}'].iloc[0] == pytest.approx(2.0)
+
+
+def test_picked_stock_fingerprint_dispersion_correct():
+    # Picks have known std at short horizon; mid and long different.
+    d = pd.Timestamp('2020-01-31')
+    panel_rows = []
+    for permno, vals in [
+        (0, [1, 1, 1, 1,  10, 10, 10, 10,  0, 0, 0, 0]),
+        (1, [3, 3, 3, 3,  20, 20, 20, 20,  1, 1, 1, 1]),
+    ]:
+        row = {'date': d, 'permno': permno}
+        for h, v in zip(range(1, 13), vals):
+            row[f'mom_{h}'] = float(v)
+        panel_rows.append(row)
+    panel = pd.DataFrame(panel_rows)
+    picks = pd.DataFrame([{'date': d, 'permno': p} for p in [0, 1]])
+    mom_cols = [f'mom_{h}' for h in range(1, 13)]
+    fp = picked_stock_fingerprint(picks, panel, mom_cols)
+    # short tertile (h=1..4): values are [(1,3),(1,3),(1,3),(1,3)] -> std per horizon = sqrt(2),
+    #   mean of those 4 stds = sqrt(2)
+    assert fp['pick_disp_short'].iloc[0] == pytest.approx(np.sqrt(2.0))
+    # mid tertile (h=5..8): values [(10,20)] -> std per horizon = sqrt(50),
+    #   mean = sqrt(50)
+    assert fp['pick_disp_mid'].iloc[0] == pytest.approx(np.sqrt(50.0))
+    # long tertile (h=9..12): values [(0,1)] -> std per horizon = sqrt(0.5),
+    #   mean = sqrt(0.5)
+    assert fp['pick_disp_long'].iloc[0] == pytest.approx(np.sqrt(0.5))
