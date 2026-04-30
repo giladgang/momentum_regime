@@ -1,0 +1,19 @@
+|--- mom_overall <= 0.07
+|   |--- cs_disp_long <= 0.59
+|   |   |--- class: 1
+|   |--- cs_disp_long >  0.59
+|   |   |--- cs_mom_short <= 0.01
+|   |   |   |--- class: 1
+|   |   |--- cs_mom_short >  0.01
+|   |   |   |--- class: 0
+|--- mom_overall >  0.07
+|   |--- cs_mom_short <= 0.03
+|   |   |--- past_sharpe_12mo <= 0.56
+|   |   |   |--- class: 0
+|   |   |--- past_sharpe_12mo >  0.56
+|   |   |   |--- class: 1
+|   |--- cs_mom_short >  0.03
+|   |   |--- mom_overall <= 0.10
+|   |   |   |--- class: 0
+|   |   |--- mom_overall >  0.10
+|   |   |   |--- class: 0

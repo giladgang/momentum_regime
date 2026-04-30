@@ -1,0 +1,10 @@
+|--- mom_overall <= -0.03
+|   |--- pi_panic_freq_6mo <= 0.08
+|   |   |--- class: 0
+|   |--- pi_panic_freq_6mo >  0.08
+|   |   |--- cs_disp_mid <= 0.53
+|   |   |   |--- class: 1
+|   |   |--- cs_disp_mid >  0.53
+|   |   |   |--- class: 0
+|--- mom_overall >  -0.03
+|   |--- class: 0
