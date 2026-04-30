@@ -15,7 +15,10 @@ import sys
 import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
-from sklearn.metrics import adjusted_rand_score, silhouette_score
+from sklearn.feature_selection import f_classif
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, adjusted_rand_score, silhouette_score
+from sklearn.model_selection import LeaveOneOut, cross_val_predict
 from sklearn.preprocessing import StandardScaler
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -80,6 +83,65 @@ def build_feature_panel(panel, m2_returns, dates):
             'cs_skew_long':  float(tertile_mean(skew_df.loc[[d]], LONG_H).iloc[0]),
         })
     return pd.DataFrame(rows)
+
+
+PRED_COLS = [
+    'pi_panic',
+    'cs_mom_short', 'cs_mom_mid', 'cs_mom_long', 'mom_overall',
+    'cs_disp_short', 'cs_disp_mid', 'cs_disp_long',
+    'pi_panic_freq_6mo', 'pi_panic_freq_12mo', 'past_sharpe_12mo',
+    'cs_skew_short', 'cs_skew_mid', 'cs_skew_long',
+]
+
+
+def univariate_ranking(feat_df):
+    """ANOVA F-statistic per feature against cluster labels."""
+    valid = feat_df[PRED_COLS + ['cluster']].dropna()
+    F, p = f_classif(valid[PRED_COLS].values, valid['cluster'].values)
+    rank = pd.DataFrame({
+        'feature': PRED_COLS,
+        'F_statistic': F,
+        'p_value': p,
+    }).sort_values('F_statistic', ascending=False)
+    return rank
+
+
+def multinomial_l1_loo(feat_df, C_grid=(0.05, 0.1, 0.3, 1.0, 3.0)):
+    """Multinomial L1 logistic regression, LOO-CV across C grid."""
+    valid = feat_df[PRED_COLS + ['cluster']].dropna()
+    X = valid[PRED_COLS].values
+    y = valid['cluster'].values
+    X_std = StandardScaler().fit_transform(X)
+
+    print('\n  LOO-CV across C grid:')
+    best_acc = -1.0
+    best_C = None
+    for C in C_grid:
+        lr = LogisticRegression(
+            solver='saga', l1_ratio=1, C=C,
+            max_iter=10000,
+        )
+        y_pred = cross_val_predict(lr, X_std, y, cv=LeaveOneOut(), n_jobs=-1)
+        acc = accuracy_score(y, y_pred)
+        print(f'    C={C:>5.2f}: acc={acc:.3f}', flush=True)
+        if acc > best_acc:
+            best_acc = acc
+            best_C = C
+
+    lr = LogisticRegression(
+        solver='saga', l1_ratio=1, C=best_C,
+        max_iter=10000,
+    ).fit(X_std, y)
+    # Binary case: coef_ is shape (1, n_features); use positive-class label as column.
+    # Multinomial case: coef_ is shape (n_classes, n_features); use all class labels.
+    if lr.coef_.shape[0] == 1:
+        col_labels = [lr.classes_[1]]
+    else:
+        col_labels = list(lr.classes_)
+    coef = pd.DataFrame(lr.coef_.T, index=PRED_COLS, columns=col_labels)
+    coef.index.name = 'feature'
+    baseline = float(pd.Series(y).value_counts(normalize=True).max())
+    return coef, best_acc, baseline, best_C
 
 
 def cluster_sweep(X_std):
@@ -182,6 +244,22 @@ def main():
     print(f'\nFeature panel shape: {feat.shape}')
     print('\nMissingness per feature:')
     print(feat.isna().sum())
+
+    # ---- Univariate ranking ----
+    print('\n=== Univariate ANOVA ranking ===', flush=True)
+    rank = univariate_ranking(feat)
+    rank.to_csv(f'{RES_DIR}/picked_stock_feature_ranking.csv', index=False)
+    print(rank.to_string(index=False, float_format='%.3f'))
+    print(f'Saved: {RES_DIR}/picked_stock_feature_ranking.csv')
+
+    # ---- Multinomial L1 logistic with LOO-CV ----
+    print('\n=== Multinomial L1 logistic (LOO-CV) ===', flush=True)
+    coef, loo_acc, baseline, best_C = multinomial_l1_loo(feat)
+    coef.to_csv(f'{RES_DIR}/picked_stock_logistic_coefficients.csv')
+    print(f'\n  best C = {best_C}, LOO-CV acc = {loo_acc:.3f}, baseline (max class) = {baseline:.3f}')
+    print('  Coefficients:')
+    print(coef.round(3).to_string())
+    print(f'Saved: {RES_DIR}/picked_stock_logistic_coefficients.csv')
 
 
 if __name__ == '__main__':
