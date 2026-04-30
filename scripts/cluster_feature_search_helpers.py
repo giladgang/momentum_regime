@@ -50,6 +50,8 @@ def past_strategy_sharpe(returns_series, date, n_months):
         return float('nan')
     window = returns_series.iloc[pos - n_months:pos]
     sd = window.std(ddof=1)
+    # atol=1e-8 catches IEEE 754 noise (~1e-18) from ddof=1 on constant
+    # series; real monthly strategy vol >= 0.005, so no false-positive risk.
     if np.isclose(sd, 0) or not np.isfinite(sd):
         return float('nan')
     return float((window.mean() / sd) * np.sqrt(12))
