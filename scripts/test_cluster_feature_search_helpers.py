@@ -2,7 +2,12 @@ import pandas as pd
 import numpy as np
 import pytest
 
-from cluster_feature_search_helpers import pi_panic_freq
+from cluster_feature_search_helpers import (
+    pi_panic_freq,
+    past_strategy_sharpe,
+    cross_section_skew,
+    picked_stock_fingerprint,
+)
 
 
 def test_pi_panic_freq_all_panic():
@@ -44,9 +49,6 @@ def test_pi_panic_freq_custom_threshold():
     assert pi_panic_freq(pi, dates[-1], n_months=12, threshold=0.7) == pytest.approx(0.0)
 
 
-from cluster_feature_search_helpers import past_strategy_sharpe
-
-
 def test_past_strategy_sharpe_zero_std_returns_nan():
     dates = pd.date_range('2020-01-31', periods=13, freq='ME')
     rets = pd.Series([0.01] * 13, index=dates)
@@ -82,10 +84,6 @@ def test_past_strategy_sharpe_insufficient_history():
     assert pd.isna(result)
 
 
-from cluster_feature_search_helpers import cross_section_skew
-from cluster_feature_search_helpers import picked_stock_fingerprint
-
-
 def test_cross_section_skew_returns_dataframe():
     rng = np.random.default_rng(0)
     rows = []
@@ -115,8 +113,8 @@ def test_cross_section_skew_zero_for_symmetric():
 def test_cross_section_skew_positive_for_right_tail():
     rows = []
     for d in pd.date_range('2020-01-31', periods=1, freq='ME'):
-        for v in [0, 0, 0, 0, 10]:
-            rows.append({'date': d, 'permno': v, 'mom_1': v})
+        for i, v in enumerate([0, 0, 0, 0, 10]):
+            rows.append({'date': d, 'permno': i, 'mom_1': v})
     panel = pd.DataFrame(rows)
     skew = cross_section_skew(panel, ['mom_1'])
     assert skew['mom_1'].iloc[0] > 0
