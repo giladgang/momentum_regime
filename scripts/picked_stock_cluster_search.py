@@ -19,7 +19,13 @@ from sklearn.metrics import adjusted_rand_score, silhouette_score
 from sklearn.preprocessing import StandardScaler
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from cluster_feature_search_helpers import picked_stock_fingerprint
+from cluster_feature_search_helpers import (
+    picked_stock_fingerprint,
+    pi_panic_freq,
+    past_strategy_sharpe,
+    cross_section_skew,
+    SHORT_H, MID_H, LONG_H,
+)
 
 RES_DIR = 'results/thesis'
 HORIZONS = list(range(1, 13))
@@ -29,6 +35,51 @@ STABILITY_SEEDS = [42, 123, 456, 789, 1011, 1213]
 N_INIT = 20
 ARI_THRESHOLD = 0.90
 MIN_CLUSTER_SIZE_FRAC = 0.05  # smallest cluster must be >=5% of months
+
+
+def tertile_mean(df, group):
+    """Mean of mom_h columns for h in `group` (a list of horizon ints)."""
+    cols = [f'mom_{h}' for h in group]
+    return df[cols].mean(axis=1)
+
+
+def build_feature_panel(panel, m2_returns, dates):
+    """Build the 14-feature predictor panel for the given dates.
+
+    Parameters
+    ----------
+    panel : DataFrame full cross-section (date, permno, mom_1..mom_12, pi_filter)
+    m2_returns : pd.Series M2 monthly returns indexed by date
+    dates : iterable of pd.Timestamp -- months to include
+    """
+    pi = panel.groupby('date')['pi_filter'].first().sort_index()
+    agg_mean = panel.groupby('date')[MOM_COLS].mean()
+    agg_std = panel.groupby('date')[MOM_COLS].std()
+    skew_df = cross_section_skew(panel, MOM_COLS)
+
+    rows = []
+    for d in dates:
+        rows.append({
+            'date': d,
+            # Group A -- context
+            'pi_panic': int(pi.loc[d] > 0.5),
+            'cs_mom_short': float(tertile_mean(agg_mean.loc[[d]], SHORT_H).iloc[0]),
+            'cs_mom_mid':   float(tertile_mean(agg_mean.loc[[d]], MID_H).iloc[0]),
+            'cs_mom_long':  float(tertile_mean(agg_mean.loc[[d]], LONG_H).iloc[0]),
+            'mom_overall':  float(agg_mean.loc[d, MOM_COLS].mean()),
+            'cs_disp_short': float(tertile_mean(agg_std.loc[[d]], SHORT_H).iloc[0]),
+            'cs_disp_mid':   float(tertile_mean(agg_std.loc[[d]], MID_H).iloc[0]),
+            'cs_disp_long':  float(tertile_mean(agg_std.loc[[d]], LONG_H).iloc[0]),
+            # Group B -- time-series
+            'pi_panic_freq_6mo':  pi_panic_freq(pi, d, n_months=6),
+            'pi_panic_freq_12mo': pi_panic_freq(pi, d, n_months=12),
+            'past_sharpe_12mo':   past_strategy_sharpe(m2_returns, d, n_months=12),
+            # Group C -- cross-section skew
+            'cs_skew_short': float(tertile_mean(skew_df.loc[[d]], SHORT_H).iloc[0]),
+            'cs_skew_mid':   float(tertile_mean(skew_df.loc[[d]], MID_H).iloc[0]),
+            'cs_skew_long':  float(tertile_mean(skew_df.loc[[d]], LONG_H).iloc[0]),
+        })
+    return pd.DataFrame(rows)
 
 
 def cluster_sweep(X_std):
@@ -115,6 +166,22 @@ def main():
     print(f'Saved: {RES_DIR}/picked_stock_cluster_centroids.csv', flush=True)
     print('\nCentroids (raw mom) per cluster:')
     print(centroids.round(3).to_string())
+
+    # ---- Predictor feature panel ----
+    print('\nLoading M2 returns...', flush=True)
+    with open(f'{RES_DIR}/fundamentals_returns.pkl', 'rb') as f:
+        rets = pickle.load(f)
+    m2_ret = rets['baseline_mom_pi']['returns']
+    m2_ret.index = pd.to_datetime(m2_ret.index)
+
+    print('Building predictor feature panel...', flush=True)
+    feat = build_feature_panel(panel, m2_ret, list(fp.index))
+    feat = feat.merge(label_df, on='date', how='left')
+    feat.to_csv(f'{RES_DIR}/picked_stock_feature_panel.csv', index=False)
+    print(f'Saved: {RES_DIR}/picked_stock_feature_panel.csv', flush=True)
+    print(f'\nFeature panel shape: {feat.shape}')
+    print('\nMissingness per feature:')
+    print(feat.isna().sum())
 
 
 if __name__ == '__main__':
