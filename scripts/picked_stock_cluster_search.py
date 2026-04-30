@@ -20,6 +20,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, adjusted_rand_score, silhouette_score
 from sklearn.model_selection import LeaveOneOut, cross_val_predict
 from sklearn.preprocessing import StandardScaler
+from sklearn.tree import DecisionTreeClassifier, export_text
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from cluster_feature_search_helpers import (
@@ -144,6 +145,36 @@ def multinomial_l1_loo(feat_df, C_grid=(0.05, 0.1, 0.3, 1.0, 3.0)):
     return coef, best_acc, baseline, best_C
 
 
+def decision_tree_readout(feat_df, max_depth=3):
+    """Fit a depth-3 tree, return text rule + train + LOO accuracy."""
+    valid = feat_df[PRED_COLS + ['cluster']].dropna()
+    X = valid[PRED_COLS].values
+    y = valid['cluster'].values
+    tree = DecisionTreeClassifier(max_depth=max_depth, random_state=42).fit(X, y)
+    text = export_text(tree, feature_names=PRED_COLS)
+    train_acc = accuracy_score(y, tree.predict(X))
+    y_loo = cross_val_predict(
+        DecisionTreeClassifier(max_depth=max_depth, random_state=42),
+        X, y, cv=LeaveOneOut(), n_jobs=-1,
+    )
+    loo_acc = accuracy_score(y, y_loo)
+    return text, train_acc, loo_acc
+
+
+def per_cluster_summary(feat_df, fp_df):
+    """Mean +/- std of every fingerprint dim AND every predictor feature, per cluster."""
+    fp_with_cluster = fp_df.merge(
+        feat_df[['date', 'cluster']], left_index=True, right_on='date',
+    ).drop(columns='date')
+    fp_summary = fp_with_cluster.groupby('cluster').agg(['mean', 'std'])
+    feat_summary = (
+        feat_df[PRED_COLS + ['cluster']]
+        .groupby('cluster').agg(['mean', 'std'])
+    )
+    full = pd.concat([fp_summary, feat_summary], axis=1)
+    return full
+
+
 def cluster_sweep(X_std):
     """Run KMeans for each K in K_GRID, with 6-seed stability + silhouette."""
     rows = []
@@ -260,6 +291,39 @@ def main():
     print('  Coefficients:')
     print(coef.round(3).to_string())
     print(f'Saved: {RES_DIR}/picked_stock_logistic_coefficients.csv')
+
+    # ---- Decision tree ----
+    print('\n=== Depth-3 decision tree ===', flush=True)
+    tree_text, tree_train_acc, tree_loo_acc = decision_tree_readout(feat, max_depth=3)
+    with open(f'{RES_DIR}/picked_stock_decision_tree.txt', 'w') as f:
+        f.write(tree_text)
+    print(tree_text)
+    print(f'  train acc = {tree_train_acc:.3f}, LOO acc = {tree_loo_acc:.3f}')
+    print(f'Saved: {RES_DIR}/picked_stock_decision_tree.txt')
+
+    # ---- Per-cluster summary ----
+    print('\n=== Per-cluster summary ===', flush=True)
+    summary = per_cluster_summary(feat, fp)
+    summary.to_csv(f'{RES_DIR}/picked_stock_cluster_summary.csv')
+    print(f'Saved: {RES_DIR}/picked_stock_cluster_summary.csv')
+
+    # ---- Headline verdict ----
+    print('\n' + '=' * 60)
+    print('  HEADLINE')
+    print('=' * 60)
+    print(f'  Chosen K:                     {chosen_k}')
+    print(f'  Logistic LOO-CV accuracy:     {loo_acc:.3f}')
+    print(f'  Decision tree LOO-CV accuracy: {tree_loo_acc:.3f}')
+    print(f'  Class-imbalance baseline:     {baseline:.3f}')
+    if loo_acc >= 0.70:
+        print('\n  STRONG: features cleanly recover cluster structure.')
+        print('  -> Use top features as the natural group-by variables for §5.2.')
+    elif loo_acc >= 0.60:
+        print('\n  WEAK: marginal predictability; check decision tree for partial split.')
+    else:
+        print('\n  NEGATIVE: no month-level feature predicts cluster membership.')
+        print('  -> Picks are determined below the monthly aggregate (stock-level).')
+        print('  -> Establishes a boundary for the §5.2 narrative.')
 
 
 if __name__ == '__main__':
