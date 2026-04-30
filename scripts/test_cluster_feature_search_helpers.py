@@ -188,3 +188,24 @@ def test_picked_stock_fingerprint_dispersion_correct():
     # long tertile (h=9..12): values [(0,1)] -> std per horizon = sqrt(0.5),
     #   mean = sqrt(0.5)
     assert fp['pick_disp_long'].iloc[0] == pytest.approx(np.sqrt(0.5))
+
+
+def test_picked_stock_fingerprint_dedups_picks():
+    # If picks_df has a duplicate (date, permno) row, the helper must NOT
+    # double-count that stock's momentum in the mean.
+    d = pd.Timestamp('2020-01-31')
+    panel = pd.DataFrame([
+        {'date': d, 'permno': 0, **{f'mom_{h}': 1.0 for h in range(1, 13)}},
+        {'date': d, 'permno': 1, **{f'mom_{h}': 5.0 for h in range(1, 13)}},
+    ])
+    # Pick permno 0 twice (a duplicate) and permno 1 once.
+    picks = pd.DataFrame([
+        {'date': d, 'permno': 0},
+        {'date': d, 'permno': 0},  # duplicate
+        {'date': d, 'permno': 1},
+    ])
+    mom_cols = [f'mom_{h}' for h in range(1, 13)]
+    fp = picked_stock_fingerprint(picks, panel, mom_cols)
+    # If dedup works, mean across {0, 1} = 3.0. If duplicates are kept, it would be 7/3 = 2.333.
+    for h in range(1, 13):
+        assert fp[f'pick_mom_{h}'].iloc[0] == pytest.approx(3.0)

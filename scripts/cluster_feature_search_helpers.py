@@ -6,6 +6,8 @@ Helpers:
   cross_section_skew(monthly_panel, mom_cols)
   picked_stock_fingerprint(picks_df, mom_panel, mom_cols)
 """
+import warnings
+
 import numpy as np
 import pandas as pd
 
@@ -83,6 +85,7 @@ def picked_stock_fingerprint(picks_df, mom_panel, mom_cols):
     Parameters
     ----------
     picks_df : DataFrame with columns 'date', 'permno' (long-leg picks).
+        Duplicate (date, permno) rows are deduplicated before merging.
     mom_panel : DataFrame with columns 'date', 'permno', and each of mom_cols.
     mom_cols : list of length 12 -- momentum horizon columns in order
         (mom_1, mom_2, ..., mom_12).
@@ -97,10 +100,21 @@ def picked_stock_fingerprint(picks_df, mom_panel, mom_cols):
     """
     if len(mom_cols) != 12:
         raise ValueError(f'expected 12 mom columns, got {len(mom_cols)}')
-    merged = picks_df[['date', 'permno']].merge(
-        mom_panel[['date', 'permno'] + list(mom_cols)],
-        on=['date', 'permno'], how='inner',
+    merged = (
+        picks_df[['date', 'permno']]
+        .drop_duplicates()
+        .merge(
+            mom_panel[['date', 'permno'] + list(mom_cols)],
+            on=['date', 'permno'], how='inner',
+        )
     )
+    n_dropped = len(picks_df) - len(merged)
+    if n_dropped > 0:
+        warnings.warn(
+            f'picked_stock_fingerprint: {n_dropped} pick rows had no panel match '
+            f'and were dropped (inner merge). Check date/permno alignment.',
+            stacklevel=2,
+        )
     grp = merged.groupby('date')[list(mom_cols)]
     means = grp.mean()
     stds = grp.std(ddof=1)
