@@ -191,21 +191,44 @@ def test_picked_stock_fingerprint_dispersion_correct():
 
 
 def test_picked_stock_fingerprint_dedups_picks():
-    # If picks_df has a duplicate (date, permno) row, the helper must NOT
-    # double-count that stock's momentum in the mean.
+    """If picks_df has a duplicate (date, permno) row, the helper must NOT
+    double-count that stock's momentum in the mean. Also: dedup alone must
+    NOT trigger the alignment-drop warning."""
+    import warnings as _warnings
     d = pd.Timestamp('2020-01-31')
     panel = pd.DataFrame([
         {'date': d, 'permno': 0, **{f'mom_{h}': 1.0 for h in range(1, 13)}},
         {'date': d, 'permno': 1, **{f'mom_{h}': 5.0 for h in range(1, 13)}},
     ])
-    # Pick permno 0 twice (a duplicate) and permno 1 once.
     picks = pd.DataFrame([
         {'date': d, 'permno': 0},
         {'date': d, 'permno': 0},  # duplicate
         {'date': d, 'permno': 1},
     ])
     mom_cols = [f'mom_{h}' for h in range(1, 13)]
-    fp = picked_stock_fingerprint(picks, panel, mom_cols)
-    # If dedup works, mean across {0, 1} = 3.0. If duplicates are kept, it would be 7/3 = 2.333.
+    with _warnings.catch_warnings(record=True) as caught:
+        _warnings.simplefilter('always')
+        fp = picked_stock_fingerprint(picks, panel, mom_cols)
+    # Mean across {0, 1} = 3.0 (no double-count).
     for h in range(1, 13):
         assert fp[f'pick_mom_{h}'].iloc[0] == pytest.approx(3.0)
+    # Dedup alone must NOT trigger the alignment-drop warning.
+    assert len(caught) == 0, f'unexpected warnings: {[str(w.message) for w in caught]}'
+
+
+def test_picked_stock_fingerprint_warns_on_missing_panel_row():
+    import warnings as _warnings
+    d = pd.Timestamp('2020-01-31')
+    panel = pd.DataFrame([
+        {'date': d, 'permno': 0, **{f'mom_{h}': 1.0 for h in range(1, 13)}},
+    ])
+    picks = pd.DataFrame([
+        {'date': d, 'permno': 0},
+        {'date': d, 'permno': 99},  # not in panel
+    ])
+    mom_cols = [f'mom_{h}' for h in range(1, 13)]
+    with _warnings.catch_warnings(record=True) as caught:
+        _warnings.simplefilter('always')
+        picked_stock_fingerprint(picks, panel, mom_cols)
+    msgs = [str(w.message) for w in caught]
+    assert any('no panel match' in m for m in msgs), f'expected alignment-drop warning, got: {msgs}'

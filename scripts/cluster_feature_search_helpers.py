@@ -100,15 +100,12 @@ def picked_stock_fingerprint(picks_df, mom_panel, mom_cols):
     """
     if len(mom_cols) != 12:
         raise ValueError(f'expected 12 mom columns, got {len(mom_cols)}')
-    merged = (
-        picks_df[['date', 'permno']]
-        .drop_duplicates()
-        .merge(
-            mom_panel[['date', 'permno'] + list(mom_cols)],
-            on=['date', 'permno'], how='inner',
-        )
+    deduped = picks_df[['date', 'permno']].drop_duplicates()
+    merged = deduped.merge(
+        mom_panel[['date', 'permno'] + list(mom_cols)],
+        on=['date', 'permno'], how='inner',
     )
-    n_dropped = len(picks_df) - len(merged)
+    n_dropped = len(deduped) - len(merged)
     if n_dropped > 0:
         warnings.warn(
             f'picked_stock_fingerprint: {n_dropped} pick rows had no panel match '
