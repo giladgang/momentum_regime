@@ -80,3 +80,42 @@ def test_past_strategy_sharpe_insufficient_history():
     rets = pd.Series(np.random.default_rng(2).standard_normal(5), index=dates)
     result = past_strategy_sharpe(rets, dates[-1], n_months=12)
     assert pd.isna(result)
+
+
+from cluster_feature_search_helpers import cross_section_skew
+
+
+def test_cross_section_skew_returns_dataframe():
+    rng = np.random.default_rng(0)
+    rows = []
+    for d in pd.date_range('2020-01-31', periods=3, freq='ME'):
+        for s in range(5):
+            row = {'date': d, 'permno': s}
+            for h in range(1, 5):
+                row[f'mom_{h}'] = rng.standard_normal()
+            rows.append(row)
+    panel = pd.DataFrame(rows)
+    skew = cross_section_skew(panel, [f'mom_{h}' for h in range(1, 5)])
+    assert isinstance(skew, pd.DataFrame)
+    assert skew.shape == (3, 4)
+    assert list(skew.columns) == ['mom_1', 'mom_2', 'mom_3', 'mom_4']
+
+
+def test_cross_section_skew_zero_for_symmetric():
+    rows = []
+    for d in pd.date_range('2020-01-31', periods=2, freq='ME'):
+        for v in [-2, -1, 0, 1, 2]:
+            rows.append({'date': d, 'permno': v + 100, 'mom_1': v})
+    panel = pd.DataFrame(rows)
+    skew = cross_section_skew(panel, ['mom_1'])
+    assert all(abs(s) < 1e-9 for s in skew['mom_1'])
+
+
+def test_cross_section_skew_positive_for_right_tail():
+    rows = []
+    for d in pd.date_range('2020-01-31', periods=1, freq='ME'):
+        for v in [0, 0, 0, 0, 10]:
+            rows.append({'date': d, 'permno': v, 'mom_1': v})
+    panel = pd.DataFrame(rows)
+    skew = cross_section_skew(panel, ['mom_1'])
+    assert skew['mom_1'].iloc[0] > 0

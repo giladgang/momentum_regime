@@ -55,3 +55,18 @@ def past_strategy_sharpe(returns_series, date, n_months):
     if np.isclose(sd, 0) or not np.isfinite(sd):
         return float('nan')
     return float((window.mean() / sd) * np.sqrt(12))
+
+
+def cross_section_skew(monthly_panel, mom_cols):
+    """Per-month skewness across stocks at each momentum horizon.
+
+    Parameters
+    ----------
+    monthly_panel : DataFrame with column 'date' + each of mom_cols
+    mom_cols : list of column names
+
+    Returns
+    -------
+    DataFrame indexed by date, columns = mom_cols, values = skewness
+    """
+    return monthly_panel.groupby('date')[mom_cols].skew()
