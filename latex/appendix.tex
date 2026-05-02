@@ -238,7 +238,7 @@ To assess whether XGBoost benefits specifically from the HMM regime signal rathe
 
 \input{tables/table_placebo}
 
-Removing the regime signal reduces M2's Sharpe from 1.11 to 0.41, a drop of 0.70. The regime signal is essential for long-short momentum stock selection, not merely a marginal improvement.
+Removing the regime signal reduces M2's Sharpe from 1.11 to 0.43, a drop of 0.68. The regime signal is essential for long-short momentum stock selection, not merely a marginal improvement.
 
 \subsection{Factor Model Regressions}\label{app:factor_alphas}
 
@@ -337,6 +337,10 @@ To measure this dependence, we subsample $k \in \{1, 2, 3, 5, 10, 15, 20, 30, 50
 \input{tables/table_seed_convergence}
 
 Two patterns emerge. First, the mean Sharpe rises from 1.04 at $k = 1$ to 1.12 at $k = 100$, so a single-chain point estimate understates the strategy's performance by roughly 0.08 in Sharpe units. The gap closes monotonically, with most of the lift realised by $k = 30$. Second, the interquartile range across random subsets collapses from 0.10 at $k = 1$ to 0.02 at $k = 50$: once $k \geq 50$, any two random subsets of the seed pool produce nearly the same XGBoost portfolio. The production configuration ($N_s = 200$) sits well inside this plateau, which is why the 1.11 Sharpe reported in Section~\ref{sec:results} is insensitive to which specific seeds were drawn. The practical implication is methodological rather than cosmetic: a single-chain HMM would not reliably support the main conclusions, so the seed ensemble is a requirement of the design, not a late-stage performance tuning.
+
+\section{International HMM Feature Selection}\label{app:intl_feature_selection}
+
+For the international robustness check (Section~\ref{sec:international}), the HMM feature set is selected per region using the same 4-pass procedure as the US production specification (Section~\ref{sec:feature_selection}): a quality screen on MCMC convergence and crisis-window alignment, a portfolio-Sharpe ranking on the surviving combinations, a definitive validation at higher seed counts, and an additional stability check across random seed partitions. The international candidate pool comprises the five locally-available stress features (DD, VOL, DISP, REL\_N, BANK\_REL); BANK\_REL is the value-weighted bank-sector excess return over the broad regional market, sign-flipped so high values indicate stress, and substitutes for the US-specific Moody's BAA-AAA spread. With DD required, the procedure evaluates fifteen combinations of size one to four. Both UK and Japan select \emph{DD+VOL+REL\_N} as the regional feature set. The transplanted-from-US template (DD+DISP+REL\_N+BANK\_REL) fails the Pass-1 quality screen for both regions (minimum effective sample size of 14 and 4 respectively), motivating per-region selection. Pass-by-pass results are reported in \texttt{results/thesis/intl\_<region>\_hmm\_feature\_selection\_pass\{1,2,3,4\}.csv}; chosen-features manifests in \texttt{intl\_<region>\_hmm\_chosen\_features.json}.
 
 \section{Fundamental Feature Definitions}\label{app:fundamental_features}
 
