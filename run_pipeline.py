@@ -431,10 +431,46 @@ def main():
 
         102: ('tests/test_reproducibility.py',
               'STEP 102: Reproducibility and determinism guards (artefact regression)'),
+
+        # ── Additional test files wired 2026-05-03 to close the silent-test gap.
+        # HMM-related tests (test_hmm_diagnostics_helpers, test_parallel_hmm_determinism,
+        # test_intl_scripts, test_apply_shumway_intl, test_cv_scripts) and
+        # test_expanding_window are intentionally NOT wired — by design choice.
+
+        103: ('tests/test_audit_compustat_delisting.py',
+              'STEP 103: US Compustat delisting audit'),
+
+        104: ('tests/test_build_prose_edit_list.py',
+              'STEP 104: Prose-drift edit-list builder'),
+
+        105: ('tests/test_compose_step_f_report.py',
+              'STEP 105: Phase F report composer'),
+
+        106: ('tests/test_compose_step_k_report.py',
+              'STEP 106: Phase K report composer'),
+
+        107: ('tests/test_fundamentals_test.py',
+              'STEP 107: Fundamentals ablation script'),
+
+        108: ('tests/test_leg_betas_by_regime.py',
+              'STEP 108: leg_betas_by_regime helpers (gates Step 37)'),
+
+        109: ('tests/test_lookahead_behavioural.py',
+              'STEP 109: Behavioural lookahead audit'),
+
+        110: ('tests/test_new_ls_analyses_helpers.py',
+              'STEP 110: new_ls_analyses helpers'),
+
+        111: ('tests/test_pipeline_step_helpers.py',
+              'STEP 111: run_pipeline step-helper unit tests'),
+
+        112: ('tests/test_shumway_delisting.py',
+              'STEP 112: US Shumway delisting'),
     }
 
     # Steps that should be run via pytest instead of plain python
-    pytest_steps = {95, 96, 97, 98, 99, 100, 101, 102}
+    pytest_steps = {95, 96, 97, 98, 99, 100, 101, 102,
+                    103, 104, 105, 106, 107, 108, 109, 110, 111, 112}
 
     if args.step > 0:
         if args.step in steps:
