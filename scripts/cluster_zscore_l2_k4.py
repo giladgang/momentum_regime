@@ -324,12 +324,14 @@ print(f"\n  ARI (L2 K=4 vs L2 within-regime) = {ari_vs_l2:.4f}", flush=True)
 # ---------------------------------------------------------------------------
 print("\nGenerating dispersion plot ...", flush=True)
 
-fig, axes = plt.subplots(
-    1, 4,
-    figsize=(18, 5.5),
+fig, axes2d = plt.subplots(
+    2, 2,
+    figsize=(11, 9.5),
     sharey=True,
+    sharex=True,
     constrained_layout=True,
 )
+axes = axes2d.flatten()
 
 # Global y-axis limits
 all_z_vals = list(ref_centroid) + [
@@ -346,7 +348,6 @@ fig.suptitle(
     "L2 KMeans K=4 on 12-d z-curves (no regime pre-split)",
     fontsize=13,
     fontweight="bold",
-    y=1.01,
 )
 
 for ax, cl in zip(axes, range(K)):
@@ -393,8 +394,12 @@ for ax, cl in zip(axes, range(K)):
     ax.set_ylim(y_min, y_max)
     ax.set_xticks(HORIZONS)
     ax.set_xlabel("Horizon (months)", fontsize=9)
-    if ax is axes[0]:
+    # y-label on left column (axes[0] = top-left, axes[2] = bottom-left)
+    if cl in (0, 2):
         ax.set_ylabel("Cross-sectional z-score", fontsize=9)
+    # x-label only on bottom row
+    if cl not in (2, 3):
+        ax.set_xlabel("")
 
     ax.set_title(
         f"Cluster {cl}\n"
