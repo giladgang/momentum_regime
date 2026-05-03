@@ -1,0 +1,5 @@
+cell_label,rule_id,rule_name,output_subshape,n_months,mean_pi,panic_share,land_short_pct,land_long_pct,output_z_short,output_z_long,sharpe,sharpe_lo95,sharpe_hi95,mean_ret_pct,hit_rate
+R0.0,0,panic-rule,0,18,1.0,1.0,-7.4,-10.7,-0.745,-0.915,1.707,0.964,2.563,2.92,0.556
+R0.1,0,panic-rule,1,45,0.908,0.911,3.1,4.8,0.084,0.197,1.604,1.013,2.445,3.352,0.733
+R1.0,1,calm-rule,0,38,0.007,0.0,3.3,23.9,-0.237,-0.194,0.92,0.005,1.789,1.244,0.579
+R1.1,1,calm-rule,1,66,0.012,0.0,6.2,20.4,0.279,0.568,0.576,-0.096,1.368,0.753,0.561

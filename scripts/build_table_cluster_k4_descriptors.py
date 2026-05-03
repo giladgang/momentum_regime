@@ -113,7 +113,7 @@ def main():
         mdd = _fmt_pct(-abs(row['max_drawdown']))  # drawdown is positive in CSV, show as negative
 
         data_rows.append(
-            f"    {k} ({label}) & {n} & {pi_bar} & {sharpe_str} "
+            f"    {k+1} ({label}) & {n} & {pi_bar} & {sharpe_str} "
             f"& {hit} & {sortino} & {mdd} \\\\"
         )
 

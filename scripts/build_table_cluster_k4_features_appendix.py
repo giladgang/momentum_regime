@@ -196,10 +196,10 @@ def main():
     # ------------------------------------------------------------------
     col_header_parts = [
         r'Feature',
-        r'\multicolumn{1}{c}{Cluster 0}',
         r'\multicolumn{1}{c}{Cluster 1}',
         r'\multicolumn{1}{c}{Cluster 2}',
         r'\multicolumn{1}{c}{Cluster 3}',
+        r'\multicolumn{1}{c}{Cluster 4}',
     ]
     col_header = ' & '.join(col_header_parts) + r' \\'
 

@@ -123,7 +123,7 @@ def main():
     data_rows = []
     for r in rows_data:
         data_rows.append(
-            f"    {r['cluster']} ({r['label']}) & {r['n_months']}"
+            f"    {r['cluster']+1} ({r['label']}) & {r['n_months']}"
             f" & {_fmt_z(r['z_mom1'])}"
             f" & {_fmt_z(r['z_mean'])}"
             f" & {r['basket']:.0f}"

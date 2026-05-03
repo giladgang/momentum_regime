@@ -97,7 +97,7 @@ def main():
         fx_spread = _fmt_spread(row['fixed_beta_spread'])
 
         data_rows.append(
-            f'    {k} ({label}) & {n}'
+            f'    {k+1} ({label}) & {n}'
             f' & {m2_long} & {m2_short} & {m2_spread}'
             f' & {fx_long} & {fx_short} & {fx_spread} \\\\'
         )

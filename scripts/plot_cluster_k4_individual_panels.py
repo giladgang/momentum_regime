@@ -54,10 +54,10 @@ CLUSTER_COLORS = {
 }
 
 CLUSTER_TITLES = {
-    0: "Cluster 0 (calm continuation)",
-    1: "Cluster 1 (mild continuation)",
-    2: "Cluster 2 (post-panic recovery)",
-    3: "Cluster 3 (deep crisis)",
+    0: "Cluster 1 (calm continuation)",
+    1: "Cluster 2 (mild continuation)",
+    2: "Cluster 3 (post-panic recovery)",
+    3: "Cluster 4 (deep crisis)",
 }
 
 # ---------------------------------------------------------------------------

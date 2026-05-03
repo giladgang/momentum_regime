@@ -80,7 +80,7 @@ def main():
         comb_share  = _fmt_pct(row['pi_share_combined'])
 
         data_rows.append(
-            f'    {k} ({label}) & {n}'
+            f'    {k+1} ({label}) & {n}'
             f' & {long_share} & {short_share} & {comb_share} \\\\'
         )
 
