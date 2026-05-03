@@ -1,6 +1,6 @@
 # Thesis TODO
 
-**Last updated**: 2026-05-03 (N1 international subsection landed: §5.5 + table + appendix subsection; per-region 4-pass HMM feature selection ran 2026-04-28 to 2026-04-29 selecting DD+VOL+REL\_N for both UK and JP; production HMM refit + CS pipeline rerun gave UK regional Sharpe 0.84, JP 0.50; conclusion `International replication` future-work paragraph removed since work is done; build script `render_table_international_results` in `scripts/build_thesis_tables.py` makes the table canonical-generated. All thesis-side intl edits in commits 6583e5e, 13aa0a7, 745ff1d, 2819057. Remaining HARD STOP work: **Lehmann1990 citation** for M5 reversal prose).
+**Last updated**: 2026-05-03 (N1 international subsection landed: §5.5 + table + appendix subsection; per-region 4-pass HMM feature selection ran 2026-04-28 to 2026-04-29 selecting DD+VOL+REL\_N for both UK and JP; production HMM refit + CS pipeline rerun gave UK regional Sharpe 0.84, JP 0.50; conclusion `International replication` future-work paragraph removed since work is done; build script `render_table_international_results` in `scripts/build_thesis_tables.py` makes the table canonical-generated. All thesis-side intl edits in commits 6583e5e, 13aa0a7, 745ff1d, 2819057. Lehmann1990 citation for M5 reversal prose landed in commit 2233cc8 ([literature_review.tex:15](latex/literature_review.tex#L15) + [main_results.tex:144](latex/main_results.tex#L144)). **HARD STOP cleared.**)
 
 ## Companion files
 
@@ -91,7 +91,7 @@ Bib audit shows 6 of 8 are already cited in thesis (TODO rows redundant); 2 rema
 - [x] **Novy-Marx (2012)** (`NovyMarx2012`) — already cited (3 uses)
 - [x] **Lee & Swaminathan (2000)** (`LeeSwaminathan2000`) — already cited (1 use)
 - [~] **Rey, H. (2013)** — bib entry added 2026-04-28 but DROPPED from thesis prose. Was originally planned for N1 international subsection's "global financial cycle" framing; the framing itself was dropped after per-region CV-selection inverted the UK headline (regional π beats US π by +0.16 in UK; near-tie in JP). N1 §5.5 is now a clean robustness check rather than a global-cycle hypothesis test. Bib entry remains for any future use.
-- [ ] **Lehmann (1990)** (`Lehmann1990`) — bib entry added 2026-04-28; intended for M5 short-term reversal prose (mom_1 neutral mechanism); independent of N1, can be cited whenever the prose lands
+- [x] **Lehmann (1990)** (`Lehmann1990`) — landed in commit 2233cc8. Cited at [`literature_review.tex:15`](latex/literature_review.tex#L15) (short-lookback reversal cluster with Jegadeesh1990 + JegadeeshTitman1993) and [`main_results.tex:144`](latex/main_results.tex#L144) (deep-crisis selection-shape contrast with Jegadeesh1990 + Nagel2012).
 
 ---
 
