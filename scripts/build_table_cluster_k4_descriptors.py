@@ -114,7 +114,7 @@ def main():
 
         data_rows.append(
             f"    {k+1} ({label}) & {n} & {pi_bar} & {sharpe_str} "
-            f"& {hit} & {sortino} & {mdd} \\\\"
+            f"& {hit} & {mdd} \\\\"
         )
 
     # ------------------------------------------------------------------
@@ -123,12 +123,12 @@ def main():
     caption = (
         r'K=4 cluster descriptors, 2011--2024 test period, '
         r'$n_{\text{total}} = 167$ months. '
+        r'All figures are at the monthly frequency. '
         r'Sharpes are annualised and computed via block bootstrap with block size 6, '
         r'5{,}000 reps. '
         r'Hit rate is the fraction of cluster months with positive M2 return. '
         r"Maximum drawdown is the peak-to-trough drawdown within the cluster's "
-        r'chronological subseries. '
-        r'Sortino uses downside std (negative-return std) in the denominator.'
+        r'chronological subseries.'
     )
 
     tex_lines = [
@@ -136,9 +136,9 @@ def main():
         r'\begin{table}[H]',
         r'\centering',
         r'\small',
-        r'\begin{tabular}{l r r l r r r}',
+        r'\begin{tabular}{l r r l r r}',
         r'\toprule',
-        r'Cluster & $n$ & $\bar{\pi}$ & Sharpe [95\% CI] & Hit rate & Sortino & Max DD \\',
+        r'Cluster & $n$ & $\bar{\pi}$ & Sharpe [95\% CI] & Hit rate & Max DD \\',
         r'\midrule',
     ]
     tex_lines.extend(data_rows)
