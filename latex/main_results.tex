@@ -52,20 +52,11 @@ M2 uses momentum differently across regimes (Table~\ref{tab:regime_sharpe}): Sha
 
 The regime signal is structurally embedded in the ensemble rather than applied selectively. Across the 25{,}000 trees of the 50-seed production ensemble, 18{,}463 (73.9\%) contain at least one split on $\pi_t^{\text{filter}}$, and a typical long-leg stock's path through the ensemble passes through a $\pi$-split 55\% of the time: regime conditioning is built into roughly three-quarters of the model's decision rules and consulted in the majority of individual stock evaluations. The economically informative statistic is how this reliance is state-dependent. In panic months, 65\% of the long leg's total predicted return flows from $\pi$-splitting trees; in calm months, only 17\% does. The model leans on the regime signal predominantly during stress, and its calm-period predictions come mostly from trees that operate on momentum alone. This pattern is consistent with the Sharpe decomposition in Table~\ref{tab:regime_sharpe}: the regime signal adds the most value in exactly the months where it carries the most weight.
 
-M2's predictions are decomposed using two complementary tools. SHAP values \citep{Lundberg2017} measure how much each horizon contributes to the model's prediction (definitions in Appendix~\ref{app:shap}). Cross-sectional z-scores measure where in the momentum distribution the model's selected stocks fall: for each stock in the long or short leg, the z-score at horizon $k$ is $(mom_k^s - \bar{mom}_k) / \sigma_k$, computed from the cross-sectional mean and standard deviation of all stocks that month. Figure~\ref{fig:term_structure} reports these measures averaged across all selected stocks and all months in each regime.
+M2's predictions are decomposed using two complementary tools. SHAP values \citep{Lundberg2017} measure how much each horizon contributes to the model's prediction (definitions in Appendix~\ref{app:shap}). Cross-sectional z-scores measure where in the momentum distribution the model's selected stocks fall: for each stock in the long or short leg, the z-score at horizon $k$ is $(mom_k^s - \bar{mom}_k) / \sigma_k$, computed from the cross-sectional mean and standard deviation of all stocks that month. The z-score answers \emph{what} the model selects; SHAP answers \emph{what drives} the selection.
 
-Aggregate feature importance is split almost evenly: $\pi_t^{\text{filter}}$ accounts for 46\% of total SHAP, the 12 momentum horizons together for 54\% (Table~\ref{tab:shap}). Between regimes, momentum's share rises from 50\% in calm to 58\% in panic while $\pi_t^{\text{filter}}$'s share falls from 50\% to 42\%. The model leans on momentum more heavily during stress, but uses it in a fundamentally different way.
+Aggregate feature importance is split almost evenly: $\pi_t^{\text{filter}}$ accounts for 46\% of total SHAP, the 12 momentum horizons together for 54\% (Table~\ref{tab:shap}). Between regimes, momentum's share rises from 50\% in calm to 58\% in panic while $\pi_t^{\text{filter}}$'s share falls from 50\% to 42\%. The model leans on momentum more heavily during stress, but uses it in a fundamentally different way -- the per-cluster decomposition is developed in Section~\ref{sec:heterogeneity_picks} and the per-horizon decomposition in Section~\ref{sec:horizon_evidence}.
 
 \input{tables/table_shap}
-
-Figure~\ref{fig:term_structure} decomposes these aggregates by horizon, regime, and portfolio leg. The top panels report cross-sectional z-scores (\emph{what} the model selects); the bottom panels report each horizon's SHAP share (\emph{what drives} the selection). The two measures answer different questions and peak at different horizons: in calm, z-scores peak at month~8 while SHAP peaks at months 11--12.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{plots/thesis/zscore_and_absshap_v3.png}
-    \caption{Momentum term structure by regime. Calm (left) and panic (right), split by long and short legs.}
-    \label{fig:term_structure}
-\end{figure}
 
 \subsubsection{Cluster Decomposition of Test-period Picks}\label{sec:heterogeneity_picks}
 
