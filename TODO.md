@@ -1,6 +1,6 @@
 # Thesis TODO
 
-**Last updated**: 2026-04-27 (post-Phase-3 composition complete; N8 IC paradox dropped from thesis; N3 reframed — both HMM and XGB CV deferred to future research only, no thesis citation; awaiting Gilad row-by-row thesis-edit review).
+**Last updated**: 2026-05-03 (N1 international subsection landed: §5.5 + table + appendix subsection; per-region 4-pass HMM feature selection ran 2026-04-28 to 2026-04-29 selecting DD+VOL+REL\_N for both UK and JP; production HMM refit + CS pipeline rerun gave UK regional Sharpe 0.84, JP 0.50; conclusion `International replication` future-work paragraph removed since work is done; build script `render_table_international_results` in `scripts/build_thesis_tables.py` makes the table canonical-generated. All thesis-side intl edits in commits 6583e5e, 13aa0a7, 745ff1d, 2819057. Remaining HARD STOP work: **Lehmann1990 citation** for M5 reversal prose).
 
 ## Companion files
 
@@ -20,25 +20,19 @@ Two distinct types of work. Tackle them differently.
 
 ---
 
-### 🔢 BUCKET 1 — Just numbers (slight modifications)
+### 🔢 BUCKET 1 — Just numbers (slight modifications) — DONE
 
-Existing thesis claims, post-Shumway values. **No new sections, no new framing.** Walk the auto-generated checklist; tick or skip each row.
+Existing thesis claims, post-Shumway values. **No new sections, no new framing.** Shipped in 0e107d9 (initial walk) and 7ff6ac5 (post-restructure phase F drift sweep).
 
-- [ ] **Walk all 944 numeric prose candidates** in [`results/PROSE_EDITS.md`](results/PROSE_EDITS.md)
-  - 40 tables changed × 415 cells × prose mentions
-  - Source: [`baseline_pre_shumway_20260426_150517/tables/`](baseline_pre_shumway_20260426_150517/) (pre) vs [`tables/`](tables/) (post)
-  - Each row is `file:line — "old" → "new"` with surrounding context
-  - Skip false-positive matches (e.g., a number that happens to appear in unrelated prose)
-  - Effort: ~1-2 hours of mechanical ticking
-- [ ] **Headline numbers** (16 high-priority):
-  - M2 Ann.Ret 21.9% → 21.7% | Vol 19.7% → 19.5% | MDD −24.8% → −22.8% | Beta 0.46 → 0.45
-  - Sub-period Sharpes 0.62→0.59, 1.03→1.04, 1.69→1.70
-  - Factor α: CAPM 23.4% (t=4.08), FF3 23.2% (t=4.48), Carhart 24.3% (t=4.75), FF5 22.9% (t=4.62), FF6 24.1% (t=4.81)
-  - Stress baseline MDD −24.8% → −23.0%
-  - Final-$ multiple 15.7× → 15.3×
-  - Sharpe unchanged at 1.11
-- [ ] **NW t-stat — 1.83\* → 4.37\*\*\*** (unique among numeric updates: significance jump from marginal to highly significant — flag in prose)
-- [ ] **Existing claims to verify post-Shumway** (37 sub-sections E1-E37; full granular detail in §📋 Granular thesis-edit detail below)
+- [x] **Walk all 944 numeric prose candidates** in [`results/PROSE_EDITS.md`](results/PROSE_EDITS.md). The 944 was the auto-flagged upper bound; the canonical drift report narrowed it to 12 real prose mentions, all walked in 0e107d9 with a follow-up sweep in 7ff6ac5.
+- [x] **Headline numbers** (the ones that surface in prose):
+  - M2 Ann.Ret 21.7% ([`latex/main_results.tex:169`](latex/main_results.tex#L169)) | Vol 19.5% (same line) | Beta 0.45, MDD −22.8% via fund-variant comparison ([`latex/main_results.tex:16,40`](latex/main_results.tex#L16))
+  - Sub-period Sharpes 0.59, 1.04, 1.70 ([`latex/appendix.tex:175`](latex/appendix.tex#L175))
+  - Factor α: CAPM 23.4% (t=4.08) ([`latex/main_results.tex:231`](latex/main_results.tex#L231)); FF6 24.1% (t=4.81) ([`latex/introduction.tex:14`](latex/introduction.tex#L14), [`latex/main_results.tex:231`](latex/main_results.tex#L231)). FF3/Carhart/FF5 numbers live in [`tables/table_factor_alphas.tex`](tables/table_factor_alphas.tex), not in prose.
+  - Sharpe 1.11 unchanged; M2 Sharpe CI [0.67, 1.53] ([`latex/introduction.tex:14`](latex/introduction.tex#L14), [`latex/appendix.tex:259`](latex/appendix.tex#L259))
+  - Stress baseline MDD and Final-$ multiple — only appear in tables, no prose update needed.
+- [x] **NW t-stat 1.83\* → 4.37\*\*\*** — landed at [`latex/conclusion.tex:34`](latex/conclusion.tex#L34) and [`latex/main_results.tex:40`](latex/main_results.tex#L40) (fund variant compares 4.37 → 3.56). Also folded into the N5 reframe (see Bucket 2).
+- [x] **Existing claims to verify post-Shumway** (§E1–E37) — VERIFIED 2026-04-28. One real prose drift fixed ([appendix.tex:241](latex/appendix.tex#L241), 0.41→0.43). Stale TODO bookkeeping updated (panic subtypes -0.33→-0.48 / +2.35→+2.40, bootstrap CIs, fund-perf row, "all non-M2 negative β" caveat). One area flagged as needs-recompute: §E9 spanning regressions (no current canonical CSV; not cited in thesis prose). Full row-by-row breakdown in §📋 Granular thesis-edit detail below.
 
 ---
 
@@ -46,18 +40,19 @@ Existing thesis claims, post-Shumway values. **No new sections, no new framing.*
 
 Genuinely new findings or significant reframings. Each item is a writing task. **The 7 items below are the focus of the thesis edits.**
 
-#### N1 — Global financial cycle (UK + JP) — NEW SECTION
+#### N1 — International Robustness (UK + JP) — DONE
 
-- [ ] Add new "International validation" subsection in `latex/main_results.tex` (or as an own section)
-  - **Drafted prose ready**: [`RESULTS_LOG.md`](RESULTS_LOG.md) §12 — copy-paste and edit
-  - **Data**:
-    - UK: [`results/intl_uk_summary.csv`](results/intl_uk_summary.csv) (regional π, Sharpe +0.631) vs [`results/intl_uk_summary_uspi.csv`](results/intl_uk_summary_uspi.csv) (US π, Sharpe **+0.678**)
-    - JP: [`results/intl_jp_summary.csv`](results/intl_jp_summary.csv) (regional π, +0.435) vs [`results/intl_jp_summary_uspi.csv`](results/intl_jp_summary_uspi.csv) (US π, **+0.525**, MDD halved -33% → -18%)
-  - **Citation**: Rey (2013) — global financial cycle channel
-  - **Caveat 1** — JP M2 (0.52) < JP market (0.86): cite Asness/Moskowitz/Pedersen (2013) on JP momentum weakness
-  - **Caveat 2** — UK M2 (0.68) ~ UK market (0.62): residual L/S exposure of dollar-neutral construction
-  - **Methodology footnote**: BANK_REL replaces CS_z (no Moody's BAA-AAA for UK/JP); 4-feature HMM. See [`INTL_VALIDATION_PLAN.md`](INTL_VALIDATION_PLAN.md)
-  - **Methodology footnote**: strict-mode Shumway-intl applied (UK 219 rows, JP 85)
+**Decision locked**: per-region 4-pass HMM feature selection (DD+VOL+REL\_N for both UK and JP). The original transplanted-template approach (DD+DISP+REL\_N+BANK\_REL) failed Pass-1 quality screen for both regions (UK ESS=14, JP ESS=4). The "global financial cycle" framing originally planned was DROPPED -- with proper per-region selection, UK regional π (0.84) substantially beats US π (0.68), inverting the original headline; JP regional (0.50) is a near-tie with US π (0.52). The N1 section is framed as a robustness check: the cross-sectional regime-momentum mechanism extends to UK and Japan when each region's HMM is fit on locally-selected features.
+
+- [x] §5.5 `\subsection{International Robustness}` landed at [`latex/main_results.tex:235`](latex/main_results.tex#L235) (commits 6583e5e + 745ff1d). ~130-word prose + footnote + table input + closing paragraph follows.
+- [x] `\input{tables/table_international_results}` -- table is canonical-generated by `scripts/build_thesis_tables.py` `render_table_international_results` registered to step 82 of `run_pipeline.py` (commit 2819057). Auto-regenerates from `results/thesis/intl_<region>_summary.csv` on every full pipeline run.
+- [x] Appendix `\section{International HMM Feature Selection}\label{app:intl_feature_selection}` landed at [`latex/appendix.tex:341`](latex/appendix.tex#L341) (commit 6583e5e). Brief methodology note (4-pass procedure, 5-feature pool, BANK\_REL substitution, transplanted-template Pass-1 failure).
+- [x] AMP 2013 caveat for JP momentum weakness landed via `\citep{Asness2013}` (citation key fix in 13aa0a7).
+- [x] Conclusion `\paragraph{International replication}` future-work paragraph removed (commit 2819057) -- the work it described has been done.
+- [x] Methodology section + data section explicitly NOT touched per user direction (lean robustness check, not methodological overhaul).
+- [x] Snapshots saved: `baseline_pre_intl_featuresel_20260428_134241/`, `baseline_pre_intl_phase_c_20260429_135446/`, `baseline_post_intl_phase_c_20260429_155420/`.
+- [x] Memory entry: `~/.claude/projects/.../memory/project_intl_robustness_finding.md` (indexed in MEMORY.md).
+- [x] Audit verified post-landing (commit 745ff1d): pdflatex compiles cleanly (88 pages, 0 undefined refs/cites); all numbers in §5.5 match `PRODUCTION_METRICS.json` `'international'` block within 0.005; corrected "NYSE-equivalent breakpoints" misclaim (intl uses unconditional decile breakpoints across all listed stocks); date span fixed to "1990--2025".
 
 #### N2 — Cross-sectional re-ranking framing — DONE
 
@@ -74,56 +69,29 @@ Genuinely new findings or significant reframings. Each item is a writing task. *
 
 **Decision locked**: keep production specs (HMM `DD+CS+DISP+REL_N`, XGB `depth=4 lr=0.05 n=500`). **Neither the HMM CV nor the XGB CV result is cited in the thesis** — both are flagged as future research only. The existing "specification-search" / "test-set tuned" caveats in `latex/data_section.tex`, `latex/methodology.tex`, `latex/appendix.tex` STAY IN PLACE as honest acknowledgments. Existing in-thesis tables (`table_xgb_hyperparams.tex`, `table_feature_selection.tex`) and their prose are unchanged by N3 — only post-Shumway numbers refresh via Bucket 1.
 
-- [ ] **Edit #6 (future work — HMM feature selection)** — paragraph in `latex/future_work_full.tex` on CV as more robust HMM feature-selection. **Draft prose** (does NOT reveal CV findings):
+- [x] **Edit #6 (future work — HMM feature selection)** — landed at [`latex/conclusion.tex:53`](latex/conclusion.tex#L53) (in 3c8f6e5). Refers to Sections~\ref{sec:feature_selection} and \ref{sec:limitations}; describes 5-fold expanding-window CV on 1990-2010 with rolling-window robustness checks. No CV findings cited.
+- [x] **Edit #7 (future work — XGB hyperparameter dissection)** — landed at [`latex/conclusion.tex:56`](latex/conclusion.tex#L56) (in 3c8f6e5). Frames dissection as fine-resolution sweep evaluated on Sharpe AND on long/short-leg z-score profiles across regimes; references Section~\ref{sec:panic} and Appendix~\ref{app:xgb_sensitivity}. No CV findings cited.
+  - **Note:** Both paragraphs landed in [`latex/conclusion.tex`](latex/conclusion.tex), not [`latex/future_work_full.tex`](latex/future_work_full.tex), per implementation choice. Original plan referenced `future_work_full.tex` but conclusion.tex was the right home given existing limitations/future-research framing there.
 
-  > Future research should replace the test-period-evaluated 4-pass feature-selection pipeline used here (Section~X.Y) with a cross-validation procedure run entirely within the training partition — for instance, a 5-fold expanding-window CV on the 1990-2010 panel that never touches the 2011-2025 test data — combined with rolling-window robustness checks at multiple training-end dates to validate stability of the chosen feature set across regimes.
+#### N5 — NW t-stat significance jump — DONE
 
-  No in-thesis citations to specific CV results.
+Defensive paragraph rewritten in 0e107d9. Both rows below shipped.
 
-- [ ] **Edit #7 (future work — XGB hyperparameter dissection)** — paragraph in `latex/future_work_full.tex`. **Draft prose**:
+- [x] Rewrote the defensive t-stat paragraph at [`latex/conclusion.tex:34`](latex/conclusion.tex#L34): "The Newey--West $t$-statistic on M2's excess return over the market is 4.37\textsuperscript{***}, well above conventional thresholds, and the factor-model alphas in Appendix~\ref{app:factor_alphas} confirm this strength across all five specifications (CAPM, FF3, Carhart, FF5, FF6: every $t > 4$)."
+- [x] Updated wherever the t-stat appears in [`latex/main_results.tex:40`](latex/main_results.tex#L40) (fund-variant comparison: 4.37\*\*\* → 3.56\*\*\*) and other prose mentions covered by the canonical drift sweep (phase F, 7ff6ac5).
 
-  > A natural extension of this work is a systematic dissection of the XGBoost hyperparameter space — sweeping tree depth, learning rate, and ensemble size at fine resolution and comparing not only out-of-sample Sharpe ratios but also the cross-sectional z-scores of long- and short-leg selections across regimes. Such an analysis would test whether the regime-conditional term-structure shape we identify (Section~X.Y) is robust to model-capacity choices, or whether the panic-recovery selection pattern is specific to the production specification. A rolling-window cross-validation across multiple training-end dates would further test stability of the optimum across market regimes.
+### Citations status (audited 2026-04-28)
 
-  No in-thesis citations to specific CV results.
+Bib audit shows 6 of 8 are already cited in thesis (TODO rows redundant); 2 remain actionable.
 
-- [ ] CV artefacts (`tables/table_hmm_cv.tex`, `tables/table_xgb_cv.tex`, `results/hmm_cv_*`, `results/xgb_cv_*`) exist on disk for follow-up work but are NOT referenced in any `.tex` file. Verify after Bucket 2 edits that no `\input` or `\ref` to these files leaked in.
-
-#### N5 — NW t-stat significance jump — REFRAME defensive paragraph + sharpen
-
-**More than just a number swap.** The current `latex/conclusion.tex` paragraph **defends** the low t-stat:
-
-> "The Newey-West t-statistic on M2's excess return over the market is **1.83**; this reflects the strategy's near-zero market beta, and the economically meaningful test is the factor model alpha..."
-
-With t=4.37\*\*\* post-Shumway, this defensive framing is no longer needed and reads awkwardly. The paragraph should be **rewritten**, not just have the number swapped.
-
-- [ ] Rewrite the defensive t-stat paragraph in `latex/conclusion.tex` (currently in the limitations/caveats section). New framing: "The Newey-West t-statistic on M2's excess return over the market is 4.37\*\*\* post-Shumway, well above conventional thresholds. The factor-model alphas in Appendix~\ref{app:factor_alphas} confirm this across all five factor specifications (t > 4)."
-- [ ] One-line emphasis wherever the t-stat appears in `latex/main_results.tex`: **t-stat 1.83\* → 4.37\*\*\*** post-Shumway. Marginal → highly significant. Largest single result of the Shumway treatment.
-
-#### N9 — Already strong in existing thesis (verify only, no new prose)
-
-Items that the thesis already frames well; just verify post-Shumway numbers updated via Bucket 1:
-
-- [ ] **Panic subtypes** — `latex/main_results.tex` already says "the overall panic Sharpe of 1.56 is driven entirely by recovery months" with all the right numbers. Just verify the −0.49 / +4.42 / Sharpe-2.35 numbers in PROSE_EDITS.md.
-- [ ] **Ridge baseline** — `latex/main_results.tex` 5.3 nonlinearity section already discusses ridge failure. Just verify the −0.58 number lands consistently and the "all alphas give the same answer" claim is preserved.
-- [ ] **Term-structure framing** — `latex/conclusion.tex` already mentions "term-structure reorganisation". Detailed §5.2 figure explanations are already tracked in the "Pre-existing thesis-writing tasks" section below (improve Chapter 5.2 graphs).
-
-#### N6 — Connect 30-year backtest to stress scenario — REFRAME
-
-- [ ] Add explicit cross-link between §5.4.3 (30-year backtest) and §5.4 (stress test).
-  - The 36-month dot-com bear (2000-2002, -36% cumulative, MDD -64.8%) is the documented version of the synthetic 24+ month sustained-bear stress scenario.
-  - Hypothetical → real. One paragraph that ties the two analyses together explicitly.
-
----
-
-### Citations to add (across N1, N2)
-
-- [ ] **Rey, H. (2013)** — global financial cycle (N1 framing)
-- [ ] **Asness, Moskowitz & Pedersen (2013)** — international momentum (N1 JP caveat)
-- [ ] **Daniel & Moskowitz (2016)** — distinguish their inversion from N2 re-ranking
-- [ ] **Shumway (1997, 2001)** — delisting bias methodology footnote
-- [ ] **Jegadeesh (1990)** + **Lehmann (1990)** — short-term reversal (M5 mechanism prose, mom_1 neutral)
-- [ ] **Novy-Marx (2012)** — intermediate-horizon momentum (mom_8 peak)
-- [ ] **Lee & Swaminathan (2000)** — momentum lifecycle (mom_12 decay)
+- [x] **Asness, Moskowitz & Pedersen (2013)** (`Asness2013`) — already cited (1 use, [literature_review.tex](latex/literature_review.tex))
+- [x] **Daniel & Moskowitz (2016)** (`DanielMoskowitz2016`) — already cited (16 uses across thesis)
+- [x] **Shumway (2001)** (`Shumway2001`) — already cited (2 uses, appendix.tex + data_section.tex). Shumway 1997 not separately needed (delisting-bias methodology covered by 2001).
+- [x] **Jegadeesh (1990)** (`Jegadeesh1990`) — already cited (2 uses)
+- [x] **Novy-Marx (2012)** (`NovyMarx2012`) — already cited (3 uses)
+- [x] **Lee & Swaminathan (2000)** (`LeeSwaminathan2000`) — already cited (1 use)
+- [~] **Rey, H. (2013)** — bib entry added 2026-04-28 but DROPPED from thesis prose. Was originally planned for N1 international subsection's "global financial cycle" framing; the framing itself was dropped after per-region CV-selection inverted the UK headline (regional π beats US π by +0.16 in UK; near-tie in JP). N1 §5.5 is now a clean robustness check rather than a global-cycle hypothesis test. Bib entry remains for any future use.
+- [ ] **Lehmann (1990)** (`Lehmann1990`) — bib entry added 2026-04-28; intended for M5 short-term reversal prose (mom_1 neutral mechanism); independent of N1, can be cited whenever the prose lands
 
 ---
 
@@ -184,48 +152,6 @@ CV results stay out of thesis prose entirely. These exist on disk for follow-up 
 
 ---
 
-## 💡 Optional future-work analyses (candidates for `latex/future_work_full.tex`)
-
-Carried over from old project planning; absent from current thesis and from `future_work_full.tex`. Out of scope for this draft, but each is a plausible "next paper" extension. Add to future-work section if any of them resonates.
-
-- [ ] **Portfolio characteristics by regime** — size, β, B/M, profitability, leverage of long/short legs in calm vs panic. Partial scaffolding exists in [`scripts/portfolio_characteristics_chart.py`](scripts/portfolio_characteristics_chart.py), [`scripts/portfolio_chars_options.py`](scripts/portfolio_chars_options.py) — never landed in thesis.
-- [ ] **Forward return decomposition** — in panic reversal bets, separate stock-specific recovery from market-recovery contribution. Adjacent to but distinct from §E15 panic subtypes (which split panic-crash vs panic-recovery months).
-- [ ] **Holding-period analysis** — hold the panic portfolio 1, 3, 6 months instead of monthly rebalancing. Tests whether the panic edge is genuine reversal or short-lived noise.
-- [ ] **Sector rotation by regime** — which sectors does the strategy buy/short in calm vs panic? Currently we only document the term-structure shape, not the cross-sectional sector tilt.
-
----
-
-## 🎯 Final wrap-up (after Bucket 1 + Bucket 2)
-
-- [ ] **Final coherence pass** — read straight through the post-edit thesis; check that the new sections (N1 international, N2 re-ranking) cross-reference cleanly with the existing §5.4.3 30-year backtest and §5.4 stress test, and that no contradictory sentence survived from a deleted paragraph.
-- [ ] **Send updated draft to Denis** once Buckets 1 + 2 land.
-
----
-
-## ⚙️ Source-of-truth framework — BUILT and wired into pipeline
-
-Canonical metrics store. Every published thesis number lives under a named key. Wired into [`run_pipeline.py`](run_pipeline.py) as steps 21 ([`build_metrics.py`](scripts/build_metrics.py)), 22 ([`build_canonical_macros.py`](scripts/build_canonical_macros.py)), 24 ([`verify_thesis_consistency.py`](scripts/verify_thesis_consistency.py)) — runs automatically after every full pipeline.
-
-**Files (all built):**
-- [`results/PRODUCTION_METRICS.json`](results/PRODUCTION_METRICS.json) — canonical store (~200 metrics across 12 sections)
-- [`scripts/_canonical_metrics.py`](scripts/_canonical_metrics.py) — read/write helper (`set_metric`, `get_metric`)
-- [`scripts/build_metrics.py`](scripts/build_metrics.py) — parses `tables/*.tex` + `results/*.csv` → JSON
-- [`scripts/build_canonical_macros.py`](scripts/build_canonical_macros.py) — emits `latex/canonical_macros.tex`
-- [`scripts/verify_thesis_consistency.py`](scripts/verify_thesis_consistency.py) — flags prose-vs-JSON mismatches
-- [`latex/canonical_macros.tex`](latex/canonical_macros.tex) — auto-generated; do NOT hand-edit
-
-**Open follow-ups** (tracked in 🛠️ Engineering follow-ups below): CI hook, thesis macro adoption, verifier regex.
-
-**Usage when macros adopted:**
-
-```latex
-\input{canonical_macros}   % at the top of main.tex once
-
-The strategy delivers a Sharpe ratio of \mmperfm2sharpe with a Newey-West
-t-statistic of \mmperfm2nwt, well above conventional thresholds.
-```
-
----
 
 ## 🛠️ Engineering / testing follow-ups (low priority)
 
@@ -272,218 +198,219 @@ Each requires a bit-exact regression check (`md5 tables/*.tex plots/*.png result
 
 Reference layer for the HARD STOP section. Triage tags: **[M]** = must land, **[S]** = should land, **[N]** = nice to have.
 
-### §A. Numeric updates — full list (Bucket 1 headlines, with sources)
+### §A. Numeric updates — full list (Bucket 1 headlines, with sources) — DONE
 
-- [ ] [M] M2 Ann.Ret 21.9% → **21.7%** — [`tables/table_performance.tex`](tables/table_performance.tex), goes to [`latex/main_results.tex`](latex/main_results.tex)
-- [ ] [M] M2 Ann.Vol 19.7% → **19.5%** — same
-- [ ] [M] M2 Sharpe 1.11 → **1.11** (unchanged) — same
-- [ ] [M] M2 Max DD −24.8% → **−22.8%** — same
-- [ ] [M] M2 Beta 0.46 → **0.45** — same
-- [ ] [M] M2 NW t-stat: 1.83\* → **4.37\*\*\*** *(major significance jump)* — same
-- [ ] [M] M2 Final-$ multiple 15.7× → **15.3×** — same
-- [ ] [M] Sub-period Sharpe 2011–2015: 0.62 → **0.59** — [`tables/table_subperiod.tex`](tables/table_subperiod.tex)
-- [ ] [M] Sub-period 2016–2020: 1.03 → **1.04** — same
-- [ ] [M] Sub-period 2021–2025: 1.69 → **1.70** — same
-- [ ] [M] CAPM α: 23.8% → **23.4% (t=4.08)** — [`tables/table_factor_alphas.tex`](tables/table_factor_alphas.tex)
-- [ ] [M] FF3 α: 23.7% → **23.2% (t=4.48)** — same
-- [ ] [M] Carhart α: 24.9% → **24.3% (t=4.75)** — same
-- [ ] [M] FF5 α: 23.4% → **22.9% (t=4.62)** — same
-- [ ] [M] FF6 α: 24.7% → **24.1% (t=4.81)** — same, mentioned in [`latex/main_results.tex`](latex/main_results.tex)
-- [ ] [M] Stress baseline MDD −24.8% → **−23.0%** — [`tables/table_stress_scenarios.tex`](tables/table_stress_scenarios.tex)
-- [ ] [M] All other prose mentions of pre-Shumway numbers — see [`results/PROSE_EDITS.md`](results/PROSE_EDITS.md) (944 candidates, 415 cells across 40 tables)
+All prose-side updates landed in 0e107d9 + 7ff6ac5. Items marked [tables-only] never appeared in prose (verified by grep across `latex/*.tex`); the table cells themselves regenerated via the post-Shumway pipeline rerun.
 
-### §E. Existing claims worth restating / verifying post-Shumway
+- [x] [M] M2 Ann.Ret 21.9% → **21.7%** — [`latex/main_results.tex:169`](latex/main_results.tex#L169)
+- [x] [M] M2 Ann.Vol 19.7% → **19.5%** — [`latex/main_results.tex:169`](latex/main_results.tex#L169)
+- [x] [M] M2 Sharpe 1.11 unchanged — [`latex/introduction.tex:14`](latex/introduction.tex#L14)
+- [x] [M] M2 Max DD −24.8% → **−22.8%** — [`latex/main_results.tex:16`](latex/main_results.tex#L16) (fund-variant comparison)
+- [x] [M] M2 Beta 0.46 → **0.45** — [`latex/main_results.tex:16,40`](latex/main_results.tex#L16)
+- [x] [M] M2 NW t-stat: 1.83\* → **4.37\*\*\*** — [`latex/conclusion.tex:34`](latex/conclusion.tex#L34), [`latex/main_results.tex:40`](latex/main_results.tex#L40)
+- [x] [M] M2 Final-$ multiple — [tables-only] no prose mention; [`tables/table_performance.tex`](tables/table_performance.tex) regenerated post-Shumway
+- [x] [M] Sub-period Sharpes 0.62→**0.59**, 1.03→**1.04**, 1.69→**1.70** — [`latex/appendix.tex:175`](latex/appendix.tex#L175)
+- [x] [M] CAPM α: 23.8% → **23.4% (t=4.08)** — [`latex/main_results.tex:231`](latex/main_results.tex#L231)
+- [x] [M] FF3 α: **23.2% (t=4.48)** — [tables-only] [`tables/table_factor_alphas.tex`](tables/table_factor_alphas.tex)
+- [x] [M] Carhart α: **24.3% (t=4.75)** — [tables-only]
+- [x] [M] FF5 α: **22.9% (t=4.62)** — [tables-only]
+- [x] [M] FF6 α: 24.7% → **24.1% (t=4.81)** — [`latex/introduction.tex:14`](latex/introduction.tex#L14), [`latex/main_results.tex:231`](latex/main_results.tex#L231) footnote
+- [x] [M] Stress baseline MDD — [tables-only] [`tables/table_stress_scenarios.tex`](tables/table_stress_scenarios.tex) regenerated post-Shumway
+- [x] [M] All other prose mentions of pre-Shumway numbers — phase F drift sweep (7ff6ac5) walked the canonical-CSV-traced drift report after the directory restructure
 
-#### §E0. CV tables NOT cited in thesis (per N3 decision)
+### §E. Existing claims worth restating / verifying post-Shumway — VERIFIED 2026-04-28
 
-- [ ] [M] `tables/table_hmm_cv.tex` and `tables/table_xgb_cv.tex` exist on disk but are NOT referenced in any `.tex` file. Verify no `\input` or `\ref` leaked in during Bucket 2 edits.
-- [ ] [N] Companion CSVs (`results/hmm_cv_*`, `results/xgb_cv_*`, `results/hmm_feature_selection_pass{1,2,3}.csv`) kept for audit; not cited in thesis.
-- [ ] [M] Existing thesis tables `tables/table_xgb_hyperparams.tex` and `tables/table_feature_selection.tex` STAY in place; verify post-Shumway numeric updates flowed through (covered in §A and Bucket 1 prose walk).
+Walked all subsections against canonical tables/CSVs. Results inline below. Two real drifts found and fixed:
 
-#### §E1–E4. Ablations
+- **Drift fixed:** [`latex/appendix.tex:241`](latex/appendix.tex#L241) "from 1.11 to 0.41" → 0.43 (matches three canonical tables and main_results.tex:27)
+- **False-alarm investigated and dismissed:** [`tables/table_fundamentals_ablation.tex`](tables/table_fundamentals_ablation.tex) baseline NW $t$ = 1.83\* — column header is "NW $t$ (exc.)" = market-excess t-stat (different metric from raw-mean NW $t$ = 4.37\*\*\* in `table_performance.tex`). Canonical CSV [`results/thesis/fundamentals_test_results.csv`](results/thesis/fundamentals_test_results.csv) confirms `nw_t_excess = 1.8290` post-Shumway.
 
-- [ ] [M] **Removing π**: Sharpe 1.11 → **0.41** — [`tables/table_kitchen_sink.tex`](tables/table_kitchen_sink.tex), [`tables/table_regime_signal_ablation.tex`](tables/table_regime_signal_ablation.tex)
-- [ ] [M] Raw stress indicators (no HMM): Sharpe **0.257** — [`tables/table_regime_signal_ablation.tex`](tables/table_regime_signal_ablation.tex)
-- [ ] [M] No regime signal: Sharpe **0.429** — same
-- [ ] [M] HMM smoothing essential — raw indicators *worse than no signal* in some configs
-- [ ] [M] GHM-style classification collapses: M2 1.11 vs SLOW 0.07, MED 0.12, FAST 0.26, DYN 0.03 — [`tables/table_ghm_comparison.tex`](tables/table_ghm_comparison.tex)
-- [ ] [M] Adding fundamentals dilutes: 1.11 → **0.92** despite 43% fund SHAP — [`tables/table_fundamentals_ablation.tex`](tables/table_fundamentals_ablation.tex)
-- [ ] [M] Raw-return targets essential — [`tables/table_alt_targets.tex`](tables/table_alt_targets.tex), [`tables/table_risk_aversion.tex`](tables/table_risk_aversion.tex)
-- [ ] [S] Note: MV with γ=2 actually *better* (Sharpe 1.135, MDD −22.0%); Log-MV γ=5 best MDD (−18.7%) — qualifies "raw essential"
-- [ ] [M] Sequential boosting essential — RF bagging loses ~0.3 Sharpe — [`results/random_forest_results.csv`](results/random_forest_results.csv)
+#### §E0. CV tables NOT cited in thesis (per N3 decision) — VERIFIED ✅
 
-#### §E5. Regime-conditional Sharpe
+- [x] [M] `tables/table_hmm_cv.tex` and `tables/table_xgb_cv.tex` exist on disk; **0 `\input` or `\ref` references in latex/** (grep clean).
+- [x] [N] Companion CSVs (`results/hmm_cv_*`, `results/xgb_cv_*`, `results/hmm_feature_selection_pass{1,2,3}.csv`) on disk; not cited.
+- [x] [M] [`tables/table_xgb_hyperparams.tex`](tables/table_xgb_hyperparams.tex) still inputted at [`appendix.tex:193`](latex/appendix.tex#L193); [`tables/table_feature_selection.tex`](tables/table_feature_selection.tex) still inputted at [`data_section.tex:73`](latex/data_section.tex#L73).
 
-- [ ] [M] M2 Calm **0.84** (was 0.82); M2 Panic **1.53** (was 1.56) — [`tables/table_regime_sharpe.tex`](tables/table_regime_sharpe.tex)
+#### §E1–E4. Ablations — VERIFIED ✅
 
-#### §E6. Cost sensitivity
+- [x] [M] **Removing π**: Sharpe 1.11 → **0.43** (was stale "0.41" in TODO) — [`tables/table_kitchen_sink.tex`](tables/table_kitchen_sink.tex) shows 0.43, [`tables/table_regime_signal_ablation.tex`](tables/table_regime_signal_ablation.tex) shows 0.429, [`tables/table_placebo.tex`](tables/table_placebo.tex) shows 0.43, [`latex/main_results.tex:27`](latex/main_results.tex#L27) prose says 0.43; appendix.tex:241 fixed
+- [x] [M] Raw stress indicators (no HMM): Sharpe **0.257** ✓ matches [`tables/table_regime_signal_ablation.tex`](tables/table_regime_signal_ablation.tex)
+- [x] [M] No regime signal: Sharpe **0.429** ✓ matches same
+- [x] [M] HMM smoothing essential — raw indicators (0.257) *worse than no signal* (0.429) confirmed in regime_signal_ablation table
+- [x] [M] GHM-style classification collapses: M2 1.11 vs SLOW 0.07, MED 0.12, FAST 0.26, DYN 0.03 ✓ exact match in [`tables/table_ghm_comparison.tex`](tables/table_ghm_comparison.tex)
+- [x] [M] Adding fundamentals dilutes: 1.11 → **0.89** (was stale "0.92" in TODO) despite 44% fund SHAP — [`tables/table_fundamentals_ablation.tex`](tables/table_fundamentals_ablation.tex), [`latex/main_results.tex:16,40`](latex/main_results.tex#L16), [`latex/conclusion.tex:50`](latex/conclusion.tex#L50)
+- [x] [M] Raw-return targets essential — [`tables/table_alt_targets.tex`](tables/table_alt_targets.tex) verified
+- [x] [S] Note: MV with γ=2 actually *better* (Sharpe 1.135, MDD −22.0%); Log-MV γ=5 best MDD (−18.7%) ✓ matches [`tables/table_alt_targets.tex`](tables/table_alt_targets.tex)
+- [x] [M] Sequential boosting essential — RF bagging loses ~0.3 Sharpe — [`results/thesis/random_forest_results.csv`](results/thesis/random_forest_results.csv) (verified existence)
 
-- [ ] [S] M2 at 0/5/10/20/30/50 bps: 1.19/1.15/1.11/1.03/0.95/**0.78** — [`tables/table_cost_sensitivity.tex`](tables/table_cost_sensitivity.tex)
-- [ ] [S] M2 is the **only** strategy profitable at 50bps; benchmarks unprofitable by 30bps
+#### §E5. Regime-conditional Sharpe — VERIFIED ✅
 
-#### §E7. Threshold sensitivity
+- [x] [M] M2 Calm **0.84**; M2 Panic **1.53** ✓ exact match in [`tables/table_regime_sharpe.tex`](tables/table_regime_sharpe.tex)
 
-- [ ] [S] π > 0.25, 0.50, 0.75 all give stable regime-conditional Sharpes — [`tables/table_threshold_sensitivity.tex`](tables/table_threshold_sensitivity.tex)
+#### §E6. Cost sensitivity — VERIFIED ✅
 
-#### §E8. HMM diagnostics
+- [x] [S] M2 at 0/5/10/20/30/50 bps: 1.19/1.15/1.11/1.03/0.95/**0.78** ✓ exact match in [`tables/table_cost_sensitivity.tex`](tables/table_cost_sensitivity.tex)
+- [x] [S] M2 only strategy profitable at 50bps; M0/M1/Fixed-12/Fixed-1 all unprofitable by 30bps confirmed
 
-- [ ] [S] K=2 best AND most stable; K=3 → 0.83, K=4 → 0.61 (std=0.29), K=5 → 0.72 — [`tables/table_multistate_hmm.tex`](tables/table_multistate_hmm.tex)
-- [ ] [S] **Regime separation magnitudes** (95% CI excludes 0): DD Δ=−1.51 [−1.80,−1.23]; DISP Δ=+1.12 [+0.87,+1.35]; REL_N Δ=−1.42 [−1.59,−1.24]; CS Δ=+0.90 [+0.62,+1.16] — [`tables/table_hmm_separation.tex`](tables/table_hmm_separation.tex)
-- [ ] [N] Student-t HMM: no improvement over Gaussian — [`tables/table_student_t_hmm.tex`](tables/table_student_t_hmm.tex)
-- [ ] [N] Gelman-Rubin: chains converge — [`tables/table_gelman_rubin.tex`](tables/table_gelman_rubin.tex)
+#### §E7. Threshold sensitivity — VERIFIED ✅
 
-#### §E9. Spanning regressions
+- [x] [S] π > 0.25, 0.50, 0.75: regime Sharpes stable across all three — [`tables/table_threshold_sensitivity.tex`](tables/table_threshold_sensitivity.tex)
 
-- [ ] [M] M2 ~ M1: M2 retains alpha; M1 ~ M2: M1 alpha doesn't survive — computed by [`scripts/new_ls_analyses.py`](scripts/new_ls_analyses.py)
+#### §E8. HMM diagnostics — VERIFIED ✅
 
-#### §E10. Granger causality
+- [x] [S] K=2 best (Sharpe 1.107, std 0.000); K=3 → 0.831, K=4 → 0.606 (std 0.291), K=5 → 0.724 ✓ — [`tables/table_multistate_hmm.tex`](tables/table_multistate_hmm.tex)
+- [x] [S] **Regime separation** (95% CI excludes 0): DD Δ=−1.507 [−1.794,−1.215]; DISP Δ=+1.113 [+0.869,+1.353]; REL_N Δ=−1.419 [−1.591,−1.231]; CS Δ=+0.900 [+0.626,+1.159] ✓ — [`tables/table_hmm_separation.tex`](tables/table_hmm_separation.tex)
+- [ ] [N] Student-t HMM: not separately verified ([`tables/table_student_t_hmm.tex`](tables/table_student_t_hmm.tex))
+- [ ] [N] Gelman-Rubin: not separately verified ([`tables/table_gelman_rubin.tex`](tables/table_gelman_rubin.tex))
 
-- [ ] [S] π → IC_mom and IC_mom → π **both non-significant** (F<2, p>0.10 lags 1–3) — [`tables/table_granger.tex`](tables/table_granger.tex). Frame: model uses regime + momentum *jointly*, not sequentially
+#### §E9. Spanning regressions — NEEDS RECOMPUTE
 
-#### §E12. Bootstrap inference
+- [ ] [M] M2 ~ M1 / M1 ~ M2 spanning regressions — no dedicated CSV; needs rerun of [`scripts/new_ls_analyses.py`](scripts/new_ls_analyses.py) to re-confirm post-Shumway. Not currently cited in thesis prose (grep: no "spanning" mention).
 
-- [ ] [M] M2 Sharpe 1.11, **95% CI [0.66, 1.54]** — [`tables/table_bootstrap.tex`](tables/table_bootstrap.tex), [`results/bootstrap_sharpe_cis.csv`](results/bootstrap_sharpe_cis.csv)
-- [ ] [M] Calm 0.82 [0.25,1.32]; Panic 1.57 [0.93,2.19]
-- [ ] [S] Panic − Calm: 0.75 [−0.08,1.60], **p=0.074\*** (panic outperformance only marginally significant)
-- [ ] [M] **Paired tests vs benchmarks**: M2 vs M1 **p=0.001**, vs M0 **p=0.010**, vs Fixed 12-mo **p=0.006**, vs Fixed 1-mo **p=0.024** — [`results/bootstrap_paired_tests.csv`](results/bootstrap_paired_tests.csv)
+#### §E10. Granger causality — VERIFIED ✅
 
-#### §E13. Factor loadings
+- [x] [S] π → IC_mom: F=1.61/0.83/0.62, p=0.206/0.439/0.601; IC_mom → π: F=1.69/1.43/1.25, p=0.195/0.243/0.293 (lags 1/2/3). All p>0.18, both directions non-significant ✓ — [`tables/table_granger.tex`](tables/table_granger.tex)
 
-- [ ] [M] M2 has NEGATIVE UMD loading (−0.20 to −0.22) — bets on a different slice
-- [ ] [M] Negative HML (−0.17 to −0.31): growth-tilted; Mkt-RF ≈ −0.15: defensive
-- [ ] [S] Positive CMA in FF5/FF6 (+0.12 to +0.21): investment-tilted
+#### §E12. Bootstrap inference — VERIFIED + STALE TODO NUMBERS UPDATED ✅
 
-#### §E14. Performance table benchmarks
+- [x] [M] M2 Sharpe 1.11, **95% CI [0.67, 1.53]** (TODO had stale "[0.66, 1.54]") — [`tables/table_bootstrap.tex`](tables/table_bootstrap.tex)
+- [x] [M] Calm 0.84 [0.29, 1.32]; Panic 1.54 [0.85, 2.22] (TODO had stale "0.82" / "1.57 [0.93, 2.19]")
+- [x] [S] Panic − Calm: 0.70 [−0.16, 1.59], **p=0.109** (TODO had stale "0.75 / p=0.074\*"). No longer marginally significant — already reframed in [`appendix.tex:259`](latex/appendix.tex#L259) prose
+- [x] [M] **Paired tests vs benchmarks**: M2 vs M1 **p=0.001**, vs M0 p=0.008, vs Fixed-12 p=0.005, vs Fixed-1 p=0.021 ✓ — [`tables/table_bootstrap.tex`](tables/table_bootstrap.tex)
 
-- [ ] [S] All non-M2 strategies have **negative β** (−0.34 to −0.66); M2 is the only L/S strategy with positive β (+0.45) — [`tables/table_performance.tex`](tables/table_performance.tex)
-- [ ] [S] M2 NW t-stat 4.37\*\*\* — strongest of all benchmarks
+#### §E13. Factor loadings — VERIFIED ✅
 
-#### §E15. Panic SUBTYPES (mechanism finding)
+- [x] [M] M2 UMD loading: -0.20 (Carhart) / -0.22 (FF6) ✓ — [`tables/table_factor_alphas.tex`](tables/table_factor_alphas.tex)
+- [x] [M] Negative HML: -0.17 (FF3), -0.22 (Carhart), -0.23 (FF5), -0.31 (FF6); Mkt-RF range -0.13 to -0.19 (defensive) ✓
+- [x] [S] Positive CMA in FF5/FF6: +0.12, +0.21 ✓
 
-- [ ] [M] **Calm Sharpe 0.82** (108 mo) — [`tables/table_panic_subtypes.tex`](tables/table_panic_subtypes.tex)
-- [ ] [M] **Panic-Crash (negative-mkt) Sharpe −0.33** (18 mo) — strategy *loses* in actual crashes
-- [ ] [M] **Panic-Recovery (positive-mkt within panic) Sharpe +2.35** (41 mo)
-- [ ] [M] Reframe: strategy wins by riding the rebound rally after panic onset, not by predicting crashes
+#### §E14. Performance table benchmarks — VERIFIED with caveat ✅
 
-#### §E16. Stress scenario progression
+- [x] [S] M2 only L/S with materially positive β (+0.45). Other strategies: M0 -0.59, Fixed-12 -0.66, Fixed-1 -0.34, **M1 +0.05** (essentially zero, not negative). TODO claim "all non-M2 negative" technically wrong; M1 sits near zero — [`tables/table_performance.tex`](tables/table_performance.tex)
+- [x] [S] M2 NW t-stat 4.37\*\*\* strongest of all benchmarks (others: 0.24, 1.08, 0.43, -0.04) ✓
 
-- [ ] [S] Linear: 3-mo recession adds 10% loss, 6=19%, 12=34%, 18=47%, **24=57%** — [`tables/table_stress_scenarios.tex`](tables/table_stress_scenarios.tex)
-- [ ] [S] Worst-case MDD: 3mo→−38%, 12mo→−49%, **24mo→−69%**
+#### §E15. Panic SUBTYPES — VERIFIED + STALE TODO NUMBERS UPDATED ✅
 
-#### §E17. Ridge baseline (definitive)
+- [x] [M] **Calm Sharpe 0.84** (108 mo) — TODO had stale "0.82" — [`tables/table_panic_subtypes.tex`](tables/table_panic_subtypes.tex)
+- [x] [M] **Panic-Crash Sharpe −0.48** (18 mo, Ann.Ret −9.9%) — TODO had stale "−0.33"; thesis prose [`main_results.tex:86`](latex/main_results.tex#L86) already correct
+- [x] [M] **Panic-Recovery Sharpe +2.40** (41 mo, Ann.Ret 64.7%) — TODO had stale "+2.35"; thesis prose already correct
+- [x] [M] Reframe (strategy wins via rebound rally, not crashes) — already in [`main_results.tex:86`](latex/main_results.tex#L86) ✓
 
-- [ ] [M] Ridge with α∈{0.1,1,10,100,1000}: ALL give Sharpe **−0.58** — [`tables/table_ridge.tex`](tables/table_ridge.tex)
-- [ ] [M] OLS unconstrained: also −0.58
-- [ ] [M] **Linearity is the binding constraint, NOT regularisation choice**
+#### §E16. Stress scenario progression — VERIFIED ✅
 
-#### §E18. Z-scores by horizon
+- [x] [S] Recession losses: 3mo→-10%, 6mo→-19%, 12mo→-34%, 18mo→-47%, **24mo→-57%** ✓ — [`tables/table_stress_scenarios.tex`](tables/table_stress_scenarios.tex)
+- [x] [S] Worst-case MDD: 3mo→-38%, 12mo→-49%, **24mo→-69%** ✓; baseline -23%
 
-- [ ] [S] Calm Long peak at mom_8: +0.39 z; Panic Long flat ≈ −0.13 — [`tables/table_zscore_shap_detail.tex`](tables/table_zscore_shap_detail.tex)
-- [ ] [S] Panic Short at mom_1: +0.30 z (recent winners get shorted)
-- [ ] [S] SHAP shares: mom_11 18.6–23.1%, mom_9 12.7–15.5%, mom_8 10.2–12.8%
+#### §E17. Ridge baseline — VERIFIED ✅
 
-#### §E19. Tree path / combo analysis
+- [x] [M] Ridge α∈{0.1, 1, 10, 100}: all Sharpe **-0.58**; α=1000: -0.54 (slight tail-off) — [`tables/table_ridge.tex`](tables/table_ridge.tex)
+- [x] [M] OLS unconstrained: also -0.58 ✓
+- [x] [M] **Linearity is the binding constraint, NOT regularisation** — confirmed (caption says "Sharpe of -0.57 robust across all regularisation strengths")
 
-- [ ] [N] Most common decision paths use multi-horizon conditioning — [`results/tree_path_results.csv`](results/tree_path_results.csv)
-- [ ] [N] Combo frequencies: I+L 12.9–14.8%, M+I+L ~10%, single-horizon 5–7% — [`tables/table_combo_freq.tex`](tables/table_combo_freq.tex)
-- [ ] [N] Long-combo z-scores: I+L at +0.45 z; S+L at +0.46 — [`tables/table_combo_long_cp.tex`](tables/table_combo_long_cp.tex)
+#### §E18. Z-scores by horizon — VERIFIED ✅
 
-#### §E20. Sample summary
+- [x] [S] Calm Long peak at mom_8: +0.39 z ✓; Panic Long flat in -0.09 to -0.19 range ✓ — [`tables/table_zscore_shap_detail.tex`](tables/table_zscore_shap_detail.tex)
+- [x] [S] Panic Short at mom_1: +0.30 z ✓
+- [x] [S] SHAP shares: mom_8 calm 10.2/12.8%, mom_9 12.7/14.5%, mom_11 visible in table ✓
 
-- [ ] [N] 16,657 unique stocks; 1.72M stock-month obs; train 4,838/mo, test 3,336/mo — [`tables/table_sample_summary.tex`](tables/table_sample_summary.tex)
+#### §E19. Tree path / combo analysis — VERIFIED ✅
 
-#### §E21. Alt train/test splits robustness
+- [x] [N] Multi-horizon conditioning dominates: I+L 14.0/14.7/12.8/14.5% across regimes/legs — [`tables/table_combo_freq.tex`](tables/table_combo_freq.tex)
+- [x] [N] Long-combo z-scores: I+L +0.39 avg, S+L +0.33 avg — [`tables/table_combo_long_cp.tex`](tables/table_combo_long_cp.tex). TODO's "I+L +0.45" was old number; current avg is +0.39
 
-- [ ] [S] 1990-2010 baseline = 1.11; verify others post-Shumway are robust — [`tables/table_alt_splits.tex`](tables/table_alt_splits.tex)
+#### §E20. Sample summary — VERIFIED ✅
 
-#### §E22. IC rotation across regimes
+- [x] [N] 16,657 unique stocks ✓; 1,718,101 stock-month obs (≈1.72M) ✓; train 4,838/mo, test 3,336/mo ✓ — [`tables/table_sample_summary.tex`](tables/table_sample_summary.tex)
 
-- [ ] [S] Per-horizon IC by calm vs panic — [`tables/table_ic_rotation.tex`](tables/table_ic_rotation.tex)
-- [ ] [S] Per-horizon IC similar across regimes; regime difference is *which side of distribution* model picks
+#### §E21. Alt train/test splits robustness — VERIFIED ✅
 
-#### §E23. HMM feature ablation
+- [x] [S] 1990-2010 baseline test = M2 Sharpe 1.11, M1 -0.01 ✓ — [`tables/table_alt_splits.tex`](tables/table_alt_splits.tex). Currently shows ONLY the baseline split (one row); other splits not in this version of the table.
 
-- [ ] [S] Subsets of 4-feature HMM input — [`tables/table_hmm_feature_ablation.tex`](tables/table_hmm_feature_ablation.tex). Full 4F baseline 0.97 (in-sample)
-- [ ] [S] In-sample feature ablation REMAINS the canonical justification for the 4-feature HMM input; CV-based selection deferred to N3 Edit #6 future work
+#### §E22. IC rotation across regimes — VERIFIED ✅
 
-#### §E24. Fundamentals factor alphas
+- [x] [S] Per-horizon IC by calm vs panic: calm IC positive and significant (mom_8: 0.032 t=3.31\*\*\*, mom_10: 0.034 t=3.45\*\*\*); panic IC small and non-significant (mom_8: 0.013 t=0.79) — [`tables/table_ic_rotation.tex`](tables/table_ic_rotation.tex)
+- [x] [S] Calm IC > panic IC at every horizon; regime difference is which side of cross-sectional distribution model picks ✓
 
-- [ ] [S] Fund-included M2 alphas: CAPM α drops 23.4% → **18.2%** — [`tables/table_fund_alphas.tex`](tables/table_fund_alphas.tex)
-- [ ] [N] Fund-included perf row: Ann.Ret 16.6%, Vol 18.6%, Sharpe **0.92**, MDD −18.4%, β=0.11, NW t=3.70\*\*\* — [`tables/table_performance_fund_row.tex`](tables/table_performance_fund_row.tex)
+#### §E23. HMM feature ablation — VERIFIED ✅
 
-#### §E25. LR (M1) coefficients
+- [x] [S] Full 4F baseline 0.97 (in-sample) ✓; DD only 0.66; drop DD -0.46; drop DISP -0.01; drop REL_N -0.54; drop CS -0.01 — [`tables/table_hmm_feature_ablation.tex`](tables/table_hmm_feature_ablation.tex). DD and REL_N are the load-bearing features.
+- [x] [S] In-sample feature ablation remains canonical justification for 4F input; CV deferred to N3 Edit #6 ✓
 
-- [ ] [S] LR coefficient estimates — [`tables/table_lr_coef.tex`](tables/table_lr_coef.tex)
-- [ ] [S] M1's coefficients stable but sign-aware portfolio-formation step fails (M1 IC>0 but Sharpe ≈ 0)
+#### §E24. Fundamentals factor alphas — VERIFIED + STALE TODO NUMBERS UPDATED ✅
 
-#### §E26. SHAP feature attribution
+- [x] [S] Fund-included CAPM α: **17.6% (t=3.04)** — TODO had stale "18.2%" (which is the Carhart α, not CAPM) — [`tables/table_fund_alphas.tex`](tables/table_fund_alphas.tex). Full row: CAPM 17.6/3.04, FF3 17.1/3.12, Carhart 18.2/3.22, FF5 16.4/3.02, FF6 17.7/3.17.
+- [x] [N] Fund-included perf: Sharpe **0.89** (TODO had stale "0.92"), β=**0.07** (TODO had "0.11"), MDD **-18.3%** (TODO had "-18.4%"), NW t=**3.56\*\*\*** raw / 0.61 market-excess (TODO had "3.70") — [`tables/table_fundamentals_ablation.tex`](tables/table_fundamentals_ablation.tex), [`results/thesis/fundamentals_test_results.csv`](results/thesis/fundamentals_test_results.csv)
 
-- [ ] [M] Overall SHAP: Momentum **54%**, π_filter **46%** — [`tables/table_shap.tex`](tables/table_shap.tex)
-- [ ] [M] Calm: Momentum 51%, π 49%
-- [ ] [M] Panic: Momentum 59%, π 41%
-- [ ] [M] Implication: model uses momentum *more* in panic and π *more* in calm — opposite of expectation
-- [ ] [S] SHAP dependence by horizon × regime — [`results/shap_dependence_all_horizons.csv`](results/shap_dependence_all_horizons.csv)
+#### §E25. LR (M1) coefficients — VERIFIED ✅
 
-#### §E27. Turnover
+- [x] [S] LR coefficients (top by |z|): mom_11 +0.054 z=7.47\*\*\*, mom_12 -0.044 z=-8.26\*\*\*, mom_8 +0.032 z=5.00\*\*\*, mom_4 -0.029 z=-5.79\*\*\*, π_filter +0.007 z=3.84\*\*\* — [`tables/table_lr_coef.tex`](tables/table_lr_coef.tex)
+- [x] [S] M1's IC is significant per-horizon (calm); Sharpe collapses to -0.01 because portfolio formation can't extract directional signal ✓
 
-- [ ] [S] M2 monthly TO **132.4%** (annualised ~1,590%) vs Fixed 12-mo at 70.1% — [`tables/table_turnover.tex`](tables/table_turnover.tex)
-- [ ] [S] Still profitable at 50bps cost (§E6)
+#### §E26. SHAP feature attribution — VERIFIED ✅
 
-#### §E28. Placebo test
+- [x] [M] Overall SHAP: Momentum **54%**, π_filter **46%** ✓ — [`tables/table_shap.tex`](tables/table_shap.tex)
+- [x] [M] Calm: Momentum 51%, π 49% ✓
+- [x] [M] Panic: Momentum 59%, π 41% ✓
+- [x] [M] Implication preserved: model uses momentum *more* in panic — already in thesis (main_results.tex SHAP discussion)
+- [x] [S] SHAP dependence by horizon × regime — backing CSV referenced; table_zscore_shap_detail.tex shows the per-horizon split ✓
 
-- [ ] [M] Real π gives M2 1.11; placebo π collapses — [`tables/table_placebo.tex`](tables/table_placebo.tex)
+#### §E27. Turnover — VERIFIED ✅
 
-#### §E29. Seed convergence
+- [x] [S] M2 monthly TO **132.3%** (annualised 1,588%) vs Fixed-12 at 70.1% (842%) ✓ — [`tables/table_turnover.tex`](tables/table_turnover.tex). M1 at 168.8% / 2,026%; Fixed-1 at 184.3% / 2,211%.
+- [x] [S] Still profitable at 50bps cost — confirmed by §E6 cost-sensitivity row ✓
 
-- [ ] [S] Sharpe stabilizes ~1.11 at k=50 seeds; std 1/√k — [`tables/table_seed_convergence.tex`](tables/table_seed_convergence.tex)
+#### §E28. Placebo test — VERIFIED ✅
 
-#### §E30. Tree-path SHORT-leg combos
+- [x] [M] Real π → M2 Sharpe 1.11; no regime signal → 0.43 ✓ — [`tables/table_placebo.tex`](tables/table_placebo.tex). Consistent with §E1 ablation.
 
-- [ ] [N] Short-leg combo paths and z-scores — [`tables/table_combo_short_cp.tex`](tables/table_combo_short_cp.tex). Confirms term-structure shape *flips on short side too*
+#### §E29. Seed convergence — VERIFIED ✅
 
-#### §E31. Pi-filter dominance stats
+- [x] [S] Sharpe stabilises around 1.09 at k=50 (mean 1.093, std 0.015) and 1.118 at k=100; std shrinks roughly as 1/√k ✓ — [`tables/table_seed_convergence.tex`](tables/table_seed_convergence.tex)
 
-- [ ] [N] π_filter dominates other regime-signal candidates — [`results/pi_dominance_stats.csv`](results/pi_dominance_stats.csv)
+#### §E30. Tree-path SHORT-leg combos — VERIFIED ✅
 
-#### §E32. Two-model dual utility
+- [x] [N] All entries in calm-minus-panic short-leg z-score table are negative — confirms term-structure shape flips on short side: short-leg z-score shifts upward (less extreme) in panic ✓ — [`tables/table_combo_short_cp.tex`](tables/table_combo_short_cp.tex)
 
-- [ ] [N] Dual-utility comparison (M1 + M2) — [`results/two_model_dual_util.csv`](results/two_model_dual_util.csv) ([`scripts/two_model_dual_util.py`](scripts/two_model_dual_util.py))
+#### §E31. Pi-filter dominance stats — VERIFIED ✅
 
-#### §E33. Other existing claims (verify post-Shumway)
+- [x] [N] 73.9% of trees split on π (18,470/25,000); 76.8% in seed-50 alone; 55.0% of long-leg paths use π; **64.7% of panic long-leg return** comes from π-splitting trees vs 17.6% in calm ✓ — [`results/thesis/pi_dominance_stats.csv`](results/thesis/pi_dominance_stats.csv)
 
-- [ ] [N] Selection rank analysis — [`results/selection_rank_analysis.csv`](results/selection_rank_analysis.csv)
-- [ ] [N] Risk-aversion CRRA — [`results/risk_aversion_crra_results.csv`](results/risk_aversion_crra_results.csv)
-- [ ] [N] Risk-aversion extended — [`results/risk_aversion_extended_results.csv`](results/risk_aversion_extended_results.csv)
-- [ ] [N] Risk-aversion thesis (headline) — [`results/risk_aversion_thesis_results.csv`](results/risk_aversion_thesis_results.csv)
-- [ ] [N] Z-score time series — [`results/zscore_long_by_month.csv`](results/zscore_long_by_month.csv), [`results/zscore_short_by_month.csv`](results/zscore_short_by_month.csv), [`results/zscore_longshort_by_month.csv`](results/zscore_longshort_by_month.csv)
-- [ ] [N] Tree combo full results — [`results/tree_combo_results.csv`](results/tree_combo_results.csv)
-- [ ] [N] RF baseline (RF underperforms XGB) — [`results/random_forest_results.csv`](results/random_forest_results.csv)
-- [ ] [N] Fundamentals test — [`results/fundamentals_test_results.csv`](results/fundamentals_test_results.csv)
-- [ ] [N] Bootstrap regime-conditional — [`results/bootstrap_regime.csv`](results/bootstrap_regime.csv)
+#### §E32. Two-model dual utility — VERIFIED ✅
 
-#### §E34. January-exclusion robustness
+- [x] [N] γ=0 baseline Sharpe 1.110 (matches M2 prod); γ=0.05–0.45 sweep shows graceful degradation as overlap penalty increases ✓ — [`results/thesis/two_model_dual_util.csv`](results/thesis/two_model_dual_util.csv)
 
-- [ ] [S] M2 ex-January Sharpe ~1.06 (verify post-Shumway) — [`tables/table_january.tex`](tables/table_january.tex)
+#### §E33. Other existing claims — CSVs EXIST ✅
 
-#### §E35. 30-year backtest companion files
+All listed CSVs verified to exist on disk under [`results/thesis/`](results/thesis/). Numeric verification of each cell deferred to per-claim spot-checks if they appear in prose or tables (most are appendix-only or analysis support).
 
-- [ ] [S] Year-by-year returns — [`results/expanding_returns_prod.csv`](results/expanding_returns_prod.csv)
-- [ ] [S] Year-by-year π_filter — [`results/expanding_pi_filter_prod.csv`](results/expanding_pi_filter_prod.csv)
-- [ ] [S] Per-year fit summary — [`results/expanding_summary_prod.csv`](results/expanding_summary_prod.csv)
-- [ ] [N] OOS 1990-1999 train — [`results/oos_returns_prod_1990_1999.csv`](results/oos_returns_prod_1990_1999.csv), [`results/oos_pi_filter_prod_1990_1999.csv`](results/oos_pi_filter_prod_1990_1999.csv), [`results/oos_subperiods_prod_1990_1999.csv`](results/oos_subperiods_prod_1990_1999.csv)
-- [ ] [N] OOS 1990-2004 train — [`results/oos_returns_prod_1990_2004.csv`](results/oos_returns_prod_1990_2004.csv), [`results/oos_subperiods_prod_1990_2004.csv`](results/oos_subperiods_prod_1990_2004.csv), [`results/oos_pi_filter_prod_1990_2004.csv`](results/oos_pi_filter_prod_1990_2004.csv)
-- [ ] [N] Sub-period decomposition full — [`results/oos_subperiod_full.csv`](results/oos_subperiod_full.csv)
+- [x] [N] Selection rank analysis ([`results/thesis/selection_rank_analysis.csv`](results/thesis/selection_rank_analysis.csv))
+- [x] [N] Risk-aversion CRRA, extended, thesis ([`results/thesis/risk_aversion_*.csv`](results/thesis/))
+- [x] [N] Z-score time series ([`results/thesis/zscore_*_by_month.csv`](results/thesis/))
+- [x] [N] Tree combo full results ([`results/thesis/tree_combo_results.csv`](results/thesis/tree_combo_results.csv))
+- [x] [N] RF baseline ([`results/thesis/random_forest_results.csv`](results/thesis/random_forest_results.csv))
+- [x] [N] Fundamentals test ([`results/thesis/fundamentals_test_results.csv`](results/thesis/fundamentals_test_results.csv))
+- [x] [N] Bootstrap regime-conditional ([`results/thesis/bootstrap_regime.csv`](results/thesis/bootstrap_regime.csv))
 
-#### §E36. International full returns time series
+#### §E34. January-exclusion robustness — VERIFIED ✅
 
-- [ ] [N] UK monthly returns: [`results/intl_uk_returns.csv`](results/intl_uk_returns.csv); UK with US π: [`results/intl_uk_returns_uspi.csv`](results/intl_uk_returns_uspi.csv)
-- [ ] [N] JP monthly returns: [`results/intl_jp_returns.csv`](results/intl_jp_returns.csv); JP with US π: [`results/intl_jp_returns_uspi.csv`](results/intl_jp_returns_uspi.csv)
+- [x] [S] M2 ex-January Sharpe **1.06** (153 mo, vs 1.11 / 167 mo full) ✓ — [`tables/table_january.tex`](tables/table_january.tex). Result is robust to dropping all 14 January months.
 
-#### §E37. Critical figures for new claims
+#### §E35. 30-year backtest companion files — VERIFIED ✅
+
+- [x] [S] Year-by-year returns + π_filter + summary CSVs all present at [`results/thesis/expanding_*_prod.csv`](results/thesis/) ✓
+- [x] [N] OOS 1990-1999 and 1990-2004 train CSVs present ([`results/thesis/oos_*_prod_*.csv`](results/thesis/)) ✓
+- [x] [N] Sub-period decomposition ([`results/thesis/oos_subperiod_full.csv`](results/thesis/oos_subperiod_full.csv)) ✓
+
+#### §E36. International full returns time series — VERIFIED ✅
+
+- [x] [N] UK regional/US-π summary: M2 Sharpe **0.631 → 0.678**, MDD **-27.7% → -23.0%** — [`results/thesis/intl_uk_summary.csv`](results/thesis/intl_uk_summary.csv), [`results/thesis/intl_uk_summary_uspi.csv`](results/thesis/intl_uk_summary_uspi.csv)
+- [x] [N] JP regional/US-π summary: M2 Sharpe **0.435 → 0.525**, MDD **-33.1% → -18.1%** (≈halved) — [`results/thesis/intl_jp_summary.csv`](results/thesis/intl_jp_summary.csv), [`results/thesis/intl_jp_summary_uspi.csv`](results/thesis/intl_jp_summary_uspi.csv). These are the canonical numbers for N1.
+
+#### §E37. Critical figures for new claims — file existence checks
 
 - [ ] [M] [`plots/depth_vs_sharpe.pdf`](plots/depth_vs_sharpe.pdf) — depth-vs-Sharpe (already in thesis)
 - [ ] [M] [`plots/chart2_rank_by_horizon_v2.pdf`](plots/chart2_rank_by_horizon_v2.pdf) — term-structure shape (consider for main_results)
-- [ ] [M] [`plots/leg_betas_rolling.pdf`](plots/leg_betas_rolling.pdf) — rolling β panel (supports N2)
+- [ ] [M] [`plots/leg_betas_rolling.pdf`](plots/leg_betas_rolling.pdf) — rolling β panel (supports N2; already cited in app:leg_betas)
 - [ ] [S] [`plots/momentum_shape_final.pdf`](plots/momentum_shape_final.pdf), [`plots/chart_ls_rank_yearly.pdf`](plots/chart_ls_rank_yearly.pdf), [`plots/chart_m2_vs_mom12.pdf`](plots/chart_m2_vs_mom12.pdf), [`plots/avg_tree_production.pdf`](plots/avg_tree_production.pdf)
 - [ ] [S] SHAP attribution figures: [`plots/chart1_shap_by_horizon.pdf`](plots/chart1_shap_by_horizon.pdf), [`plots/chart1_shap_pct_by_horizon.pdf`](plots/chart1_shap_pct_by_horizon.pdf)
 
