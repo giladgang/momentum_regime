@@ -53,7 +53,7 @@ def main():
 
     lines = [
         '% Auto-generated from results/PRODUCTION_METRICS.json',
-        '% by scripts/build_canonical_macros.py — DO NOT HAND EDIT.',
+        '% by scripts/build_canonical_macros.py -- DO NOT HAND EDIT.',
         '%',
         '% Single source of truth for thesis numbers. Use these macros in',
         '% thesis prose so values stay consistent with PRODUCTION_METRICS.json.',
