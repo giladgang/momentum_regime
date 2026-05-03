@@ -50,8 +50,8 @@ def _fmt_beta(beta, se):
     if np.isnan(beta):
         return '---'
     sign = '$-$' if beta < 0 else ''
-    se_str = f'({se:.4f})' if not np.isnan(se) else ''
-    return f'{sign}{abs(beta):.4f} {se_str}'
+    se_str = f'({se:.2f})' if not np.isnan(se) else ''
+    return f'{sign}{abs(beta):.2f} {se_str}'
 
 
 def _fmt_spread(spread):
@@ -59,7 +59,7 @@ def _fmt_spread(spread):
     if np.isnan(spread):
         return '---'
     sign = '$-$' if spread < 0 else r'\phantom{$-$}'
-    return f'{sign}{abs(spread):.4f}'
+    return f'{sign}{abs(spread):.2f}'
 
 
 def main():
