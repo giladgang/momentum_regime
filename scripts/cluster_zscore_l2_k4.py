@@ -66,10 +66,10 @@ BOOT_SEED = 42
 
 # Cluster aesthetics (spec colours: 0=light blue, 1=gray-blue, 2=orange, 3=red)
 CLUSTER_COLORS = {
-    0: "#1f77b4",
-    1: "#9ecae1",
-    2: "#ff7f0e",
-    3: "#d62728",
+    0: "#1f6dad",  # deep blue: picks far above cross-section
+    1: "#26a69a",  # teal: picks moderately above cross-section
+    2: "#e67a00",  # deep orange: picks moderately below cross-section
+    3: "#d62728",  # red: deep crisis, picks far below cross-section
 }
 
 # ---------------------------------------------------------------------------
