@@ -293,7 +293,14 @@ print(f"\nAll-calm reference: {len(Z_calm)} months used for dashed reference lin
 # ---------------------------------------------------------------------------
 print("\nGenerating dispersion plot ...")
 
-colors = plt.cm.viridis(np.linspace(0.15, 0.85, chosen_K))
+_PALETTE = {
+    2: ["#1f6dad", "#d62728"],
+    3: ["#1f6dad", "#e67a00", "#d62728"],
+    4: ["#1f6dad", "#26a69a", "#e67a00", "#d62728"],
+    5: ["#1f6dad", "#26a69a", "#bcbd22", "#e67a00", "#d62728"],
+}
+colors = (_PALETTE.get(chosen_K)
+          or plt.cm.viridis(np.linspace(0.15, 0.85, chosen_K)))
 
 fig, axes = plt.subplots(
     1, chosen_K,
