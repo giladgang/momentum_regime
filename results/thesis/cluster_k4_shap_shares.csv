@@ -1,0 +1,5 @@
+cluster,n_months,n_stock_months_long,n_stock_months_short,n_stock_months_all,pi_share_long,pi_share_short,pi_share_combined
+0,53,26416,20700,177408,0.3402,0.5007,0.4988
+1,62,32861,20706,204708,0.2693,0.4650,0.4597
+2,31,15135,11853,103096,0.2780,0.5370,0.5363
+3,21,11187,7420,71875,0.1144,0.3807,0.2441
