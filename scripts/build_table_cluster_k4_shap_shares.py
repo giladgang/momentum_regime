@@ -90,9 +90,7 @@ def main():
     caption = (
         r"$\pi^{\text{filter}}$'s SHAP share by K=4 cluster, 2011--2024 test period. "
         r'Long and short shares are computed over long-leg and short-leg picks respectively; '
-        r'combined is over all stock-months in the cluster. '
-        r'The weighted average across clusters recovers the overall combined share of '
-        r'$0.46$ from Section~\ref{sec:regime_results}.'
+        r'combined is over all stock-months in the cluster.'
     )
 
     tex_lines = [

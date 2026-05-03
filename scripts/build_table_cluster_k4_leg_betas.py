@@ -110,9 +110,7 @@ def main():
         r'M2 (regime-conditional XGB ensemble) versus unconditional 12-month momentum, '
         r'side-by-side. '
         r'Standard errors in parentheses. '
-        r'Spread $= \beta_L - \beta_S$. '
-        r'M2 retains positive spread in every cluster (no leg-beta inversion); '
-        r'fixed momentum exhibits inversion in every cluster.'
+        r'Spread $= \beta_L - \beta_S$.'
     )
 
     tex_lines = [

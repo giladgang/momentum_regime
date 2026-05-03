@@ -139,12 +139,8 @@ def main():
         r'at the 1-month horizon; $\bar{z}$ averages across all 12 horizons. '
         r'Basket size is mean stocks per month. '
         r'$\rho(-z^L)$ is the correlation between the short-leg z-curve centroid '
-        r'and the negated long-leg z-curve centroid: values below 0.95 indicate '
-        r'structural asymmetry. '
-        r'Cluster 3 (deep crisis) shows $\rho = -0.84$, driven by '
-        r'short-leg recent momentum elevated at the 1-month horizon while '
-        r'long-leg picks exhibit the opposite pattern -- '
-        r'consistent with the panic-period asymmetry documented in Section~\ref{sec:cluster_triangulation}.'
+        r'and the negated long-leg z-curve centroid; values below 0.95 indicate '
+        r'structural asymmetry.'
     )
 
     tex_lines = [
