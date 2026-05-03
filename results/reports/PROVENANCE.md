@@ -18,7 +18,7 @@ canonical_macros.tex  (auto-generated, optional in prose)
 drift detection (verify_thesis_consistency.py + PROSE_DRIFT_REPORT.md)
 ```
 
-After every pipeline rerun, steps 21/22/23 of `run_pipeline.py` re-walk the chain
+After every pipeline rerun, steps 80–83 of `run_pipeline.py` re-walk the chain
 automatically; `results/METRICS_DIFF.md` shows what changed and which configs
 likely caused it.
 
@@ -146,12 +146,13 @@ Source: [`scripts/_config_deps.py`](../scripts/_config_deps.py) — extend by ad
 After any rerun:
 
 ```bash
-python scripts/build_metrics.py            # canonical store ← tables/+CSVs
-python scripts/build_canonical_macros.py   # latex/canonical_macros.tex ← canonical store
-python scripts/verify_thesis_consistency.py  # PROSE_DRIFT_REPORT.md ← latex prose vs canonical
+python scripts/build_metrics.py              # canonical store ← tables/+CSVs           (step 80)
+python scripts/build_canonical_macros.py     # latex/canonical_macros.tex ← canonical   (step 81)
+python scripts/build_thesis_tables.py        # headline tables ← canonical              (step 82)
+python scripts/verify_thesis_consistency.py  # PROSE_DRIFT_REPORT.md ← latex vs canonical (step 83)
 ```
 
-Or run the wired pipeline (steps 21/22/23 do this automatically):
+Or run the wired pipeline (steps 80–83 do this automatically):
 
 ```bash
 python run_pipeline.py
