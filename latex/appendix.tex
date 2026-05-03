@@ -266,6 +266,12 @@ The D\&M comparison in Section~\ref{sec:dm_comparison} characterises M2's contri
 
 The pattern in Table~\ref{tab:leg_betas} is consistent with the cross-sectional re-ranking interpretation. M2's long-leg beta rises from 1.40 in calm to 1.65 in panic (\emph{tilt amplification}: in panic, the long leg holds names with higher market sensitivity), while the short-leg beta falls from 1.22 to 0.98. Fixed 12-month momentum, by contrast, holds both leg-level betas roughly stable across regimes (long: 1.09 calm, 1.07 panic; short: 1.80 calm, 1.69 panic), consistent with the unconditional rank-based construction. The difference is direct evidence that the regime signal acts on \emph{which} stocks are held rather than on \emph{how much}.
 
+\subsection{Per-cluster Feature Signature ($K=4$ Partition)}\label{app:cluster_k4_features}
+
+Section~\ref{sec:heterogeneity_picks} reports a $K=4$ partition of the 167 test months and characterises each cluster narratively. Table~\ref{tab:cluster_k4_features_appendix} provides the full per-cluster feature signature for completeness: cross-section context features (regime composition, momentum landscape, dispersion, skewness, recent strategy performance) computed at the month level and averaged across each cluster's months; long-leg pick raw momentum at each horizon, averaged across each cluster's months; and long-leg pick cross-sectional z-score (deviation from the cross-section mean at each horizon, in units of cross-section std) averaged across cluster months. Per-cluster Sharpes and other strategy outcomes appear in Table~\ref{tab:cluster_k4_descriptors} in the main text.
+
+\input{tables/table_cluster_k4_features_appendix}
+
 \subsection{Ridge Regression Baseline}\label{app:ridge}
 
 To isolate the effect of linearity from the choice of training target, a Ridge regression is estimated on the same 13 standardised features as M1 and M2, predicting continuous forward returns (the same target as XGBoost). Table~\ref{tab:ridge} reports results across a range of regularisation strengths.

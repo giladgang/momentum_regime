@@ -144,7 +144,7 @@ def main():
         r'Cluster 3 (deep crisis) shows $\rho = -0.84$, driven by '
         r'short-leg recent momentum elevated at the 1-month horizon while '
         r'long-leg picks exhibit the opposite pattern -- '
-        r'consistent with the panic-period asymmetry documented in Section~\ref{sec:cluster_k4_zcurves}.'
+        r'consistent with the panic-period asymmetry documented in Section~\ref{sec:cluster_triangulation}.'
     )
 
     tex_lines = [
