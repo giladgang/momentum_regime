@@ -35,7 +35,7 @@ TEX_PATH         = os.path.join(TABLES_DIR, 'table_cluster_k4_descriptors.tex')
 
 CLUSTER_LABELS = {
     0: 'calm',
-    1: 'mild',
+    1: 'transition',
     2: 'post-panic',
     3: 'deep crisis',
 }
@@ -94,11 +94,11 @@ def main():
     groups.append([
         (r'$\bar{\pi}_t^{\text{filter}}$ (current panic prob.)',
          [f"{r['pi_panic_mean']:.2f}" for _, r in df.iterrows()]),
+        (r'Cross-section avg stock return (12-mo)',
+         [_fmt_pct(r['mom_overall_mean']) for _, r in df.iterrows()]),
     ])
 
     groups.append([
-        (r'Cross-section avg stock return',
-         [_fmt_pct(r['mom_overall_mean']) for _, r in df.iterrows()]),
         (r'Cross-section std of 9--12 mo momentum',
          [_fmt_2dp(r['cs_disp_long_mean']) for _, r in df.iterrows()]),
         (r'Cross-section skewness of 1--4 mo momentum',
@@ -134,10 +134,11 @@ def main():
         r'$K=4$ cluster descriptors, 2011--2025 test period, '
         r'$n_{\text{total}} = 167$ months. '
         r'Each column is one cluster; rows are grouped (top to bottom): '
-        r'cluster size; regime context (current $\pi_t^{\text{filter}}$, the '
-        r"only regime feature the model sees); cross-section state "
-        r'(average-stock trailing return; cross-stock standard deviation '
-        r'of 9--12 month momentum; cross-stock skewness of 1--4 month '
+        r'cluster size; regime-routing inputs (current $\pi_t^{\text{filter}}$ '
+        r"and cross-section average stock return, the two features that "
+        r'jointly determine which selection mode the model commits to); '
+        r'descriptive cross-section state (cross-stock standard deviation '
+        r'of 9--12 month momentum, cross-stock skewness of 1--4 month '
         r'momentum); long-leg average z-score $\bar{z}$ (the '
         r"model\textquoteright s picks, averaged across the 12 momentum "
         r'horizons); and the cluster Sharpe (annualised, block bootstrap '
