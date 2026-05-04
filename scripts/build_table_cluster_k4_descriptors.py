@@ -105,9 +105,22 @@ def main():
          [_fmt_skew(r['cs_skew_short_mean']) for _, r in df.iterrows()]),
     ])
 
+    # Compute long-leg and short-leg avg pick momentum (across 12 horizons).
+    long_pick_cols = [f'pick_mom_{i}_mean' for i in range(1, 13)]
+    long_avg_mom = df[long_pick_cols].mean(axis=1)
+
+    sl_path = os.path.join(RESULTS_THESIS_DIR, 'cluster_k4_short_leg_descriptors.csv')
+    sl = pd.read_csv(sl_path).sort_values('cluster').reset_index(drop=True)
+    short_pick_cols = [f'short_pick_mom_{i}_mean' for i in range(1, 13)]
+    short_avg_mom = sl[short_pick_cols].mean(axis=1)
+
     groups.append([
         (r'Long-leg avg z-score $\bar{z}$',
          [_fmt_signed_2dp(r['z_centroid_mean']) for _, r in df.iterrows()]),
+        (r'Long-leg avg trailing return',
+         [_fmt_pct(v) for v in long_avg_mom]),
+        (r'Short-leg avg trailing return',
+         [_fmt_pct(v) for v in short_avg_mom]),
     ])
 
     groups.append([
@@ -139,10 +152,10 @@ def main():
         r'jointly determine which selection mode the model commits to); '
         r'descriptive cross-section state (cross-stock standard deviation '
         r'of 9--12 month momentum, cross-stock skewness of 1--4 month '
-        r'momentum); long-leg average z-score $\bar{z}$ (the '
-        r"model\textquoteright s picks, averaged across the 12 momentum "
-        r'horizons); and the cluster Sharpe (annualised, block bootstrap '
-        r'with block size 6, 5{,}000 reps). '
+        r'momentum); the picks themselves (long-leg average z-score $\bar{z}$, '
+        r'and the average trailing return of the long and short legs, all '
+        r'averaged across the 12 momentum horizons); and the cluster Sharpe '
+        r'(annualised, block bootstrap with block size 6, 5{,}000 reps). '
         r'The 9--12 month and 1--4 month windows are chosen as the ones '
         r'with the largest cross-cluster spread for each measure.'
     )
