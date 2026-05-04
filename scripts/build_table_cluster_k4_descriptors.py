@@ -94,10 +94,6 @@ def main():
     groups.append([
         (r'$\bar{\pi}_t^{\text{filter}}$ (current panic prob.)',
          [f"{r['pi_panic_mean']:.2f}" for _, r in df.iterrows()]),
-        (r'$\pi$ 6-mo prior frequency',
-         [f"{r['pi_panic_freq_6mo_mean']:.2f}" for _, r in df.iterrows()]),
-        (r'$\pi$ 12-mo prior frequency',
-         [f"{r['pi_panic_freq_12mo_mean']:.2f}" for _, r in df.iterrows()]),
     ])
 
     groups.append([
@@ -138,8 +134,8 @@ def main():
         r'$K=4$ cluster descriptors, 2011--2025 test period, '
         r'$n_{\text{total}} = 167$ months. '
         r'Each column is one cluster; rows are grouped (top to bottom): '
-        r'cluster size; regime context (current $\pi_t^{\text{filter}}$ and '
-        r'prior 6-/12-month panic frequencies); cross-section state '
+        r'cluster size; regime context (current $\pi_t^{\text{filter}}$, the '
+        r"only regime feature the model sees); cross-section state "
         r'(average-stock trailing return; cross-stock standard deviation '
         r'of 9--12 month momentum; cross-stock skewness of 1--4 month '
         r'momentum); long-leg average z-score $\bar{z}$ (the '
