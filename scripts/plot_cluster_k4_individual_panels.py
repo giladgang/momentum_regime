@@ -22,7 +22,6 @@ Outputs (plots/thesis/):
 """
 
 import os
-import pickle
 import sys
 from pathlib import Path
 
@@ -37,8 +36,6 @@ ROOT = Path(__file__).resolve().parent.parent
 ZSCORE_CSV    = ROOT / "results/thesis/zscore_long_by_month.csv"
 LABELS_CSV    = ROOT / "results/thesis/zscore_l2_k4_labels.csv"
 CENTROIDS_CSV = ROOT / "results/thesis/zscore_l2_k4_centroids.csv"
-ARTEFACTS_PKL = ROOT / "artefacts/cs_artefacts_data.pkl"
-
 PLOT_DIR = ROOT / "plots/thesis"
 PLOT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -75,21 +72,10 @@ labels = labels_df.reindex(Z.index)["cluster"].astype(int).values
 print("Loading centroids ...", flush=True)
 centroids_df = pd.read_csv(CENTROIDS_CSV)
 
-print("Loading artefacts (for all-calm reference) ...", flush=True)
-with open(ARTEFACTS_PKL, "rb") as fh:
-    art = pickle.load(fh)
-test_df = art["test"].copy()
-test_df["date"] = pd.to_datetime(test_df["date"])
-pi_monthly = test_df.groupby("date")["pi_filter"].first()
-pi_aligned = pi_monthly.reindex(Z.index)
-calm_mask  = (pi_aligned <= 0.5).values
-ref_centroid = X[calm_mask].mean(axis=0)
-print(f"  All-calm reference: {int(calm_mask.sum())} months", flush=True)
-
 # ---------------------------------------------------------------------------
 # Global y-limits (consistent across panels for visual comparability)
 # ---------------------------------------------------------------------------
-all_z_vals = list(ref_centroid) + list(X.flatten())
+all_z_vals = list(X.flatten())
 y_min = round((min(all_z_vals) - 0.15) * 4) / 4
 y_max = round((max(all_z_vals) + 0.15) * 4) / 4
 
@@ -120,13 +106,6 @@ for cl in range(K):
         color=color, lw=2.5, marker="o", ms=6,
         label=f"centroid ({n_cl} mo)",
         zorder=5,
-    )
-
-    ax.plot(
-        HORIZONS, ref_centroid,
-        color="#333333", lw=1.5, ls="--",
-        label="all-calm ref",
-        zorder=4,
     )
 
     ax.axhline(0, color="#888888", lw=0.6, zorder=1)

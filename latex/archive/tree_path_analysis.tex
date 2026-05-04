@@ -1,0 +1,51 @@
+%% ═══════════════════════════════════════════════════════════════════════════
+%% TREE PATH ANALYSIS -- archived content
+%%
+%% Originally lived in latex/main_results.tex as §5.3.1 (subsubsection
+%% "Tree Path Analysis", label sec:tree_paths) and in latex/appendix.tex as
+%% the appendix "Tree Path Horizon Interaction Analysis" (label
+%% app:combo_analysis).
+%%
+%% Removed from the thesis on 2026-05-04 to tighten §5.3. Kept here so it can
+%% be re-included verbatim if needed. To re-enable: \input{latex/archive/tree_path_analysis}
+%% from the appropriate location, OR copy the relevant block back into
+%% main_results.tex / appendix.tex.
+%%
+%% Tables referenced (still exist in tables/):
+%%   tables/table_combo_freq.tex
+%%   tables/table_combo_long_cp.tex
+%%   tables/table_combo_short_cp.tex
+%%   tables/table_zscore_shap_detail.tex
+%% ═══════════════════════════════════════════════════════════════════════════
+
+% ---------------------------------------------------------------------------
+% Main-body content (was §5.3.1 Tree Path Analysis)
+% ---------------------------------------------------------------------------
+
+\subsubsection{Tree Path Analysis}\label{sec:tree_paths}
+
+The per-horizon decomposition in Section~\ref{sec:regime_results} treats each horizon independently, leaving open whether the model relies on specific \emph{interactions} between horizons. To test this, 5{,}000 sampled stocks from each regime$\times$leg group are traced through 50{,}000 individual trees, recording which momentum horizon groups each decision path splits on (Appendix~\ref{app:combo_analysis}). Horizons are grouped into four bands: short (S, months 1--3), medium (M, months 4--6), intermediate (I, months 7--9), and long (L, months 10--12). Table~\ref{tab:combo_freq} reports the frequency of each of the 15 possible combinations; each column sums to 100\%.
+
+\input{tables/table_combo_freq}
+
+The combination frequencies are stable across all four groups: I{+}L accounts for 13--15\% of paths, M{+}I{+}L for 10--11\%, and S{+}M for 7--8\%. No unexpected interaction emerges. The distribution matches what the per-horizon SHAP decomposition would predict: horizons with higher SHAP weight appear more frequently in tree paths and combine in proportion to their individual importance.
+
+The model's value does not come from complex momentum-momentum interactions that differ across regimes; the horizon combinations are regime-invariant. It comes from $\pi_t^{\text{filter}}$ at the routing step. Table~\ref{tab:combo_long_cp} in Appendix~\ref{app:combo_analysis} quantifies this: the calm-minus-panic z-score difference is positive for all 39 long-leg entries, with the largest shifts at the intermediate horizon ($+$0.36 to $+$0.55).
+
+% ---------------------------------------------------------------------------
+% Appendix content (was \section{Tree Path Horizon Interaction Analysis})
+% ---------------------------------------------------------------------------
+
+\section{Tree Path Horizon Interaction Analysis}\label{app:combo_analysis}
+
+To examine which momentum horizons XGBoost conditions on jointly, we trace stocks through 50{,}000 individual trees and record which horizon groups each decision path splits on. Momentum lookbacks are grouped into four bands: S (months 1--3), M (months 4--6), I (months 7--9), and L (months 10--12). For each of the four regime$\times$leg groups (calm long, calm short, panic long, panic short), 5{,}000 stocks are sampled and traced through all trees. A path that splits on at least one feature from both the I and L groups is recorded as the ``I{+}L'' combination. Paths that split only on $\pi_t^{\text{filter}}$ (no momentum splits) are excluded; the remaining paths are normalised to sum to 100\%.
+
+Tables~\ref{tab:combo_long_cp} and~\ref{tab:combo_short_cp} report the calm-minus-panic z-score difference for the long and short legs, respectively. The long leg table shows uniformly positive entries: the model selects stocks with higher relative momentum in calm at every horizon. The short leg table shows uniformly negative entries: in panic, the short leg shifts toward shorting stocks with higher relative momentum (closer to the cross-sectional average or above it), rather than the deep losers it targets in calm. Together, the two tables confirm that the regime signal reverses the selection direction on both sides of the portfolio while preserving the same horizon interaction structure.
+
+Table~\ref{tab:zscore_shap_detail} reports the underlying per-horizon z-scores and SHAP shares by regime and leg from which the calm-minus-panic differences below are computed.
+
+\input{tables/table_zscore_shap_detail}
+
+\input{tables/table_combo_long_cp}
+
+\input{tables/table_combo_short_cp}

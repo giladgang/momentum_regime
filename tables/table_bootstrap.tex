@@ -3,20 +3,20 @@
 \small
 \begin{tabular}{l r r r}
 \toprule
- & Sharpe & 95\% CI & vs M2 ($p$) \\
+ & Sharpe & 95\% CI & vs XGB ($p$) \\
 \midrule
-M2 (XGB) & 1.11 & [0.67,\,1.53] & --- \\
-M1 (LR) & $-$0.01 & [$-$0.41,\,0.42] & 0.001$^{***}$ \\
-M0 (Formula) & 0.11 & [$-$0.36,\,0.59] & 0.008$^{***}$ \\
+XGB & 1.11 & [0.67,\,1.53] & --- \\
+LR & $-$0.01 & [$-$0.41,\,0.42] & 0.001$^{***}$ \\
+DET (Formula) & 0.11 & [$-$0.36,\,0.59] & 0.008$^{***}$ \\
 Fixed 12-mo mom & 0.06 & [$-$0.43,\,0.59] & 0.005$^{***}$ \\
 Fixed 1-mo mom & 0.26 & [$-$0.21,\,0.73] & 0.021$^{**}$ \\
 \midrule
-\multicolumn{4}{l}{\emph{M2 regime-conditional Sharpe}} \\[2pt]
-M2 Calm ($n=$108) & 0.84 & [0.29,\,1.32] & --- \\
-M2 Panic ($n=$59) & 1.54 & [0.85,\,2.22] & --- \\
+\multicolumn{4}{l}{\emph{XGB regime-conditional Sharpe}} \\[2pt]
+XGB Calm ($n=$108) & 0.84 & [0.29,\,1.32] & --- \\
+XGB Panic ($n=$59) & 1.54 & [0.85,\,2.22] & --- \\
 Panic $-$ Calm & 0.70 & [-0.16,\,1.59] & 0.109 \\
 \bottomrule
 \end{tabular}
-\caption{Block bootstrap confidence intervals for Sharpe ratios and paired tests of M2's outperformance. Uses 12-month blocks and 10{,}000 resamples with a fixed seed. The ``vs M2 ($p$)'' column reports two-sided $p$-values from paired tests where both strategies are resampled on the same dates. $^{*}\,p<0.10$; $^{**}\,p<0.05$; $^{***}\,p<0.01$.}
+\caption{Block bootstrap confidence intervals for Sharpe ratios and paired tests of XGB's outperformance. Uses 12-month blocks and 10{,}000 resamples with a fixed seed. The ``vs XGB ($p$)'' column reports two-sided $p$-values from paired tests where both strategies are resampled on the same dates. $^{*}\,p<0.10$; $^{**}\,p<0.05$; $^{***}\,p<0.01$.}
 \label{tab:bootstrap}
 \end{table}

@@ -3,7 +3,7 @@ build_table_cluster_k4_leg_betas.py
 =====================================
 Generates tables/table_cluster_k4_leg_betas.tex for thesis §5.2.
 Reads results/thesis/cluster_k4_leg_betas.csv and emits a booktabs table
-with side-by-side M2 and Fixed 12-mo momentum leg-level CAPM betas per
+with side-by-side XGB and Fixed 12-mo momentum leg-level CAPM betas per
 K=4 cluster, with standard errors in parentheses and beta spread.
 
 Run:
@@ -107,7 +107,7 @@ def main():
     # ------------------------------------------------------------------
     caption = (
         r'Leg-level CAPM betas by K=4 cluster, 2011--2024 test period. '
-        r'M2 (regime-conditional XGB ensemble) versus unconditional 12-month momentum, '
+        r'XGB (regime-conditional XGBoost ensemble) versus unconditional 12-month momentum, '
         r'side-by-side. '
         r'Standard errors in parentheses. '
         r'Spread $= \beta_L - \beta_S$.'
@@ -120,7 +120,7 @@ def main():
         r'\small',
         r'\begin{tabular}{l r | l l r | l l r}',
         r'\toprule',
-        r' & & \multicolumn{3}{c|}{M2 (XGB ensemble)} & \multicolumn{3}{c}{Fixed 12-mo mom} \\',
+        r' & & \multicolumn{3}{c|}{XGB} & \multicolumn{3}{c}{Fixed 12-mo mom} \\',
         r'\cmidrule(lr){3-5} \cmidrule(lr){6-8}',
         r'Cluster & $n$ & $\beta_L$ & $\beta_S$ & Spread & $\beta_L$ & $\beta_S$ & Spread \\',
         r'\midrule',

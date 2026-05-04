@@ -125,8 +125,7 @@ def main():
         r'$n_{\text{total}} = 167$ months. '
         r'All figures are at the monthly frequency. '
         r'Sharpes are annualised and computed via block bootstrap with block size 6, '
-        r'5{,}000 reps. '
-        r'Hit rate is the fraction of cluster months with positive M2 return. '
+        r'5{,}000 reps.\protect\footnote{Hit rate is the fraction of cluster months with positive XGB return.} '
         r"Maximum drawdown is the peak-to-trough drawdown within the cluster's "
         r'chronological subseries.'
     )

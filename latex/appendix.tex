@@ -81,7 +81,7 @@ where $\tau_t^L$ and $\tau_t^S$ are the one-way turnover in the long and short l
 \end{equation}
 and each summation runs over all stocks appearing in either the new or previous portfolio for that leg. The 10 basis point cost reflects the transaction environment for a value-weighted, large-cap-biased strategy where NYSE breakpoints tilt toward liquid securities.
 
-It is important to note that transaction costs are applied \emph{post-hoc} as an accounting adjustment and are not incorporated into the models' training objectives. The cross-sectional models (Methods~0--2) optimise stock-level prediction (classification accuracy or return forecasting) without knowledge of the previous portfolio, the resulting turnover, or the cost of rebalancing. This is standard practice in the empirical asset pricing literature \citep[e.g.,][]{FamaFrench2015, GHM2023}, where portfolio construction is treated as a fixed downstream step applied uniformly to all strategies. An end-to-end framework that jointly optimises stock selection and portfolio-level objectives (e.g., net-of-cost Sharpe ratio) would require a fundamentally different architecture, such as a reinforcement learning or differentiable portfolio optimisation layer, and remains a potential extension of this work.
+It is important to note that transaction costs are applied \emph{post-hoc} as an accounting adjustment and are not incorporated into the models' training objectives. The cross-sectional models (DET, LR, and XGB) optimise stock-level prediction (classification accuracy or return forecasting) without knowledge of the previous portfolio, the resulting turnover, or the cost of rebalancing. This is standard practice in the empirical asset pricing literature \citep[e.g.,][]{FamaFrench2015, GHM2023}, where portfolio construction is treated as a fixed downstream step applied uniformly to all strategies. An end-to-end framework that jointly optimises stock selection and portfolio-level objectives (e.g., net-of-cost Sharpe ratio) would require a fundamentally different architecture, such as a reinforcement learning or differentiable portfolio optimisation layer, and remains a potential extension of this work.
 
 \subsection{Performance Metrics}\label{app:evaluation}
 
@@ -172,7 +172,7 @@ To assess whether the main findings are driven by a single favourable sub-period
 
 \input{tables/table_subperiod}
 
-In long-short construction, M2 is the only strategy that produces positive Sharpe ratios in every sub-period (0.59, 1.04, 1.70). M1 collapses in 2016--2020 (Sharpe $-$0.02) and turns negative in 2021--2025 ($-$0.38). Fixed 12-month momentum turns negative after 2015, confirming the momentum crash phenomenon documented by \citet{DanielMoskowitz2016}. M2's strongest performance (1.70) is in 2021--2025, a period characterised by elevated volatility and multiple stress episodes -- precisely the conditions where regime-conditional stock selection adds the most value.
+In long-short construction, XGB is the only strategy that produces positive Sharpe ratios in every sub-period (0.59, 1.04, 1.70). LR collapses in 2016--2020 (Sharpe $-$0.02) and turns negative in 2021--2025 ($-$0.38). Fixed 12-month momentum turns negative after 2015, confirming the momentum crash phenomenon documented by \citet{DanielMoskowitz2016}. XGB's strongest performance (1.70) is in 2021--2025, a period characterised by elevated volatility and multiple stress episodes, precisely the conditions where regime-conditional stock selection adds the most value.
 
 \subsection{Turnover and Transaction Cost Sensitivity}\label{app:turnover}
 
@@ -180,11 +180,11 @@ A strategy's net-of-cost performance depends critically on its turnover. Table~\
 
 \input{tables/table_turnover}
 
-In long-short construction, M2's average monthly one-way turnover is 132.3\%, reflecting the regime-conditional changes in stock selection that shift the portfolio composition substantially. Table~\ref{tab:cost_sensitivity} translates these turnover differences into Sharpe ratio sensitivity across a range of transaction cost assumptions.
+In long-short construction, XGB's average monthly one-way turnover is 132.3\%, reflecting the regime-conditional changes in stock selection that shift the portfolio composition substantially. Table~\ref{tab:cost_sensitivity} translates these turnover differences into Sharpe ratio sensitivity across a range of transaction cost assumptions.
 
 \input{tables/table_cost_sensitivity}
 
-M2 remains profitable across all cost levels tested: even at 50\,bps one-way (five times the baseline), its Sharpe ratio is 0.78. All other strategies become unprofitable at moderate cost levels. The baseline 10\,bps assumption is reasonable for a value-weighted strategy using NYSE breakpoints, which tilts toward the most liquid names.
+XGB remains profitable across all cost levels tested: even at 50\,bps one-way (five times the baseline), its Sharpe ratio is 0.78. All other strategies become unprofitable at moderate cost levels. The baseline 10\,bps assumption is reasonable for a value-weighted strategy using NYSE breakpoints, which tilts toward the most liquid names.
 
 \subsection{Model Sensitivity}\label{app:xgb_sensitivity}
 
@@ -193,24 +193,24 @@ The XGBoost model uses hyperparameters selected via cross-validation on the trai
 \input{tables/table_xgb_hyperparams}
 
 \paragraph{Hyperparameter sensitivity.}
-At the baseline depth of 4, the Sharpe ratio ranges from 0.89 to 1.11 across learning rate and ensemble size variations. Performance degrades at depths below 3 (see Section~\ref{sec:depth_analysis} for the depth analysis) and above 5 due to overfitting. The results confirm that M2's performance is not an artefact of a particular hyperparameter configuration.
+At the baseline depth of 4, the Sharpe ratio ranges from 0.89 to 1.11 across learning rate and ensemble size variations. Performance degrades at depths below 3 (see Section~\ref{sec:depth_analysis} for the depth analysis) and above 5 due to overfitting. The results confirm that XGB's performance is not an artefact of a particular hyperparameter configuration.
 
 \paragraph{Boosting versus bagging.}
 As a complementary check, a Random Forest matched on depth (4), ensemble size (500 trees per seed), and feature set (the same 13 features) was trained over 50 seeds (\texttt{results/thesis/random\_forest\_results.csv}). Sharpe falls from 1.08 to 0.73 and $\pi_t^{\text{filter}}$'s SHAP share drops from 45\% to 18\%. The mechanism is the difference between boosting and bagging. XGBoost fits each successive tree to the residuals of the current ensemble, so at every iteration the algorithm preferentially selects whichever feature most reduces the current error; for this problem that feature is $\pi_t^{\text{filter}}$, and its importance compounds across trees. Random Forest grows each tree independently on a bootstrap sample and subsamples a random subset of features at every split, which by construction prevents any single feature from dominating the ensemble and distributes importance more evenly across the 13 features. Nonlinearity and depth are therefore necessary but not sufficient: the boosted additive structure is what converts the regime signal into a primary gating variable rather than a marginal predictor, which is the basis for the architecture-dependence claim in Section~\ref{sec:method2}.
 
 \subsection{Number of Hidden States}\label{app:num_states}
 
-The baseline HMM uses $K = 2$ states (calm and panic). A natural question is whether finer regime granularity -- for example, distinguishing mild corrections from severe crises -- would improve the downstream portfolio models. Table~\ref{tab:multistate_hmm} reports out-of-sample Sharpe ratios for $K = 2, 3, 4, 5$, each averaged over five representative Gibbs sampler seeds (the production regime signal averages 200 seeds, but five suffice for this diagnostic).
+The baseline HMM uses $K = 2$ states (calm and panic). A natural question is whether finer regime granularity (for example, distinguishing mild corrections from severe crises) would improve the downstream portfolio models. Table~\ref{tab:multistate_hmm} reports out-of-sample Sharpe ratios for $K = 2, 3, 4, 5$, each averaged over five representative Gibbs sampler seeds (the production regime signal averages 200 seeds, but five suffice for this diagnostic).
 
 \input{tables/table_multistate_hmm}
 
-In long-short construction, M2 shows no consistent improvement beyond $K = 2$. Cross-seed variability increases with $K$, and the intermediate states that emerge for $K \geq 3$ lack the persistence needed to provide a stable conditioning signal. With only 241 training months, the data cannot reliably separate more than two regimes for the purpose of downstream cross-sectional stock selection.
+In long-short construction, XGB shows no consistent improvement beyond $K = 2$. Cross-seed variability increases with $K$, and the intermediate states that emerge for $K \geq 3$ lack the persistence needed to provide a stable conditioning signal. With only 241 training months, the data cannot reliably separate more than two regimes for the purpose of downstream cross-sectional stock selection.
 
 Beyond estimation, $K = 2$ has an interpretability advantage. The two-state model produces a single continuous signal ($\pi_t^{\text{filter}}$) that XGBoost can condition on in a straightforward way: higher values indicate more stress. With $K \geq 3$, the additional states may capture dimensions of the economy that are orthogonal to the continuation-reversal mechanism, for example a ``growth'' state characterised by strong fundamentals but moderate stress indicators. Such a state would conflate two economically distinct situations (a genuine expansion vs.\ a recovery from panic) and could introduce noise into the regime signal, degrading the model's ability to distinguish continuation from reversal. The two-state framework avoids this by restricting the regime classification to a single dimension, the degree of market stress, which is the dimension most relevant to momentum's cross-sectional structure.
 
 \subsection{January Exclusion}\label{app:january}
 
-Momentum is known to reverse in January \citep{JegadeeshTitman1993}: past losers outperform past winners, partially offsetting momentum's annual profitability. To verify that M2's performance is not driven by a January seasonal, Table~\ref{tab:january} recomputes all metrics after excluding the 14 January months from the test period. M2's Sharpe ratio declines marginally from 1.11 to 1.06, confirming that the regime-momentum interaction operates throughout the calendar year. Fixed 12-month momentum improves slightly when January is excluded (0.06 to 0.14), consistent with the well-documented January reversal in unconditional momentum.
+Momentum is known to reverse in January \citep{JegadeeshTitman1993}: past losers outperform past winners, partially offsetting momentum's annual profitability. To verify that XGB's performance is not driven by a January seasonal, Table~\ref{tab:january} recomputes all metrics after excluding the 14 January months from the test period. XGB's Sharpe ratio declines marginally from 1.11 to 1.06, confirming that the regime-momentum interaction operates throughout the calendar year. Fixed 12-month momentum improves slightly when January is excluded (0.06 to 0.14), consistent with the well-documented January reversal in unconditional momentum.
 
 \input{tables/table_january}
 
@@ -222,7 +222,7 @@ Table~\ref{tab:alt_splits} reports the baseline train/test split performance. Th
 
 \input{tables/table_alt_splits}
 
-In the baseline split (1990--2010 training, 2011--2025 test), M2 achieves a Sharpe of 1.11 while M1 collapses ($-$0.01), confirming the nonlinear regime-momentum interaction documented in Section~\ref{sec:performance_results}.
+In the baseline split (1990--2010 training, 2011--2025 test), XGB achieves a Sharpe of 1.11 while LR collapses ($-$0.01), confirming the nonlinear regime-momentum interaction documented in Section~\ref{sec:performance_results}.
 
 \subsection{30-Year Expanding-Window Out-of-Sample Methodology}\label{app:expanding_window}
 
@@ -238,33 +238,33 @@ To assess whether XGBoost benefits specifically from the HMM regime signal rathe
 
 \input{tables/table_placebo}
 
-Removing the regime signal reduces M2's Sharpe from 1.11 to 0.43, a drop of 0.68. The regime signal is essential for long-short momentum stock selection, not merely a marginal improvement.
+Removing the regime signal reduces XGB's Sharpe from 1.11 to 0.43, a drop of 0.68. The regime signal is essential for long-short momentum stock selection, not merely a marginal improvement.
 
 \subsection{Factor Model Regressions}\label{app:factor_alphas}
 
-To test whether M2's out-of-sample return is explained by known risk factors, monthly returns are regressed on five standard factor models: CAPM, Fama--French three-factor, Carhart four-factor, Fama--French five-factor, and a six-factor specification that augments FF5 with the momentum factor (UMD). Newey--West standard errors (6 lags) are used throughout. Table~\ref{tab:factor_alphas} reports the intercept (alpha) and its $t$-statistic under each specification; Table~\ref{tab:fund_alphas} repeats the exercise for the fund-augmented variant. Alphas that survive all five factor models indicate return that cannot be attributed to market, size, value, profitability, investment, or momentum exposure.
+To test whether XGB's out-of-sample return is explained by known risk factors, monthly returns are regressed on five standard factor models: CAPM, Fama--French three-factor, Carhart four-factor, Fama--French five-factor, and a six-factor specification that augments FF5 with the momentum factor (UMD). Newey--West standard errors (6 lags) are used throughout. Table~\ref{tab:factor_alphas} reports the intercept (alpha) and its $t$-statistic under each specification; Table~\ref{tab:fund_alphas} repeats the exercise for the fund-augmented variant. Alphas that survive all five factor models indicate return that cannot be attributed to market, size, value, profitability, investment, or momentum exposure.
 
 \input{tables/table_factor_alphas}
 
-For completeness, Table~\ref{tab:fund_alphas} reports the same regressions for the fund-augmented variant (M2: mom+$\pi$+fund) discussed in Section~\ref{sec:fund_ablation}. Alphas remain statistically significant under all five specifications ($t > 2.9$) but are materially smaller than the baseline's, consistent with the dilution documented in the main text.
+For completeness, Table~\ref{tab:fund_alphas} reports the same regressions for the fund-augmented variant (XGB: mom+$\pi$+fund) discussed in Section~\ref{sec:fund_ablation}. Alphas remain statistically significant under all five specifications ($t > 2.9$) but are materially smaller than the baseline's, consistent with the dilution documented in the main text.
 
 \input{tables/table_fund_alphas}
 
 \subsection{Block Bootstrap Inference}\label{app:bootstrap}
 
-To assess the sampling variability of M2's Sharpe ratio and test its outperformance formally, a block bootstrap is applied to the monthly return series. Returns are resampled with replacement in 12-month blocks to preserve autocorrelation, producing 10{,}000 synthetic 167-month paths (fixed seed 42). The Sharpe ratio is recomputed on each resample to obtain a 95\% confidence interval, and the same block draws are used for M2 and each benchmark to form a paired test of the Sharpe difference. The bottom panel repeats the exercise on M2 returns split by regime.
+To assess the sampling variability of XGB's Sharpe ratio and test its outperformance formally, a block bootstrap is applied to the monthly return series. Returns are resampled with replacement in 12-month blocks to preserve autocorrelation, producing 10{,}000 synthetic 167-month paths (fixed seed 42). The Sharpe ratio is recomputed on each resample to obtain a 95\% confidence interval, and the same block draws are used for XGB and each benchmark to form a paired test of the Sharpe difference. The bottom panel repeats the exercise on XGB returns split by regime.
 
 \input{tables/table_bootstrap}
 
-M2's Sharpe confidence interval is [0.67, 1.53], comfortably above zero, while every benchmark's interval straddles zero. The paired tests reject equality of Sharpe ratios between M2 and each benchmark at $p < 0.025$. Within M2, the panic-period Sharpe exceeds the calm-period Sharpe in point estimate (1.54 vs 0.84), but with only 59 panic months the paired difference is not statistically significant ($p = 0.109$); the 95\% interval $[-0.16, 1.59]$ straddles zero. The point-estimate gap is consistent with the regime-conditional selection mechanism described in Section~\ref{sec:regime_results}, but its statistical confirmation would require a longer panic sample. These intervals describe sampling variability within the 2011--2025 sample; out-of-sample generalisation is addressed separately by the 30-year expanding-window backtest (Section~\ref{sec:historical_stress}) and the sub-period analysis (Appendix~\ref{app:subperiod}).
+XGB's Sharpe confidence interval is [0.67, 1.53], comfortably above zero, while every benchmark's interval straddles zero. The paired tests reject equality of Sharpe ratios between XGB and each benchmark at $p < 0.025$. Within XGB, the panic-period Sharpe exceeds the calm-period Sharpe in point estimate (1.54 vs 0.84), but with only 59 panic months the paired difference is not statistically significant ($p = 0.109$); the 95\% interval $[-0.16, 1.59]$ straddles zero. The point-estimate gap is consistent with the regime-conditional selection mechanism described in Section~\ref{sec:regime_results}, but its statistical confirmation would require a longer panic sample. These intervals describe sampling variability within the 2011--2025 sample; out-of-sample generalisation is addressed separately by the 30-year expanding-window backtest (Section~\ref{sec:historical_stress}) and the sub-period analysis (Appendix~\ref{app:subperiod}).
 
 \subsection{Leg-Level CAPM Betas by Regime}\label{app:leg_betas}
 
-The D\&M comparison in Section~\ref{sec:dm_comparison} characterises M2's contribution as stock selection rather than exposure scaling. A direct test of this framing is to compute leg-level CAPM betas separately by regime: if M2 reorganises which stocks it holds across regimes (cross-sectional re-ranking), the long-leg and short-leg betas should shift between calm and panic in opposite directions; if instead M2 mechanically scales exposure, both legs' betas should move together.
+The D\&M comparison in Section~\ref{sec:stress_test} characterises XGB's contribution as stock selection rather than exposure scaling. A direct test of this framing is to compute leg-level CAPM betas separately by regime: if XGB reorganises which stocks it holds across regimes (cross-sectional re-ranking), the long-leg and short-leg betas should shift between calm and panic in opposite directions; if instead XGB mechanically scales exposure, both legs' betas should move together.
 
 \input{tables/table_leg_betas}
 
-The pattern in Table~\ref{tab:leg_betas} is consistent with the cross-sectional re-ranking interpretation. M2's long-leg beta rises from 1.40 in calm to 1.65 in panic (\emph{tilt amplification}: in panic, the long leg holds names with higher market sensitivity), while the short-leg beta falls from 1.22 to 0.98. Fixed 12-month momentum, by contrast, holds both leg-level betas roughly stable across regimes (long: 1.09 calm, 1.07 panic; short: 1.80 calm, 1.69 panic), consistent with the unconditional rank-based construction. The difference is direct evidence that the regime signal acts on \emph{which} stocks are held rather than on \emph{how much}.
+The pattern in Table~\ref{tab:leg_betas} is consistent with the cross-sectional re-ranking interpretation. XGB's long-leg beta rises from 1.40 in calm to 1.65 in panic (\emph{tilt amplification}: in panic, the long leg holds names with higher market sensitivity), while the short-leg beta falls from 1.22 to 0.98. Fixed 12-month momentum, by contrast, holds both leg-level betas roughly stable across regimes (long: 1.09 calm, 1.07 panic; short: 1.80 calm, 1.69 panic), consistent with the unconditional rank-based construction. The difference is direct evidence that the regime signal acts on \emph{which} stocks are held rather than on \emph{how much}.
 
 \subsection{Per-cluster Feature Signature ($K=4$ Partition)}\label{app:cluster_k4_features}
 
@@ -272,9 +272,28 @@ Section~\ref{sec:heterogeneity_picks} reports a $K=4$ partition of the 167 test 
 
 \input{tables/table_cluster_k4_features_appendix}
 
+\subsection{Cluster-Level Cross-Validation}\label{app:cluster_cross_validation}
+
+Three diagnostics extend the regime-aggregate findings of Section~\ref{sec:regime_results} across the $K=4$ partition.
+
+\paragraph{Leg-betas across the $K=4$ partition}
+XGB retains long-leg $\beta >$ short-leg $\beta$ in every cluster (spreads $+0.68$, $+0.40$, $+0.49$, $+0.43$ for clusters 1--4), while unconditional 12-month momentum exhibits leg-beta inversion in every cluster ($-0.24$, $-0.87$, $-0.75$, $-0.42$; Table~\ref{tab:cluster_k4_leg_betas}). \citet{DanielMoskowitz2016}'s crash mechanism is latent across every cluster type; XGB escapes it everywhere through compositional re-ranking.
+
+\input{tables/table_cluster_k4_leg_betas}
+
+\paragraph{$\pi_t^{\text{filter}}$'s SHAP share by cluster}
+Combined long-and-short SHAP shares are $0.50$, $0.46$, $0.54$, $0.24$ for clusters 1--4 (Table~\ref{tab:cluster_k4_shap_shares}). The pattern is consistent with the routing interpretation: $\pi_t^{\text{filter}}$ contributes most where the cross-section is ambiguous (cluster 3) and least where it is unambiguously crisis-shaped (cluster 4, where momentum splits alone suffice to produce the loser portfolio).
+
+\input{tables/table_cluster_k4_shap_shares}
+
+\paragraph{Short-leg structure (future work)}
+The $K=4$ partition was defined on long-leg z-curves; applying the same labels to the short leg shows the short basket is structurally distinct from a negated long-leg, with short-vs-negated-long correlations of $+0.94$, $+0.89$, $+0.19$, and $-0.84$ for clusters 1--4 (Table~\ref{tab:cluster_k4_short_leg}). The month-1 short-leg spike in cluster 4 ($+0.57$) replicates the asymmetric short-side sensitivity documented by \citet{Nagel2012}, consistent with Section~\ref{sec:horizon_evidence}: month 1 carries $10.6\%$ of panic short-leg momentum SHAP versus $5.3\%$ in calm. A full short-leg analysis is left to future work.
+
+\input{tables/table_cluster_k4_short_leg}
+
 \subsection{Ridge Regression Baseline}\label{app:ridge}
 
-To isolate the effect of linearity from the choice of training target, a Ridge regression is estimated on the same 13 standardised features as M1 and M2, predicting continuous forward returns (the same target as XGBoost). Table~\ref{tab:ridge} reports results across a range of regularisation strengths.
+To isolate the effect of linearity from the choice of training target, a Ridge regression is estimated on the same 13 standardised features as LR and XGB, predicting continuous forward returns (the same target as XGBoost). Table~\ref{tab:ridge} reports results across a range of regularisation strengths.
 
 \input{tables/table_ridge}
 
@@ -289,21 +308,6 @@ The Student-$t$ model is estimated via data augmentation \citep{Geweke1993}: eac
 \input{tables/table_student_t_hmm}
 
 The Normal model achieves the lowest BIC (2257.3 vs.\ 2257.6 for the best Student-$t$ at $\nu = 100$), indicating no meaningful improvement from heavier tails. Regime classifications agree with the Normal HMM on at least 97.8\% of months across all $\nu$ values, and the correlation of filtered panic probabilities exceeds 0.98 everywhere. These results confirm that the Gaussian emission specification is robust for this application.
-
-\section{Tree Path Horizon Interaction Analysis}\label{app:combo_analysis}
-
-To examine which momentum horizons XGBoost conditions on jointly, we trace stocks through 50{,}000 individual trees and record which horizon groups each decision path splits on. Momentum lookbacks are grouped into four bands: S (months 1--3), M (months 4--6), I (months 7--9), and L (months 10--12). For each of the four regime$\times$leg groups (calm long, calm short, panic long, panic short), 5{,}000 stocks are sampled and traced through all trees. A path that splits on at least one feature from both the I and L groups is recorded as the ``I{+}L'' combination. Paths that split only on $\pi_t^{\text{filter}}$ (no momentum splits) are excluded; the remaining paths are normalised to sum to 100\%.
-
-Tables~\ref{tab:combo_long_cp} and~\ref{tab:combo_short_cp} report the calm-minus-panic z-score difference for the long and short legs, respectively. The long leg table shows uniformly positive entries: the model selects stocks with higher relative momentum in calm at every horizon. The short leg table shows uniformly negative entries: in panic, the short leg shifts toward shorting stocks with higher relative momentum (closer to the cross-sectional average or above it), rather than the deep losers it targets in calm. Together, the two tables confirm that the regime signal reverses the selection direction on both sides of the portfolio while preserving the same horizon interaction structure.
-
-Table~\ref{tab:zscore_shap_detail} reports the underlying per-horizon z-scores and SHAP shares by regime and leg from which the calm-minus-panic differences below are computed.
-
-\input{tables/table_zscore_shap_detail}
-
-\input{tables/table_combo_long_cp}
-
-\input{tables/table_combo_short_cp}
-
 
 \section{Label Switching: Sign Correction Procedure}\label{app:label_switching}
 
