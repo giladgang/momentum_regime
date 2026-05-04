@@ -2,9 +2,10 @@
 \begin{table}[H]
 \centering
 \small
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{l r r r r}
 \toprule
-Feature & 1 (calm cont.) & 2 (mild cont.) & 3 (post-panic) & 4 (deep crisis) \\
+Feature & 1 (calm) & 2 (mild) & 3 (post-panic) & 4 (deep crisis) \\
 \midrule
     Months ($n$) & 53 & 62 & 31 & 21 \\
     \midrule
@@ -22,7 +23,8 @@ Feature & 1 (calm cont.) & 2 (mild cont.) & 3 (post-panic) & 4 (deep crisis) \\
     \midrule
     Cluster Sharpe & 0.92 & 0.93 & 1.21 & 1.82 \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \caption{$K=4$ cluster descriptors, 2011--2025 test period, $n_{\text{total}} = 167$ months. Each column is one cluster; rows are grouped (top to bottom): cluster size; regime context (current $\pi_t^{\text{filter}}$ and prior 6-/12-month panic frequencies); cross-section state (average-stock trailing return; cross-stock standard deviation of 9--12 month momentum; cross-stock skewness of 1--4 month momentum); the strategy\textquoteright s trailing 12-month Sharpe entering the cluster's months; long-leg average z-score $\bar{z}$ (the model\textquoteright s picks, averaged across the 12 momentum horizons); and the cluster Sharpe (annualised, block bootstrap with block size 6, 5{,}000 reps). The 9--12 month and 1--4 month windows are chosen as the ones with the largest cross-cluster spread for each measure.}
 \label{tab:cluster_k4_descriptors}
 \end{table}

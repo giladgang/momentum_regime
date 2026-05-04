@@ -34,8 +34,8 @@ DESCRIPTORS_PATH = os.path.join(RESULTS_THESIS_DIR, 'cluster_k4_descriptor_table
 TEX_PATH         = os.path.join(TABLES_DIR, 'table_cluster_k4_descriptors.tex')
 
 CLUSTER_LABELS = {
-    0: 'calm cont.',
-    1: 'mild cont.',
+    0: 'calm',
+    1: 'mild',
     2: 'post-panic',
     3: 'deep crisis',
 }
@@ -161,6 +161,7 @@ def main():
         r'\begin{table}[H]',
         r'\centering',
         r'\small',
+        r'\resizebox{\textwidth}{!}{%',
         r'\begin{tabular}{l r r r r}',
         r'\toprule',
         header_line,
@@ -169,7 +170,8 @@ def main():
     tex_lines.extend(body_lines)
     tex_lines += [
         r'\bottomrule',
-        r'\end{tabular}',
+        r'\end{tabular}%',
+        r'}',
         f'\\caption{{{caption}}}',
         r'\label{tab:cluster_k4_descriptors}',
         r'\end{table}',
