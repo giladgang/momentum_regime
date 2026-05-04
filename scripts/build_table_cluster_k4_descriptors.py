@@ -103,9 +103,9 @@ def main():
     groups.append([
         (r'Cross-section avg stock return',
          [_fmt_pct(r['mom_overall_mean']) for _, r in df.iterrows()]),
-        (r'Cross-section disp.\ (long, $h{=}9$--$12$)',
+        (r'Cross-section std of 9--12 mo trailing returns',
          [_fmt_2dp(r['cs_disp_long_mean']) for _, r in df.iterrows()]),
-        (r'Cross-section skew.\ (short, $h{=}1$--$4$)',
+        (r'Cross-section skewness of 1--4 mo trailing returns',
          [_fmt_skew(r['cs_skew_short_mean']) for _, r in df.iterrows()]),
     ])
 
@@ -145,18 +145,18 @@ def main():
         r'Each column is one cluster; rows are grouped (top to bottom): '
         r'cluster size; regime context (current $\pi_t^{\text{filter}}$ and '
         r'prior 6-/12-month panic frequencies); cross-section state '
-        r'(average-stock trailing return; dispersion at the long horizon band; '
-        r'skewness at the short horizon band); the strategy\textquoteright s trailing 12-month '
-        r"Sharpe entering the cluster's months; long-leg average z-score "
-        r'$\bar{z}$ (the model\textquoteright s picks, averaged across the 12 momentum '
-        r'horizons); and the cluster Sharpe (annualised, block bootstrap with '
-        r'block size 6, 5{,}000 reps). '
-        r'The horizon shown for dispersion and skewness is the one with the '
-        r"largest cross-cluster spread, averaged across the cluster\textquoteright s months. "
-        r'Intuitively, cross-section dispersion measures how much stocks differ '
-        r'from each other in their trailing returns; cross-section skewness '
-        r'measures whether a few outlier stocks dominate the cross-sectional '
-        r'average return.'
+        r'(average-stock trailing return; standard deviation of stocks\textquoteright\ '
+        r'9--12 month trailing returns; skewness of stocks\textquoteright\ 1--4 month '
+        r"trailing returns); the strategy\textquoteright s trailing 12-month Sharpe entering "
+        r"the cluster's months; long-leg average z-score $\bar{z}$ (the "
+        r'model\textquoteright s picks, averaged across the 12 momentum horizons); and '
+        r'the cluster Sharpe (annualised, block bootstrap with block size 6, '
+        r'5{,}000 reps). '
+        r'The std and skewness windows shown are the ones with the largest '
+        r'cross-cluster spread; std measures how much stocks differ from each '
+        r'other in their multi-quarter trailing returns, and skewness measures '
+        r'whether a few outlier stocks dominate the cross-sectional average of '
+        r'recent returns.'
     )
 
     tex_lines = [
