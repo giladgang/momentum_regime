@@ -103,9 +103,9 @@ def main():
     groups.append([
         (r'Cross-section avg stock return',
          [_fmt_pct(r['mom_overall_mean']) for _, r in df.iterrows()]),
-        (r'Cross-stock return spread (9--12 mo)',
+        (r'How much stocks differ from each other in 9--12 month returns',
          [_fmt_2dp(r['cs_disp_long_mean']) for _, r in df.iterrows()]),
-        (r'Cross-stock return skew (1--4 mo)',
+        (r'Whether a few outlier stocks dominate the 1--4 month average',
          [_fmt_skew(r['cs_skew_short_mean']) for _, r in df.iterrows()]),
     ])
 
@@ -145,17 +145,14 @@ def main():
         r'Each column is one cluster; rows are grouped (top to bottom): '
         r'cluster size; regime context (current $\pi_t^{\text{filter}}$ and '
         r'prior 6-/12-month panic frequencies); cross-section state '
-        r'(average-stock trailing return, the cross-stock std and skewness '
-        r"of trailing returns at the indicated window); the strategy\textquoteright s "
-        r"trailing 12-month Sharpe entering the cluster's months; long-leg "
-        r'average z-score $\bar{z}$ (the model\textquoteright s picks, averaged across '
-        r'the 12 momentum horizons); and the cluster Sharpe (annualised, '
-        r'block bootstrap with block size 6, 5{,}000 reps). '
-        r'Std measures how much stocks differ from each other in their '
-        r'trailing returns; skewness measures whether a few outlier stocks '
-        r'dominate the cross-sectional average. '
-        r'The 9--12 month and 1--4 month windows shown are the ones with the '
-        r'largest cross-cluster spread.'
+        r'(average-stock trailing return, plus two cross-stock summaries '
+        r"of trailing returns); the strategy\textquoteright s trailing 12-month "
+        r"Sharpe entering the cluster's months; long-leg average z-score "
+        r'$\bar{z}$ (the model\textquoteright s picks, averaged across the 12 '
+        r'momentum horizons); and the cluster Sharpe (annualised, block '
+        r'bootstrap with block size 6, 5{,}000 reps). '
+        r'The 9--12 month and 1--4 month windows are chosen as the ones '
+        r'with the largest cross-cluster spread for each measure.'
     )
 
     tex_lines = [
@@ -163,7 +160,7 @@ def main():
         r'\begin{table}[H]',
         r'\centering',
         r'\small',
-        r'\begin{tabular}{l r r r r}',
+        r'\begin{tabular}{p{6.5cm} r r r r}',
         r'\toprule',
         header_line,
         r'\midrule',
