@@ -110,11 +110,6 @@ def main():
     ])
 
     groups.append([
-        (r'Strategy trailing 12-mo Sharpe',
-         [_fmt_2dp(r['past_sharpe_12mo_mean']) for _, r in df.iterrows()]),
-    ])
-
-    groups.append([
         (r'Long-leg avg z-score $\bar{z}$',
          [_fmt_signed_2dp(r['z_centroid_mean']) for _, r in df.iterrows()]),
     ])
@@ -147,11 +142,10 @@ def main():
         r'prior 6-/12-month panic frequencies); cross-section state '
         r'(average-stock trailing return; cross-stock standard deviation '
         r'of 9--12 month momentum; cross-stock skewness of 1--4 month '
-        r"momentum); the strategy\textquoteright s trailing 12-month "
-        r"Sharpe entering the cluster's months; long-leg average z-score "
-        r'$\bar{z}$ (the model\textquoteright s picks, averaged across the 12 '
-        r'momentum horizons); and the cluster Sharpe (annualised, block '
-        r'bootstrap with block size 6, 5{,}000 reps). '
+        r'momentum); long-leg average z-score $\bar{z}$ (the '
+        r"model\textquoteright s picks, averaged across the 12 momentum "
+        r'horizons); and the cluster Sharpe (annualised, block bootstrap '
+        r'with block size 6, 5{,}000 reps). '
         r'The 9--12 month and 1--4 month windows are chosen as the ones '
         r'with the largest cross-cluster spread for each measure.'
     )
