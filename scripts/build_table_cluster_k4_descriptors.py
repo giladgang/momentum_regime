@@ -105,8 +105,8 @@ def main():
          [_fmt_pct(r['mom_overall_mean']) for _, r in df.iterrows()]),
         (r'Cross-section disp.\ (long, $h{=}9$--$12$)',
          [_fmt_2dp(r['cs_disp_long_mean']) for _, r in df.iterrows()]),
-        (r'Cross-section skew.\ (mid, $h{=}5$--$8$)',
-         [_fmt_skew(r['cs_skew_mid_mean']) for _, r in df.iterrows()]),
+        (r'Cross-section skew.\ (short, $h{=}1$--$4$)',
+         [_fmt_skew(r['cs_skew_short_mean']) for _, r in df.iterrows()]),
     ])
 
     groups.append([
@@ -140,17 +140,23 @@ def main():
             body_lines.append(r'    \midrule')
 
     caption = (
-        r'$K=4$ cluster descriptors, 2011--2024 test period, '
+        r'$K=4$ cluster descriptors, 2011--2025 test period, '
         r'$n_{\text{total}} = 167$ months. '
         r'Each column is one cluster; rows are grouped (top to bottom): '
-        r'cluster size, regime context (current $\pi_t^{\text{filter}}$ and '
-        r'prior 6-/12-month panic frequencies), cross-section state '
-        r'(average-stock trailing return, dispersion at the long horizon band, '
-        r'skewness at the mid horizon band, all averaged across the cluster\textquoteright s months), '
-        r"strategy's trailing 12-month Sharpe entering the cluster's months, "
-        r'long-leg average z-score $\bar{z}$ (the model\textquoteright s picks, '
-        r'averaged across the 12 momentum horizons), and the cluster Sharpe '
-        r'(annualised, block bootstrap with block size 6, 5{,}000 reps).'
+        r'cluster size; regime context (current $\pi_t^{\text{filter}}$ and '
+        r'prior 6-/12-month panic frequencies); cross-section state '
+        r'(average-stock trailing return; dispersion at the long horizon band; '
+        r'skewness at the short horizon band); the strategy\textquoteright s trailing 12-month '
+        r"Sharpe entering the cluster's months; long-leg average z-score "
+        r'$\bar{z}$ (the model\textquoteright s picks, averaged across the 12 momentum '
+        r'horizons); and the cluster Sharpe (annualised, block bootstrap with '
+        r'block size 6, 5{,}000 reps). '
+        r'The horizon shown for dispersion and skewness is the one with the '
+        r"largest cross-cluster spread, averaged across the cluster\textquoteright s months. "
+        r'Intuitively, cross-section dispersion measures how much stocks differ '
+        r'from each other in their trailing returns; cross-section skewness '
+        r'measures whether a few outlier stocks dominate the cross-sectional '
+        r'average return.'
     )
 
     tex_lines = [
