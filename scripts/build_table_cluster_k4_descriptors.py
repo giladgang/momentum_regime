@@ -103,9 +103,9 @@ def main():
     groups.append([
         (r'Cross-section avg stock return',
          [_fmt_pct(r['mom_overall_mean']) for _, r in df.iterrows()]),
-        (r'Cross-section std of 9--12 mo trailing returns',
+        (r'Cross-stock return spread (9--12 mo)',
          [_fmt_2dp(r['cs_disp_long_mean']) for _, r in df.iterrows()]),
-        (r'Cross-section skewness of 1--4 mo trailing returns',
+        (r'Cross-stock return skew (1--4 mo)',
          [_fmt_skew(r['cs_skew_short_mean']) for _, r in df.iterrows()]),
     ])
 
@@ -145,18 +145,17 @@ def main():
         r'Each column is one cluster; rows are grouped (top to bottom): '
         r'cluster size; regime context (current $\pi_t^{\text{filter}}$ and '
         r'prior 6-/12-month panic frequencies); cross-section state '
-        r'(average-stock trailing return; standard deviation of stocks\textquoteright\ '
-        r'9--12 month trailing returns; skewness of stocks\textquoteright\ 1--4 month '
-        r"trailing returns); the strategy\textquoteright s trailing 12-month Sharpe entering "
-        r"the cluster's months; long-leg average z-score $\bar{z}$ (the "
-        r'model\textquoteright s picks, averaged across the 12 momentum horizons); and '
-        r'the cluster Sharpe (annualised, block bootstrap with block size 6, '
-        r'5{,}000 reps). '
-        r'The std and skewness windows shown are the ones with the largest '
-        r'cross-cluster spread; std measures how much stocks differ from each '
-        r'other in their multi-quarter trailing returns, and skewness measures '
-        r'whether a few outlier stocks dominate the cross-sectional average of '
-        r'recent returns.'
+        r'(average-stock trailing return, the cross-stock std and skewness '
+        r"of trailing returns at the indicated window); the strategy\textquoteright s "
+        r"trailing 12-month Sharpe entering the cluster's months; long-leg "
+        r'average z-score $\bar{z}$ (the model\textquoteright s picks, averaged across '
+        r'the 12 momentum horizons); and the cluster Sharpe (annualised, '
+        r'block bootstrap with block size 6, 5{,}000 reps). '
+        r'Std measures how much stocks differ from each other in their '
+        r'trailing returns; skewness measures whether a few outlier stocks '
+        r'dominate the cross-sectional average. '
+        r'The 9--12 month and 1--4 month windows shown are the ones with the '
+        r'largest cross-cluster spread.'
     )
 
     tex_lines = [
