@@ -82,28 +82,47 @@ def main():
     df = pd.read_csv(DESCRIPTORS_PATH).sort_values('cluster').reset_index(drop=True)
     print(f'Loaded {len(df)} clusters')
 
-    rows = []
+    # Group rows by what they describe: regime, cross-section state,
+    # strategy state, picks, cluster outcome. Midrules separate groups.
+    groups = []
 
-    rows.append((r'$n$',
-                 [str(int(r['n_months'])) for _, r in df.iterrows()]))
-    rows.append((r'$\bar{\pi}_t^{\text{filter}}$',
-                 [f"{r['pi_panic_mean']:.2f}" for _, r in df.iterrows()]))
-    rows.append((r'$\pi$ 6-mo prior',
-                 [f"{r['pi_panic_freq_6mo_mean']:.2f}" for _, r in df.iterrows()]))
-    rows.append((r'$\pi$ 12-mo prior',
-                 [f"{r['pi_panic_freq_12mo_mean']:.2f}" for _, r in df.iterrows()]))
-    rows.append((r'avg stock return',
-                 [_fmt_pct(r['mom_overall_mean']) for _, r in df.iterrows()]))
-    rows.append((r'cs.\ disp.\ (long)',
-                 [_fmt_2dp(r['cs_disp_long_mean']) for _, r in df.iterrows()]))
-    rows.append((r'cs.\ skew.\ (mid)',
-                 [_fmt_skew(r['cs_skew_mid_mean']) for _, r in df.iterrows()]))
-    rows.append((r'trailing 12-mo Sharpe',
-                 [_fmt_2dp(r['past_sharpe_12mo_mean']) for _, r in df.iterrows()]))
-    rows.append((r'$\bar{z}$ long-leg',
-                 [_fmt_signed_2dp(r['z_centroid_mean']) for _, r in df.iterrows()]))
-    rows.append((r'Sharpe',
-                 [_fmt_2dp(r['sharpe']) for _, r in df.iterrows()]))
+    groups.append([
+        (r'Months ($n$)',
+         [str(int(r['n_months'])) for _, r in df.iterrows()]),
+    ])
+
+    groups.append([
+        (r'$\bar{\pi}_t^{\text{filter}}$ (current panic prob.)',
+         [f"{r['pi_panic_mean']:.2f}" for _, r in df.iterrows()]),
+        (r'$\pi$ 6-mo prior frequency',
+         [f"{r['pi_panic_freq_6mo_mean']:.2f}" for _, r in df.iterrows()]),
+        (r'$\pi$ 12-mo prior frequency',
+         [f"{r['pi_panic_freq_12mo_mean']:.2f}" for _, r in df.iterrows()]),
+    ])
+
+    groups.append([
+        (r'Cross-section avg stock return',
+         [_fmt_pct(r['mom_overall_mean']) for _, r in df.iterrows()]),
+        (r'Cross-section disp.\ (long, $h{=}9$--$12$)',
+         [_fmt_2dp(r['cs_disp_long_mean']) for _, r in df.iterrows()]),
+        (r'Cross-section skew.\ (mid, $h{=}5$--$8$)',
+         [_fmt_skew(r['cs_skew_mid_mean']) for _, r in df.iterrows()]),
+    ])
+
+    groups.append([
+        (r'Strategy trailing 12-mo Sharpe',
+         [_fmt_2dp(r['past_sharpe_12mo_mean']) for _, r in df.iterrows()]),
+    ])
+
+    groups.append([
+        (r'Long-leg avg z-score $\bar{z}$',
+         [_fmt_signed_2dp(r['z_centroid_mean']) for _, r in df.iterrows()]),
+    ])
+
+    groups.append([
+        (r'Cluster Sharpe',
+         [_fmt_2dp(r['sharpe']) for _, r in df.iterrows()]),
+    ])
 
     cluster_headers = []
     for _, r in df.iterrows():
@@ -114,22 +133,24 @@ def main():
     header_line = 'Feature & ' + ' & '.join(cluster_headers) + r' \\'
 
     body_lines = []
-    for label, vals in rows:
-        body_lines.append(f'    {label} & ' + ' & '.join(vals) + r' \\')
+    for i, group in enumerate(groups):
+        for label, vals in group:
+            body_lines.append(f'    {label} & ' + ' & '.join(vals) + r' \\')
+        if i < len(groups) - 1:
+            body_lines.append(r'    \midrule')
 
     caption = (
         r'$K=4$ cluster descriptors, 2011--2024 test period, '
         r'$n_{\text{total}} = 167$ months. '
-        r'Each column is one cluster; each row is one of the context features '
-        r'used in the cluster analysis. '
-        r"``cs.\ disp.'' and ``cs.\ skew.'' are the cross-section dispersion "
-        r'(standard deviation across stocks) and skewness of momentum returns '
-        r'at the named horizon band (mid: months 5--8; long: months 9--12), '
-        r"averaged across the cluster's months. "
-        r'$\bar{z}$ long-leg is the average long-leg cross-sectional z-score '
-        r'across the 12 momentum horizons. '
-        r'Sharpes are annualised and computed via block bootstrap with block size 6, '
-        r'5{,}000 reps.'
+        r'Each column is one cluster; rows are grouped (top to bottom): '
+        r'cluster size, regime context (current $\pi_t^{\text{filter}}$ and '
+        r'prior 6-/12-month panic frequencies), cross-section state '
+        r'(average-stock trailing return, dispersion at the long horizon band, '
+        r'skewness at the mid horizon band, all averaged across the cluster\textquoteright s months), '
+        r"strategy's trailing 12-month Sharpe entering the cluster's months, "
+        r'long-leg average z-score $\bar{z}$ (the model\textquoteright s picks, '
+        r'averaged across the 12 momentum horizons), and the cluster Sharpe '
+        r'(annualised, block bootstrap with block size 6, 5{,}000 reps).'
     )
 
     tex_lines = [

@@ -6,18 +6,23 @@
 \toprule
 Feature & 1 (calm cont.) & 2 (mild cont.) & 3 (post-panic) & 4 (deep crisis) \\
 \midrule
-    $n$ & 53 & 62 & 31 & 21 \\
-    $\bar{\pi}_t^{\text{filter}}$ & 0.21 & 0.34 & 0.32 & 0.81 \\
-    $\pi$ 6-mo prior & 0.27 & 0.37 & 0.30 & 0.51 \\
-    $\pi$ 12-mo prior & 0.31 & 0.32 & 0.41 & 0.30 \\
-    avg stock return & $+$14\% & $+$7\% & $+$13\% & $-$9\% \\
-    cs.\ disp.\ (long) & 0.60 & 0.59 & 0.85 & 0.45 \\
-    cs.\ skew.\ (mid) & 6.2 & 7.6 & 6.2 & 5.6 \\
-    trailing 12-mo Sharpe & 1.22 & 1.04 & 1.15 & 1.08 \\
-    $\bar{z}$ long-leg & $+$0.57 & $+$0.19 & $-$0.29 & $-$0.82 \\
-    Sharpe & 0.92 & 0.93 & 1.21 & 1.82 \\
+    Months ($n$) & 53 & 62 & 31 & 21 \\
+    \midrule
+    $\bar{\pi}_t^{\text{filter}}$ (current panic prob.) & 0.21 & 0.34 & 0.32 & 0.81 \\
+    $\pi$ 6-mo prior frequency & 0.27 & 0.37 & 0.30 & 0.51 \\
+    $\pi$ 12-mo prior frequency & 0.31 & 0.32 & 0.41 & 0.30 \\
+    \midrule
+    Cross-section avg stock return & $+$14\% & $+$7\% & $+$13\% & $-$9\% \\
+    Cross-section disp.\ (long, $h{=}9$--$12$) & 0.60 & 0.59 & 0.85 & 0.45 \\
+    Cross-section skew.\ (mid, $h{=}5$--$8$) & 6.2 & 7.6 & 6.2 & 5.6 \\
+    \midrule
+    Strategy trailing 12-mo Sharpe & 1.22 & 1.04 & 1.15 & 1.08 \\
+    \midrule
+    Long-leg avg z-score $\bar{z}$ & $+$0.57 & $+$0.19 & $-$0.29 & $-$0.82 \\
+    \midrule
+    Cluster Sharpe & 0.92 & 0.93 & 1.21 & 1.82 \\
 \bottomrule
 \end{tabular}
-\caption{$K=4$ cluster descriptors, 2011--2024 test period, $n_{\text{total}} = 167$ months. Each column is one cluster; each row is one of the context features used in the cluster analysis. ``cs.\ disp.'' and ``cs.\ skew.'' are the cross-section dispersion (standard deviation across stocks) and skewness of momentum returns at the named horizon band (mid: months 5--8; long: months 9--12), averaged across the cluster's months. $\bar{z}$ long-leg is the average long-leg cross-sectional z-score across the 12 momentum horizons. Sharpes are annualised and computed via block bootstrap with block size 6, 5{,}000 reps.}
+\caption{$K=4$ cluster descriptors, 2011--2024 test period, $n_{\text{total}} = 167$ months. Each column is one cluster; rows are grouped (top to bottom): cluster size, regime context (current $\pi_t^{\text{filter}}$ and prior 6-/12-month panic frequencies), cross-section state (average-stock trailing return, dispersion at the long horizon band, skewness at the mid horizon band, all averaged across the cluster\textquoteright s months), strategy's trailing 12-month Sharpe entering the cluster's months, long-leg average z-score $\bar{z}$ (the model\textquoteright s picks, averaged across the 12 momentum horizons), and the cluster Sharpe (annualised, block bootstrap with block size 6, 5{,}000 reps).}
 \label{tab:cluster_k4_descriptors}
 \end{table}
