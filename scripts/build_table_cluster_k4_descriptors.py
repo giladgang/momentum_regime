@@ -103,9 +103,9 @@ def main():
     groups.append([
         (r'Cross-section avg stock return',
          [_fmt_pct(r['mom_overall_mean']) for _, r in df.iterrows()]),
-        (r'How much stocks differ from each other in 9--12 month returns',
+        (r'Cross-section std of 9--12 mo momentum',
          [_fmt_2dp(r['cs_disp_long_mean']) for _, r in df.iterrows()]),
-        (r'Whether a few outlier stocks dominate the 1--4 month average',
+        (r'Cross-section skewness of 1--4 mo momentum',
          [_fmt_skew(r['cs_skew_short_mean']) for _, r in df.iterrows()]),
     ])
 
@@ -145,8 +145,9 @@ def main():
         r'Each column is one cluster; rows are grouped (top to bottom): '
         r'cluster size; regime context (current $\pi_t^{\text{filter}}$ and '
         r'prior 6-/12-month panic frequencies); cross-section state '
-        r'(average-stock trailing return, plus two cross-stock summaries '
-        r"of trailing returns); the strategy\textquoteright s trailing 12-month "
+        r'(average-stock trailing return; cross-stock standard deviation '
+        r'of 9--12 month momentum; cross-stock skewness of 1--4 month '
+        r"momentum); the strategy\textquoteright s trailing 12-month "
         r"Sharpe entering the cluster's months; long-leg average z-score "
         r'$\bar{z}$ (the model\textquoteright s picks, averaged across the 12 '
         r'momentum horizons); and the cluster Sharpe (annualised, block '
@@ -160,7 +161,7 @@ def main():
         r'\begin{table}[H]',
         r'\centering',
         r'\small',
-        r'\begin{tabular}{p{6.5cm} r r r r}',
+        r'\begin{tabular}{l r r r r}',
         r'\toprule',
         header_line,
         r'\midrule',
