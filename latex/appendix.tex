@@ -103,7 +103,7 @@ Strategy performance is assessed using four standard risk-adjusted metrics compu
 \begin{equation}
     SR = \frac{\bar{r}}{\sigma(r)} \cdot \sqrt{12},
 \end{equation}
-where $\bar{r}$ is the mean monthly return.
+where $\bar{r}$ is the mean monthly return. Sharpe is computed from the arithmetic monthly mean annualised by $\sqrt{12}$, while annualised returns reported elsewhere in this thesis are compound (geometric); under high volatility the two definitions of average return differ, so Sharpe should not be inferred from a table by dividing annualised return by annualised volatility (e.g.\ at depth~1 in the methodology hyperparameter sweep, the reported Sharpe is $0.53$ but $8.7\% / 19.4\% = 0.45$).
 
 \textbf{Maximum drawdown} Let $C_t = \prod_{\tau=1}^{t}(1 + r_\tau)$ denote the cumulative wealth path. The maximum drawdown is:
 \begin{equation}
@@ -231,14 +231,6 @@ The historical evidence reported in Section~\ref{sec:historical_stress} comes fr
 The HMM's panic-state label is fixed by an economically motivated sign convention rather than the data-driven percentile comparison used elsewhere. The convention encodes the known direction of each feature in panic regimes: $-1$ for drawdown, $+1$ for cross-sectional dispersion, $-1$ for relative market participation, and $+1$ for the credit spread. The data-driven label-switching procedure used in the main pipeline is unstable on short training windows with few observed crisis months (under 20), so the fixed-sign fallback activates for retrainings before 2002. From 2002 onward the data-driven procedure resumes, by which point the training window contains the dot-com bust as a calibration anchor. The HMM seed loop is parallelised across CPU cores via \texttt{multiprocessing.Pool}; the parallel implementation is bit-identical to the serial reference (verified in the test suite by comparing per-seed pi-filter arrays).
 
 Each retraining produces 12 monthly out-of-sample long-short returns, which are stitched into a single 30-year monthly time series spanning January 1995 to November 2024 (359 months). Every prediction is strictly causal: the model used for month~$t$ saw no information after month~$t-1$. The 167-month sub-window from January 2011 onward overlaps the main test period reported in Section~\ref{sec:performance_results} and serves as a methodological cross-check; expanding-window OOS produces a Sharpe of 0.88 over that window, within the production result's bootstrap interval.
-
-\subsection{Placebo Regime Signals}\label{app:placebo}
-
-To assess whether XGBoost benefits specifically from the HMM regime signal rather than from any additional feature, the regime signal is removed entirely and XGBoost is retrained on the 12 momentum features alone.
-
-\input{tables/table_placebo}
-
-Removing the regime signal reduces XGB's Sharpe from 1.11 to 0.43, a drop of 0.68. The regime signal is essential for long-short momentum stock selection, not merely a marginal improvement.
 
 \subsection{Factor Model Regressions}\label{app:factor_alphas}
 

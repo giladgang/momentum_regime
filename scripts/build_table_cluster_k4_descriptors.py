@@ -2,10 +2,12 @@
 build_table_cluster_k4_descriptors.py
 ======================================
 Generates tables/table_cluster_k4_descriptors.tex for thesis §5.2.
-Reads results/thesis/cluster_k4_descriptor_table.csv (main descriptors) and
-results/thesis/cluster_k4_downside_metrics.csv (Sortino + max drawdown) and
-emits a booktabs table with per-cluster regime labels, n, pi_bar, Sharpe with
-CI, hit rate, Sortino, and max drawdown.
+Reads results/thesis/cluster_k4_descriptor_table.csv and emits a booktabs table
+in inverse layout (clusters as columns, features as rows). The features
+displayed are the ones referenced in the §5.2 cluster analysis: regime
+(current and prior panic frequencies), cross-section trend, dispersion,
+skewness, trailing strategy Sharpe, long-leg z-curve mean, and per-cluster
+Sharpe.
 
 Run:
     python scripts/build_table_cluster_k4_descriptors.py
@@ -28,106 +30,106 @@ from config import RESULTS_THESIS_DIR, TABLES_DIR
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
-DESCRIPTORS_PATH    = os.path.join(RESULTS_THESIS_DIR, 'cluster_k4_descriptor_table.csv')
-DOWNSIDE_PATH       = os.path.join(RESULTS_THESIS_DIR, 'cluster_k4_downside_metrics.csv')
-TEX_PATH            = os.path.join(TABLES_DIR, 'table_cluster_k4_descriptors.tex')
+DESCRIPTORS_PATH = os.path.join(RESULTS_THESIS_DIR, 'cluster_k4_descriptor_table.csv')
+TEX_PATH         = os.path.join(TABLES_DIR, 'table_cluster_k4_descriptors.tex')
 
 CLUSTER_LABELS = {
-    0: 'calm continuation',
-    1: 'mild continuation',
-    2: 'post-panic recovery',
+    0: 'calm cont.',
+    1: 'mild cont.',
+    2: 'post-panic',
     3: 'deep crisis',
 }
 
-EXPECTED_COLS_DESC = {
-    'cluster', 'n_months', 'pi_panic_mean', 'sharpe', 'sharpe_lo95',
-    'sharpe_hi95', 'hit_rate',
-}
-EXPECTED_COLS_DOWN = {'cluster', 'max_drawdown', 'sortino_ratio'}
 
-
-def _fmt_sharpe(x):
-    """Format Sharpe to 2 d.p., math minus for negatives."""
+# ---------------------------------------------------------------------------
+# Formatters
+# ---------------------------------------------------------------------------
+def _fmt_2dp(x):
     if np.isnan(x):
         return '---'
     return f'$-${abs(x):.2f}' if x < 0 else f'{x:.2f}'
 
 
-def _fmt_pct(x):
-    """Format a [0,1] fraction as a percentage to 1 d.p."""
+def _fmt_signed_2dp(x):
+    """Always show sign for emphasis (e.g. z-curve mean)."""
+    if np.isnan(x):
+        return '---'
+    sign = '$-$' if x < 0 else '$+$'
+    return f'{sign}{abs(x):.2f}'
+
+
+def _fmt_pct(x, decimals=0):
     if np.isnan(x):
         return '---'
     pct = x * 100
-    sign = '-' if pct < 0 else ''
-    return f'{sign}{abs(pct):.1f}\\%'
+    sign = '$-$' if pct < 0 else '$+$'
+    return f'{sign}{abs(pct):.{decimals}f}\\%'
 
 
-def _fmt_2dp(x):
-    """Format to 2 d.p., math minus for negatives."""
+def _fmt_skew(x):
     if np.isnan(x):
         return '---'
-    return f'$-${abs(x):.2f}' if x < 0 else f'{x:.2f}'
+    return f'{x:.1f}'
 
 
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
 def main():
-    # ------------------------------------------------------------------
-    # Load and validate inputs
-    # ------------------------------------------------------------------
-    for path in [DESCRIPTORS_PATH, DOWNSIDE_PATH]:
-        if not os.path.exists(path):
-            raise FileNotFoundError(
-                f'{path} not found. Run the cluster descriptor scripts first.'
-            )
+    if not os.path.exists(DESCRIPTORS_PATH):
+        raise FileNotFoundError(f'{DESCRIPTORS_PATH} not found.')
 
-    desc = pd.read_csv(DESCRIPTORS_PATH)
-    down = pd.read_csv(DOWNSIDE_PATH)
-
-    missing_desc = EXPECTED_COLS_DESC - set(desc.columns)
-    if missing_desc:
-        raise ValueError(f'cluster_k4_descriptor_table.csv missing columns: {missing_desc}')
-
-    missing_down = EXPECTED_COLS_DOWN - set(down.columns)
-    if missing_down:
-        raise ValueError(f'cluster_k4_downside_metrics.csv missing columns: {missing_down}')
-
-    # Merge on cluster
-    df = desc.merge(down[['cluster', 'max_drawdown', 'sortino_ratio']], on='cluster')
-    df = df.sort_values('cluster').reset_index(drop=True)
+    df = pd.read_csv(DESCRIPTORS_PATH).sort_values('cluster').reset_index(drop=True)
     print(f'Loaded {len(df)} clusters')
 
-    # ------------------------------------------------------------------
-    # Build LaTeX rows
-    # ------------------------------------------------------------------
-    data_rows = []
-    for _, row in df.iterrows():
-        k = int(row['cluster'])
+    rows = []
+
+    rows.append((r'$n$',
+                 [str(int(r['n_months'])) for _, r in df.iterrows()]))
+    rows.append((r'$\bar{\pi}_t^{\text{filter}}$',
+                 [f"{r['pi_panic_mean']:.2f}" for _, r in df.iterrows()]))
+    rows.append((r'$\pi$ 6-mo prior',
+                 [f"{r['pi_panic_freq_6mo_mean']:.2f}" for _, r in df.iterrows()]))
+    rows.append((r'$\pi$ 12-mo prior',
+                 [f"{r['pi_panic_freq_12mo_mean']:.2f}" for _, r in df.iterrows()]))
+    rows.append((r'avg stock return',
+                 [_fmt_pct(r['mom_overall_mean']) for _, r in df.iterrows()]))
+    rows.append((r'cs.\ disp.\ (long)',
+                 [_fmt_2dp(r['cs_disp_long_mean']) for _, r in df.iterrows()]))
+    rows.append((r'cs.\ skew.\ (mid)',
+                 [_fmt_skew(r['cs_skew_mid_mean']) for _, r in df.iterrows()]))
+    rows.append((r'trailing 12-mo Sharpe',
+                 [_fmt_2dp(r['past_sharpe_12mo_mean']) for _, r in df.iterrows()]))
+    rows.append((r'$\bar{z}$ long-leg',
+                 [_fmt_signed_2dp(r['z_centroid_mean']) for _, r in df.iterrows()]))
+    rows.append((r'Sharpe',
+                 [_fmt_2dp(r['sharpe']) for _, r in df.iterrows()]))
+
+    cluster_headers = []
+    for _, r in df.iterrows():
+        k = int(r['cluster'])
         label = CLUSTER_LABELS[k]
-        n = int(row['n_months'])
-        pi_bar = f"{row['pi_panic_mean']:.2f}"
-        sharpe_str = (
-            f"{_fmt_sharpe(row['sharpe'])} "
-            f"[{_fmt_sharpe(row['sharpe_lo95'])}, {_fmt_sharpe(row['sharpe_hi95'])}]"
-        )
-        hit = _fmt_pct(row['hit_rate'])
-        sortino = _fmt_2dp(row['sortino_ratio'])
-        mdd = _fmt_pct(-abs(row['max_drawdown']))  # drawdown is positive in CSV, show as negative
+        cluster_headers.append(f"{k+1} ({label})")
 
-        data_rows.append(
-            f"    {k+1} ({label}) & {n} & {pi_bar} & {sharpe_str} "
-            f"& {hit} & {mdd} \\\\"
-        )
+    header_line = 'Feature & ' + ' & '.join(cluster_headers) + r' \\'
 
-    # ------------------------------------------------------------------
-    # Assemble .tex
-    # ------------------------------------------------------------------
+    body_lines = []
+    for label, vals in rows:
+        body_lines.append(f'    {label} & ' + ' & '.join(vals) + r' \\')
+
     caption = (
-        r'K=4 cluster descriptors, 2011--2024 test period, '
+        r'$K=4$ cluster descriptors, 2011--2024 test period, '
         r'$n_{\text{total}} = 167$ months. '
-        r'All figures are at the monthly frequency. '
+        r'Each column is one cluster; each row is one of the context features '
+        r'used in the cluster analysis. '
+        r"``cs.\ disp.'' and ``cs.\ skew.'' are the cross-section dispersion "
+        r'(standard deviation across stocks) and skewness of momentum returns '
+        r'at the named horizon band (mid: months 5--8; long: months 9--12), '
+        r"averaged across the cluster's months. "
+        r'$\bar{z}$ long-leg is the average long-leg cross-sectional z-score '
+        r'across the 12 momentum horizons. '
         r'Sharpes are annualised and computed via block bootstrap with block size 6, '
-        r'5{,}000 reps.\protect\footnote{Hit rate is the fraction of cluster months with positive XGB return.} '
-        r"Maximum drawdown is the peak-to-trough drawdown within the cluster's "
-        r'chronological subseries.'
+        r'5{,}000 reps.'
     )
 
     tex_lines = [
@@ -135,12 +137,12 @@ def main():
         r'\begin{table}[H]',
         r'\centering',
         r'\small',
-        r'\begin{tabular}{l r r l r r}',
+        r'\begin{tabular}{l r r r r}',
         r'\toprule',
-        r'Cluster & $n$ & $\bar{\pi}$ & Sharpe [95\% CI] & Hit rate & Max DD \\',
+        header_line,
         r'\midrule',
     ]
-    tex_lines.extend(data_rows)
+    tex_lines.extend(body_lines)
     tex_lines += [
         r'\bottomrule',
         r'\end{tabular}',
@@ -149,9 +151,6 @@ def main():
         r'\end{table}',
     ]
 
-    # ------------------------------------------------------------------
-    # Write output
-    # ------------------------------------------------------------------
     os.makedirs(TABLES_DIR, exist_ok=True)
     with open(TEX_PATH, 'w') as f:
         f.write('\n'.join(tex_lines) + '\n')
