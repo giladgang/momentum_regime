@@ -344,18 +344,18 @@ def render_table_international_results(metrics):
     rows = [
         ('Local market',     'market'),
         ('Fixed 12-mo mom',  'fixed_12'),
-        ('M2 (XGB)',         'm2'),
+        ('XGB',              'm2'),
     ]
     sec = 'international'
     lines = [
         r'\begin{table}[H]',
         r'\centering',
         r'\small',
-        r'\begin{tabular}{l c c c c c c}',
+        r'\begin{tabular}{l c c c c c c c c}',
         r'\toprule',
-        r' & \multicolumn{3}{c}{UK} & \multicolumn{3}{c}{JP} \\',
-        r'\cmidrule(lr){2-4} \cmidrule(lr){5-7}',
-        r'Strategy & Sharpe & Ann.\ Ret & Max DD & Sharpe & Ann.\ Ret & Max DD \\',
+        r' & \multicolumn{4}{c}{UK} & \multicolumn{4}{c}{JP} \\',
+        r'\cmidrule(lr){2-5} \cmidrule(lr){6-9}',
+        r'Strategy & Sharpe & Ann.\ Ret & Total Ret & Max DD & Sharpe & Ann.\ Ret & Total Ret & Max DD \\',
         r'\midrule',
     ]
     # Intl metrics are stored as raw decimals (e.g., ann_ret=0.16 for 16%) -- multiply by
@@ -363,27 +363,23 @@ def render_table_international_results(metrics):
     def _to_pct(v):
         return v * 100 if isinstance(v, (int, float)) else v
 
-    # Bold the M2 row's UK columns (UK regional is the headline finding); JP M2 not bolded.
     for i, (label, key) in enumerate(rows):
         cells = [label]
         for region in ['uk', 'jp']:
-            uk_bold = (key == 'm2') and (region == 'uk')
             sh_raw = _g(metrics, sec, f'{region}_regional_{key}_sharpe')
             ar_raw = _g(metrics, sec, f'{region}_regional_{key}_ann_ret')
+            cr_raw = _g(metrics, sec, f'{region}_regional_{key}_cum_ret')
             dd_raw = _g(metrics, sec, f'{region}_regional_{key}_max_dd')
             sh = _num(sh_raw, places=2)
             ar = _signed_pct(_to_pct(ar_raw), places=1)
+            cr = _signed_pct(_to_pct(cr_raw), places=1)
             dd = _signed_pct(_to_pct(dd_raw), places=1)
-            if uk_bold:
-                sh = rf'\textbf{{{sh}}}'
-                ar = rf'\textbf{{{ar}}}'
-                dd = rf'\textbf{{{dd}}}'
-            cells += [sh, ar, dd]
+            cells += [sh, ar, cr, dd]
         lines.append(' & '.join(cells) + r' \\')
     lines += [
         r'\bottomrule',
         r'\end{tabular}',
-        r'\caption{International cross-sectional model performance, 2011--2025 OOS. XGB uses the US specification (50-seed XGBoost ensemble, decile-spread long-short, value-weighted) with regionally-fitted HMM (DD+VOL+REL\_N). Long/short legs from unconditional decile breakpoints (no NYSE-equivalent tier). Net of 10 bps one-way transaction cost.}',
+        r'\caption{International cross-sectional model performance, 2011--2025 OOS. Regionally-fitted HMM (DD+VOL+REL\_N).}',
         r'\label{tab:international_results}',
         r'\end{table}',
         '',

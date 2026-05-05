@@ -353,30 +353,43 @@ def parse_table_fund_alphas():
 
 
 def parse_intl_summary():
-    """Parse UK/JP intl summary CSVs. Strategy column uses 'method2_xgb' for M2."""
+    """Parse UK/JP intl summary CSVs. Strategy column uses 'method2_xgb' for M2.
+    Compounded total return is computed from the per-strategy monthly returns CSV."""
     import csv
+    import pandas as pd
     out = {}
+    strat_map = {
+        'method2_xgb': 'm2', 'method1_lr': 'm1', 'method0_formula': 'm0',
+        'fixed_mom_12': 'fixed_12', 'fixed_mom_1': 'fixed_1',
+        'market': 'market',
+    }
     for region, suffix in [('uk', 'uk_regional'), ('jp', 'jp_regional'),
                            ('uk', 'uk_uspi'),    ('jp', 'jp_uspi')]:
         is_uspi = suffix.endswith('_uspi')
-        path = ROOT / f"results/thesis/intl_{region}_summary{'_uspi' if is_uspi else ''}.csv"
-        if not path.exists():
+        summary_path = ROOT / f"results/thesis/intl_{region}_summary{'_uspi' if is_uspi else ''}.csv"
+        returns_path = ROOT / f"results/thesis/intl_{region}_returns{'_uspi' if is_uspi else ''}.csv"
+        if not summary_path.exists():
             continue
-        with open(path) as f:
+        # Compounded cumulative returns from monthly series
+        cum_by_strat = {}
+        if returns_path.exists():
+            rdf = pd.read_csv(returns_path)
+            for raw_col, key in strat_map.items():
+                if raw_col in rdf.columns:
+                    s = rdf[raw_col].dropna()
+                    if len(s) > 0:
+                        cum_by_strat[key] = float((1 + s).prod() - 1)
+        with open(summary_path) as f:
             for row in csv.DictReader(f):
                 name = row.get('strategy', '').strip().lower()
-                # Map every strategy to a key prefix
-                strat_map = {
-                    'method2_xgb': 'm2', 'method1_lr': 'm1', 'method0_formula': 'm0',
-                    'fixed_mom_12': 'fixed_12', 'fixed_mom_1': 'fixed_1',
-                    'market': 'market',
-                }
                 strat_key = strat_map.get(name)
                 if not strat_key:
                     continue
                 out[f'{suffix}_{strat_key}_sharpe'] = {'value': _to_float(row.get('sharpe'))}
                 out[f'{suffix}_{strat_key}_max_dd'] = {'value': _to_float(row.get('max_dd'))}
                 out[f'{suffix}_{strat_key}_ann_ret'] = {'value': _to_float(row.get('ann_ret'))}
+                if strat_key in cum_by_strat:
+                    out[f'{suffix}_{strat_key}_cum_ret'] = {'value': cum_by_strat[strat_key]}
     return out
 
 

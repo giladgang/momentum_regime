@@ -95,7 +95,7 @@ def main():
         if np.isnan(x):
             return '---'
         pct = x * 100
-        sign = '-' if pct < 0 else ''
+        sign = '$-$' if pct < 0 else ''
         return f"{sign}{abs(pct):,.1f}\\%".replace(',', '{,}')
 
     # Write LaTeX table
@@ -124,12 +124,10 @@ def main():
     tex.append(r'\end{tabular}')
     tex.append(
         r'\caption{Sub-period decomposition of the expanding-window '
-        r'out-of-sample backtest, restricted to 2000--2024. The 1995--1999 '
-        r'sub-period predates the dot-com bust and is dominated by an '
-        r'exceptional bull run; it is excluded from the table to keep the '
-        r'comparison focused on the post-2000 period that contains all major '
-        r'momentum-relevant stress events. Market is the value-weighted CRSP '
-        r'market (Mkt-RF + RF, Fama-French monthly factors).}'
+        r'out-of-sample backtest, 2000--2024. Annual retraining is '
+        r'initialised in 1995 using all data available through the prior '
+        r'December. Market is the value-weighted CRSP market (Mkt-RF + RF, '
+        r'Fama-French monthly factors).}'
     )
     tex.append(r'\label{tab:expanding_subperiods}')
     tex.append(r'\end{table}')
