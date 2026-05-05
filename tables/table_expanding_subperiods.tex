@@ -1,20 +1,22 @@
 \begin{table}[H]
 \centering
 \small
-\begin{tabular}{l r r r r}
+\begin{tabular}{l r c c c c c c}
 \toprule
-Period & N months & Sharpe & Cumulative & Max DD \\
+ & & \multicolumn{3}{c}{XGB} & \multicolumn{3}{c}{Market} \\
+\cmidrule(lr){3-5} \cmidrule(lr){6-8}
+Period & N months & Sharpe & Cum.\ & Max DD & Sharpe & Cum.\ & Max DD \\
 \midrule
-Full sample, 1995--2024 & 359 & 0.50 & 1{,}405.5\% & -64.8\% \\
+Full sample, 1995--2024 & 359 & 0.50 & 1{,}405.5\% & -64.8\% & 0.74 & 2{,}094.2\% & -50.3\% \\
 \midrule
-1995--1999 & 60 & 0.50 & 50.8\% & -25.5\% \\
-2000--2002 dot-com & 36 & $-$0.15 & -35.9\% & -64.8\% \\
-2003--2006 bull & 48 & 0.70 & 37.5\% & -12.7\% \\
-2007--2009 GFC & 36 & 0.26 & 11.1\% & -36.3\% \\
-2010--2019 calm & 120 & 0.67 & 155.4\% & -17.9\% \\
-2020--2024 COVID era & 59 & 1.23 & 299.1\% & -22.2\% \\
+1995--1999 & 60 & 0.50 & 50.8\% & -25.5\% & 1.78 & 239.0\% & -17.3\% \\
+2000--2002 dot-com & 36 & $-$0.15 & -35.9\% & -64.8\% & $-$0.72 & -38.1\% & -45.0\% \\
+2003--2006 bull & 48 & 0.70 & 37.5\% & -12.7\% & 1.70 & 80.5\% & -4.6\% \\
+2007--2009 GFC & 36 & 0.26 & 11.1\% & -36.3\% & $-$0.15 & -13.9\% & -50.3\% \\
+2010--2019 calm & 120 & 0.67 & 155.4\% & -17.9\% & 1.05 & 258.1\% & -17.6\% \\
+2020--2024 COVID era & 59 & 1.23 & 299.1\% & -22.2\% & 0.81 & 95.2\% & -24.8\% \\
 \bottomrule
 \end{tabular}
-\caption{Sub-period decomposition of the 30-year expanding-window out-of-sample backtest.}
+\caption{Sub-period decomposition of the 30-year expanding-window out-of-sample backtest. Market is the value-weighted CRSP market (Mkt-RF + RF, Fama-French monthly factors).}
 \label{tab:expanding_subperiods}
 \end{table}

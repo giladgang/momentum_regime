@@ -26,6 +26,7 @@ from config import RESULTS_THESIS_DIR, TABLES_DIR
 
 
 RETURNS_PATH = os.path.join(RESULTS_THESIS_DIR, 'expanding_returns_prod.csv')
+FF_FACTORS_PATH = os.path.join('data', 'ff_factors.parquet')
 TEX_PATH = os.path.join(TABLES_DIR, 'table_expanding_subperiods.tex')
 
 SUBPERIODS = [
@@ -60,6 +61,11 @@ def main():
     print(f"Loaded {len(r)} OOS months from {r.index.min().date()} to "
           f"{r.index.max().date()}")
 
+    # Load FF factors and compute total market return = Mkt-RF + RF.
+    ff = pd.read_parquet(FF_FACTORS_PATH)
+    mkt = (ff['Mkt-RF'] + ff['RF']).rename('mkt_ret').to_frame()
+    mkt.index = pd.to_datetime(mkt.index)
+
     # Compute production-overlap stats for the table caption note
     overlap = r['ret'][r.index.year >= 2011]
     overlap_stats = stats(overlap)
@@ -68,12 +74,18 @@ def main():
     for label, start, end in SUBPERIODS:
         if start is None:
             rs = r['ret']
+            ms = mkt['mkt_ret'].loc[(mkt.index >= r.index.min()) & (mkt.index <= r.index.max())]
         else:
             rs = r['ret'][(r.index >= start) & (r.index < end)]
+            ms = mkt['mkt_ret'][(mkt.index >= start) & (mkt.index < end)]
         s = stats(rs)
-        rows.append((label, s))
-        print(f"  {label:<28} N={s['n']:>3}  Sh={s['sharpe']:+.2f}  "
-              f"Cum={s['cum'] * 100:>+8.1f}%  MDD={s['mdd'] * 100:>+7.1f}%")
+        m = stats(ms)
+        rows.append((label, s, m))
+        print(f"  {label:<28} N={s['n']:>3}  "
+              f"XGB Sh={s['sharpe']:+.2f} Cum={s['cum'] * 100:>+8.1f}% "
+              f"MDD={s['mdd'] * 100:>+7.1f}%  "
+              f"Mkt Sh={m['sharpe']:+.2f} Cum={m['cum'] * 100:>+8.1f}% "
+              f"MDD={m['mdd'] * 100:>+7.1f}%")
 
     # Format helpers matching thesis convention:
     # - Bare numbers: positive shown unsigned, negative as $-$ (math minus).
@@ -96,16 +108,20 @@ def main():
     tex.append(r'\begin{table}[H]')
     tex.append(r'\centering')
     tex.append(r'\small')
-    tex.append(r'\begin{tabular}{l r r r r}')
+    tex.append(r'\begin{tabular}{l r c c c c c c}')
     tex.append(r'\toprule')
-    tex.append(r'Period & N months & Sharpe & Cumulative & Max DD \\')
+    tex.append(r' & & \multicolumn{3}{c}{XGB} & \multicolumn{3}{c}{Market} \\')
+    tex.append(r'\cmidrule(lr){3-5} \cmidrule(lr){6-8}')
+    tex.append(r'Period & N months & Sharpe & Cum.\ & Max DD & Sharpe & Cum.\ & Max DD \\')
     tex.append(r'\midrule')
-    for i, (label, s) in enumerate(rows):
+    for i, (label, s, m) in enumerate(rows):
         n = s['n']
-        sh = fmt_sharpe(s['sharpe'])
-        cum = fmt_pct(s['cum'])
-        mdd = fmt_pct(s['mdd'])
-        tex.append(f"{label} & {n} & {sh} & {cum} & {mdd} \\\\")
+        x_sh = fmt_sharpe(s['sharpe']); x_cum = fmt_pct(s['cum']); x_mdd = fmt_pct(s['mdd'])
+        m_sh = fmt_sharpe(m['sharpe']); m_cum = fmt_pct(m['cum']); m_mdd = fmt_pct(m['mdd'])
+        tex.append(
+            f"{label} & {n} & {x_sh} & {x_cum} & {x_mdd} & "
+            f"{m_sh} & {m_cum} & {m_mdd} \\\\"
+        )
         # Visual separator after the full-sample row
         if i == 0:
             tex.append(r'\midrule')
@@ -113,11 +129,8 @@ def main():
     tex.append(r'\end{tabular}')
     tex.append(
         r'\caption{Sub-period decomposition of the 30-year expanding-window '
-        r'out-of-sample backtest. Sub-period rows aggregate by calendar year. '
-        rf"The 2011--2024 sub-window of this test (167 months, the same window "
-        rf"as the main test in Section~\ref{{sec:performance_results}}) "
-        rf"reproduces the production Sharpe within sampling noise: "
-        rf"{overlap_stats['sharpe']:.2f} vs production 1.11.}}"
+        r'out-of-sample backtest. Market is the value-weighted CRSP market '
+        r'(Mkt-RF + RF, Fama-French monthly factors).}'
     )
     tex.append(r'\label{tab:expanding_subperiods}')
     tex.append(r'\end{table}')
