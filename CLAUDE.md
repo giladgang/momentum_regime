@@ -9,6 +9,7 @@ Code in `scripts/`, results in `results/`, plots in `plots/`, LaTeX tables in
 - Pull before push and before starting work — Gilad edits on Overleaf in parallel.
 - Push after every meaningful change.
 - Never use em-dashes (—, ---) in `.tex` files.
+- No trailing period in `\paragraph{…}` / section headings (e.g. `\paragraph{Summary}`, not `\paragraph{Summary.}`).
 - Don't edit thesis `.tex` for data-dependent claims until Gilad has reviewed the numbers.
 - Never force-push, amend pushed commits, `--no-verify`, or skip hooks.
 
