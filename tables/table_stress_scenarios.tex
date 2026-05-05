@@ -3,7 +3,7 @@
 \small
 \begin{tabular}{l r r}
 \toprule
-Recession Duration & Cumulative Loss & MDD (worst case) \\
+Recession Duration & XGB Cumulative Loss & XGB MDD (worst case) \\
 \midrule
 Baseline (no recession) & --- & $-$23\% \\
 3 months & $-$10\% & $-$38\% \\
@@ -13,6 +13,6 @@ Baseline (no recession) & --- & $-$23\% \\
 24 months & $-$57\% & $-$69\% \\
 \bottomrule
 \end{tabular}
-\caption{Prolonged bear market simulation. Each row injects a recession during which XGB loses $3.44\%$ per month (its average losing panic-month return). Cumulative Loss is the geometric compounding of that monthly loss over the recession's length. MDD is the worst-case maximum drawdown across all possible insertion points.}
+\caption{Prolonged bear market simulation. Each row injects a recession during which XGB is assumed to lose $3.44\%$ per month, its average losing panic-month return. Cumulative Loss is the geometric compounding of that monthly loss over the recession's length, a worst-case uniform assumption. MDD is the worst-case maximum drawdown over the test sample across all possible insertion points.}
 \label{tab:stress_scenarios}
 \end{table}
