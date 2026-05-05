@@ -94,8 +94,6 @@ def main():
     groups.append([
         (r'$\bar{\pi}_t^{\text{filter}}$ (current panic prob.)',
          [f"{r['pi_panic_mean']:.2f}" for _, r in df.iterrows()]),
-        (r'Cross-section avg stock return (12-mo)',
-         [_fmt_pct(r['mom_overall_mean']) for _, r in df.iterrows()]),
     ])
 
     groups.append([
@@ -119,6 +117,8 @@ def main():
          [_fmt_signed_2dp(r['z_centroid_mean']) for _, r in df.iterrows()]),
         (r'Long-leg avg trailing return',
          [_fmt_pct(v) for v in long_avg_mom]),
+        (r'Cross-section avg trailing return',
+         [_fmt_pct(r['mom_overall_mean']) for _, r in df.iterrows()]),
         (r'Short-leg avg trailing return',
          [_fmt_pct(v) for v in short_avg_mom]),
     ])
@@ -144,20 +144,13 @@ def main():
             body_lines.append(r'    \midrule')
 
     caption = (
-        r'$K=4$ cluster descriptors, 2011--2025 test period, '
-        r'$n_{\text{total}} = 167$ months. '
-        r'Each column is one cluster; rows are grouped (top to bottom): '
-        r'cluster size; regime-routing inputs (current $\pi_t^{\text{filter}}$ '
-        r"and cross-section average stock return, the two features that "
-        r'jointly determine which selection mode the model commits to); '
-        r'descriptive cross-section state (cross-stock standard deviation '
-        r'of 9--12 month momentum, cross-stock skewness of 1--4 month '
-        r'momentum); the picks themselves (long-leg average z-score $\bar{z}$, '
-        r'and the average trailing return of the long and short legs, all '
-        r'averaged across the 12 momentum horizons); and the cluster Sharpe '
-        r'(annualised, block bootstrap with block size 6, 5{,}000 reps). '
-        r'The 9--12 month and 1--4 month windows are chosen as the ones '
-        r'with the largest cross-cluster spread for each measure.'
+        r'$K=4$ cluster descriptors, 2011--2025 ($n=167$ months); '
+        r'columns are clusters. The trailing-return rows (long, '
+        r'cross-section, short) are averaged across the 12 momentum '
+        r'horizons. Dispersion is shown at 9--12 months and skewness '
+        r'at 1--4 months, the windows where clusters differ most. '
+        r'Cluster Sharpe is annualised, block-bootstrapped (block '
+        r'size 6, 5{,}000 reps).'
     )
 
     tex_lines = [

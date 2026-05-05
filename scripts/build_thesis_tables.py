@@ -350,8 +350,6 @@ def render_table_international_results(metrics):
     lines = [
         r'\begin{table}[H]',
         r'\centering',
-        r'\caption{International cross-sectional model performance, 2011--2025 out-of-sample test period. M2 uses the US specification (12 momentum horizons, 50-seed XGBoost ensemble, decile-spread long-short construction, value-weighted by market equity) with locally-fitted HMM (200 production seeds, DD+VOL+REL\_N feature set selected per region). Long and short legs are formed from unconditional decile breakpoints across all listed stocks (no NYSE-equivalent tier exists for either market). Net of 10 bps one-way transaction cost.}',
-        r'\label{tab:international_results}',
         r'\small',
         r'\begin{tabular}{l c c c c c c}',
         r'\toprule',
@@ -385,6 +383,8 @@ def render_table_international_results(metrics):
     lines += [
         r'\bottomrule',
         r'\end{tabular}',
+        r'\caption{International cross-sectional model performance, 2011--2025 OOS. XGB uses the US specification (50-seed XGBoost ensemble, decile-spread long-short, value-weighted) with regionally-fitted HMM (DD+VOL+REL\_N). Long/short legs from unconditional decile breakpoints (no NYSE-equivalent tier). Net of 10 bps one-way transaction cost.}',
+        r'\label{tab:international_results}',
         r'\end{table}',
         '',
     ]

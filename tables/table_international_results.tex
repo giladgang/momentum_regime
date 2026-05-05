@@ -1,7 +1,5 @@
 \begin{table}[H]
 \centering
-\caption{International cross-sectional model performance, 2011--2025 out-of-sample test period. XGB uses the US specification (12 momentum horizons, 50-seed XGBoost ensemble, decile-spread long-short construction, value-weighted by market equity) with locally-fitted HMM (200 production seeds, DD+VOL+REL\_N feature set selected per region). Long and short legs are formed from unconditional decile breakpoints across all listed stocks (no NYSE-equivalent tier exists for either market). Net of 10 bps one-way transaction cost.}
-\label{tab:international_results}
 \small
 \begin{tabular}{l c c c c c c}
 \toprule
@@ -14,4 +12,6 @@ Fixed 12-mo mom & 0.45 & 9.3\% & $-$62.6\% & 0.07 & $-$0.5\% & $-$66.3\% \\
 XGB & \textbf{0.84} & \textbf{16.0\%} & \textbf{$-$21.4\%} & 0.50 & 6.0\% & $-$19.8\% \\
 \bottomrule
 \end{tabular}
+\caption{International cross-sectional model performance, 2011--2025 OOS. XGB uses the US specification (50-seed XGBoost ensemble, decile-spread long-short, value-weighted) with regionally-fitted HMM (DD+VOL+REL\_N). Long/short legs from unconditional decile breakpoints (no NYSE-equivalent tier). Net of 10 bps one-way transaction cost.}
+\label{tab:international_results}
 \end{table}

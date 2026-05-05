@@ -10,19 +10,19 @@ Feature & 1 (calm) & 2 (transition) & 3 (post-panic) & 4 (deep crisis) \\
     Months ($n$) & 53 & 62 & 31 & 21 \\
     \midrule
     $\bar{\pi}_t^{\text{filter}}$ (current panic prob.) & 0.21 & 0.34 & 0.32 & 0.81 \\
-    Cross-section avg stock return (12-mo) & $+$14\% & $+$7\% & $+$13\% & $-$9\% \\
     \midrule
     Cross-section std of 9--12 mo momentum & 0.60 & 0.59 & 0.85 & 0.45 \\
     Cross-section skewness of 1--4 mo momentum & 4.6 & 7.2 & 6.4 & 3.7 \\
     \midrule
     Long-leg avg z-score $\bar{z}$ & $+$0.57 & $+$0.19 & $-$0.29 & $-$0.82 \\
     Long-leg avg trailing return & $+$40\% & $+$16\% & $-$3\% & $-$37\% \\
+    Cross-section avg trailing return & $+$14\% & $+$7\% & $+$13\% & $-$9\% \\
     Short-leg avg trailing return & $-$3\% & $+$0\% & $+$42\% & $-$4\% \\
     \midrule
     Cluster Sharpe & 0.92 & 0.93 & 1.21 & 1.82 \\
 \bottomrule
 \end{tabular}%
 }
-\caption{$K=4$ cluster descriptors, 2011--2025 test period, $n_{\text{total}} = 167$ months. Each column is one cluster; rows are grouped (top to bottom): cluster size; regime-routing inputs (current $\pi_t^{\text{filter}}$ and cross-section average stock return, the two features that jointly determine which selection mode the model commits to); descriptive cross-section state (cross-stock standard deviation of 9--12 month momentum, cross-stock skewness of 1--4 month momentum); the picks themselves (long-leg average z-score $\bar{z}$, and the average trailing return of the long and short legs, all averaged across the 12 momentum horizons); and the cluster Sharpe (annualised, block bootstrap with block size 6, 5{,}000 reps). The 9--12 month and 1--4 month windows are chosen as the ones with the largest cross-cluster spread for each measure.}
+\caption{$K=4$ cluster descriptors, 2011--2025 ($n=167$ months); columns are clusters. The trailing-return rows (long, cross-section, short) are averaged across the 12 momentum horizons. Dispersion is shown at 9--12 months and skewness at 1--4 months, the windows where clusters differ most. Cluster Sharpe is annualised, block-bootstrapped (block size 6, 5{,}000 reps).}
 \label{tab:cluster_k4_descriptors}
 \end{table}
