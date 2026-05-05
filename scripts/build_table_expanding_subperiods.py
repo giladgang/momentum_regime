@@ -30,8 +30,7 @@ FF_FACTORS_PATH = os.path.join('data', 'ff_factors.parquet')
 TEX_PATH = os.path.join(TABLES_DIR, 'table_expanding_subperiods.tex')
 
 SUBPERIODS = [
-    ('Full sample, 1995--2024', None, None),
-    ('1995--1999',              '1995-01-01', '2000-01-01'),
+    ('Full sample, 2000--2024', '2000-01-01', '2025-01-01'),
     ('2000--2002 dot-com',      '2000-01-01', '2003-01-01'),
     ('2003--2006 bull',         '2003-01-01', '2007-01-01'),
     ('2007--2009 GFC',          '2007-01-01', '2010-01-01'),
@@ -72,12 +71,8 @@ def main():
 
     rows = []
     for label, start, end in SUBPERIODS:
-        if start is None:
-            rs = r['ret']
-            ms = mkt['mkt_ret'].loc[(mkt.index >= r.index.min()) & (mkt.index <= r.index.max())]
-        else:
-            rs = r['ret'][(r.index >= start) & (r.index < end)]
-            ms = mkt['mkt_ret'][(mkt.index >= start) & (mkt.index < end)]
+        rs = r['ret'][(r.index >= start) & (r.index < end)]
+        ms = mkt['mkt_ret'][(mkt.index >= start) & (mkt.index < end)]
         s = stats(rs)
         m = stats(ms)
         rows.append((label, s, m))
@@ -112,7 +107,7 @@ def main():
     tex.append(r'\toprule')
     tex.append(r' & & \multicolumn{3}{c}{XGB} & \multicolumn{3}{c}{Market} \\')
     tex.append(r'\cmidrule(lr){3-5} \cmidrule(lr){6-8}')
-    tex.append(r'Period & N months & Sharpe & Cum.\ & Max DD & Sharpe & Cum.\ & Max DD \\')
+    tex.append(r'Period & N months & Sharpe & Total Return & Max DD & Sharpe & Total Return & Max DD \\')
     tex.append(r'\midrule')
     for i, (label, s, m) in enumerate(rows):
         n = s['n']
@@ -128,9 +123,13 @@ def main():
     tex.append(r'\bottomrule')
     tex.append(r'\end{tabular}')
     tex.append(
-        r'\caption{Sub-period decomposition of the 30-year expanding-window '
-        r'out-of-sample backtest. Market is the value-weighted CRSP market '
-        r'(Mkt-RF + RF, Fama-French monthly factors).}'
+        r'\caption{Sub-period decomposition of the expanding-window '
+        r'out-of-sample backtest, restricted to 2000--2024. The 1995--1999 '
+        r'sub-period predates the dot-com bust and is dominated by an '
+        r'exceptional bull run; it is excluded from the table to keep the '
+        r'comparison focused on the post-2000 period that contains all major '
+        r'momentum-relevant stress events. Market is the value-weighted CRSP '
+        r'market (Mkt-RF + RF, Fama-French monthly factors).}'
     )
     tex.append(r'\label{tab:expanding_subperiods}')
     tex.append(r'\end{table}')

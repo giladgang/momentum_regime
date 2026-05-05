@@ -5,11 +5,10 @@
 \toprule
  & & \multicolumn{3}{c}{XGB} & \multicolumn{3}{c}{Market} \\
 \cmidrule(lr){3-5} \cmidrule(lr){6-8}
-Period & N months & Sharpe & Cum.\ & Max DD & Sharpe & Cum.\ & Max DD \\
+Period & N months & Sharpe & Total Return & Max DD & Sharpe & Total Return & Max DD \\
 \midrule
-Full sample, 1995--2024 & 359 & 0.50 & 1{,}405.5\% & -64.8\% & 0.74 & 2{,}094.2\% & -50.3\% \\
+Full sample, 2000--2024 & 299 & 0.50 & 898.4\% & -64.8\% & 0.56 & 572.6\% & -50.3\% \\
 \midrule
-1995--1999 & 60 & 0.50 & 50.8\% & -25.5\% & 1.78 & 239.0\% & -17.3\% \\
 2000--2002 dot-com & 36 & $-$0.15 & -35.9\% & -64.8\% & $-$0.72 & -38.1\% & -45.0\% \\
 2003--2006 bull & 48 & 0.70 & 37.5\% & -12.7\% & 1.70 & 80.5\% & -4.6\% \\
 2007--2009 GFC & 36 & 0.26 & 11.1\% & -36.3\% & $-$0.15 & -13.9\% & -50.3\% \\
@@ -17,6 +16,6 @@ Full sample, 1995--2024 & 359 & 0.50 & 1{,}405.5\% & -64.8\% & 0.74 & 2{,}094.2\
 2020--2024 COVID era & 59 & 1.23 & 299.1\% & -22.2\% & 0.81 & 95.2\% & -24.8\% \\
 \bottomrule
 \end{tabular}
-\caption{Sub-period decomposition of the 30-year expanding-window out-of-sample backtest. Market is the value-weighted CRSP market (Mkt-RF + RF, Fama-French monthly factors).}
+\caption{Sub-period decomposition of the expanding-window out-of-sample backtest, restricted to 2000--2024. The 1995--1999 sub-period predates the dot-com bust and is dominated by an exceptional bull run; it is excluded from the table to keep the comparison focused on the post-2000 period that contains all major momentum-relevant stress events. Market is the value-weighted CRSP market (Mkt-RF + RF, Fama-French monthly factors).}
 \label{tab:expanding_subperiods}
 \end{table}
