@@ -351,6 +351,7 @@ def render_table_international_results(metrics):
         r'\begin{table}[H]',
         r'\centering',
         r'\small',
+        r'\resizebox{\textwidth}{!}{%',
         r'\begin{tabular}{l c c c c c c c c}',
         r'\toprule',
         r' & \multicolumn{4}{c}{UK} & \multicolumn{4}{c}{JP} \\',
@@ -379,6 +380,7 @@ def render_table_international_results(metrics):
     lines += [
         r'\bottomrule',
         r'\end{tabular}',
+        r'}',
         r'\caption{International cross-sectional model performance, 2011--2025 OOS. Regionally-fitted HMM (DD+VOL+REL\_N).}',
         r'\label{tab:international_results}',
         r'\end{table}',
