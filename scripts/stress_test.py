@@ -539,21 +539,19 @@ tex_lines = []
 tex_lines.append(r'\begin{table}[H]')
 tex_lines.append(r'\centering')
 tex_lines.append(r'\small')
-tex_lines.append(r'\begin{tabular}{l r r r}')
+tex_lines.append(r'\begin{tabular}{l r r}')
 tex_lines.append(r'\toprule')
-tex_lines.append(r'Recession Duration & Market Loss & M2 Loss & MDD (worst case) \\')
+tex_lines.append(r'Recession Duration & Cumulative Loss & MDD (worst case) \\')
 tex_lines.append(r'\midrule')
 
 for row in stress_rows:
     dur = row['duration']
     if np.isnan(row['mkt_loss']):
-        mkt = '---'
-        m2 = '---'
+        loss = '---'
     else:
-        mkt = fmt_pct_round(row['mkt_loss'])
-        m2 = fmt_pct_round(row['m2_loss'])
+        loss = fmt_pct_round(row['mkt_loss'])
     mdd = fmt_pct_round(row['mdd_worst'])
-    tex_lines.append(f"{dur} & {mkt} & {m2} & {mdd} \\\\")
+    tex_lines.append(f"{dur} & {loss} & {mdd} \\\\")
 
 tex_lines.append(r'\bottomrule')
 tex_lines.append(r'\end{tabular}')
