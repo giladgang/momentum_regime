@@ -94,7 +94,7 @@ Table~\ref{tab:hmm_separation} and Figure~\ref{fig:regime_probabilities} summari
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{plots/thesis/regime_probabilities.png}
-    \caption{Filtered regime probability $\pi_t^{\text{filter}}$ (1990--2025). The dashed vertical line marks the train/test split (January 2011). Shaded regions indicate months where $\pi_t^{\text{filter}} \geq 0.5$ (panic classification).}
+    \caption{Filtered regime probability $\pi_t^{\text{filter}}$ (1990--2025). The pink area shows the filtered probability path; the dashed vertical line marks the train/test split (January 2011), the dotted horizontal line marks the $0.5$ threshold above which a month is classified as panic, and the grey vertical bands mark NBER recession periods. Major stress episodes (Dot-com, GFC, COVID) are labelled at the top.}
     \label{fig:regime_probabilities}
 \end{figure}
 
@@ -116,5 +116,3 @@ The filtered panic probability $\pi_t^{\text{filter}}$ from the HMM enters as a 
 \subsection{International Sample}\label{sec:intl_sample}
 
 For the robustness check in Section~\ref{sec:international}, the same pipeline is applied to UK and Japanese equities from Compustat Global over the same 1990--2025 window. The HMM feature set is re-selected per region using the four-pass procedure described in Section~\ref{sec:feature_selection}, run separately on each market's data; the candidate pool substitutes \texttt{BANK\_REL} (the value-weighted bank-sector excess return over the broad regional market, sign-flipped so high values indicate stress) for the US-specific Moody's BAA--AAA spread, and both regions select \emph{DD+VOL+REL\_N}. Long and short legs are formed from unconditional decile breakpoints across all listed stocks, since no NYSE-equivalent tier exists for either market. Per-region selection details and stability checks are in Appendix~\ref{app:intl_feature_selection}.
-
-With the data and features defined, the next section presents the out-of-sample results of the three portfolio construction methods.
