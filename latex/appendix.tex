@@ -190,15 +190,12 @@ XGB remains profitable across all cost levels tested: even at 50\,bps one-way (f
 
 \subsection{Model Sensitivity}\label{app:xgb_sensitivity}
 
-The XGBoost model uses hyperparameters selected via cross-validation on the training set. To verify that the results are not an artefact of a particular configuration, Table~\ref{tab:xgb_hyperparams} reports out-of-sample performance under alternative tree depths, learning rates, and ensemble sizes. A depth-matched Random Forest baseline is discussed below; full numbers are in \texttt{results/thesis/random\_forest\_results.csv}.
+The XGBoost model uses hyperparameters selected via cross-validation on the training set. To verify that the results are not an artefact of a particular configuration, Table~\ref{tab:xgb_hyperparams} reports out-of-sample performance under alternative tree depths, learning rates, and ensemble sizes.
 
 \input{tables/table_xgb_hyperparams}
 
 \paragraph{Hyperparameter sensitivity}
 At the baseline depth of 4, the Sharpe ratio ranges from 0.89 to 1.11 across learning rate and ensemble size variations. Performance degrades at depths below 3 (see Section~\ref{sec:depth_analysis} for the depth analysis) and above 5 due to overfitting. The results confirm that XGB's performance is not an artefact of a particular hyperparameter configuration.
-
-\paragraph{Boosting versus bagging}
-As a complementary check, a Random Forest matched on depth (4), ensemble size (500 trees per seed), and feature set (the same 13 features) was trained over 50 seeds (\texttt{results/thesis/random\_forest\_results.csv}). Sharpe falls from 1.08 to 0.73 and $\pi_t^{\text{filter}}$'s SHAP share drops from 45\% to 18\%. The mechanism is the difference between boosting and bagging. XGBoost fits each successive tree to the residuals of the current ensemble, so at every iteration the algorithm preferentially selects whichever feature most reduces the current error; for this problem that feature is $\pi_t^{\text{filter}}$, and its importance compounds across trees. Random Forest grows each tree independently on a bootstrap sample and subsamples a random subset of features at every split, which by construction prevents any single feature from dominating the ensemble and distributes importance more evenly across the 13 features. Nonlinearity and depth are therefore necessary but not sufficient: the boosted additive structure is what converts the regime signal into a primary gating variable rather than a marginal predictor, which is the basis for the architecture-dependence claim in Section~\ref{sec:method2}.
 
 \subsection{Number of Hidden States}\label{app:num_states}
 
