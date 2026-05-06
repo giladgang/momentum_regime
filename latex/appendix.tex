@@ -285,14 +285,6 @@ The $K=4$ partition was defined on long-leg z-curves; applying the same labels t
 
 \input{tables/table_cluster_k4_short_leg}
 
-\subsection{Ridge Regression Baseline}\label{app:ridge}
-
-To isolate the effect of linearity from the choice of training target, a Ridge regression is estimated on the same 13 standardised features as LR and XGB, predicting continuous forward returns (the same target as XGBoost). Table~\ref{tab:ridge} reports results across a range of regularisation strengths.
-
-\input{tables/table_ridge}
-
-The Ridge regression assigns $\pi_t^{\text{filter}}$ a coefficient of $+0.003$, which is positive but economically negligible: a one-standard-deviation increase in the panic probability shifts the predicted return by only 0.3 basis points. The linear model cannot use the regime signal to condition how the momentum horizons jointly determine the stock ranking, regardless of the training target.
-
 \subsection{Emission Distribution Robustness}\label{app:emission_robustness}
 
 To verify that regime identification is robust to the choice of emission distribution, the HMM is re-estimated with multivariate Student-$t$ emissions across a grid of degrees of freedom $\nu \in \{3, 5, 7, 10, 15, 20, 30, 50, 100\}$.
