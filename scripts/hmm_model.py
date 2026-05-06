@@ -271,7 +271,7 @@ def forward_filter(Z, mu, Sigma, P):
 # Set RERUN_MCMC = False to skip the sampler and load saved draws from disk.
 # Set RERUN_MCMC = True  to re-run the full sampler and overwrite saved draws.
 
-RERUN_MCMC  = True
+RERUN_MCMC  = False
 MCMC_CACHE  = 'data/mcmc_draws.npz'
 
 SEEDS = HMM_SEEDS  # from config.py
@@ -672,12 +672,15 @@ crises = [
     ('2020-02-01', '2020-05-01', 'COVID'),
 ]
 
-def shade_crises(ax, label=False):
+def shade_crises(ax, label=False, data_start=None):
     for start, end, lbl in crises:
-        ax.axvspan(pd.Timestamp(start), pd.Timestamp(end), alpha=0.12, color='grey')
+        s = pd.Timestamp(start)
+        if data_start is not None and s < pd.Timestamp(data_start):
+            continue
+        ax.axvspan(s, pd.Timestamp(end), alpha=0.12, color='grey')
         if label:
-            ax.text(pd.Timestamp(start), 0.97, lbl, fontsize=7, color='grey',
-                    va='top', transform=ax.get_xaxis_transform())
+            ax.text(s, 1.02, lbl, fontsize=7, color='grey',
+                    va='bottom', transform=ax.get_xaxis_transform())
 
 dates = panel['date']
 
@@ -691,9 +694,9 @@ ax.set_ylabel('$\\pi_t^{\\mathrm{filter}}$', fontsize=11)
 ax.set_ylim(0, 1)
 ax.axhline(0.5, color='black', linewidth=0.5, linestyle=':')
 ax.legend(fontsize=8, loc='upper left')
-shade_crises(ax, label=True)
 ax.set_xlabel('Date')
 ax.set_xlim(dates.min(), dates.max())
+shade_crises(ax, label=True, data_start=dates.min())
 
 plt.tight_layout()
 fig.savefig('plots/thesis/regime_probabilities.png', dpi=150)
