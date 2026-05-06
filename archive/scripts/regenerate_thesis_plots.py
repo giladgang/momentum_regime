@@ -14,7 +14,7 @@ import pickle
 # ── Load data ───────────────────────────────────────────────────────────────
 
 panel = pd.read_parquet('data/panel.parquet')
-features_z = ['DD_z', 'VOL_z', 'DISP_z', 'REL_N_z']
+features_z = ['DD_z', 'CS_z', 'DISP_z', 'REL_N_z']
 panel = panel.dropna(subset=features_z).reset_index(drop=True)
 
 # Load the saved HMM artefacts to get pi_filter
@@ -101,7 +101,7 @@ print("Saved regime_probabilities.png (single panel)")
 
 feature_labels = {
     'DD_z':    'DD (Drawdown)',
-    'VOL_z':   'VOL (Realised Volatility)',
+    'CS_z':    'CS (BAA-AAA Credit Spread)',
     'DISP_z':  'DISP (Return Dispersion)',
     'REL_N_z': 'REL_N (Market Participation)',
 }
