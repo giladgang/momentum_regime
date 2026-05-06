@@ -1,6 +1,6 @@
 # Metrics diff report
 
-Generated: 2026-05-05T18:20:11  
+Generated: 2026-05-06T21:49:59  
 Total metrics tracked: 192
 
 ## ⚙️ Config knobs
