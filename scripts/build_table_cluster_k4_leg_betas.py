@@ -118,6 +118,7 @@ def main():
         r'\begin{table}[H]',
         r'\centering',
         r'\small',
+        r'\resizebox{\textwidth}{!}{%',
         r'\begin{tabular}{l r | l l r | l l r}',
         r'\toprule',
         r' & & \multicolumn{3}{c|}{XGB} & \multicolumn{3}{c}{Fixed 12-mo mom} \\',
@@ -128,7 +129,8 @@ def main():
     tex_lines.extend(data_rows)
     tex_lines += [
         r'\bottomrule',
-        r'\end{tabular}',
+        r'\end{tabular}%',
+        r'}',
         f'\\caption{{{caption}}}',
         r'\label{tab:cluster_k4_leg_betas}',
         r'\end{table}',

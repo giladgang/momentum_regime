@@ -385,6 +385,80 @@ def main():
              '(tables/table_leg_betas.tex + results/leg_betas_by_regime.csv + '
              'plots/leg_betas_rolling.pdf). Depends on Steps 1+2'),
 
+        # ── Auxiliary thesis-cited generators added 2026-05-06 after a
+        # provenance audit found 14 scripts producing thesis figures/tables
+        # were unregistered (cluster K=4 chain, per-horizon SHAP, z-score
+        # heatmap), plus features_hmm whose generator was archived. Same
+        # silent-staleness pattern as the 2026-04-27 incident.
+
+        # Upstream producers (read from cs_artefacts + Step 18 z-scores).
+        38: ('scripts/per_horizon_shap_by_regime.py',
+             'STEP 38: Per-horizon SHAP shares by regime and leg '
+             '(results/thesis/per_horizon_shap_by_regime.csv). Depends on Step 2'),
+
+        39: ('scripts/cluster_zscore_l2_k4.py',
+             'STEP 39: Pure-L2 KMeans K=4 clustering on long-leg z-curves '
+             '(results/thesis/zscore_l2_k4_{labels,centroids}.csv + '
+             'plots/thesis/zscore_l2_k4_dispersion.{png,pdf}). '
+             'Depends on Steps 2 + 18 (zscore_long_by_month + cs_artefacts)'),
+
+        40: ('scripts/cluster_k4_descriptor_table.py',
+             'STEP 40: K=4 cluster descriptors '
+             '(results/thesis/cluster_k4_descriptor_table.csv). Depends on Step 39'),
+
+        41: ('scripts/cluster_k4_short_leg_descriptors.py',
+             'STEP 41: K=4 cluster short-leg z-curve descriptors '
+             '(results/thesis/cluster_k4_short_leg_descriptors.csv). '
+             'Depends on Step 39'),
+
+        42: ('scripts/cluster_k4_leg_betas.py',
+             'STEP 42: K=4 per-cluster leg-level CAPM betas, XGB vs fixed 12-mo '
+             '(results/thesis/cluster_k4_leg_betas.csv). Depends on Steps 2 + 39'),
+
+        43: ('scripts/cluster_k4_shap_shares.py',
+             'STEP 43: K=4 per-cluster pi_filter SHAP share breakdown '
+             '(results/thesis/cluster_k4_shap_shares.csv). Depends on Steps 2 + 39'),
+
+        # Leaf plot generators.
+        44: ('scripts/plot_shap_per_horizon_by_leg.py',
+             'STEP 44: Render per-horizon SHAP-by-leg bar chart '
+             '(plots/thesis/shap_per_horizon_by_leg.{png,pdf}). Depends on Step 38'),
+
+        45: ('scripts/plot_zscore_long_heatmap.py',
+             'STEP 45: Render long-leg z-curve heatmap (167 months × 12 horizons) '
+             '(plots/thesis/zscore_long_heatmap.{png,pdf}). Depends on Steps 18 + 39'),
+
+        46: ('scripts/plot_cluster_k4_individual_panels.py',
+             'STEP 46: Render four standalone per-cluster z-curve panels '
+             '(plots/thesis/zscore_l2_k4_panel_c{0..3}.{png,pdf}). '
+             'Depends on Steps 2 + 18 + 39'),
+
+        47: ('scripts/plot_features_hmm.py',
+             'STEP 47: Render four HMM input features with NBER shading '
+             '(plots/thesis/features_hmm.{png,pdf}). '
+             'Promoted from archive/scripts/regenerate_thesis_plots.py'),
+
+        # Leaf table builders.
+        48: ('scripts/build_table_cluster_k4_descriptors.py',
+             'STEP 48: Render K=4 cluster descriptors LaTeX table '
+             '(tables/table_cluster_k4_descriptors.tex). Depends on Steps 40 + 41'),
+
+        49: ('scripts/build_table_cluster_k4_features_appendix.py',
+             'STEP 49: Render K=4 cluster feature appendix LaTeX table '
+             '(tables/table_cluster_k4_features_appendix.tex). Depends on Step 40'),
+
+        50: ('scripts/build_table_cluster_k4_leg_betas.py',
+             'STEP 50: Render K=4 cluster leg-betas LaTeX table '
+             '(tables/table_cluster_k4_leg_betas.tex). Depends on Step 42'),
+
+        51: ('scripts/build_table_cluster_k4_shap_shares.py',
+             'STEP 51: Render K=4 cluster SHAP-shares LaTeX table '
+             '(tables/table_cluster_k4_shap_shares.tex). Depends on Step 43'),
+
+        52: ('scripts/build_table_cluster_k4_short_leg.py',
+             'STEP 52: Render K=4 cluster short-leg LaTeX table '
+             '(tables/table_cluster_k4_short_leg.tex). Depends on Steps 40 + 41'),
+
         # ─ Canonical chain (must run AFTER all generators above).
         # Renumbered 21-24 -> 80-83 so sorted(steps.keys()) places them
         # strictly after the auxiliary generators (steps 25-33). Earlier

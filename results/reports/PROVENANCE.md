@@ -52,7 +52,7 @@ No data assets.
 
 | Asset | Type | Source script | Config knob |
 |---|---|---|---|
-| `plots/features_hmm.png` | figure | `archive/scripts/regenerate_thesis_plots.py` | HMM_FEATURES |
+| `plots/features_hmm.png` | figure | `scripts/plot_features_hmm.py` (Step 47) | HMM_FEATURES |
 | `plots/regime_probabilities.png` | figure | `scripts/hmm_model.py` | HMM_FEATURES, HMM_K_STATES |
 | `tables/table_features_summary.tex` | table | `scripts/hmm_model.py` | HMM_FEATURES |
 | `tables/table_feature_selection.tex` | table — **frozen at Apr 14 by decision** | Still `\input`-ed in `data_section.tex:73`. NOT regenerated post-Shumway: the 4-pass HMM feature-selection pipeline that produced the table picked DD+CS+DISP+REL_N as the winning combo, which is the production HMM feature set. Rerunning would shift every reported sub-Sharpe but not the qualitative selection. Per the 2026-04-27 decision, prose stays as-is; the CV winner discussion lives in the appendix via `table_hmm_cv`. | — (frozen) |
@@ -89,10 +89,20 @@ No data assets.
 | `tables/table_leg_betas.tex` | `scripts/leg_betas_by_regime.py` | — |
 | `tables/table_combo_freq.tex` | `scripts/tree_combo_grouped.py` | — |
 | `tables/table_fundamentals_ablation.tex` | `scripts/fundamentals_test.py` | FUND_FEATURES |
+| `tables/table_turnover.tex` | `scripts/robustness_checks.py` (Step 4) | — |
+| `tables/table_international_results.tex` | `scripts/build_thesis_tables.py` (Step 82) | — |
+| `tables/table_cluster_k4_descriptors.tex` | `scripts/build_table_cluster_k4_descriptors.py` (Step 48) — depends on Steps 40 + 41 | — |
+| `tables/table_cluster_k4_features_appendix.tex` | `scripts/build_table_cluster_k4_features_appendix.py` (Step 49) — depends on Step 40 | — |
+| `tables/table_cluster_k4_leg_betas.tex` | `scripts/build_table_cluster_k4_leg_betas.py` (Step 50) — depends on Step 42 | — |
+| `tables/table_cluster_k4_shap_shares.tex` | `scripts/build_table_cluster_k4_shap_shares.py` (Step 51) — depends on Step 43 | — |
+| `tables/table_cluster_k4_short_leg.tex` | `scripts/build_table_cluster_k4_short_leg.py` (Step 52) — depends on Steps 40 + 41 | — |
 | `plots/cs_performance_regime_shaded.png` | `scripts/generate_plots.py` | — |
 | `plots/depth_vs_sharpe.png` | `scripts/depth_vs_sharpe.py` | MAX_DEPTH |
 | `plots/zscore_and_absshap_v3.png` | `scripts/selection_rank_analysis.py` | — |
 | `plots/zscore_panic_subtypes.png` | `scripts/panic_subtype_analysis.py` | — |
+| `plots/shap_per_horizon_by_leg.png` | `scripts/plot_shap_per_horizon_by_leg.py` (Step 44) — depends on Step 38 | — |
+| `plots/zscore_long_heatmap.png` | `scripts/plot_zscore_long_heatmap.py` (Step 45) — depends on Steps 18 + 39 | — |
+| `plots/zscore_l2_k4_panel_c{0..3}.png` | `scripts/plot_cluster_k4_individual_panels.py` (Step 46) — depends on Steps 2 + 18 + 39 | — |
 
 ### Chapter 7 — Conclusion (`latex/conclusion.tex`)
 
