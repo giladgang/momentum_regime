@@ -210,7 +210,7 @@ ESS
 \end{equation}
 where $\hat{\rho}(\ell)$ is the estimated autocorrelation at lag $\ell$,\footnote{$\hat{\rho}(\ell) = \frac{1}{(n-\ell)\,\hat{\sigma}^2}\sum_{i=1}^{n-\ell}(\theta_i - \bar{\theta})(\theta_{i+\ell} - \bar{\theta})$, where $\theta_i$ is the $i$-th post-burn-in draw, $\bar{\theta}$ its sample mean, and $\hat{\sigma}^2$ its sample variance.} and $L^\ast$ is the first lag at which the autocorrelation becomes negative. High ESS indicates that the chain provides many effectively independent posterior draws.\footnote{An ESS of at least 100 per parameter is a common minimum for reliable posterior inference \citep{Gelman2013}.}
 
-While ESS measures efficiency within a single chain, it cannot detect whether different chains have converged to different modes. The Gelman--Rubin $\hat{R}$ statistic \citep{Gelman2013} addresses this by comparing within-chain and between-chain variance across $M$ independent chains, each of length $n$. Let $s_m^2$ denote the variance of chain $m$ and $\bar{\theta}_m$ its mean. The within-chain variance is:
+While ESS measures efficiency within a single chain, it cannot detect whether different chains have converged to different modes. The Gelman--Rubin $\hat{R}$ statistic \citep{GelmanRubin1992, Gelman2013} addresses this by comparing within-chain and between-chain variance across $M$ independent chains, each of length $n$. Let $s_m^2$ denote the variance of chain $m$ and $\bar{\theta}_m$ its mean. The within-chain variance is:
 \begin{equation}
     W = \frac{1}{M} \sum_{m=1}^{M} s_m^2,
 \end{equation}
@@ -269,7 +269,7 @@ When $\pi_t^{\text{filter}} \approx 0$ (calm), $\ell_t = 12$, recovering the sta
 
 \paragraph{LR: Logistic Regression}\label{sec:method1}
 
-A logistic regression classifier is trained to predict whether a stock's forward return exceeds the cross-sectional median in each month. Classification is chosen over direct return regression because monthly stock returns are extremely noisy, and predicting the binary outcome ``above or below median'' is a more stable learning target that still produces a useful ranking of stocks. Classification targets have been explored as an alternative to regression in cross-sectional asset pricing, though regression targets generally produce better portfolio performance \citep{Gu2020}.\footnote{The logistic sigmoid function $\sigma(z) = 1/(1 + e^{-z})$ maps the linear combination $\boldsymbol{\beta}^\top \tilde{\mathbf{x}}$ from the real line to the interval $(0, 1)$, so the output can be interpreted as a probability.}
+A logistic regression classifier is trained to predict whether a stock's forward return exceeds the cross-sectional median in each month. Classification is chosen over direct return regression because monthly stock returns are extremely noisy, and predicting the binary outcome ``above or below median'' is a more stable learning target that still produces a useful ranking of stocks. Continuous return regression remains the dominant target in the cross-sectional ML asset-pricing literature \citep{Gu2020}; classification is used here as a deliberately simpler, lower-variance alternative for the linear baseline.\footnote{The logistic sigmoid function $\sigma(z) = 1/(1 + e^{-z})$ maps the linear combination $\boldsymbol{\beta}^\top \tilde{\mathbf{x}}$ from the real line to the interval $(0, 1)$, so the output can be interpreted as a probability.}
 \begin{equation}
     P(y_t^s = 1 \mid \mathbf{x}_t^s) = \sigma(\boldsymbol{\beta}^\top \tilde{\mathbf{x}}_t^s),
 \end{equation}

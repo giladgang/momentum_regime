@@ -319,7 +319,7 @@ The state labelled $k^\ast$ is designated as ``panic'' and the other as ``calm.'
 
 \subsection{Gelman--Rubin Diagnostic}\label{app:gelman_rubin}
 
-The Gelman--Rubin $\hat{R}$ statistic \citep{Gelman2013} assesses convergence by comparing within-chain and between-chain variance across the five independent Gibbs sampler chains. For each parameter $\theta$, $\hat{R} = \sqrt{\hat{V}/W}$, where $W$ is the mean within-chain variance and $\hat{V} = \frac{n-1}{n}W + \frac{B}{n}$ combines within-chain variance with the between-chain variance $B$. Values near 1.0 indicate that the chains have converged to the same posterior distribution; $\hat{R} < 1.1$ is the standard threshold.
+The Gelman--Rubin $\hat{R}$ statistic \citep{GelmanRubin1992, Gelman2013} assesses convergence by comparing within-chain and between-chain variance across the five independent Gibbs sampler chains. For each parameter $\theta$, $\hat{R} = \sqrt{\hat{V}/W}$, where $W$ is the mean within-chain variance and $\hat{V} = \frac{n-1}{n}W + \frac{B}{n}$ combines within-chain variance with the between-chain variance $B$. Values near 1.0 indicate that the chains have converged to the same posterior distribution; $\hat{R} < 1.1$ is the standard threshold.
 
 \input{tables/table_gelman_rubin}
 
