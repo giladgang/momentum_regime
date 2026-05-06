@@ -13,6 +13,7 @@ A comprehensive overview of all data variables is provided in Table~\ref{tab:dat
 \begin{table}[H]
 \centering
 \small
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{l l l l}
 \toprule
 Variable & Source & Description & Used in \\
@@ -42,7 +43,8 @@ $mom_1, \dots, mom_{12}$ & Computed & 12 trailing momentum signals & Section~\re
 $\pi_t^{\text{filter}}$ & HMM output & Filtered panic probability & Section~\ref{sec:hmm_output} \\
 10 fundamentals (ablation only) & Computed & bm, roe, gross profit, cash flow, etc. & Appendix~\ref{app:fundamental_features} \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \caption{Summary of all data variables used in the analysis.}
 \label{tab:data_summary}
 
@@ -344,7 +346,8 @@ Two patterns emerge. First, the mean Sharpe rises from 1.04 at $k = 1$ to 1.12 a
 
 \section{International HMM Feature Selection}\label{app:intl_feature_selection}
 
-For the international robustness check (Section~\ref{sec:international}), the HMM feature set is selected per region using the same 4-pass procedure as the US production specification (Section~\ref{sec:feature_selection}): a quality screen on MCMC convergence and crisis-window alignment, a portfolio-Sharpe ranking on the surviving combinations, a definitive validation at higher seed counts, and an additional stability check across random seed partitions. The international candidate pool comprises the five locally-available stress features (DD, VOL, DISP, REL\_N, BANK\_REL); BANK\_REL is the value-weighted bank-sector excess return over the broad regional market, sign-flipped so high values indicate stress, and substitutes for the US-specific Moody's BAA-AAA spread. With DD required, the procedure evaluates fifteen combinations of size one to four. Both UK and Japan select \emph{DD+VOL+REL\_N} as the regional feature set. The transplanted-from-US template (DD+DISP+REL\_N+BANK\_REL) fails the Pass-1 quality screen for both regions (minimum effective sample size of 14 and 4 respectively), motivating per-region selection. Pass-by-pass results are reported in \texttt{results/thesis/intl\_<region>\_hmm\_feature\_selection\_pass\{1,2,3,4\}.csv}; chosen-features manifests in \texttt{intl\_<region>\_hmm\_chosen\_features.json}.
+\sloppy
+For the international robustness check (Section~\ref{sec:international}), the HMM feature set is selected per region using the same 4-pass procedure as the US production specification (Section~\ref{sec:feature_selection}): a quality screen on MCMC convergence and crisis-window alignment, a portfolio-Sharpe ranking on the surviving combinations, a definitive validation at higher seed counts, and an additional stability check across random seed partitions. The international candidate pool comprises the five locally-available stress features (DD, VOL, DISP, REL\_N, BANK\_REL); BANK\_REL is the value-weighted bank-sector excess return over the broad regional market, sign-flipped so high values indicate stress, and substitutes for the US-specific Moody's BAA-AAA spread. With DD required, the procedure evaluates fifteen combinations of size one to four. Both UK and Japan select \emph{DD+VOL+REL\_N} as the regional feature set. The transplanted-from-US template (DD+DISP+REL\_N+BANK\_REL) fails the Pass-1 quality screen for both regions (minimum effective sample size of 14 and 4 respectively), motivating per-region selection. Pass-by-pass CSV results and chosen-features JSON manifests are saved under \texttt{results/thesis/} with the prefix \texttt{intl\_<region>\_hmm}.
 
 \section{Fundamental Feature Definitions}\label{app:fundamental_features}
 
