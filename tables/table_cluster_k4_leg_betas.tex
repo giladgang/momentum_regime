@@ -2,6 +2,7 @@
 \begin{table}[H]
 \centering
 \small
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{l r | l l r | l l r}
 \toprule
  & & \multicolumn{3}{c|}{XGB} & \multicolumn{3}{c}{Fixed 12-mo mom} \\
@@ -13,7 +14,8 @@ Cluster & $n$ & $\beta_L$ & $\beta_S$ & Spread & $\beta_L$ & $\beta_S$ & Spread 
     3 (post-panic recovery) & 31 & 1.46 (0.16) & 0.97 (0.11) & \phantom{$-$}0.49 & 1.09 (0.17) & 1.84 (0.22) & $-$0.75 \\
     4 (deep crisis) & 21 & 1.49 (0.08) & 1.06 (0.09) & \phantom{$-$}0.43 & 1.07 (0.10) & 1.49 (0.14) & $-$0.42 \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \caption{Leg-level CAPM betas by K=4 cluster, 2011--2024 test period. XGB (regime-conditional XGBoost ensemble) versus unconditional 12-month momentum, side-by-side. Standard errors in parentheses. Spread $= \beta_L - \beta_S$.}
 \label{tab:cluster_k4_leg_betas}
 \end{table}

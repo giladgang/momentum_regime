@@ -1,6 +1,7 @@
 \begin{table}[H]
 \centering
 \small
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{l r c c c c c c}
 \toprule
  & & \multicolumn{3}{c}{XGB} & \multicolumn{3}{c}{Market} \\
@@ -15,7 +16,8 @@ Full sample, 2000--2024 & 299 & 0.50 & 898.4\% & $-$64.8\% & 0.56 & 572.6\% & $-
 2010--2019 calm & 120 & 0.67 & 155.4\% & $-$17.9\% & 1.05 & 258.1\% & $-$17.6\% \\
 2020--2024 COVID era & 59 & 1.23 & 299.1\% & $-$22.2\% & 0.81 & 95.2\% & $-$24.8\% \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \caption{Sub-period decomposition of the expanding-window out-of-sample backtest, 2000--2024. Annual retraining is initialised in 1995 using all data available through the prior December. Market is the value-weighted CRSP market (Mkt-RF + RF, Fama-French monthly factors).}
 \label{tab:expanding_subperiods}
 \end{table}
