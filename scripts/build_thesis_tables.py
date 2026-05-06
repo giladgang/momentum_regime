@@ -81,7 +81,10 @@ def _signed_num(v, places=2):
 def _stars(s):
     if not s:
         return ''
-    return f'$^{{{"*" * len(s)}}}$'
+    # Wrap in \rlap so the significance stars hang to the right of the cell
+    # without consuming horizontal space, keeping the digits right-aligned
+    # with the other rows in the column.
+    return f'\\rlap{{$^{{{"*" * len(s)}}}$}}'
 
 
 def _t_with_stars(metrics, section, key, places=2):
