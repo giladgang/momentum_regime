@@ -6,7 +6,7 @@
 
 Three primary data sources are used. \textbf{CRSP} (Center for Research in Security Prices, via WRDS) provides monthly stock-level returns, prices, shares outstanding, exchange codes, and share codes from the Monthly Stock File (\texttt{crsp.msf}), as well as daily market returns from the Daily Stock Index file (\texttt{crsp.dsi}). \textbf{Compustat} (via WRDS) provides quarterly fundamental accounting data from \texttt{comp.fundq}, linked to CRSP via the CCM bridge table using primary link types (LU, LC). \textbf{FRED} (Federal Reserve Economic Data) provides Moody's BAA and AAA corporate bond yields for computing the credit spread.
 
-Following \citet{Shumway2001}, delisting returns are incorporated to prevent survivorship bias. When a stock is delisted, its actual delisting return is used if available; for performance-related delistings (CRSP codes 500--584) with missing returns, $-30\%$ is imputed.
+Following \citet{Shumway1997}, delisting returns are incorporated to prevent survivorship bias. When a stock is delisted, its actual delisting return is used if available; for performance-related delistings (CRSP codes 500--584) with missing returns, $-30\%$ is imputed.
 
 A comprehensive overview of all data variables is provided in Table~\ref{tab:data_summary}.
 
@@ -278,7 +278,7 @@ Combined long-and-short SHAP shares are $0.50$, $0.46$, $0.54$, $0.24$ for clust
 \input{tables/table_cluster_k4_shap_shares}
 
 \paragraph{Short-leg structure (future work)}
-The $K=4$ partition was defined on long-leg z-curves; applying the same labels to the short leg shows the short basket is structurally distinct from a negated long-leg, with short-vs-negated-long correlations of $+0.94$, $+0.89$, $+0.19$, and $-0.84$ for clusters 1--4 (Table~\ref{tab:cluster_k4_short_leg}). The month-1 short-leg spike in cluster 4 ($+0.57$) replicates the asymmetric short-side sensitivity documented by \citet{Nagel2012}, consistent with Section~\ref{sec:horizon_evidence}: month 1 carries $10.6\%$ of panic short-leg momentum SHAP versus $5.3\%$ in calm. A full short-leg analysis is left to future work.
+The $K=4$ partition was defined on long-leg z-curves; applying the same labels to the short leg shows the short basket is structurally distinct from a negated long-leg, with short-vs-negated-long correlations of $+0.94$, $+0.89$, $+0.19$, and $-0.84$ for clusters 1--4 (Table~\ref{tab:cluster_k4_short_leg}). The month-1 short-leg spike in cluster 4 ($+0.57$) is consistent with \citet{Nagel2012}'s finding that short-horizon reversal returns spike during high-volatility periods: month 1 carries $10.6\%$ of panic short-leg momentum SHAP versus $5.3\%$ in calm. A full short-leg analysis is left to future work.
 
 \input{tables/table_cluster_k4_short_leg}
 
