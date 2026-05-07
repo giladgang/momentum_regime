@@ -5,6 +5,8 @@ Central configuration for the momentum regime shifts pipeline.
 Edit parameters here and run run_pipeline.py to regenerate all results.
 """
 
+import os as _os
+
 # ═══════════════════════════════════════════════════════════════════════════════
 #  HMM SETTINGS
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -56,8 +58,16 @@ CRISIS_WINDOWS = [
 #  PORTFOLIO SETTINGS
 # ═══════════════════════════════════════════════════════════════════════════════
 
-# Portfolio construction type: 'long_short' or 'long_only'
-PORTFOLIO_TYPE = 'long_short'
+# Portfolio construction type: 'long_short' or 'long_only'.
+# Honour MOMENTUM_PORTFOLIO_TYPE env var so ad-hoc sandbox runs (e.g.,
+# long-only sensitivity, portfolio-type ablations) can override the
+# production setting without editing this file. Pair with
+# MOMENTUM_OUTPUT_ROOT to redirect outputs and avoid clobbering production
+# artefacts.
+PORTFOLIO_TYPE = _os.environ.get('MOMENTUM_PORTFOLIO_TYPE', 'long_short')
+assert PORTFOLIO_TYPE in ('long_short', 'long_only'), (
+    f"PORTFOLIO_TYPE must be 'long_short' or 'long_only', got {PORTFOLIO_TYPE!r}"
+)
 
 # One-way transaction cost (10 bps)
 TRADING_FEE = 0.001
@@ -166,8 +176,6 @@ N_PLACEBO_RUNS = 5
 # ═══════════════════════════════════════════════════════════════════════════════
 #  OUTPUT SETTINGS
 # ═══════════════════════════════════════════════════════════════════════════════
-
-import os as _os
 
 # When MOMENTUM_OUTPUT_ROOT is set in the environment (e.g. by run_pipeline.py
 # --repro-smoke or by tests/thesis/make_smoke_fixture.py), every output path
