@@ -24,6 +24,17 @@ print(f"Plotting {len(df)} points over gamma in [0, 1]")
 HIGHLIGHTS = [0.0, 0.1, 0.5, 1.0]
 HIGHLIGHT_COLOR = '#C62828'
 
+# Per-highlight label placement: leftmost goes right-of-marker, rightmost goes
+# left-of-marker, middle highlights go cleanly above. Avoids overlap with
+# panel titles, plot edges, and adjacent labels (gamma=0 and gamma=0.1 sit
+# close on the x-axis, so the gamma=0 label is placed to the side instead).
+HIGHLIGHT_LABEL_PLACEMENT = {
+    0.0: {'xytext': (12,  0), 'ha': 'left',   'va': 'center'},
+    0.1: {'xytext': (0,  14), 'ha': 'center', 'va': 'bottom'},
+    0.5: {'xytext': (0,  14), 'ha': 'center', 'va': 'bottom'},
+    1.0: {'xytext': (-12, 0), 'ha': 'right',  'va': 'center'},
+}
+
 plt.rcParams.update({
     'font.family': 'serif',
     'font.serif': ['Times New Roman', 'DejaVu Serif'],
@@ -47,14 +58,19 @@ def panel(ax, y, color, title, ylabel, ypct=False):
             ax.plot([hi], [yi], 'o', color=HIGHLIGHT_COLOR, markersize=9,
                     markerfacecolor=HIGHLIGHT_COLOR, zorder=5)
             label = f"{yi:.1%}" if ypct else f"{yi:.2f}"
+            placement = HIGHLIGHT_LABEL_PLACEMENT.get(
+                hi, {'xytext': (8, 10), 'ha': 'left', 'va': 'bottom'})
             ax.annotate(label, (hi, yi), textcoords='offset points',
-                        xytext=(8, 10), fontsize=9, color=HIGHLIGHT_COLOR,
-                        fontweight='bold')
+                        fontsize=9, color=HIGHLIGHT_COLOR,
+                        fontweight='bold', **placement)
     ax.set_xlabel(r'Risk aversion $\gamma$')
     ax.set_ylabel(ylabel)
     ax.set_title(title, fontweight='bold')
     ax.grid(True, alpha=0.2)
     ax.axhline(0, color='gray', linewidth=0.5, alpha=0.5)
+    # Extra y-margin so highlight labels (notably the gamma=0 maxima)
+    # do not bump against the panel title.
+    ax.margins(y=0.10)
 
 panel(axes[0, 0], df['sharpe'].values,  '#1B4F8A',
       'Sharpe Ratio', 'Sharpe')
