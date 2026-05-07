@@ -19,7 +19,6 @@ Design:
   - X-axis: 12 horizons (mom_1 to mom_12)
   - Y-axis: 167 dates, chronological (oldest top, newest bottom), labels every 12m
   - Colour: RdBu_r (divergent), symmetric range based on data |max|
-  - Vertical white separators between months 4/5 and 8/9 (short/mid/long tertile)
   - Colourbar labelled "long-leg cross-sectional z-score"
   - Title: "Long-leg z-curves over the test period (167 months)"
   - No row dendrogram, no clustering colouring
@@ -99,13 +98,6 @@ tick_labels    = [date_labels[i] for i in tick_positions]
 ax.yaxis.set_major_locator(FixedLocator(tick_positions))
 ax.set_yticklabels(tick_labels, fontsize=8)
 ax.set_ylabel("Month (chronological)", fontsize=11)
-
-# ── Vertical separators between months 4/5 and 8/9 ───────────────────────────
-# Column indices: mom_1=0 .. mom_12=11
-# Between mom_4 (idx 3) and mom_5 (idx 4): x = 3.5
-# Between mom_8 (idx 7) and mom_9 (idx 8): x = 7.5
-for x_sep in [3.5, 7.5]:
-    ax.axvline(x=x_sep, color="white", linewidth=2.0, linestyle="-")
 
 # ── Colourbar ─────────────────────────────────────────────────────────────────
 cbar = fig.colorbar(im, ax=ax, fraction=0.03, pad=0.02)
