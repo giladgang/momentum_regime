@@ -16,7 +16,9 @@ This thesis employs a two-state ($K = 2$) Bayesian Hidden Markov Model to classi
 Each regime is characterized by its own mean vector $\boldsymbol{\mu}_k \in \mathbb{R}^D$ and covariance matrix $\boldsymbol{\Sigma}_k \in \mathbb{R}^{D \times D}$, where $k \in \{0\text{ (calm)},\, 1\text{ (panic)}\}$. The multivariate specification allows the model to capture not only level differences in individual features across regimes, but also changes in the correlation structure; for instance, stress features may become more correlated during panic periods. The Gaussian assumption is standard in the HMM literature. Appendix~\ref{app:emission_robustness} verifies its adequacy by re-estimating the model with heavier-tailed multivariate Student-$t$ emissions across a grid of degrees of freedom, the natural alternative if monthly stress features carry tail risk that a Gaussian under-weights. The two specifications produce essentially the same regime signal: the binary calm/panic classification matches the Gaussian model in at least $97.8\%$ of months, the month-by-month filtered panic probabilities correlate above $0.98$, and the Gaussian model achieves a marginally lower BIC. Heavier tails therefore neither change the inferred regime structure nor improve fit, confirming that the Gaussian specification is adequate for this application.
 
 \bigskip
-\textbf{Transition equation} The evolution of the hidden state follows a first-order Markov chain with a $2 \times 2$ transition matrix:
+\noindent\textbf{Transition equation}
+
+\noindent The evolution of the hidden state follows a first-order Markov chain with a $2 \times 2$ transition matrix:
 \begin{equation}
     \mathbf{P} = \left(\begin{array}{cc} P_{00} & P_{01} \\ P_{10} & P_{11} \end{array}\right),
 \end{equation}
