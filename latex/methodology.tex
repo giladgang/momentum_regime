@@ -10,18 +10,15 @@ This chapter develops the two-stage framework used to test the research question
 This thesis employs a two-state ($K = 2$) Bayesian Hidden Markov Model to classify the market into latent regimes. The choice of $K = 2$ is validated empirically: Appendix~\ref{app:num_states} shows that increasing to $K = 3, 4,$ or $5$ states does not improve downstream portfolio performance and introduces estimation instability. The hidden state $s_t \in \{0, 1\}$ represents the unobserved regime at month $t$, where $s_t = 0$ denotes the \emph{calm} regime and $s_t = 1$ denotes the \emph{panic} regime. The labels \emph{calm} and \emph{panic} reflect the economic nature of the chosen stress features (drawdown, return dispersion, relative market participation, and the credit spread), which are most directly diagnostic of market stress rather than of trend direction, business-cycle phase, or volatility alone; a HMM fitted to a different feature set would identify different regimes. Crucially, as emphasized by \citet{Hamilton1989}, market regimes are not directly observable. An investor cannot know with certainty whether the market is currently in a calm or panic state, and classifications that look obvious in retrospect are genuinely difficult to identify in real time. The HMM formalises this uncertainty by treating regimes as hidden states that must be inferred probabilistically from observable market data (see Figure~\ref{fig:hmm_diagram}).
 
 \bigskip
-\noindent\textbf{Observation equation}
-
-\noindent Conditional on the regime, the vector of standardized features $\mathbf{z}_t \in \mathbb{R}^D$ (where $D = 4$) is drawn from a regime-specific multivariate Gaussian. The shorthand $\mathbf{z}_{1:t} = (\mathbf{z}_1, \mathbf{z}_2, \dots, \mathbf{z}_t)$ denotes the full history of observations up to and including month~$t$:
+\paragraph{Observation equation}
+Conditional on the regime, the vector of standardized features $\mathbf{z}_t \in \mathbb{R}^D$ (where $D = 4$) is drawn from a regime-specific multivariate Gaussian. The shorthand $\mathbf{z}_{1:t} = (\mathbf{z}_1, \mathbf{z}_2, \dots, \mathbf{z}_t)$ denotes the full history of observations up to and including month~$t$:
 \begin{equation}
     (\mathbf{z}_t \mid s_t = 0) \sim \mathcal{N}(\boldsymbol{\mu}_0, \boldsymbol{\Sigma}_0), \qquad (\mathbf{z}_t \mid s_t = 1) \sim \mathcal{N}(\boldsymbol{\mu}_1, \boldsymbol{\Sigma}_1).
 \end{equation}
 Each regime is characterized by its own mean vector $\boldsymbol{\mu}_k \in \mathbb{R}^D$ and covariance matrix $\boldsymbol{\Sigma}_k \in \mathbb{R}^{D \times D}$, where $k \in \{0\text{ (calm)},\, 1\text{ (panic)}\}$. The multivariate specification allows the model to capture not only level differences in individual features across regimes, but also changes in the correlation structure; for instance, stress features may become more correlated during panic periods. The Gaussian assumption is standard in the HMM literature. Appendix~\ref{app:emission_robustness} verifies its adequacy by re-estimating the model with heavier-tailed multivariate Student-$t$ emissions across a grid of degrees of freedom, the natural alternative if monthly stress features carry tail risk that a Gaussian under-weights. The two specifications produce essentially the same regime signal: the binary calm/panic classification matches the Gaussian model in at least $97.8\%$ of months, the month-by-month filtered panic probabilities correlate above $0.98$, and the Gaussian model achieves a marginally lower BIC. Heavier tails therefore neither change the inferred regime structure nor improve fit, confirming that the Gaussian specification is adequate for this application.
 
-\bigskip
-\noindent\textbf{Transition equation}
-
-\noindent The evolution of the hidden state follows a first-order Markov chain with a $2 \times 2$ transition matrix:
+\paragraph{Transition equation}
+The evolution of the hidden state follows a first-order Markov chain with a $2 \times 2$ transition matrix:
 \begin{equation}
     \mathbf{P} = \left(\begin{array}{cc} P_{00} & P_{01} \\ P_{10} & P_{11} \end{array}\right),
 \end{equation}
@@ -38,7 +35,7 @@ where $P_{ij} = P(s_t = j \mid s_{t-1} = i)$ and each row sums to one. The diago
 
 The standard frequentist alternative is the Baum--Welch algorithm \citep{Baum1970}, a special case of Expectation-Maximisation \citep{Dempster1977}, which finds maximum likelihood point estimates.
 
-Maximum likelihood estimation of regime-switching HMMs has several known shortcomings for the present application. The likelihood surface is multimodal, with at minimum two equivalent global optima arising from the invariance of the likelihood under state relabelling. Additionally, expectation maximization can converge to degenerate solutions in which one regime collapses around a single observation \citep{FruhwirthSchnatter2006}. Both problems are exacerbated for rare regimes, the panic state in this sample contains only 91 monthly observations in training, where the asymptotic standard errors that frequentist inference relies on are unreliable, and the standard regularity conditions can fail because the transition parameters $p$ and $q$ are unidentified when the two regimes' means coincide and the information matrix becomes singular at that point \citep[footnote 12]{Hamilton1989}. The Bayesian approach addresses these issues directly. Posterior sampling integrates over parameter uncertainty rather than relying on a point estimate. Conjugate priors regularise rare-regime estimates with explicit, defensible weights (Section~\ref{sec:priors}). And convergence diagnostics across multiple chains (Section~\ref{sec:convergence}) diagnose multimodality that would otherwise go unnoticed under a single EM run.
+Maximum likelihood estimation of regime-switching HMMs has several known shortcomings for the present application. The likelihood surface is multimodal, with at minimum two equivalent global optima arising from the invariance of the likelihood under state relabelling. Additionally, expectation maximization can converge to degenerate solutions in which one regime collapses around a single observation \citep{FruhwirthSchnatter2006}. Both problems are exacerbated for rare regimes, the panic state in this sample contains only 91 monthly observations in training, where the asymptotic standard errors that frequentist inference relies on are unreliable, and the standard regularity conditions can fail because the persistence parameters $P_{00}$ and $P_{11}$ are unidentified when the two regimes' means coincide and the information matrix becomes singular at that point \citep[footnote 12]{Hamilton1989}. The Bayesian approach addresses these issues directly. Posterior sampling integrates over parameter uncertainty rather than relying on a point estimate. Conjugate priors regularise rare-regime estimates with explicit, defensible weights (Section~\ref{sec:priors}). And convergence diagnostics across multiple chains (Section~\ref{sec:convergence}) diagnose multimodality that would otherwise go unnoticed under a single EM run.
 
 The Bayesian approach instead draws from the joint posterior:
 \[
@@ -70,7 +67,7 @@ where $D=4$ is the number of features. After observing data, these prior hyperpa
 \begin{itemize}
     \item $\mathbf{m}_0$ is the prior guess for each regime's mean vector. Setting $\mathbf{m}_0 = \mathbf{0}$ reflects that, since all features are standardized, there is no reason to expect either regime to be centered away from zero before seeing the data.
     \item $\kappa_0$ controls how strongly the prior mean $\mathbf{m}_0$ is trusted relative to the data. The very small value $\kappa_0 = 0.01$ makes this prior nearly uninformative, so the posterior mean is driven overwhelmingly by the observed data.
-    \item $\nu_0$ is the degrees of freedom of the Inverse-Wishart prior, interpretable as the number of pseudo-observations the prior is worth. The value $\nu_0 = D + 2 = 6$ is the smallest integer for which the prior expected value exists, yielding the most diffuse valid prior; a larger choice (e.g., $\nu_0 = 9$) would impose stronger confidence that the covariance is close to $\mathbf{I}_D$. With roughly 150 calm and 91 panic months in training, the posterior degrees of freedom ($\nu_n = \nu_0 + n_k$) far exceed the prior, so the data dominate the covariance estimates.
+    \item $\nu_0$ is the degrees of freedom of the Inverse-Wishart prior, interpretable as the number of pseudo-observations the prior is worth. The value $\nu_0 = D + 2 = 6$ is the smallest integer that yields a proper prior with finite mean (any smaller value gives an improper prior); a larger choice (e.g., $\nu_0 = 9$) would impose stronger confidence that the covariance is close to $\mathbf{I}_D$. With roughly 150 calm and 91 panic months in training, the posterior degrees of freedom ($\nu_n = \nu_0 + n_k$) far exceed the prior, so the data dominate the covariance estimates.
     \item $\boldsymbol{\Psi}_0$ is the scale matrix of the Inverse-Wishart prior. It is calibrated so that the prior expected covariance equals the identity matrix, $\mathbb{E}[\boldsymbol{\Sigma}_k] = \boldsymbol{\Psi}_0 / (\nu_0 - D - 1) = \mathbf{I}_D$, implying unit marginal variance and no cross-feature correlation before observing the data.
 \end{itemize}
 
@@ -141,7 +138,7 @@ Second, an \emph{update step} revises this prediction once the current observati
      {f(\mathbf{z}_t \mid s_t=0)\;\alpha_{t|t-1}(0) + f(\mathbf{z}_t \mid s_t=1)\;\alpha_{t|t-1}(1)},
 \label{eq:forward_plain}
 \end{equation}
-where $f(\mathbf{z}_t \mid s_t=k) = \mathcal{N}(\mathbf{z}_t;\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k)$ is the Gaussian emission density.\footnote{In practice, these densities can be extremely small (or large) for four-dimensional observations, leading to numerical underflow. The implementation avoids this by working in log-space: log-likelihoods $\log f(\mathbf{z}_t \mid s_t = k)$ are computed directly, and the log-sum-exp identity $\log(e^a + e^b) = \max(a,b) + \log(1 + e^{-|a-b|})$ is used whenever probabilities must be normalised.} The recursion is initialized with $\alpha_0(k) = 1/2$, reflecting no prior preference for either regime.
+where $f(\mathbf{z}_t \mid s_t=k) = \mathcal{N}(\mathbf{z}_t;\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k)$ is the Gaussian emission density.\footnote{In practice, these densities can be extremely small (or large) for four-dimensional observations, leading to numerical underflow. The implementation avoids this by working in log-space: log-likelihoods $\log f(\mathbf{z}_t \mid s_t = k)$ are computed directly, and the log-sum-exp identity $\log(e^a + e^b) = \max(a,b) + \log(1 + e^{-|a-b|})$ is used whenever probabilities must be normalised.} The recursion is initialised with a uniform initial state distribution $P(s_1 = k) = 1/2$, so that $\alpha_1(k) \propto f(\mathbf{z}_1 \mid s_1 = k)$ for the first observation, reflecting no prior preference for either regime.
 
 The forward pass tells us how likely each regime is at every month, but if we simply flipped a weighted coin independently at each $t$ we could produce implausible paths (for example, rapid calm-panic-calm-panic switching even though the transition matrix says regimes persist for roughly ten months). The backward pass prevents this by sampling states in reverse: once a future state has been drawn, the current state is sampled conditional on it, so the entire path respects the Markov transition dynamics.
 
@@ -163,11 +160,15 @@ For example, if the forward filter assigns high probability to calm at time $t$ 
 
 The output of the full FFBS procedure is one draw from the posterior over state paths. Across Gibbs iterations, different paths are sampled, exploring the full posterior uncertainty.
 
-Importantly, the backward pass is used only during training to improve posterior parameter estimates. The trading signal $\pi_t^{\text{filter}}$ relies solely on the causal forward filter.
+Importantly, the backward pass is used only during training: the sampled state path it produces feeds the conjugate Gibbs updates of the emission and transition parameters. The trading signal $\pi_t^{\text{filter}}$ relies solely on the causal forward filter.
 
 \paragraph{Step 2: Updating the emission parameters}
 
-Given the sampled state path, each regime $k$ has $n_k$ observations assigned to it. From these, two summary statistics are computed: the sample mean $\bar{\mathbf{x}}_k = \frac{1}{n_k}\sum_{t:\,s_t=k}\mathbf{z}_t$ and the scatter matrix $\mathbf{S}_k = \sum_{t:\,s_t=k}(\mathbf{z}_t - \bar{\mathbf{x}}_k)(\mathbf{z}_t - \bar{\mathbf{x}}_k)^\top$. The posterior hyperparameters are:
+Given the sampled state path, each regime $k$ has $n_k$ observations assigned to it. From these, two summary statistics are computed:
+\[
+\bar{\mathbf{x}}_k = \frac{1}{n_k}\sum_{t:\,s_t=k}\mathbf{z}_t, \qquad \mathbf{S}_k = \sum_{t:\,s_t=k}(\mathbf{z}_t - \bar{\mathbf{x}}_k)(\mathbf{z}_t - \bar{\mathbf{x}}_k)^\top.
+\]
+The posterior hyperparameters are:
 \begin{align}\label{eq:niw_update}
 \kappa_n &= \kappa_0 + n_k, \qquad
 \mathbf{m}_n = \frac{\kappa_0 \mathbf{m}_0 + n_k \bar{\mathbf{x}}_k}{\kappa_n}, \qquad
@@ -201,7 +202,7 @@ For each seed, posterior mean parameters $\bar{\boldsymbol{\mu}}_k$, $\bar{\bold
 \begin{equation}
 \pi_t^{\text{filter}} = \frac{1}{N_s} \sum_{s=1}^{N_s} \pi_t^{\text{filter},(s)}.
 \end{equation}
-This Bayesian model averaging is a methodological requirement, not a performance optimisation: with a single Gibbs chain the out-of-sample Sharpe has mean 1.04 and interquartile range 0.10 across random HMM seed draws, while averaging 50 chains raises the mean to 1.09 and collapses the IQR to 0.02 (Appendix~\ref{app:seed_convergence}). The 1.11 figure reported in Section~\ref{sec:results} therefore reflects the production 200-seed configuration and should be interpreted as a posterior-averaged quantity rather than a single-chain point estimate.
+This averaging across MCMC chains is a methodological requirement, not a performance optimisation: with a single Gibbs chain the out-of-sample Sharpe has mean 1.04 and interquartile range 0.10 across random HMM seed draws, while averaging 50 chains raises the mean to 1.09 and collapses the IQR to 0.02 (Appendix~\ref{app:seed_convergence}). The 1.11 figure reported in Section~\ref{sec:results} therefore reflects the production 200-seed configuration and should be interpreted as an ensemble-averaged quantity across chain initialisations rather than a single-chain point estimate.
 
 \paragraph{Convergence Diagnostics}\label{sec:convergence}
 
@@ -225,7 +226,7 @@ where $\bar{\theta} = \frac{1}{M}\sum_m \bar{\theta}_m$. If all chains have conv
 \begin{equation}
     \hat{R} = \sqrt{\frac{\hat{V}}{W}}, \qquad \hat{V} = \frac{n-1}{n}\,W + \frac{B}{n}.
 \end{equation}
-Values of $\hat{R}$ near 1.0 indicate convergence; the standard threshold is $\hat{R} < 1.1$. To evaluate convergence, five of the 200 chains are selected at random. For the selected feature set (DD+DISP+REL\_N+CS), all parameters have $\hat{R} < 1.01$ (Appendix~\ref{app:gelman_rubin}).
+Values of $\hat{R}$ near 1.0 indicate convergence; the conventional threshold is $\hat{R} < 1.1$, with a stricter modern bound at $\hat{R} < 1.01$. To evaluate convergence, five of the 200 chains are selected at random. For the selected feature set (DD+DISP+REL\_N+CS), all parameters have $\hat{R} < 1.01$ (Appendix~\ref{app:gelman_rubin}).
 
 Trace plots of the regime means and persistence probabilities (Figure~\ref{fig:convergence_trace}, Appendix~\ref{app:convergence}) provide visual confirmation that all chains converge to stable posterior values after the burn-in period.
 
@@ -261,7 +262,7 @@ The deterministic formula serves as a transparent baseline that tests whether si
 
 The simplest approach exploits the economic intuition that the optimal momentum lookback horizon varies with market conditions. The lookback horizon and stock score are:
 \begin{equation}
-    \ell_t = \text{clip}\!\left(\text{round}(12 - 11 \cdot \pi_t^{\text{filter}}), \; 1, \; 12\right),
+    \ell_t = \text{round}\!\left(12 - 11 \cdot \pi_t^{\text{filter}}\right),
 \end{equation}
 \begin{equation}
     \text{score}_{t}^{\,s} = \prod_{j=1}^{\ell_t}(1 + r_{t-j}^s) - 1.

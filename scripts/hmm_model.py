@@ -112,8 +112,11 @@ dd_idx = 0  # DD_z is always first in HMM_FEATURES
 def init_sampler(seed):
     """Initialize Gibbs sampler state for a given random seed."""
     np.random.seed(seed)
-    # crude initial state assignment: above-median DD_z -> state 1, below -> state 0
-    states = (Z_train[:, dd_idx] > np.median(Z_train[:, dd_idx])).astype(int)
+    # crude initial state assignment: below-median DD_z (deeper drawdowns) -> state 1, above -> state 0
+    # Matches historical_oos_production.py and the thesis methodology description.
+    # The post-Gibbs sign-correction step (crisis-calibrated) re-assigns the panic label
+    # regardless, so the final pi_filter is invariant to this initialisation up to MCMC noise.
+    states = (Z_train[:, dd_idx] < np.median(Z_train[:, dd_idx])).astype(int)
     mu_init    = np.zeros((K, D))
     Sigma_init = np.array([np.eye(D)] * K)
     for k in range(K):
@@ -121,7 +124,9 @@ def init_sampler(seed):
         if idx.sum() > D + 1:
             mu_init[k]    = Z_train[idx].mean(axis=0)
             Sigma_init[k] = np.cov(Z_train[idx].T) + 1e-6 * np.eye(D)
-    P_init = np.array([[0.95, 0.05],
+    # Initial transition matrix = Dirichlet prior mean ([9,1] / [1,9] -> 0.9 / 0.1).
+    # Matches the thesis methodology description (P^{(0)} = E[P]).
+    P_init = np.array([[0.90, 0.10],
                         [0.10, 0.90]])
     return states, mu_init, Sigma_init, P_init
 
@@ -263,7 +268,7 @@ def forward_filter(Z, mu, Sigma, P):
     log_alpha -= logsumexp(log_alpha, axis=1, keepdims=True)  # normalize rows
     return np.exp(log_alpha)  # return probabilities, not log-probs
 
-# ── Section 5: Multi-seed Gibbs sampler with Bayesian model averaging ─────────
+# ── Section 5: Multi-seed Gibbs sampler with chain-averaged plug-in filter ────
 # Run the full Gibbs sampler with multiple seeds and average the resulting
 # pi_filter across seeds. This reduces sensitivity to MCMC initialization
 # and produces a more stable trading signal.
