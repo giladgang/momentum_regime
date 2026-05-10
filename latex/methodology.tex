@@ -54,14 +54,14 @@ For each regime $k$, the mean vector and covariance matrix are given a conjugate
 \qquad
 \boldsymbol{\mu}_k \mid \boldsymbol{\Sigma}_k
 \sim
-\mathcal{N}\!\left(\mathbf{m}_0,\frac{\boldsymbol{\Sigma}_k}{\kappa_0}\right).
+\mathcal{N}\!\left(\mathbf{m}_0,\frac{\boldsymbol{\Sigma}_k}{\kappa_0}\right)
 \end{equation}
 The hyperparameters are chosen as
 \begin{equation}\label{eq:niw_hyperparams}
-\mathbf{m}_0 = \mathbf{0},\qquad
-\kappa_0 = 0.01,\qquad
-\nu_0 = D+2,\qquad
-\boldsymbol{\Psi}_0 = \mathbf{I}_D(\nu_0-D-1),
+\mathbf{m}_0 = \mathbf{0}\qquad
+\kappa_0 = 0.01\qquad
+\nu_0 = D+2\qquad
+\boldsymbol{\Psi}_0 = \mathbf{I}_D(\nu_0-D-1)
 \end{equation}
 where $D=4$ is the number of features. After observing data, these prior hyperparameters update to posterior counterparts $\kappa_n$, $\mathbf{m}_n$, $\nu_n$, and $\boldsymbol{\Psi}_n$ (Equation~\ref{eq:niw_update}). Each hyperparameter controls a different aspect of the prior belief:
 \begin{itemize}
@@ -104,9 +104,9 @@ In other words, the prior expects each regime to continue with probability $0.9$
 \paragraph{Initialization}
 The Gibbs sampler requires starting values for the emission parameters and the transition matrix. A crude drawdown-based partition is used:\footnote{The choice of initialization has negligible impact on the posterior: the sampler is run for 2{,}000 iterations with 500 discarded as burn-in, and convergence diagnostics (Section~\ref{sec:convergence}) confirm that the chain mixes well regardless of the starting partition.} months with below-median drawdown $DD_t^z$ (i.e., deeper drawdowns) are initially assigned to the panic state ($s_t=1$), and the remaining months to the calm state ($s_t=0$). The initial emission parameters are then computed from each group:
 \[
-\boldsymbol{\mu}_k^{(0)} = \frac{1}{n_k}\sum_{t:\,s_t=k}\mathbf{z}_t,
+\boldsymbol{\mu}_k^{(0)} = \frac{1}{n_k}\sum_{t:\,s_t=k}\mathbf{z}_t
 \qquad
-\boldsymbol{\Sigma}_k^{(0)} = \text{Cov}(\{\mathbf{z}_t : s_t=k\}),
+\boldsymbol{\Sigma}_k^{(0)} = \text{Cov}(\{\mathbf{z}_t : s_t=k\})
 \]
 where $n_k$ is the number of months assigned to regime $k$. The initial transition matrix is set to the prior mean, $\mathbf{P}^{(0)} = \mathbb{E}[\mathbf{P}]$ (Equation~\ref{eq:prior_mean_P}). These initial parameters give the first forward pass (described below) emission densities that can distinguish the two states.
 
@@ -135,7 +135,7 @@ Second, an \emph{update step} revises this prediction once the current observati
 \alpha_t(k)
 =
 \frac{f(\mathbf{z}_t \mid s_t=k)\;\alpha_{t|t-1}(k)}
-     {f(\mathbf{z}_t \mid s_t=0)\;\alpha_{t|t-1}(0) + f(\mathbf{z}_t \mid s_t=1)\;\alpha_{t|t-1}(1)},
+     {f(\mathbf{z}_t \mid s_t=0)\;\alpha_{t|t-1}(0) + f(\mathbf{z}_t \mid s_t=1)\;\alpha_{t|t-1}(1)}
 \label{eq:forward_plain}
 \end{equation}
 where $f(\mathbf{z}_t \mid s_t=k) = \mathcal{N}(\mathbf{z}_t;\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k)$ is the Gaussian emission density.\footnote{In practice, these densities can be extremely small (or large) for four-dimensional observations, leading to numerical underflow. The implementation avoids this by working in log-space: log-likelihoods $\log f(\mathbf{z}_t \mid s_t = k)$ are computed directly, and the log-sum-exp identity $\log(e^a + e^b) = \max(a,b) + \log(1 + e^{-|a-b|})$ is used whenever probabilities must be normalised.} The recursion is initialised with a uniform initial state distribution $P(s_1 = k) = 1/2$, so that $\alpha_1(k) \propto f(\mathbf{z}_1 \mid s_1 = k)$ for the first observation, reflecting no prior preference for either regime.
@@ -146,7 +146,7 @@ The backward pass proceeds in two steps:
 
 \paragraph{Terminal state} At $t = T$, the filtered probability already conditions on all observations, so the terminal state is drawn directly:
 \[
-s_T \sim \text{Cat}(\alpha_T(0),\, \alpha_T(1)),
+s_T \sim \text{Cat}(\alpha_T(0),\, \alpha_T(1))
 \]
 that is, the algorithm draws $s_T = 0$ (calm) with probability $\alpha_T(0)$ and $s_T = 1$ (panic) with probability $\alpha_T(1)$.\footnote{$\text{Cat}$ denotes the categorical distribution, the standard notation for a single draw from a discrete probability vector. With two states it reduces to a weighted coin flip.}
 
