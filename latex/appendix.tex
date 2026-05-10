@@ -153,24 +153,17 @@ The pattern is consistent: returns fall faster than volatility under every risk 
 
 \section{CRRA Dual-Utility Construction}\label{app:crra_construction}
 
-This appendix provides the technical specification behind the risk-aversion sweep in Section~\ref{sec:risk_aversion}. The strategy uses two forecasts for each stock-month: an expected-return forecast $\hat r_t^s$ and a forward-volatility forecast $\hat\sigma_t^s$. $\hat r_t^s$ is produced by the XGBoost ensemble described in Section~\ref{sec:methodology}. $\hat\sigma_t^s$ is produced by a second XGBoost ensemble trained on the realised forward volatility
+This appendix supplements the dual-utility specification in Section~\ref{sec:risk_aversion} with the volatility-forecast model, the high-$\gamma$ collapse mechanism, and the sweep grid.
+
+\paragraph{Volatility forecast} The expected-return forecast $\hat r_t^s$ comes from the XGBoost ensemble described in Section~\ref{sec:methodology}. The volatility forecast $\hat\sigma_t^s$ comes from a second XGBoost ensemble trained on the realised 12-month forward volatility
 \[
     \sigma^s_{[t+1,\,t+12]} \;=\; \mathrm{std}\!\big(r^s_{t+1}, \ldots, r^s_{t+12}\big)
 \]
-using the same feature set augmented with trailing 12-month realised volatility.
+using the same feature set augmented with trailing 12-month realised volatility. The 50-seed ensemble is trained on 1990--2010 and evaluated out-of-sample on 2011--2025.
 
-For each stock, utility is computed under both trading directions:
-\begin{equation}
-\begin{aligned}
-u_{\text{long}}^s  \;&=\; +\,\mathrm{sign}(\hat r^s)\,\log\!\big(1 + |\hat r^s|/\varepsilon\big) \;-\; \gamma\,\log(\hat\sigma^s),\\[2pt]
-u_{\text{short}}^s \;&=\; -\,\mathrm{sign}(\hat r^s)\,\log\!\big(1 + |\hat r^s|/\varepsilon\big) \;-\; \gamma\,\log(\hat\sigma^s),
-\end{aligned}
-\end{equation}
-with $\varepsilon = 0.01$. The return term is $\pm$\,log-compressed expected return under each direction; the $-\gamma\log(\hat\sigma)$ term enters with the same sign in both, so a low-$\sigma$ stock is preferred whether considered as a long or as a short.
+\paragraph{Convergence to dollar-neutral noise at high $\gamma$} Stocks appearing in both top deciles of $u_{\text{long}}$ and $u_{\text{short}}$ (the overlap set, which grows with $\gamma$) are retained on both sides, and their contributions to the long and short books net out in $r_L - r_S$. This is the mechanism by which the long-short spread converges to zero as $\gamma$ rises beyond the useful range. At high $\gamma$, the volatility penalty dominates the return signal, low-$\hat\sigma$ stocks occupy both top deciles simultaneously, and the two legs become near-identical value-weighted low-volatility portfolios.
 
-Each month, longs are the top decile of $u_{\text{long}}$ and shorts are the top decile of $u_{\text{short}}$, both using NYSE breakpoints and full-universe membership. Positions are value-weighted within each leg. Stocks appearing in both top deciles (the overlap set, which grows with $\gamma$) are retained on both sides; their contributions to the long and short books net in $r_L - r_S$. This is the mechanism by which the long-short spread converges to zero as $\gamma$ rises beyond the useful range: at high $\gamma$, the volatility penalty dominates the return signal, low-$\hat\sigma$ stocks occupy both top deciles simultaneously, and the two legs become near-identical value-weighted low-vol portfolios.
-
-The 50-seed ensemble is trained on 1990--2010 and evaluated out-of-sample on 2011--2025. The sweep in Figure~\ref{fig:risk_aversion} uses a 17-point grid over $[0, 1]$ (step 0.05 up to 0.5, step 0.1 thereafter).
+\paragraph{Sweep grid} The risk-aversion sweep in Figure~\ref{fig:risk_aversion} uses a 17-point grid over $[0, 1]$: step 0.05 up to 0.5, step 0.1 thereafter.
 
 \section{Robustness Checks}\label{app:robustness}
 
