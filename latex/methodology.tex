@@ -203,7 +203,7 @@ The Gibbs sampler is estimated on the training sample only. To reduce sensitivit
 
 For each seed, posterior mean parameters $\bar{\boldsymbol{\mu}}_k$, $\bar{\boldsymbol{\Sigma}}_k$, and $\bar{\mathbf{P}}$ are computed by averaging over the post-burn-in draws. A causal forward filter is then applied to the full sample using these parameters to obtain a seed-specific filtered probability $\pi_{t,s}^{\text{filter}}$. The final trading signal is the average across seeds:
 \begin{equation}
-\pi_t^{\text{filter}} = \frac{1}{N_s} \sum_{s=1}^{N_s} \pi_t^{\text{filter},(s)}
+\pi_t^{\text{filter}} = \frac{1}{N_s} \sum_{s=1}^{N_s} \pi_{t,s}^{\text{filter}}
 \end{equation}
 This averaging across MCMC chains is a methodological requirement, not a performance optimisation: with a single Gibbs chain the out-of-sample Sharpe has mean 1.04 and interquartile range 0.10 across random HMM seed draws, while averaging 50 chains raises the mean to 1.09 and collapses the IQR to 0.02 (Appendix~\ref{app:seed_convergence}). The 1.11 figure reported in Section~\ref{sec:results} therefore reflects the production 200-seed configuration and should be interpreted as an ensemble-averaged quantity across chain initialisations rather than a single-chain point estimate.
 
