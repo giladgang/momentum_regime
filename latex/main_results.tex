@@ -49,7 +49,7 @@ The fundamentals-only variant identifies the source of the dilution. Its calm Sh
 
 \subsection{The Regime-Momentum Mechanism}\label{sec:regime_results}
 
-This section reads the structure of the regime-momentum signal directly off XGBoost's per-month selections.
+This section opens the XGBoost black box, reading the structure of the regime-momentum signal directly off the model's per-month selections.
 
 Section~\ref{sec:horizon_evidence} uses SHAP to establish that both $\pi_t^{\text{filter}}$ and the momentum horizons are decision-relevant; Section~\ref{sec:heterogeneity_picks} traces \emph{what shape} the model picks via cross-sectional z-scores and clusters those z-curves into discrete selection modes; Section~\ref{sec:discussion} synthesises these patterns into a regime-conditional mechanism with two interlocking facets and contrasts them with the prior crash-management literature.
 
@@ -68,11 +68,11 @@ The aggregate split is reported by leg and horizon in Figure~\ref{fig:shap_per_h
     \label{fig:shap_per_horizon_by_leg}
 \end{figure}
 
-SHAP shows which horizons matter, but not in which direction. The same SHAP weight could reflect \textbf{continuation} (high momentum predicts high return, the classical \citet{JegadeeshTitman1993} result), \textbf{reversal} (high momentum predicts low return), or \textbf{state-dependent selection} (the sign of the relationship flips with the regime). Only the third possibility requires a nonlinear model. A linear regression can encode constant continuation or constant reversal, but cannot encode a relationship whose sign depends on the regime. The next subsection identifies which of the three holds by examining the cross-sectional position of the stocks the model actually picks.
+SHAP shows which horizons matter, but not in which direction. The same SHAP weight could reflect \textbf{continuation} (high momentum predicts high return, the classical \citet{JegadeeshTitman1993} result), \textbf{reversal} (high momentum predicts low return), or \textbf{state-dependent selection} (the sign of the relationship flips with the regime). Only the third possibility requires a nonlinear model. A linear regression can encode constant continuation or constant reversal, but cannot encode a relationship whose sign depends on the regime. The relationship is state-dependent: continuation in calm-like cluster modes and reversal in panic-like ones, as the cluster patterns developed in Sections~\ref{sec:heterogeneity_picks} and~\ref{sec:discussion} make explicit.
 
 \subsubsection{Cross-Sectional Z-Scores}\label{sec:heterogeneity_picks}
 
-Opening the XGB black box. SHAP shares identify which inputs matter but not which stocks the model actually picks. To trace the picks themselves, we use cross-sectional z-scores. For each stock in the long or short leg, the z-score at horizon $k$ is $(mom_k^s - \bar{mom}_k) / \sigma_k$, computed from the cross-sectional mean and standard deviation of all stocks that month. Figure~\ref{fig:zscore_long_heatmap} plots the long-leg z-curve month by month.
+SHAP shares identify which inputs matter but not which stocks the model actually picks. To trace the picks themselves, we use cross-sectional z-scores. For each stock in the long or short leg, the z-score at horizon $k$ is $(mom_k^s - \bar{mom}_k) / \sigma_k$, computed from the cross-sectional mean and standard deviation of all stocks that month. Figure~\ref{fig:zscore_long_heatmap} plots the long-leg z-curve month by month.
 
 \begin{figure}[H]
     \centering
