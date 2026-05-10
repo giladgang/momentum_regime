@@ -263,14 +263,14 @@ The deterministic formula serves as a transparent baseline that tests whether si
 
 \paragraph{DET: Deterministic Regime-Adaptive Formula}\label{sec:method0}
 
-The simplest approach exploits the economic intuition that the optimal momentum lookback horizon varies with market conditions. The lookback horizon and stock score are:
+The simplest approach exploits the economic intuition that the optimal momentum lookback horizon varies with market conditions.\footnote{This is in the spirit of \citet{GHM2023}, with two simplifications: a continuous panic probability replaces their discrete four-state cycle classification, and a single regime-dependent horizon replaces their linear blend of one- and twelve-month signals.} The lookback horizon and stock score are:
 \begin{equation}
     \ell_t = \text{round}\!\left(12 - 11 \cdot \pi_t^{\text{filter}}\right)
 \end{equation}
 \begin{equation}
     \text{score}_{t}^{\,s} = \prod_{j=1}^{\ell_t}(1 + r_{t-j}^s) - 1
 \end{equation}
-Stocks are then ranked by this score; the top decile forms the long leg and the bottom decile the short leg, as described in Appendix~\ref{app:portfolio_construction}.
+The first equation sets the lookback horizon as a function of the regime; the second compounds the past $\ell_t$ monthly returns into a stock score. Stocks are then ranked by this score; the top decile forms the long leg and the bottom decile the short leg, as described in Appendix~\ref{app:portfolio_construction}.
 
 When $\pi_t^{\text{filter}} \approx 0$ (calm), $\ell_t = 12$, recovering the standard 12-month momentum signal that captures return continuation \citep{JegadeeshTitman1993}. When $\pi_t^{\text{filter}} \approx 1$ (panic), $\ell_t = 1$, switching to a 1-month signal that exploits the short-horizon reversal documented in \citet{Jegadeesh1990} and \citet{Lehmann1990}. At intermediate values, the lookback smoothly interpolates between these extremes.
 
