@@ -39,7 +39,7 @@ Maximum likelihood estimation of regime-switching HMMs has several known shortco
 
 The Bayesian approach instead draws from the joint posterior:
 \[
-p\!\left(\{s_t\}_{t=1}^T,\; \{\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k\}_{k=0}^1,\; \mathbf{P} \,\middle|\, \mathbf{z}_{1:T}\right).
+p\!\left(\{s_t\}_{t=1}^T,\; \{\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k\}_{k=0}^1,\; \mathbf{P} \,\middle|\, \mathbf{z}_{1:T}\right)
 \]
  The states and parameters are coupled, in the sense that each block has a tractable distribution conditional on the other but neither has a tractable marginal. Gibbs sampling \citep{AlbertChib1993, Hoff2009}, a Markov chain Monte Carlo (MCMC) method, exploits exactly that structure by alternating between three conditional updates: (i) the full hidden state path $\{s_t\}_{t=1}^T$ (sampled with the forward-filtering backward-sampling algorithm given parameters), (ii) the emission parameters $(\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k)$ for each regime (given the state path), and (iii) the transition matrix $\mathbf{P}$ (given the state path). Conjugate priors ensure that each block can be sampled exactly from its conditional posterior.
 
