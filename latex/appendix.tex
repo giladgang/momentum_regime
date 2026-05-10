@@ -53,6 +53,14 @@ $\pi_t^{\text{filter}}$ & HMM output & Filtered panic probability & Section~\ref
 \textbf{Notes:} All data accessed via WRDS. Compustat linked to CRSP via the CCM bridge table using primary link types (LU, LC). Fundamentals are lagged four months from fiscal quarter end to ensure real-time availability. The sample covers January 1990 to November 2025 (training: 1990--2010; test: 2011--2025).
 \end{table}
 
+\section{HMM Feature Selection Tables}\label{app:hmm_feature_tables}
+
+The two tables in this section support the four-pass feature selection procedure described in Section~\ref{sec:feature_selection}. Table~\ref{tab:feature_selection} reports the top 10 candidate feature combinations on ensemble Sharpe and cross-seed stability. Table~\ref{tab:hmm_feature_ablation} reports include-one and leave-one-out ablations of the production four-feature set.
+
+\input{tables/table_feature_selection}
+
+\input{tables/table_hmm_feature_ablation}
+
 \section{Portfolio Formation, Transaction Costs, and Performance Metrics}\label{app:portfolio}
 
 \subsection{Portfolio Construction}\label{app:portfolio_construction}
