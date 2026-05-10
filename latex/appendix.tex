@@ -61,11 +61,11 @@ For each method, a long-short portfolio is constructed each month. Stocks are ra
 
 Portfolio weights within each leg are assigned proportionally to market equity (value-weighting):
 \begin{equation}
-    w_t^{s,L} = \frac{ME_t^s}{\sum_{s \in \mathcal{L}_t} ME_t^s}, \qquad w_t^{s,S} = \frac{ME_t^s}{\sum_{s \in \mathcal{S}_t} ME_t^s},
+    w_t^{s,L} = \frac{ME_t^s}{\sum_{s \in \mathcal{L}_t} ME_t^s}, \qquad w_t^{s,S} = \frac{ME_t^s}{\sum_{s \in \mathcal{S}_t} ME_t^s}
 \end{equation}
 where $\mathcal{L}_t$ and $\mathcal{S}_t$ are the sets of stocks in the long and short legs at month $t$, respectively. The long-short portfolio return is:
 \begin{equation}
-    r_t^{\text{LS}} = \sum_{s \in \mathcal{L}_t} w_t^{s,L} \cdot r_t^s - \sum_{s \in \mathcal{S}_t} w_t^{s,S} \cdot r_t^s.
+    r_t^{\text{LS}} = \sum_{s \in \mathcal{L}_t} w_t^{s,L} \cdot r_t^s - \sum_{s \in \mathcal{S}_t} w_t^{s,S} \cdot r_t^s
 \end{equation}
 Value-weighting tilts each leg toward large, liquid stocks, reducing the influence of small-cap return anomalies and improving implementability.
 
@@ -75,11 +75,11 @@ All portfolios are rebalanced monthly.
 
 A one-way transaction cost of $c = 10$ basis points is applied to the turnover in both the long and short legs at each rebalancing date. The net portfolio return at month $t$ is:
 \begin{equation}
-    r_t^{\text{net}} = r_t^{\text{gross}} - c \cdot (\tau_t^L + \tau_t^S),
+    r_t^{\text{net}} = r_t^{\text{gross}} - c \cdot (\tau_t^L + \tau_t^S)
 \end{equation}
 where $\tau_t^L$ and $\tau_t^S$ are the one-way turnover in the long and short legs, respectively:
 \begin{equation}
-    \tau_t^L = \frac{1}{2} \sum_{s} \left|w_{t}^{s,L,\text{new}} - w_{t-1}^{s,L,\text{prev}}\right|, \qquad \tau_t^S = \frac{1}{2} \sum_{s} \left|w_{t}^{s,S,\text{new}} - w_{t-1}^{s,S,\text{prev}}\right|,
+    \tau_t^L = \frac{1}{2} \sum_{s} \left|w_{t}^{s,L,\text{new}} - w_{t-1}^{s,L,\text{prev}}\right|, \qquad \tau_t^S = \frac{1}{2} \sum_{s} \left|w_{t}^{s,S,\text{new}} - w_{t-1}^{s,S,\text{prev}}\right|
 \end{equation}
 and each summation runs over all stocks appearing in either the new or previous portfolio for that leg. The 10 basis point cost reflects the transaction environment for a value-weighted, large-cap-biased strategy where NYSE breakpoints tilt toward liquid securities.
 
@@ -93,30 +93,30 @@ Strategy performance is assessed using four standard risk-adjusted metrics compu
 
 \textbf{Annualized return} The geometric annualized return over $n$ months is:
 \begin{equation}
-    R_{\text{ann}} = \left[\prod_{t=1}^{n}(1 + r_t)\right]^{12/n} - 1.
+    R_{\text{ann}} = \left[\prod_{t=1}^{n}(1 + r_t)\right]^{12/n} - 1
 \end{equation}
 
 \textbf{Annualized volatility} The annualized standard deviation of monthly returns:
 \begin{equation}
-    \sigma_{\text{ann}} = \sigma(r) \cdot \sqrt{12}.
+    \sigma_{\text{ann}} = \sigma(r) \cdot \sqrt{12}
 \end{equation}
 
 \textbf{Sharpe ratio} The annualized Sharpe ratio:\footnote{All Sharpe ratios in this thesis are computed using raw returns rather than excess returns above the risk-free rate. Since the same convention is applied to every strategy, relative comparisons and rankings are unaffected. The risk-free rate was near zero for most of the test period (2011--2021) and averaged roughly 2\% annualized over the full 2011--2025 window, so absolute Sharpe ratios are overstated by approximately 0.05--0.10.}
 \begin{equation}
-    SR = \frac{\bar{r}}{\sigma(r)} \cdot \sqrt{12},
+    SR = \frac{\bar{r}}{\sigma(r)} \cdot \sqrt{12}
 \end{equation}
 where $\bar{r}$ is the mean monthly return. Sharpe is computed from the arithmetic monthly mean annualised by $\sqrt{12}$, while annualised returns reported elsewhere in this thesis are compound (geometric); under high volatility the two definitions of average return differ, so Sharpe should not be inferred from a table by dividing annualised return by annualised volatility (e.g.\ at depth~1 in the methodology hyperparameter sweep, the reported Sharpe is $0.53$ but $8.7\% / 19.4\% = 0.45$).
 
 \textbf{Maximum drawdown} Let $C_t = \prod_{\tau=1}^{t}(1 + r_\tau)$ denote the cumulative wealth path. The maximum drawdown is:
 \begin{equation}
-    MDD = \min_{1 \leq t \leq n} \frac{C_t - \max_{1 \leq \tau \leq t} C_\tau}{\max_{1 \leq \tau \leq t} C_\tau}.
+    MDD = \min_{1 \leq t \leq n} \frac{C_t - \max_{1 \leq \tau \leq t} C_\tau}{\max_{1 \leq \tau \leq t} C_\tau}
 \end{equation}
 
 \paragraph{Regime-Conditional Evaluation}\label{app:regime_eval}
 
 To assess whether the regime signal adds value beyond unconditional stock selection, performance is decomposed by market regime. Months are partitioned into calm ($\pi_t^{\text{filter}} < 0.5$) and panic ($\pi_t^{\text{filter}} \geq 0.5$) periods, and the Sharpe ratio is computed separately within each subset:
 \begin{equation}
-    SR_{\text{calm}} = \frac{\bar{r}_{\text{calm}}}{\sigma(r_{\text{calm}})} \cdot \sqrt{12}, \qquad SR_{\text{panic}} = \frac{\bar{r}_{\text{panic}}}{\sigma(r_{\text{panic}})} \cdot \sqrt{12}.
+    SR_{\text{calm}} = \frac{\bar{r}_{\text{calm}}}{\sigma(r_{\text{calm}})} \cdot \sqrt{12}, \qquad SR_{\text{panic}} = \frac{\bar{r}_{\text{panic}}}{\sigma(r_{\text{panic}})} \cdot \sqrt{12}
 \end{equation}
 This decomposition helps assess whether the strategy's alpha originates primarily from calm-period stock selection, panic-period risk avoidance, or both.
 
@@ -126,11 +126,11 @@ This decomposition helps assess whether the strategy's alpha originates primaril
 
 To interpret the XGBoost model and assess the marginal contribution of each feature, SHAP \citep[SHapley Additive exPlanations;][]{Lundberg2017} values are computed on the test set. The SHAP value of feature $j$ for observation $\mathbf{x}$ measures its average marginal contribution to the prediction across all possible feature orderings:
 \begin{equation}
-    \phi_j(\mathbf{x}) = \sum_{S \subseteq N \setminus \{j\}} \frac{|S|!\,(p - |S| - 1)!}{p!} \Big[f_{S \cup \{j\}}(\mathbf{x}) - f_S(\mathbf{x})\Big],
+    \phi_j(\mathbf{x}) = \sum_{S \subseteq N \setminus \{j\}} \frac{|S|!\,(p - |S| - 1)!}{p!} \Big[f_{S \cup \{j\}}(\mathbf{x}) - f_S(\mathbf{x})\Big]
 \end{equation}
 where $N$ is the full feature set, $p = |N|$, and $f_S(\mathbf{x})$ is the expected model output when only features in $S$ are observed. For tree-based models, the TreeSHAP algorithm \citep{Lundberg2020} computes these values exactly in polynomial time. The overall importance of each feature is summarised as:
 \begin{equation}
-    I_j = \frac{1}{n_{\text{test}}} \sum_{i=1}^{n_{\text{test}}} |\phi_j(\mathbf{x}_i)|.
+    I_j = \frac{1}{n_{\text{test}}} \sum_{i=1}^{n_{\text{test}}} |\phi_j(\mathbf{x}_i)|
 \end{equation}
 
 Two additional analyses are performed. First, the mean absolute SHAP value of $\pi_t^{\text{filter}}$ is computed separately for calm and panic months to assess whether the regime signal's influence varies across market states. Second, regime-specific XGBoost models are trained on calm-only and panic-only subsets of the training data, and their SHAP feature importances are compared to identify which features the model relies on differentially across regimes.
@@ -147,7 +147,7 @@ The pattern is consistent: returns fall faster than volatility under every risk 
 
 This appendix provides the technical specification behind the risk-aversion sweep in Section~\ref{sec:risk_aversion}. The strategy uses two forecasts for each stock-month: an expected-return forecast $\hat r_t^s$ and a forward-volatility forecast $\hat\sigma_t^s$. $\hat r_t^s$ is produced by the XGBoost ensemble described in Section~\ref{sec:methodology}. $\hat\sigma_t^s$ is produced by a second XGBoost ensemble trained on the realised forward volatility
 \[
-    \sigma^s_{[t+1,\,t+12]} \;=\; \mathrm{std}\!\big(r^s_{t+1}, \ldots, r^s_{t+12}\big),
+    \sigma^s_{[t+1,\,t+12]} \;=\; \mathrm{std}\!\big(r^s_{t+1}, \ldots, r^s_{t+12}\big)
 \]
 using the same feature set augmented with trailing 12-month realised volatility.
 
@@ -304,7 +304,7 @@ Because the four HMM features respond to stress in different directions, the exp
 \end{equation}
 Features that spike upward during crises receive $\text{sign}_j = +1$; features that decline receive $\text{sign}_j = -1$. The panic state is then identified as the regime $k \in \{0, 1\}$ whose posterior mean vector $\hat{\boldsymbol{\mu}}_k$ best aligns with the crisis direction:
 \begin{equation}
-k^\ast = \arg\max_{k \in \{0,1\}} \sum_{j=1}^{D} \text{sign}_j \cdot \hat{\mu}_{k,j}.
+k^\ast = \arg\max_{k \in \{0,1\}} \sum_{j=1}^{D} \text{sign}_j \cdot \hat{\mu}_{k,j}
 \end{equation}
 The state labelled $k^\ast$ is designated as ``panic'' and the other as ``calm.''
 

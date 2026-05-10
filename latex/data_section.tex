@@ -18,25 +18,25 @@ The HMM classifies market regimes using four monthly macrofinancial stress indic
 \begin{enumerate}
     \item \textbf{DD (Drawdown):} The percentage decline of the cumulative market price index from its rolling 12-month peak:
     \begin{equation}
-        DD_t = \frac{P_t - \max(P_{t-11}, \dots, P_t)}{\max(P_{t-11}, \dots, P_t)}.
+        DD_t = \frac{P_t - \max(P_{t-11}, \dots, P_t)}{\max(P_{t-11}, \dots, P_t)}
     \end{equation}
     DD directly measures the depth of ongoing market declines. \citet{DanielMoskowitz2016} show that momentum crashes are predictable from past market declines, making DD the natural anchor for regime identification.
 
     \item \textbf{DISP (Return Dispersion):} The log cross-sectional standard deviation of individual stock returns:
     \begin{equation}
-        DISP_t = \log\!\left(\text{std}_s(r_{s,t})\right).
+        DISP_t = \log\!\left(\text{std}_s(r_{s,t})\right)
     \end{equation}
     DISP captures cross-sectional \emph{disagreement} among stocks. During stress, individual stocks move in different directions rather than together, causing dispersion to spike.
 
     \item \textbf{REL\_N (Relative Market Participation):} The log ratio of the number of actively traded stocks to its trailing 12-month average:
     \begin{equation}
-        REL\_N_t = \log\!\left(\frac{N_t}{\frac{1}{12}\sum_{\ell=1}^{12} N_{t-\ell}}\right).
+        REL\_N_t = \log\!\left(\frac{N_t}{\frac{1}{12}\sum_{\ell=1}^{12} N_{t-\ell}}\right)
     \end{equation}
     REL\_N turns negative during crises when stocks delist, halt trading, or are acquired at elevated rates. It captures structural market damage that the other features do not measure.
 
     \item \textbf{CS (Credit Spread):} The difference between Moody's BAA and AAA corporate bond yields:
     \begin{equation}
-        CS_t = Y_t^{\text{BAA}} - Y_t^{\text{AAA}}.
+        CS_t = Y_t^{\text{BAA}} - Y_t^{\text{AAA}}
     \end{equation}
     The credit spread provides an independent signal from the corporate bond market, helping the HMM distinguish genuine stress episodes from equity-specific turbulence.
 \end{enumerate}
@@ -108,7 +108,7 @@ The cross-sectional models rank stocks each month using momentum signals and the
 \paragraph{Momentum lookbacks}
 Twelve trailing momentum signals are computed for each stock, corresponding to lookback horizons of 1 to 12 months:
 \begin{equation}
-    \text{mom}_{k,t}^s = \prod_{\ell=1}^{k}(1 + r_{t-\ell}^s) - 1, \qquad k = 1, \dots, 12,
+    \text{mom}_{k,t}^s = \prod_{\ell=1}^{k}(1 + r_{t-\ell}^s) - 1, \qquad k = 1, \dots, 12
 \end{equation}
 where $r_{t-\ell}^s$ is the adjusted return of stock $s$ in month $t - \ell$. The current month's return is excluded from all lookbacks to avoid mechanical correlation with the forward return being predicted. Including all twelve horizons rather than a single lookback allows the models to learn how the full momentum term structure interacts with the regime signal.
 
