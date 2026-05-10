@@ -169,14 +169,14 @@ Importantly, the backward pass is used only during training: the sampled state p
 
 Given the sampled state path, each regime $k$ has $n_k$ observations assigned to it. From these, two summary statistics are computed:
 \[
-\bar{\mathbf{x}}_k = \frac{1}{n_k}\sum_{t:\,s_t=k}\mathbf{z}_t, \qquad \mathbf{S}_k = \sum_{t:\,s_t=k}(\mathbf{z}_t - \bar{\mathbf{x}}_k)(\mathbf{z}_t - \bar{\mathbf{x}}_k)^\top
+\bar{\mathbf{x}}_k = \frac{1}{n_k}\sum_{t:\,s_t=k}\mathbf{z}_t \qquad \mathbf{S}_k = \sum_{t:\,s_t=k}(\mathbf{z}_t - \bar{\mathbf{x}}_k)(\mathbf{z}_t - \bar{\mathbf{x}}_k)^\top
 \]
 The posterior hyperparameters are:
 \begin{align}\label{eq:niw_update}
-\kappa_n &= \kappa_0 + n_k, \qquad
-\mathbf{m}_n = \frac{\kappa_0 \mathbf{m}_0 + n_k \bar{\mathbf{x}}_k}{\kappa_n}, \qquad
-\nu_n = \nu_0 + n_k, \notag \\[6pt]
-\boldsymbol{\Psi}_n &= \boldsymbol{\Psi}_0 + \mathbf{S}_k + \frac{\kappa_0 n_k}{\kappa_n}(\bar{\mathbf{x}}_k-\mathbf{m}_0)(\bar{\mathbf{x}}_k-\mathbf{m}_0)^\top.
+\kappa_n &= \kappa_0 + n_k \qquad
+\mathbf{m}_n = \frac{\kappa_0 \mathbf{m}_0 + n_k \bar{\mathbf{x}}_k}{\kappa_n} \qquad
+\nu_n = \nu_0 + n_k \notag \\[6pt]
+\boldsymbol{\Psi}_n &= \boldsymbol{\Psi}_0 + \mathbf{S}_k + \frac{\kappa_0 n_k}{\kappa_n}(\bar{\mathbf{x}}_k-\mathbf{m}_0)(\bar{\mathbf{x}}_k-\mathbf{m}_0)^\top
 \end{align}
 Since $\kappa_0 = 0.01 \ll n_k$, the posterior is driven almost entirely by the data.
 
@@ -190,7 +190,7 @@ The sampled path is scanned to count transitions: $n_{ij} = \sum_{t=2}^T \mathds
 \begin{equation}
 \mathbf{P}_{i,\cdot} \mid \{s_t\}
 \sim
-\text{Dir}\!\big(\alpha_{i0} + n_{i0},\; \alpha_{i1} + n_{i1}\big).
+\text{Dir}\space\!\big(\alpha_{i0} + n_{i0},\; \alpha_{i1} + n_{i1}\big).
 \label{eq:dirichlet_update}
 \end{equation}
 For row 0 (calm), the prior pseudo-counts are $(\alpha_{00}, \alpha_{01}) = (9, 1)$ from Equation~\eqref{eq:dirichlet_prior}, so the posterior becomes $\text{Dir}(9 + 140,\; 1 + 10) = \text{Dir}(149,\; 11)$. The expected persistence probability under this posterior is $149/160 = 0.93$, reflecting that the data reinforced the prior belief in regime persistence. A new transition matrix row is then drawn from this Dirichlet distribution, and the same procedure is applied independently to row 1 (panic).
@@ -201,7 +201,7 @@ With all three blocks updated, the sampler returns to Step~1. After sufficient i
 
 The Gibbs sampler is estimated on the training sample only. To reduce sensitivity to MCMC initialization, the full sampler is run independently with $N_s = 200$ different random seeds. Each chain is run for $M=2{,}000$ iterations with the initialization described above. The first $B=500$ iterations are discarded as burn-in, leaving $1{,}500$ posterior draws per seed.
 
-For each seed, posterior mean parameters $\bar{\boldsymbol{\mu}}_k$, $\bar{\boldsymbol{\Sigma}}_k$, and $\bar{\mathbf{P}}$ are computed by averaging over the post-burn-in draws. A causal forward filter is then applied to the full sample using these parameters to obtain a seed-specific filtered probability $\pi_t^{\text{filter},(s)}$. The final trading signal is the average across seeds:
+For each seed, posterior mean parameters $\bar{\boldsymbol{\mu}}_k$, $\bar{\boldsymbol{\Sigma}}_k$, and $\bar{\mathbf{P}}$ are computed by averaging over the post-burn-in draws. A causal forward filter is then applied to the full sample using these parameters to obtain a seed-specific filtered probability $\pi_{t,s}^{\text{filter}}$. The final trading signal is the average across seeds:
 \begin{equation}
 \pi_t^{\text{filter}} = \frac{1}{N_s} \sum_{s=1}^{N_s} \pi_t^{\text{filter},(s)}
 \end{equation}
