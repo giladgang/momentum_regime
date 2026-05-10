@@ -111,7 +111,7 @@ for i, regime in enumerate(['Calm', 'Panic']):
         ax.set_ylabel('Median trailing momentum (%)', fontsize=12)
         ax.legend(fontsize=11, loc='upper left')
 
-plt.suptitle('Portfolio composition by regime: what M2 holds',
+plt.suptitle('Portfolio composition by regime: what XGB holds',
              fontsize=15, fontweight='bold', y=1.02)
 plt.tight_layout()
 fig.savefig('plots/portfolio_chars_option_c_v2.png', dpi=150, bbox_inches='tight')

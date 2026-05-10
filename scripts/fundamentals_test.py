@@ -1,11 +1,11 @@
 """
 fundamentals_test.py
 ====================
-Production-level fundamentals ablation for M2 (XGBoost, 50 seeds).
+Production-level fundamentals ablation for XGB (XGBoost, 50 seeds).
 
 Retrains 5 XGB configurations on the full 1990-2010 training sample and
 evaluates them out-of-sample on 2011-onwards. Reports the same metrics the
-production pipeline reports for M2 (Ann.Ret, Ann.Vol, Sharpe, MaxDD, beta,
+production pipeline reports for XGB (Ann.Ret, Ann.Vol, Sharpe, MaxDD, beta,
 Newey-West t, Final $), plus turnover, regime-conditional Sharpe, sub-period
 Sharpe, factor alphas (CAPM/FF3/Carhart/FF5/FF6), and a block-bootstrap
 Sharpe confidence interval for the baseline and full variants.
@@ -430,7 +430,7 @@ fund_row = next(r for r in results if r['name'] == 'full_mom_pi_fund')
 nw_str = f"{fund_row['nw_t']:.2f}{sig_stars(fund_row['nw_p'])}"
 def fmt_pct(x):
     return f"{x*100:.1f}\\%"
-row = (f"M2: XGB (mom+$\\pi$+fund) & "
+row = (f"XGB (mom+$\\pi$+fund) & "
        f"{fmt_pct(fund_row['ann_ret'])} & "
        f"{fmt_pct(fund_row['ann_vol'])} & "
        f"{fund_row['sharpe']:.2f} & "
@@ -453,7 +453,7 @@ for mn, d in fund_row['alphas'].items():
         cells.append(f"{d['betas'][fc]:+.2f}" if fc in d['betas'] else '')
     tex.append(' & '.join(cells) + r' \\')
 tex.extend([r'\bottomrule', r'\end{tabular}',
-            r'\caption{Factor model regressions for M2 (XGBoost, mom+$\pi$+fund). '
+            r'\caption{Factor model regressions for XGB (XGBoost, mom+$\\pi$+fund). '
             r'$\alpha$ is annualised. Newey--West $t$-statistics (6 lags).}',
             r'\label{tab:fund_alphas}', r'\end{table}'])
 with open('tables/table_fund_alphas.tex', 'w') as f:
@@ -483,7 +483,7 @@ LABEL_MAP = {
     'full_mom_pi_fund': r'\;\;$+$ 10 fundamentals',
     'fund_only':        'Fundamentals only',
     'fund_pi':          r'Fundamentals $+\ \pi$',
-    'mom_fund_no_pi':   r'Momentum $+$ fund.\ (no $\pi$)',
+    'mom_fund_no_pi':   r'Momentum $+$ fund.\ (no $\\pi$)',
 }
 
 def _fmt_nwt_excess(rr):

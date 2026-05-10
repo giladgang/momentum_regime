@@ -1,6 +1,6 @@
 """
 For each cross-sectional momentum decile, what fraction of stocks
-does M2 select for its long leg? Calm vs panic.
+does XGB select for its long leg? Calm vs panic.
 
 This directly shows the inversion: in calm, winners go long;
 in panic, losers go long.
@@ -119,7 +119,7 @@ ax.set_xticks(x)
 ax.set_xticklabels(x_labels, fontsize=10)
 ax.set_xlabel('Stocks ranked by 12-month trailing momentum (within-month decile)', fontsize=11)
 ax.set_ylabel('% of stocks selected for the long leg', fontsize=12)
-ax.set_title('Which stocks does M2 buy? Selection rate by momentum decile',
+ax.set_title('Which stocks does XGB buy? Selection rate by momentum decile',
              fontsize=13, fontweight='bold')
 ax.legend(fontsize=11)
 ax.grid(axis='y', alpha=0.3)
@@ -143,7 +143,7 @@ ax.set_xticks(x)
 ax.set_xticklabels(x_labels, fontsize=10)
 ax.set_xlabel('Stocks ranked by 12-month trailing momentum (within-month decile)', fontsize=11)
 ax.set_ylabel('Net selection rate (% long minus % short)', fontsize=12)
-ax.set_title('M2 net position by momentum decile: calm vs panic',
+ax.set_title('XGB net position by momentum decile: calm vs panic',
              fontsize=13, fontweight='bold')
 ax.legend(fontsize=11)
 ax.grid(axis='y', alpha=0.3)

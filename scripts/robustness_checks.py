@@ -153,8 +153,8 @@ test_art = artefacts['test'].copy()
 all_strats = {
     'Market':          r_mkt,
     'Fixed 12-mo':     long_short_port(test_art, 'score_mom12'),
-    'M1: LR':          long_short_port(test_art, 'score_lr'),
-    'M2: XGB':         long_short_port(test_art, 'score_xgb'),
+    'LR':          long_short_port(test_art, 'score_lr'),
+    'XGB':         long_short_port(test_art, 'score_xgb'),
 }
 
 periods = [
@@ -203,7 +203,7 @@ for sname in all_strats:
     tex.append(f"{label:<14s} & " + " & ".join(cells) + r" \\")
 tex.append(r"\bottomrule")
 tex.append(r"\end{tabular}")
-tex.append(r"\caption{Sub-period Sharpe ratios (long-short). The test period is split into three roughly equal sub-periods. M2 is the only strategy with positive Sharpe ratios in all three sub-periods.}")
+tex.append(r"\caption{Sub-period Sharpe ratios (long-short). The test period is split into three roughly equal sub-periods. XGB is the only strategy with positive Sharpe ratios in all three sub-periods.}")
 tex.append(r"\label{tab:subperiod}")
 tex.append(r"\end{table}")
 write_tex('table_subperiod.tex', '\n'.join(tex))
@@ -250,8 +250,8 @@ test_c['score_mom1'] = test_c.groupby('date')['mom_1'].rank(pct=True)
 turnover_strats = {
     'Fixed 12-mo': 'score_mom12',
     'Fixed 1-mo': 'score_mom1',
-    'M1: LR': 'score_lr',
-    'M2: XGB': 'score_xgb',
+    'LR': 'score_lr',
+    'XGB': 'score_xgb',
 }
 
 print(f"\n  {'Strategy':<15s}  {'Avg Monthly TO':>15s}  {'Ann. TO':>10s}")
@@ -327,7 +327,7 @@ for name in turnover_strats:
     tex.append(f"{name:<14s} & " + " & ".join(cells) + r" \\")
 tex.append(r"\bottomrule")
 tex.append(r"\end{tabular}")
-tex.append(r"\caption{M2 remains profitable at 50 bps. All other strategies become unprofitable at moderate cost levels.}")
+tex.append(r"\caption{XGB remains profitable at 50 bps. All other strategies become unprofitable at moderate cost levels.}")
 tex.append(r"\label{tab:cost_sensitivity}")
 tex.append(r"\end{table}")
 write_tex('table_cost_sensitivity.tex', '\n'.join(tex))
@@ -464,7 +464,7 @@ tex.append(r"\centering")
 tex.append(r"\small")
 tex.append(r"\begin{tabular}{l r r r r r r}")
 tex.append(r"\toprule")
-tex.append(r" & \multicolumn{2}{c}{Months} & \multicolumn{2}{c}{Market Sharpe} & \multicolumn{2}{c}{M1 Sharpe} \\")
+tex.append(r" & \multicolumn{2}{c}{Months} & \multicolumn{2}{c}{Market Sharpe} & \multicolumn{2}{c}{LR Sharpe} \\")
 tex.append(r"\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7}")
 tex.append(r"Threshold & Calm & Panic & Calm & Panic & Calm & Panic \\")
 tex.append(r"\midrule")
@@ -472,7 +472,7 @@ for thresh, nc, np_, mc, mp, m1c, m1p in threshold_rows:
     tex.append(f"$\\pi > {thresh:.2f}$ & {nc} & {np_} & {mc:.2f} & {mp:.2f} & {m1c:.2f} & {m1p:.2f} \\\\")
 tex.append(r"\bottomrule")
 tex.append(r"\end{tabular}")
-tex.append(r"\caption{Regime threshold sensitivity (long-short). Regime-conditional Sharpe ratios for the market and M1 under alternative panic thresholds for $\pi_t^{\text{filter}}$. Results are stable across all three thresholds.}")
+tex.append(r"\caption{Regime threshold sensitivity (long-short). Regime-conditional Sharpe ratios for the market and LR under alternative panic thresholds for $\pi_t^{\text{filter}}$. Results are stable across all three thresholds.}")
 tex.append(r"\label{tab:threshold_sensitivity}")
 tex.append(r"\end{table}")
 write_tex('table_threshold_sensitivity.tex', '\n'.join(tex))
@@ -555,7 +555,7 @@ print("  " + "-" * 55)
 
 # Compute baselines from production artefacts (no-skip features)
 base_sharpes = {}
-for name, col in [('Fixed 12-mo', 'score_mom12'), ('M1: LR', 'score_lr'), ('M2: XGB', 'score_xgb')]:
+for name, col in [('Fixed 12-mo', 'score_mom12'), ('LR', 'score_lr'), ('XGB', 'score_xgb')]:
     if col == 'score_mom12':
         test_base = test_art.copy()
         test_base['score_mom12'] = test_base.groupby('date')['mom_12'].rank(pct=True)
@@ -567,7 +567,7 @@ for name, col in [('Fixed 12-mo', 'score_mom12'), ('M1: LR', 'score_lr'), ('M2: 
     _, _, base_sh, _ = metrics(r_base) if len(r_base) > 0 else (0, 0, np.nan, 0)
     base_sharpes[name] = base_sh
 
-for name, col in [('Fixed 12-mo', 'score_mom12'), ('M1: LR', 'score_lr'), ('M2: XGB', 'score_xgb')]:
+for name, col in [('Fixed 12-mo', 'score_mom12'), ('LR', 'score_lr'), ('XGB', 'score_xgb')]:
     r = long_short_port(test2, col)
     _, _, sh, _ = metrics(r)
     base_sh = base_sharpes[name]
@@ -780,10 +780,10 @@ for K_val in K_STATES_ROBUSTNESS:
     print(f"  Fitting K={K_val} HMM ({len(hmm_seeds)} seeds) ...")
     mean_lr, std_lr, mean_xgb, std_xgb = evaluate_k_state(K_val, hmm_seeds)
     multistate_rows.append((K_val, mean_lr, std_lr, mean_xgb, std_xgb))
-    print(f"    M1: {mean_lr:.3f} +/- {std_lr:.3f}  |  M2: {mean_xgb:.3f} +/- {std_xgb:.3f}")
+    print(f"    LR: {mean_lr:.3f} +/- {std_lr:.3f}  |  XGB: {mean_xgb:.3f} +/- {std_xgb:.3f}")
 print(f"  Multi-state HMM completed in {time.time()-t0:.0f}s")
 
-print(f"\n  {'K':<5s}  {'M1 Mean':>10s}  {'M1 Std':>8s}  {'M2 Mean':>10s}  {'M2 Std':>8s}")
+print(f"\n  {'K':<5s}  {'LR Mean':>10s}  {'LR Std':>8s}  {'XGB Mean':>10s}  {'XGB Std':>8s}")
 print("  " + "-" * 50)
 for K_val, ml, sl, mx, sx in multistate_rows:
     print(f"  {K_val:<5d}  {ml:>10.3f}  {sl:>8.3f}  {mx:>10.3f}  {sx:>8.3f}")
@@ -795,7 +795,7 @@ tex.append(r"\centering")
 tex.append(r"\small")
 tex.append(r"\begin{tabular}{l r r r r}")
 tex.append(r"\toprule")
-tex.append(r" & \multicolumn{2}{c}{M1: LR} & \multicolumn{2}{c}{M2: XGB} \\")
+tex.append(r" & \multicolumn{2}{c}{LR} & \multicolumn{2}{c}{XGB} \\")
 tex.append(r"\cmidrule(lr){2-3} \cmidrule(lr){4-5}")
 tex.append(r"$K$ & Mean Sharpe & Std & Mean Sharpe & Std \\")
 tex.append(r"\midrule")
@@ -803,7 +803,7 @@ for K_val, ml, sl, mx, sx in multistate_rows:
     tex.append(f"{K_val} & {ml:.3f} & {sl:.3f} & {mx:.3f} & {sx:.3f} \\\\")
 tex.append(r"\bottomrule")
 tex.append(r"\end{tabular}")
-tex.append(r"\caption{Out-of-sample Sharpe ratios for HMMs with $K = 2, 3, 4, 5$ states (long-short). Each entry reports the mean and standard deviation across 5 independent Gibbs sampler seeds (2{,}000 iterations each). M1 is invariant to $K$. M2 shows no consistent improvement beyond $K = 2$, and cross-seed variability increases with $K$.}")
+tex.append(r"\caption{Out-of-sample Sharpe ratios for HMMs with $K = 2, 3, 4, 5$ states (long-short). Each entry reports the mean and standard deviation across 5 independent Gibbs sampler seeds (2{,}000 iterations each). LR is invariant to $K$. XGB shows no consistent improvement beyond $K = 2$, and cross-seed variability increases with $K$.}")
 tex.append(r"\label{tab:multistate_hmm}")
 tex.append(r"\end{table}")
 write_tex('table_multistate_hmm.tex', '\n'.join(tex))

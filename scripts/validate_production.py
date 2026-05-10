@@ -113,31 +113,31 @@ if os.path.exists(perf_table):
     with open(perf_table) as f:
         tex = f.read()
 
-    # Extract M2 XGB Sharpe from table (look for "M2: XGB" row)
-    # Pattern: M2 line with Sharpe value after Ann.Vol column
-    m2_match = re.search(r'M2: XGB[^&]*&[^&]*&[^&]*&\s*([-\d.]+)', tex)
+    # Extract XGB XGB Sharpe from table (look for "XGB" row)
+    # Pattern: XGB line with Sharpe value after Ann.Vol column
+    m2_match = re.search(r'XGB[^&]*&[^&]*&[^&]*&\s*([-\d.]+)', tex)
     if m2_match:
         table_sharpe = float(m2_match.group(1))
-        check("table_performance M2 Sharpe matches pickle",
+        check("table_performance XGB Sharpe matches pickle",
               abs(table_sharpe - EXPECTED_SHARPES['score_xgb']) <= TOLERANCE,
               f"table={table_sharpe}, expected={EXPECTED_SHARPES['score_xgb']}")
     else:
-        check("table_performance M2 Sharpe parseable", False, "could not parse")
+        check("table_performance XGB Sharpe parseable", False, "could not parse")
 
-    # Check M1 LR Sharpe
-    m1_match = re.search(r'M1: LR\b[^&]*&[^&]*&[^&]*&\s*([-\d.]+)', tex)
+    # Check LR LR Sharpe
+    m1_match = re.search(r'LR\b[^&]*&[^&]*&[^&]*&\s*([-\d.]+)', tex)
     if m1_match:
         table_sharpe = float(m1_match.group(1))
-        check("table_performance M1 Sharpe matches pickle",
+        check("table_performance LR Sharpe matches pickle",
               abs(table_sharpe - EXPECTED_SHARPES['score_lr']) <= TOLERANCE,
               f"table={table_sharpe}, expected={EXPECTED_SHARPES['score_lr']}")
 
-    # Check no duplicate rows -- "M2: XGB (mom+$\pi$)" is the main row;
-    # "M2: XGB (mom+raw)" is a legitimate ablation row, not a duplicate.
-    m2_main_count = len(re.findall(r'M2: XGB \(mom\+\$\\pi\$\)', tex))
-    check("table_performance has exactly one M2 main row",
+    # Check no duplicate rows -- "XGB (mom+$\\pi$)" is the main row;
+    # "XGB (mom+raw)" is a legitimate ablation row, not a duplicate.
+    m2_main_count = len(re.findall(r'XGB \(mom\+\$\\pi\$\)', tex))
+    check("table_performance has exactly one XGB main row",
           m2_main_count == 1,
-          f"found {m2_main_count} 'M2: XGB (mom+pi)' rows")
+          f"found {m2_main_count} 'XGB (mom+pi)' rows")
 else:
     check("table_performance.tex exists", False)
 

@@ -94,7 +94,7 @@ ax.set_xticks(x)
 ax.set_xticklabels(x_labels, fontsize=9)
 ax.set_xlabel('Stocks ranked by 12-month momentum', fontsize=10)
 ax.set_ylabel('% of stocks selected', fontsize=11)
-ax.set_title('Long leg: which stocks does M2 buy?', fontsize=12, fontweight='bold')
+ax.set_title('Long leg: which stocks does XGB buy?', fontsize=12, fontweight='bold')
 ax.legend(fontsize=10)
 ax.grid(axis='y', alpha=0.3)
 
@@ -108,11 +108,11 @@ ax.axhline(10, color='grey', linewidth=0.8, linestyle='--', alpha=0.5)
 ax.set_xticks(x)
 ax.set_xticklabels(x_labels, fontsize=9)
 ax.set_xlabel('Stocks ranked by 12-month momentum', fontsize=10)
-ax.set_title('Short leg: which stocks does M2 sell?', fontsize=12, fontweight='bold')
+ax.set_title('Short leg: which stocks does XGB sell?', fontsize=12, fontweight='bold')
 ax.legend(fontsize=10)
 ax.grid(axis='y', alpha=0.3)
 
-plt.suptitle('M2 stock selection by momentum decile: calm vs panic',
+plt.suptitle('XGB stock selection by momentum decile: calm vs panic',
              fontsize=14, fontweight='bold', y=1.02)
 plt.tight_layout()
 fig.savefig('plots/selection_long_short_separate.png', dpi=150, bbox_inches='tight')

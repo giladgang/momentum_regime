@@ -1,7 +1,7 @@
 """
 january_exclusion.py
 ====================
-Robustness check: recompute M2 and fixed 12-mo momentum performance
+Robustness check: recompute XGB and fixed 12-mo momentum performance
 after excluding all January months from the test period.
 
 Produces: tables/table_january.tex
@@ -89,8 +89,8 @@ ar_mom_nj, av_mom_nj, sh_mom_nj, mdd_mom_nj = metrics(r_mom_no_jan)
 
 print(f"\n{'Strategy':<22} {'Ann.Ret':>8} {'Ann.Vol':>8} {'Sharpe':>7}")
 print("-" * 50)
-print(f"{'M2 (full)':<22} {ar_m2:>7.1%} {av_m2:>7.1%} {sh_m2:>7.2f}")
-print(f"{'M2 (excl. Jan)':<22} {ar_m2_nj:>7.1%} {av_m2_nj:>7.1%} {sh_m2_nj:>7.2f}")
+print(f"{'XGB (full)':<22} {ar_m2:>7.1%} {av_m2:>7.1%} {sh_m2:>7.2f}")
+print(f"{'XGB (excl. Jan)':<22} {ar_m2_nj:>7.1%} {av_m2_nj:>7.1%} {sh_m2_nj:>7.2f}")
 print(f"{'Mom12 (full)':<22} {ar_mom:>7.1%} {av_mom:>7.1%} {sh_mom:>7.2f}")
 print(f"{'Mom12 (excl. Jan)':<22} {ar_mom_nj:>7.1%} {av_mom_nj:>7.1%} {sh_mom_nj:>7.2f}")
 
@@ -98,7 +98,7 @@ print(f"{'Mom12 (excl. Jan)':<22} {ar_mom_nj:>7.1%} {av_mom_nj:>7.1%} {sh_mom_nj
 r_m2_jan  = r_m2_full[r_m2_full.index.month == 1]
 r_mom_jan = r_mom_full[r_mom_full.index.month == 1]
 print(f"\nJanuary-only mean monthly return:")
-print(f"  M2:    {r_m2_jan.mean():+.2%}  (n={len(r_m2_jan)})")
+print(f"  XGB:    {r_m2_jan.mean():+.2%}  (n={len(r_m2_jan)})")
 print(f"  Mom12: {r_mom_jan.mean():+.2%}  (n={len(r_mom_jan)})")
 
 # ── LaTeX table ──────────────────────────────────────────────────────────────
@@ -116,11 +116,11 @@ tex = rf"""\begin{{table}}[H]
  & Ann.\ Ret & Ann.\ Vol & Sharpe & Months \\
 \midrule
 \multicolumn{{5}}{{l}}{{\emph{{Full sample (baseline)}}}} \\
-M2: XGB & {ar_m2:.1%} & {av_m2:.1%} & {sh_m2:.2f} & {n_full} \\
+XGB: XGB & {ar_m2:.1%} & {av_m2:.1%} & {sh_m2:.2f} & {n_full} \\
 Fixed 12-mo mom & {fmt_neg(ar_mom, '{:.1%}')} & {av_mom:.1%} & {sh_mom:.2f} & {n_full} \\
 \midrule
 \multicolumn{{5}}{{l}}{{\emph{{Excluding January}}}} \\
-M2: XGB & {ar_m2_nj:.1%} & {av_m2_nj:.1%} & {sh_m2_nj:.2f} & {n_no_jan} \\
+XGB: XGB & {ar_m2_nj:.1%} & {av_m2_nj:.1%} & {sh_m2_nj:.2f} & {n_no_jan} \\
 Fixed 12-mo mom & {fmt_neg(ar_mom_nj, '{:.1%}')} & {av_mom_nj:.1%} & {sh_mom_nj:.2f} & {n_no_jan} \\
 \bottomrule
 \end{{tabular}}

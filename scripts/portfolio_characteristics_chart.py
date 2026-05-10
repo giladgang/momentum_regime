@@ -1,7 +1,7 @@
 """
 portfolio_characteristics_chart.py
 ==================================
-Creates a chart showing what M2 holds in calm vs panic regimes.
+Creates a chart showing what XGB holds in calm vs panic regimes.
 Visualises the inversion: trend-riders in calm, beaten-down stocks in panic.
 """
 
@@ -139,7 +139,7 @@ for i, (col, label) in enumerate(chars.items()):
     if i == 0:
         ax.legend(fontsize=9, loc='upper left')
 
-plt.suptitle("What M2 holds: portfolio characteristics by regime",
+plt.suptitle("What XGB holds: portfolio characteristics by regime",
              fontsize=13, fontweight='bold', y=1.02)
 plt.tight_layout()
 fig.savefig('plots/portfolio_characteristics_by_regime.png', dpi=150, bbox_inches='tight')

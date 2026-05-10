@@ -12,7 +12,7 @@ Inputs
 - results/thesis/picked_stock_feature_panel.csv 14 predictor features per month
 - results/thesis/rule_path_labels.csv           long-leg picks (date, permno)
 - artefacts/cs_artefacts_data.pkl              art['test'] cross-section panel
-- results/thesis/fundamentals_returns.pkl      baseline_mom_pi -> returns (M2)
+- results/thesis/fundamentals_returns.pkl      baseline_mom_pi -> returns (XGB)
 
 Outputs
 -------
@@ -103,7 +103,7 @@ with open(RETURNS_PKL, "rb") as fh:
     ret_data = pickle.load(fh)
 m2_returns = ret_data["baseline_mom_pi"]["returns"]
 m2_returns.index = pd.to_datetime(m2_returns.index)
-print(f"  M2 returns: {len(m2_returns)} months", flush=True)
+print(f"  XGB returns: {len(m2_returns)} months", flush=True)
 
 # ---------------------------------------------------------------------------
 # 2. Merge labels with z-curves and feature panel

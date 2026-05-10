@@ -75,7 +75,7 @@ def main():
 
     labels = pd.read_csv(LABELS_CSV, parse_dates=['date'])
 
-    score_col = 'score_xgb'   # M2 strategy
+    score_col = 'score_xgb'   # XGB strategy
 
     rows = []
     for cluster_id in sorted(labels['cluster'].unique()):

@@ -3,7 +3,7 @@ random_forest_test.py
 =====================
 Standalone test: Random Forest as an alternative nonlinear model to XGBoost.
 
-Same features as M2 (mom_1..mom_12, pi_filter), same train/test split,
+Same features as XGB (mom_1..mom_12, pi_filter), same train/test split,
 same long-short portfolio construction. Tests whether the regime-momentum
 interaction is specific to XGBoost or generalises to tree-based models
 broadly.

@@ -67,7 +67,7 @@ def _make_panel(dates, n_stocks=5, seed=0):
 
 
 def _make_m2_returns(dates, seed=1):
-    """Create a Series of M2 monthly returns indexed by dates."""
+    """Create a Series of XGB monthly returns indexed by dates."""
     rng = np.random.default_rng(seed)
     return pd.Series(rng.normal(0.005, 0.04, len(dates)), index=dates)
 

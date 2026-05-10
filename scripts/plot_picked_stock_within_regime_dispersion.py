@@ -81,7 +81,7 @@ print(f"All-calm reference: {len(Z_calm)} months used")
 print()
 
 # ---------------------------------------------------------------------------
-# 5. Load M2 returns for per-cell Sharpe
+# 5. Load XGB returns for per-cell Sharpe
 # ---------------------------------------------------------------------------
 with open(RETURNS_PKL, "rb") as fh:
     ret_data = pickle.load(fh)

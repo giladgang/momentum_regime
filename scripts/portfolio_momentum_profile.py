@@ -112,7 +112,7 @@ for i, regime in enumerate(['Calm', 'Panic']):
         ax.set_ylabel('Median trailing momentum (%)', fontsize=11)
         ax.legend(fontsize=10, loc='upper left')
 
-plt.suptitle('What M2 holds: momentum profile across all 12 horizons',
+plt.suptitle('What XGB holds: momentum profile across all 12 horizons',
              fontsize=13, fontweight='bold', y=1.02)
 plt.tight_layout()
 fig.savefig('plots/portfolio_momentum_profile.png', dpi=150, bbox_inches='tight')

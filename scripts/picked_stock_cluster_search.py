@@ -53,7 +53,7 @@ def build_feature_panel(panel, m2_returns, dates):
     Parameters
     ----------
     panel : DataFrame full cross-section (date, permno, mom_1..mom_12, pi_filter)
-    m2_returns : pd.Series M2 monthly returns indexed by date
+    m2_returns : pd.Series XGB monthly returns indexed by date
     dates : iterable of pd.Timestamp -- months to include
     """
     pi = panel.groupby('date')['pi_filter'].first().sort_index()
@@ -261,7 +261,7 @@ def main():
     print(centroids.round(3).to_string())
 
     # ---- Predictor feature panel ----
-    print('\nLoading M2 returns...', flush=True)
+    print('\nLoading XGB returns...', flush=True)
     with open(f'{RES_DIR}/fundamentals_returns.pkl', 'rb') as f:
         rets = pickle.load(f)
     m2_ret = rets['baseline_mom_pi']['returns']

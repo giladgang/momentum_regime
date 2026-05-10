@@ -48,7 +48,7 @@ ax.set_xticks(x)
 ax.set_xticklabels([f'{h}' for h in range(1, 13)], fontsize=10)
 ax.set_xlabel('Lookback horizon (months)', fontsize=12)
 ax.set_ylabel('Median trailing momentum of long leg (%)', fontsize=12)
-ax.set_title('What M2 buys: momentum profile of the long leg by regime',
+ax.set_title('What XGB buys: momentum profile of the long leg by regime',
              fontsize=13, fontweight='bold')
 ax.legend(fontsize=11)
 ax.grid(axis='y', alpha=0.3)

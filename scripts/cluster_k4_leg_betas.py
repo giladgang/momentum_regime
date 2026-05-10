@@ -1,7 +1,7 @@
 """
 cluster_k4_leg_betas.py
 =======================
-Per-K=4-cluster leg-level CAPM betas for M2 (XGB) and fixed 12-month momentum.
+Per-K=4-cluster leg-level CAPM betas for XGB and fixed 12-month momentum.
 Feeds §5.2.3 of the master's thesis.
 
 Method:
@@ -14,7 +14,7 @@ Method:
     4. Repeat for score_mom12 (fixed 12-month momentum).
 
 Cross-checks (see VERIFICATION block at end of output):
-  [A1] N-weighted M2 beta_L ≈ 1.49 (within 0.05)
+  [A1] N-weighted XGB beta_L ≈ 1.49 (within 0.05)
   [A2] N-weighted fixed-mom beta_L ≈ 1.08 (within 0.05)
   [A3] All R² in [0, 1]
   [A4] No-inversion (beta_L > beta_S) per cluster
@@ -171,14 +171,14 @@ def main():
 
     n_total = out_df['n_months'].sum()
 
-    # [A1] N-weighted M2 beta_L vs full-sample anchor from leg_betas_by_regime.csv.
+    # [A1] N-weighted XGB beta_L vs full-sample anchor from leg_betas_by_regime.csv.
     # Note: The spec originally stated anchor = 1.65*(59/167) + 1.40*(108/167) = 1.488,
     # derived from panic/calm split betas. That formula is incorrect for K=4 clusters:
     # the n-weighted average of sub-period OLS betas diverges from a weighted avg of
     # panic/calm betas because market-return variance varies across clusters
     # (cluster 0 std=0.028, cluster 3 std=0.062 vs full-sample std=0.042).
     # The correct anchor is the full-sample OLS beta from leg_betas_by_regime.csv
-    # (M2 Full Long = 1.550; Fixed Full Long = 1.086). We also widen the tolerance
+    # (XGB Full Long = 1.550; Fixed Full Long = 1.086). We also widen the tolerance
     # to 0.10 to accommodate the harmless variance-heterogeneity bias.
     lb_csv = ROOT / cfg.RESULTS_THESIS_DIR / 'leg_betas_by_regime.csv'
     if lb_csv.exists():
@@ -191,7 +191,7 @@ def main():
         m2_full, fx_full = 1.550, 1.086   # fallback
     wt_m2_bl = (out_df['m2_beta_long'] * out_df['n_months']).sum() / n_total
     a1_pass = abs(wt_m2_bl - m2_full) < 0.10
-    print(f"[A1] M2 weighted-avg beta_L vs full-sample anchor {m2_full:.3f} (within 0.10): "
+    print(f"[A1] XGB weighted-avg beta_L vs full-sample anchor {m2_full:.3f} (within 0.10): "
           f"fresh = {wt_m2_bl:.4f}, diff = {abs(wt_m2_bl - m2_full):.4f}, "
           f"status = {'PASS' if a1_pass else 'FAIL'}")
 
@@ -213,9 +213,9 @@ def main():
     # [A4] No-inversion (beta_L > beta_S) per cluster
     m2_inv = out_df['m2_no_inversion'].sum()
     fix_inv = out_df['fixed_no_inversion'].sum()
-    print(f"[A4] No-inversion (beta_L > beta_S): M2 {m2_inv}/4 clusters, "
+    print(f"[A4] No-inversion (beta_L > beta_S): XGB {m2_inv}/4 clusters, "
           f"fixed {fix_inv}/4 clusters  "
-          f"(M2 expected some inversions; fixed expected none or few)")
+          f"(XGB expected some inversions; fixed expected none or few)")
 
     all_pass = a1_pass and a2_pass and a3_pass
     print(f"\nOverall leg_betas checks (A1-A3): {'ALL PASS' if all_pass else 'SOME FAIL'}")

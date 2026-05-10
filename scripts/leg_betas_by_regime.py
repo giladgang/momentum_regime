@@ -188,7 +188,7 @@ def main():
     print(f"Wrote {out_tex}")
 
     # ─── 3. Rolling-beta figure (D&M Fig. 3 layout) ───────────────────────────
-    # Panel A: Fixed 12-mom; Panel B: M2. Within each panel, long leg (solid)
+    # Panel A: Fixed 12-mom; Panel B: XGB. Within each panel, long leg (solid)
     # vs short leg (dotted), matching D&M's winner-vs-loser-on-one-panel idea.
     fig, axes = plt.subplots(2, 1, figsize=(10, 7.5), sharex=True)
 

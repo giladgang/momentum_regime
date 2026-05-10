@@ -60,7 +60,7 @@ CONFIG_DEPS = {
         ],
         'plots': ['plots/thesis/depth_vs_sharpe.png', 'plots/cs_avg_tree.png'],
         'metrics': ['m2_perf.*', 'factor_alphas.*', 'subperiod.*', 'regime_sharpe.*'],
-        'description': 'XGBoost tree depth. Production = 4. Changing alters all M2 numbers.',
+        'description': 'XGBoost tree depth. Production = 4. Changing alters all XGB numbers.',
     },
     'LEARNING_RATE': {
         'scripts': ['scripts/cross_sectional_model.py'],
@@ -95,7 +95,7 @@ CONFIG_DEPS = {
             'main_results.tex (§5.4 fundamentals discussion)',
             'future_work_full.tex',
         ],
-        'description': 'Fundamental features (cfo_a, fcf_a, accruals, ...). Changing only affects fund-augmented variant numbers, NOT the headline M2 results.',
+        'description': 'Fundamental features (cfo_a, fcf_a, accruals, ...). Changing only affects fund-augmented variant numbers, NOT the headline XGB results.',
     },
     'MOM_FEATURES': {
         'scripts': ['scripts/cross_sectional_model.py'],

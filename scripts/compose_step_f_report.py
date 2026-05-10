@@ -131,18 +131,18 @@ def main():
         '',
     ]
 
-    # ── Headline numbers from table_performance.tex (M2: XGB row) ─────────────
+    # ── Headline numbers from table_performance.tex (XGB row) ─────────────
     # Columns: Ann.Ret | Ann.Vol | Sharpe | Max DD | Beta | NW t | Final $
-    M2 = 'M2: XGB'
+    XGB = 'XGB'
     cols_perf = ['Ann.Ret', 'Ann.Vol', 'Sharpe', 'Max DD', 'Beta', 'NW t', 'Final $']
 
-    out_lines.append('### Headline (M2: XGB, mom+π) — table_performance.tex')
+    out_lines.append('### Headline (XGB, mom+π) — table_performance.tex')
     out_lines.append('')
     out_lines.append('| Metric | Pre | Post | Δ |')
     out_lines.append('|---|---|---|---|')
     for i, label in enumerate(cols_perf, start=1):
-        pre = parse_table_row(base_tables / 'table_performance.tex', M2, i)
-        post = parse_table_row(live_tables / 'table_performance.tex', M2, i)
+        pre = parse_table_row(base_tables / 'table_performance.tex', XGB, i)
+        post = parse_table_row(live_tables / 'table_performance.tex', XGB, i)
         pre_f = maybe_float(pre)
         post_f = maybe_float(post)
         delta = ''
@@ -157,7 +157,7 @@ def main():
     out_lines.append('')
     out_lines.append('| Strategy | Pre Calm | Post Calm | Pre Panic | Post Panic |')
     out_lines.append('|---|---|---|---|---|')
-    for strat in ['Market', 'Fixed 12-mo', 'M1: LR', 'M2: XGB']:
+    for strat in ['Market', 'Fixed 12-mo', 'LR', 'XGB']:
         pre_calm = _md_clean(parse_table_row(base_tables / 'table_regime_sharpe.tex', strat, 2))
         post_calm = _md_clean(parse_table_row(live_tables / 'table_regime_sharpe.tex', strat, 2))
         pre_pan = _md_clean(parse_table_row(base_tables / 'table_regime_sharpe.tex', strat, 3))
@@ -169,14 +169,14 @@ def main():
     out_lines.append('')
 
     # ── Sub-period Sharpes ────────────────────────────────────────────────────
-    out_lines.append('### Sub-period Sharpe (M2: XGB) — table_subperiod.tex')
+    out_lines.append('### Sub-period Sharpe (XGB) — table_subperiod.tex')
     out_lines.append('')
     out_lines.append('| Sub-period | Pre | Post |')
     out_lines.append('|---|---|---|')
     for col, label in enumerate(['2011-2015', '2016-2020', '2021-2025', 'Full'],
                                   start=1):
-        pre = _md_clean(parse_table_row(base_tables / 'table_subperiod.tex', M2, col))
-        post = _md_clean(parse_table_row(live_tables / 'table_subperiod.tex', M2, col))
+        pre = _md_clean(parse_table_row(base_tables / 'table_subperiod.tex', XGB, col))
+        post = _md_clean(parse_table_row(live_tables / 'table_subperiod.tex', XGB, col))
         out_lines.append(f'| {label} | {pre or "—"} | {post or "—"} |')
     out_lines.append('')
 
@@ -227,11 +227,11 @@ def main():
             out_lines.append(lb.to_string(index=False))
             out_lines.append('```')
             out_lines.append('')
-            # Try to extract calm/panic Δβ for M2 XGB
+            # Try to extract calm/panic Δβ for XGB XGB
             try:
                 m2 = lb[lb.iloc[:, 0].astype(str).str.contains(
-                    'M2|XGB', case=False, na=False, regex=True)]
-                out_lines.append('### Long − Short β (M2 XGB)')
+                    'XGB|XGB', case=False, na=False, regex=True)]
+                out_lines.append('### Long − Short β (XGB XGB)')
                 out_lines.append('')
                 out_lines.append(m2.to_markdown(index=False))
                 out_lines.append('')
@@ -263,9 +263,9 @@ def main():
     out_lines.append('## Sanity gates (Shumway shift expected band)')
     out_lines.append('')
     sharpe_pre = maybe_float(parse_table_row(
-        base_tables / 'table_performance.tex', M2, 3))
+        base_tables / 'table_performance.tex', XGB, 3))
     sharpe_post = maybe_float(parse_table_row(
-        live_tables / 'table_performance.tex', M2, 3))
+        live_tables / 'table_performance.tex', XGB, 3))
     if sharpe_pre is not None and sharpe_post is not None:
         diff = sharpe_post - sharpe_pre
         verdict = ('within band' if abs(diff) <= 0.05 else

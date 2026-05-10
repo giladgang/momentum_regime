@@ -1,11 +1,11 @@
 """
 ridge_baseline_test.py
 ======================
-Test whether the M1/M2 divergence is driven by linearity vs nonlinearity,
+Test whether the LR/XGB divergence is driven by linearity vs nonlinearity,
 or by classification vs regression targets.
 
 Adds a Ridge regression (M1b) that predicts continuous forward returns
-(same target as XGBoost M2) using a linear model (same functional form as M1).
+(same target as XGBoost XGB) using a linear model (same functional form as LR).
 This isolates the linearity/nonlinearity question from the target question.
 
 Uses saved artefacts from cross_sectional_model.py to avoid re-running
@@ -76,16 +76,16 @@ def metrics(r):
     mdd     = ((cum - cum.cummax()) / cum.cummax()).min()
     return ann_ret, ann_vol, sharpe, mdd
 
-# ── Preprocessing (same as M1: impute + scale) ──────────────────────────────
+# ── Preprocessing (same as LR: impute + scale) ──────────────────────────────
 
 imputer = SimpleImputer(strategy='median')
 scaler  = StandardScaler()
 X_tr_s  = scaler.fit_transform(imputer.fit_transform(X_train))
 X_te_s  = scaler.transform(imputer.transform(X_test))
 
-# ── Ridge Regression: predicting continuous returns (same target as M2) ──────
+# ── Ridge Regression: predicting continuous returns (same target as XGB) ──────
 
-print("\n=== Ridge Regression (continuous return target, same as M2) ===")
+print("\n=== Ridge Regression (continuous return target, same as XGB) ===")
 
 alphas_to_test = [0.01, 0.1, 1.0, 10.0, 100.0, 1000.0]
 
@@ -139,7 +139,7 @@ coefs = pd.Series(ols.coef_, index=FEATURES).sort_values(ascending=False)
 for feat, c in coefs.items():
     print(f"    {feat:<15s} {c:>+8.5f}")
 
-# ── Recap: M1 (LR classification) and M2 (XGBoost) for comparison ───────────
+# ── Recap: LR (LR classification) and XGB for comparison ───────────
 
 print("\n=== Comparison with existing models ===")
 
@@ -201,10 +201,10 @@ for alpha in alphas_to_test:
                  'ann_ret': ar_r, 'ann_vol': av_r, 'mdd': mdd_r,
                  'sr_calm': sr_calm_r, 'sr_panic': sr_panic_r})
 
-# M1 and M2 from artefacts
+# LR and XGB from artefacts
 strats = artefacts['strategies_lo']
-for name_key, label in [('Method 1: LR', 'M1 (LR, classification)'),
-                         ('Method 2: XGB', 'M2 (XGBoost)')]:
+for name_key, label in [('Method 1: LR', 'LR (LR, classification)'),
+                         ('Method 2: XGB', 'XGB')]:
     if name_key in strats:
         r = strats[name_key]
         ar_m, av_m, sh_m, mdd_m = metrics(r)
@@ -276,14 +276,14 @@ for row in rows:
     sr_c = fmt_sharpe(row['sr_calm'])
     sr_p = fmt_sharpe(row['sr_panic'])
     line = f"{m} & {a_tex} & {sh} & {ar} & {av} & {mdd} & {sr_c} / {sr_p} \\\\"
-    # Add midrule before M1
-    if m == 'M1 (LR, classification)':
+    # Add midrule before LR
+    if m == 'LR (LR, classification)':
         tex_lines.append(r'\midrule')
     tex_lines.append(line)
 
 tex_lines.append(r'\bottomrule')
 tex_lines.append(r'\end{tabular}')
-tex_lines.append(r'\caption{Ridge regression baseline predicting continuous forward returns (same target as M2). The Sharpe of $-$0.57 is robust across all regularisation strengths.}')
+tex_lines.append(r'\caption{Ridge regression baseline predicting continuous forward returns (same target as XGB). The Sharpe of $-$0.57 is robust across all regularisation strengths.}')
 tex_lines.append(r'\label{tab:ridge}')
 tex_lines.append(r'\end{table}')
 

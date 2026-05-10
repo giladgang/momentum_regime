@@ -66,12 +66,12 @@ Configuration:
 
 Output (per region, written to results/thesis/):
     - intl_<region>_hmm_feature_selection_pass1.csv  (15 combos with quality metrics)
-    - intl_<region>_hmm_feature_selection_pass2.csv  (Pass 1 survivors ranked by M2 Sharpe)
+    - intl_<region>_hmm_feature_selection_pass2.csv  (Pass 1 survivors ranked by XGB Sharpe)
     - intl_<region>_hmm_feature_selection_pass3.csv  (top combos with stability + sub-period)
     - intl_<region>_hmm_feature_selection_pass4.csv  (BIC, crisis-detection, LRT)
 
 Final feature pick:
-    The user reviews the four output CSVs (M2 Sharpe ranking, per-seed stability,
+    The user reviews the four output CSVs (XGB Sharpe ranking, per-seed stability,
     sub-period robustness, economic validation metrics) and selects the regional
     feature combination manually. The script does NOT auto-select a winner -- this
     is intentional and mirrors how the US production set was chosen.
@@ -541,7 +541,7 @@ def run_pass2(panel, train_stocks, test_stocks, passed_combos):
         r_xgb = long_short_port(te, 'score_xgb')
         sh_xgb = compute_sharpe(r_xgb)
 
-        # M1 for comparison
+        # LR for comparison
         imp = SimpleImputer(strategy='median')
         scaler = StandardScaler()
         X_tr_s = scaler.fit_transform(imp.fit_transform(X_tr))
@@ -563,7 +563,7 @@ def run_pass2(panel, train_stocks, test_stocks, passed_combos):
         })
 
         print(f"  [{idx+1:>3d}/{len(passed_combos)}] {short_name:<30s}  "
-              f"M1={sh_lr:.3f}  M2={sh_xgb:.3f}  [{elapsed:.0f}s]")
+              f"LR={sh_lr:.3f}  XGB={sh_xgb:.3f}  [{elapsed:.0f}s]")
 
     results.sort(key=lambda x: -x['sh_xgb'])
     df = pd.DataFrame(results)
@@ -573,7 +573,7 @@ def run_pass2(panel, train_stocks, test_stocks, passed_combos):
 
     print(f"\n  Top 10:")
     for i, r in enumerate(results[:10], 1):
-        print(f"    {i:>2d}. {r['name']:<30s}  M2={r['sh_xgb']:.3f}")
+        print(f"    {i:>2d}. {r['name']:<30s}  XGB={r['sh_xgb']:.3f}")
 
     print(f"  Saved: {out_path}")
     return results[:TOP_N_FOR_PASS3]

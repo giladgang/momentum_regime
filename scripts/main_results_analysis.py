@@ -288,12 +288,12 @@ lr_red = LogisticRegression(max_iter=1000, C=1.0)
 lr_red.fit(X_tr_red_s, train['above_med'].values)
 test['score_lr_red'] = lr_red.predict_proba(X_te_red_s)[:, 1]
 r_lr_red = build_port(test, 'score_lr_red')
-print(f"  M1: LR (mom+pi) — {len(r_lr_red)} monthly obs")
+print(f"  LR (mom+pi) — {len(r_lr_red)} monthly obs")
 
 # XGB: use the production 50-seed ensemble scores from the artefacts
 # (score_xgb was trained on mom+pi features with 50 seeds averaged)
 r_xgb_red = build_port(test, 'score_xgb')
-print(f"  M2: XGB (mom+pi) — {len(r_xgb_red)} monthly obs")
+print(f"  XGB (mom+pi) — {len(r_xgb_red)} monthly obs")
 
 # ══════════════════════════════════════════════════════════════════════════════
 # C. TABLE 1: FULL PERFORMANCE COMPARISON
@@ -317,9 +317,9 @@ all_strats = {
     'Market':               r_mkt,
     'Fixed 12-mo mom':      strats_ls['Fixed 12-mo mom'],
     'Fixed 1-mo mom':       strats_ls['Fixed 1-mo mom'],
-    'M0: Formula':          strats_ls['Method 0: Formula'],
-    'M1: LR':               strats_ls['Method 1: LR'],
-    'M2: XGB (mom+$\\pi$)': r_xgb_red,
+    'DET':          strats_ls['Method 0: Formula'],
+    'LR':               strats_ls['Method 1: LR'],
+    'XGB (mom+$\\pi$)': r_xgb_red,
 }
 
 perf_rows = []
@@ -543,7 +543,7 @@ for row in shap_rows:
     tex_lines.append(f"{disp} & {pct_o:.0f}\\% & {pct_c:.0f}\\% & {pct_p:.0f}\\% \\\\")
 tex_lines.append(r"\bottomrule")
 tex_lines.append(r"\end{tabular}")
-tex_lines.append(r"\caption{SHAP feature importance shares for M2. Each column sums to 100\%.}")
+tex_lines.append(r"\caption{SHAP feature importance shares for XGB. Each column sums to 100\%.}")
 tex_lines.append(r"\label{tab:shap}")
 tex_lines.append(r"\end{table}")
 
@@ -646,8 +646,8 @@ ic_df = pd.DataFrame(ic_records)
 # Significance tests
 ic_results = []
 for col, label in [('IC_mom', 'Momentum (mom\\_12)'),
-                    ('IC_lr',  'M1: LR'),
-                    ('IC_xgb', 'M2: XGB')]:
+                    ('IC_lr',  'LR'),
+                    ('IC_xgb', 'XGB')]:
     vals = ic_df[col].values
     calm_vals  = ic_df.loc[ic_df['regime'] == 'Calm',  col].values
     panic_vals = ic_df.loc[ic_df['regime'] == 'Panic', col].values
@@ -702,8 +702,8 @@ tex_lines.append(r"\midrule")
 tex_lines.append(r"\multicolumn{7}{l}{\textit{Paired differences (vs.\ momentum)}} \\")
 delta_lr = ic_df['IC_lr'].mean() - ic_df['IC_mom'].mean()
 delta_xgb = ic_df['IC_xgb'].mean() - ic_df['IC_mom'].mean()
-tex_lines.append(f"M1: LR $-$ Mom & {delta_lr:+.4f} & & {t_paired:.2f}{sig_stars(p_paired)} & & & \\\\")
-tex_lines.append(f"M2: XGB $-$ Mom & {delta_xgb:+.4f} & & {t_paired_xgb:.2f}{sig_stars(p_paired_xgb)} & & & \\\\")
+tex_lines.append(f"LR $-$ Mom & {delta_lr:+.4f} & & {t_paired:.2f}{sig_stars(p_paired)} & & & \\\\")
+tex_lines.append(f"XGB $-$ Mom & {delta_xgb:+.4f} & & {t_paired_xgb:.2f}{sig_stars(p_paired_xgb)} & & & \\\\")
 tex_lines.append(r"\bottomrule")
 tex_lines.append(r"\end{tabular}")
 tex_lines.append(r"\end{table}")
@@ -837,7 +837,7 @@ write_tex('table_granger.tex', '\n'.join(tex_lines))
 print("[ 7/10 ] Table: GHM comparison ...")
 
 ghm_strats = {
-    'M2: XGB': r_xgb_red,
+    'XGB': r_xgb_red,
     'GHM SLOW ($a=0$)': ghm_returns['GHM SLOW (a=0)'],
     'GHM MED ($a=0.5$)': ghm_returns['GHM MED (a=0.5)'],
     'GHM FAST ($a=1$)': ghm_returns['GHM FAST (a=1)'],
@@ -854,13 +854,13 @@ tex_lines.append(r" & Sharpe & Ann.\ Ret & Ann.\ Vol & Max DD \\")
 tex_lines.append(r"\midrule")
 for name, r in ghm_strats.items():
     ar, av, sh, mdd, _ = metrics(r)
-    sep = r"\midrule" if name == 'M2: XGB' else ""
+    sep = r"\midrule" if name == 'XGB' else ""
     tex_lines.append(f"{name} & {sh:.2f} & {ar:.1%} & {av:.1%} & $-${abs(mdd):.1%} \\\\")
     if sep:
         tex_lines.append(sep)
 tex_lines.append(r"\bottomrule")
 tex_lines.append(r"\end{tabular}")
-tex_lines.append(r"\caption{Comparison with \citet{GHM2023} market-state momentum strategies (long-short construction). All four GHM variants collapse in long-short, because their deterministic blending of two momentum horizons cannot adapt the short side to changing regimes. M2 is shown for reference.}")
+tex_lines.append(r"\caption{Comparison with \citet{GHM2023} market-state momentum strategies (long-short construction). All four GHM variants collapse in long-short, because their deterministic blending of two momentum horizons cannot adapt the short side to changing regimes. XGB is shown for reference.}")
 tex_lines.append(r"\label{tab:ghm_comparison}")
 tex_lines.append(r"\end{table}")
 write_tex('table_ghm_comparison.tex', '\n'.join(tex_lines))
@@ -905,13 +905,13 @@ tex_lines.append(r"\centering")
 tex_lines.append(r"\small")
 tex_lines.append(r"\begin{tabular}{l r}")
 tex_lines.append(r"\toprule")
-tex_lines.append(r"Regime signal & M2 Sharpe \\")
+tex_lines.append(r"Regime signal & XGB Sharpe \\")
 tex_lines.append(r"\midrule")
 tex_lines.append(f"Real $\\pi_t^{{\\text{{filter}}}}$ (baseline) & {sh_baseline:.2f} \\\\")
 tex_lines.append(f"No regime signal & {sh_no_pi:.2f} \\\\")
 tex_lines.append(r"\bottomrule")
 tex_lines.append(r"\end{tabular}")
-tex_lines.append(f"\\caption{{Placebo regime signal test (long-short, mom+$\\pi$). Removing the regime signal reduces M2's Sharpe from {sh_baseline:.2f} to {sh_no_pi:.2f}, confirming that the HMM signal is essential for long-short momentum stock selection.}}")
+tex_lines.append(f"\\caption{{Placebo regime signal test (long-short, mom+$\\pi$). Removing the regime signal reduces XGB's Sharpe from {sh_baseline:.2f} to {sh_no_pi:.2f}, confirming that the HMM signal is essential for long-short momentum stock selection.}}")
 tex_lines.append(r"\label{tab:placebo}")
 tex_lines.append(r"\end{table}")
 write_tex('table_placebo.tex', '\n'.join(tex_lines))
@@ -923,7 +923,7 @@ tex_lines.append(r"\centering")
 tex_lines.append(r"\small")
 tex_lines.append(r"\begin{tabular}{l r}")
 tex_lines.append(r"\toprule")
-tex_lines.append(r"Configuration & M2 Sharpe \\")
+tex_lines.append(r"Configuration & XGB Sharpe \\")
 tex_lines.append(r"\midrule")
 tex_lines.append(f"XGB with real $\\pi_t^{{\\text{{filter}}}}$ & {sh_baseline:.2f} \\\\")
 tex_lines.append(f"XGB without regime signal (baseline) & {sh_no_pi:.2f} \\\\")
@@ -947,12 +947,12 @@ tex_lines.append(r"\centering")
 tex_lines.append(r"\small")
 tex_lines.append(r"\begin{tabular}{l r r r}")
 tex_lines.append(r"\toprule")
-tex_lines.append(r"Train / Test split & $N_{\text{test}}$ & M1 Sharpe & M2 Sharpe \\")
+tex_lines.append(r"Train / Test split & $N_{\text{test}}$ & LR Sharpe & XGB Sharpe \\")
 tex_lines.append(r"\midrule")
 tex_lines.append(f"1990--2010 / 2011--2025 (baseline) & 167 & ${sh_m1:.2f}$ & {sh_baseline:.2f} \\\\")
 tex_lines.append(r"\bottomrule")
 tex_lines.append(r"\end{tabular}")
-tex_lines.append(f"\\caption{{Out-of-sample performance under the baseline train/test split (long-short, mom+$\\pi$, 50-seed ensemble). M1 collapses while M2 achieves a Sharpe of {sh_baseline:.2f} with highly significant factor model alphas.}}")
+tex_lines.append(f"\\caption{{Out-of-sample performance under the baseline train/test split (long-short, mom+$\\pi$, 50-seed ensemble). LR collapses while XGB achieves a Sharpe of {sh_baseline:.2f} with highly significant factor model alphas.}}")
 tex_lines.append(r"\label{tab:alt_splits}")
 tex_lines.append(r"\end{table}")
 write_tex('table_alt_splits.tex', '\n'.join(tex_lines))

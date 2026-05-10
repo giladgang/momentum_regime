@@ -94,7 +94,7 @@ assert merged["ret"].isna().sum() == 0, (
 )
 assert merged.index.duplicated().sum() == 0, "Duplicate index in merged!"
 
-print(f"  Labels: {labels_df.shape}, M2 returns: {len(m2_returns)}, "
+print(f"  Labels: {labels_df.shape}, XGB returns: {len(m2_returns)}, "
       f"Merged: {merged.shape}", flush=True)
 
 MOM_COLS = [f"mom_{h}" for h in range(1, 13)]

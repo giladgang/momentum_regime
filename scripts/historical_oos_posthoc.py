@@ -15,7 +15,7 @@ Operates on retrained-window OOS data:
     results/oos_returns_prod_1990_2004.csv
 
 Outputs:
-    results/oos_subperiod_full.csv          -- benchmark and M2 sub-period stats
+    results/oos_subperiod_full.csv          -- benchmark and XGB sub-period stats
     tables/table_oos_subperiods_m2.tex
     tables/table_oos_benchmark_comparison.tex
 """
@@ -94,7 +94,7 @@ def subperiod_slice(r, start, end):
     return r[mask]
 
 
-# ── Load M2 OOS returns ──
+# ── Load XGB OOS returns ──
 
 print("=" * 70)
 print("  POST-HOC ANALYSIS: Historical OOS sub-period decomposition")
@@ -229,8 +229,8 @@ def decompose_with_ci(r, label_prefix, n_boot=5000):
 
 
 all_rows = []
-all_rows += decompose_with_ci(m2_a,              'M2 (1990-1999 train)')
-all_rows += decompose_with_ci(m2_ap,             'M2 (1990-2004 train)')
+all_rows += decompose_with_ci(m2_a,              'XGB (1990-1999 train)')
+all_rows += decompose_with_ci(m2_ap,             'XGB (1990-2004 train)')
 all_rows += decompose_with_ci(mom12_2000_2010,   'Fixed 12-mo mom')
 all_rows += decompose_with_ci(mom1_2000_2010,    'Fixed 1-mo mom')
 all_rows += decompose_with_ci(mkt_2000_2010,     'Market (VW buy-hold)')
@@ -252,15 +252,15 @@ df.to_csv(out_path, index=False)
 print(f"\nSaved: {out_path}")
 
 
-# ── LaTeX table: M2 with CIs + fixed-mom + market ──
+# ── LaTeX table: XGB with CIs + fixed-mom + market ──
 
 print("\n[3/4] Writing LaTeX tables ...")
 
-# Table 1: M2 sub-period with bootstrap CIs (1990-1999 train, primary config)
+# Table 1: XGB sub-period with bootstrap CIs (1990-1999 train, primary config)
 def fmt_ci(row):
     return f"[{row['sharpe_lo']:.2f}, {row['sharpe_hi']:.2f}]"
 
-m2_rows_primary = df[df['strategy'] == 'M2 (1990-1999 train)'].copy()
+m2_rows_primary = df[df['strategy'] == 'XGB (1990-1999 train)'].copy()
 
 tex = []
 tex.append(r'\begin{table}[H]')
@@ -279,8 +279,8 @@ for _, row in m2_rows_primary.iterrows():
 tex.append(r'\bottomrule')
 tex.append(r'\end{tabular}')
 tex.append(
-    r'\caption{Historical out-of-sample sub-period decomposition of M2 '
-    r'(XGBoost, mom+$\pi$) trained on 1990--1999 and tested on 2000--2010. '
+    r'\caption{Historical out-of-sample sub-period decomposition of XGB '
+    r'(XGBoost, mom+$\\pi$) trained on 1990--1999 and tested on 2000--2010. '
     r'95\% confidence intervals are block-bootstrapped (block=6 months, '
     r'5{,}000 resamples). Small sub-period samples ($n < 20$) use smaller '
     r'blocks, giving wider intervals.}'
@@ -296,7 +296,7 @@ print(f"  Saved: {tex_path}")
 
 # Table 2: Benchmark comparison across sub-periods (Sharpe only, compact)
 bench_rows = df[df['strategy'].isin([
-    'M2 (1990-1999 train)',
+    'XGB (1990-1999 train)',
     'Fixed 12-mo mom',
     'Fixed 1-mo mom',
     'Market (VW buy-hold)',
@@ -306,7 +306,7 @@ pivot = bench_rows.pivot(index='subperiod', columns='strategy', values='sharpe')
 # Reorder rows to match SUBPERIODS + Overall at top
 row_order = ['Overall'] + [s[0] for s in SUBPERIODS]
 pivot = pivot.reindex(row_order)
-col_order = ['M2 (1990-1999 train)', 'Fixed 12-mo mom', 'Fixed 1-mo mom', 'Market (VW buy-hold)']
+col_order = ['XGB (1990-1999 train)', 'Fixed 12-mo mom', 'Fixed 1-mo mom', 'Market (VW buy-hold)']
 pivot = pivot[col_order]
 
 tex = []
@@ -315,7 +315,7 @@ tex.append(r'\centering')
 tex.append(r'\small')
 tex.append(r'\begin{tabular}{l r r r r}')
 tex.append(r'\toprule')
-tex.append(r'Subperiod & M2 & Fixed 12-mo mom & Fixed 1-mo mom & Market VW \\')
+tex.append(r'Subperiod & XGB & Fixed 12-mo mom & Fixed 1-mo mom & Market VW \\')
 tex.append(r'\midrule')
 for sp, row in pivot.iterrows():
     vals = ' & '.join(
@@ -327,7 +327,7 @@ tex.append(r'\bottomrule')
 tex.append(r'\end{tabular}')
 tex.append(
     r'\caption{Out-of-sample Sharpe ratio by sub-period (2000--2010 test). '
-    r'M2 is trained on 1990--1999 (no crisis in training). Fixed momentum '
+    r'XGB is trained on 1990--1999 (no crisis in training). Fixed momentum '
     r'portfolios and market buy-hold use the same L/S construction (top/bottom '
     r'decile, NYSE breakpoints, value-weighted) for fair comparison; the market '
     r'is value-weighted buy-and-hold.}'

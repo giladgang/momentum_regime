@@ -91,9 +91,9 @@ def parse_table_performance():
         return {}
     # Row labels in the production table
     rows = {
-        'm2':       'M2: XGB (mom+$\\pi$)',
-        'm1':       'M1: LR',
-        'm0':       'M0: Formula',
+        'm2':       'XGB (mom+$\\pi$)',
+        'm1':       'LR',
+        'm0':       'DET',
         'fixed_12': 'Fixed 12-mo mom',
         'fixed_1':  'Fixed 1-mo mom',
         'market':   'Market',
@@ -146,7 +146,7 @@ def parse_table_regime_sharpe():
     if not text:
         return {}
     out = {}
-    rows = {'m2': 'M2: XGB (mom+$\\pi$)', 'm1': 'M1: LR', 'm0': 'M0: Formula',
+    rows = {'m2': 'XGB (mom+$\\pi$)', 'm1': 'LR', 'm0': 'DET',
             'fixed_12': 'Fixed 12-mo mom', 'fixed_1': 'Fixed 1-mo mom', 'market': 'Market'}
     for key, label in rows.items():
         r = _parse_row(text, label)
@@ -162,7 +162,7 @@ def parse_table_subperiod():
     if not text:
         return {}
     out = {}
-    rows = {'m2': 'M2: XGB', 'm1': 'M1: LR', 'fixed_12': 'Fixed 12-mo', 'market': 'Market'}
+    rows = {'m2': 'XGB', 'm1': 'LR', 'fixed_12': 'Fixed 12-mo', 'market': 'Market'}
     for key, label in rows.items():
         r = _parse_row(text, label)
         if not r: continue
@@ -182,13 +182,13 @@ def parse_table_bootstrap():
         with open(cis_path) as f:
             for row in csv.DictReader(f):
                 key_map = {
-                    'M2 (XGB)':           'm2',
-                    'M1 (LR)':            'm1',
-                    'M0 (Formula)':       'm0',
+                    'XGB':           'm2',
+                    'LR':            'm1',
+                    'DET':       'm0',
                     'Fixed 12-mo mom':    'fixed_12',
                     'Fixed 1-mo mom':     'fixed_1',
-                    'M2 calm':            'm2_calm',
-                    'M2 panic':           'm2_panic',
+                    'XGB calm':            'm2_calm',
+                    'XGB panic':           'm2_panic',
                 }
                 key = key_map.get(row.get('strategy', '').strip())
                 if not key:
@@ -204,8 +204,8 @@ def parse_table_bootstrap():
             for row in csv.DictReader(f):
                 bench = row.get('benchmark', '').strip()
                 key_map = {
-                    'M1 (LR)':           'm2_vs_m1',
-                    'M0 (Formula)':      'm2_vs_m0',
+                    'LR':           'm2_vs_m1',
+                    'DET':      'm2_vs_m0',
                     'Fixed 12-mo mom':   'm2_vs_fixed_12',
                     'Fixed 1-mo mom':    'm2_vs_fixed_1',
                 }
@@ -262,9 +262,9 @@ def parse_table_ic():
     if not text:
         return {}
     out = {}
-    # Look for rows like "M2 (XGB)" or similar with IC and t-stat
-    for label, key in [('M2: XGB', 'm2'), ('Mom (12-1)', 'mom_12'),
-                       ('M2 $-$ Mom', 'm2_minus_mom'), ('M2 - Mom', 'm2_minus_mom')]:
+    # Look for rows like "XGB" or similar with IC and t-stat
+    for label, key in [('XGB', 'm2'), ('Mom (12-1)', 'mom_12'),
+                       ('XGB $-$ Mom', 'm2_minus_mom'), ('XGB - Mom', 'm2_minus_mom')]:
         r = _parse_row(text, label)
         if not r: continue
         if 'ic' not in [k.split('_')[-1] for k in out]:
@@ -308,7 +308,7 @@ def parse_table_january():
     excl_block = text[excl_start:]
     out = {}
     for block, suffix in [(full_block, '_full'), (excl_block, '_excl_jan')]:
-        for label, key in [('M2: XGB', 'm2'), ('Fixed 12-mo mom', 'mom12')]:
+        for label, key in [('XGB', 'm2'), ('Fixed 12-mo mom', 'mom12')]:
             r = _parse_row(block, label)
             if not r: continue
             if len(r) >= 4:
@@ -353,7 +353,7 @@ def parse_table_fund_alphas():
 
 
 def parse_intl_summary():
-    """Parse UK/JP intl summary CSVs. Strategy column uses 'method2_xgb' for M2.
+    """Parse UK/JP intl summary CSVs. Strategy column uses 'method2_xgb' for XGB.
     Compounded total return is computed from the per-strategy monthly returns CSV."""
     import csv
     import pandas as pd

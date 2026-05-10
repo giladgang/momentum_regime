@@ -1,5 +1,5 @@
 """
-Time series of average 12-month momentum of stocks in M2's long leg,
+Time series of average 12-month momentum of stocks in XGB's long leg,
 with panic regime shading. Shows the flip: positive in calm, negative in panic.
 """
 
@@ -64,7 +64,7 @@ ax.text(pd.Timestamp('2020-04-01'), monthly_mom.min() * 0.7,
 
 ax.set_xlabel('Date', fontsize=11)
 ax.set_ylabel('Median 12-month momentum of long leg (%)', fontsize=11)
-ax.set_title('What M2 buys over time: momentum of the long leg flips with market regime',
+ax.set_title('What XGB buys over time: momentum of the long leg flips with market regime',
              fontsize=12, fontweight='bold')
 
 # Add legend for shading

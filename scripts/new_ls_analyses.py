@@ -4,9 +4,9 @@ new_ls_analyses.py
 New analyses specific to the long-short portfolio:
 1. D&M comparison (same data, same costs, stock selection vs exposure scaling)
 2. Factor model alphas (CAPM through FF5+Mom)
-3. M1 polynomial/interaction tests
+3. LR polynomial/interaction tests
 4. IC rotation table: IC by horizon (1-12) in calm vs panic with t-stats
-5. Spanning test: M2 on M1 (and reverse)
+5. Spanning test: XGB on LR (and reverse)
 6. Sub-period IC stability
 """
 
@@ -78,7 +78,7 @@ y_tr = train['ret_fwd'].values.astype(float)
 test['score_m2'] = test['score_xgb']
 r_m2 = long_short_port(test, 'score_m2')
 
-# M1
+# LR
 imp = SimpleImputer(strategy='median')
 scaler = StandardScaler()
 X_tr_s = scaler.fit_transform(imp.fit_transform(X_tr))
@@ -90,8 +90,8 @@ lr.fit(X_tr_s, train_c['above_med'].values)
 test['score_m1'] = lr.predict_proba(X_te_s)[:, 1]
 r_m1 = long_short_port(test, 'score_m1')
 
-print(f"  M2 Sharpe: {r_m2.mean()/r_m2.std()*np.sqrt(12):.3f}")
-print(f"  M1 Sharpe: {r_m1.mean()/r_m1.std()*np.sqrt(12):.3f}")
+print(f"  XGB Sharpe: {r_m2.mean()/r_m2.std()*np.sqrt(12):.3f}")
+print(f"  LR Sharpe: {r_m1.mean()/r_m1.std()*np.sqrt(12):.3f}")
 
 # ═══════════════════════════════════════════════════════════════════
 # 1. D&M COMPARISON
@@ -188,12 +188,12 @@ def get_alphas(r, name):
         print(f"    {m:<10s}: alpha={r_dict['alpha']:>6.1%}  t={r_dict['t']:>5.2f}{stars}")
     return results
 
-alpha_m2 = get_alphas(r_m2, 'M2 (mom+pi)')
+alpha_m2 = get_alphas(r_m2, 'XGB (mom+pi)')
 alpha_dm = get_alphas(r_dm, 'D&M managed')
 alpha_wml = get_alphas(r_wml_net, 'Unscaled WML')
-alpha_m1 = get_alphas(r_m1, 'M1 (LR)')
+alpha_m1 = get_alphas(r_m1, 'LR')
 
-# Export factor alpha table for M2
+# Export factor alpha table for XGB
 all_factors = ['Mkt-RF', 'SMB', 'HML', 'UMD', 'RMW', 'CMA']
 tex = []
 tex.append(r'\begin{table}[H]')
@@ -215,7 +215,7 @@ for mname, mdata in alpha_m2.items():
     tex.append(' & '.join(cells) + r' \\')
 tex.append(r'\bottomrule')
 tex.append(r'\end{tabular}')
-tex.append(r"\caption{Factor model regressions for M2 (XGBoost, mom+$\pi$). $\alpha$ is annualised. $t$-statistics use Newey--West standard errors (6 lags).}")
+tex.append(r"\caption{Factor model regressions for XGB (XGBoost, mom+$\\pi$). $\alpha$ is annualised. $t$-statistics use Newey--West standard errors (6 lags).}")
 tex.append(r'\label{tab:factor_alphas}')
 tex.append(r'\end{table}')
 
@@ -224,10 +224,10 @@ with open(os.path.join('tables', 'table_factor_alphas.tex'), 'w') as f:
 print("  Saved: tables/table_factor_alphas.tex")
 
 # ═══════════════════════════════════════════════════════════════════
-# 3. M1 POLYNOMIAL/INTERACTION TESTS
+# 3. LR POLYNOMIAL/INTERACTION TESTS
 # ═══════════════════════════════════════════════════════════════════
 
-print("\n[ 4 ] M1 Polynomial/Interaction Tests ...")
+print("\n[ 4 ] LR Polynomial/Interaction Tests ...")
 
 pi_idx = REDUCED.index('pi_filter')
 
@@ -303,7 +303,7 @@ for lb in range(1, 13):
           f"{t_all:>7.2f} {t_calm:>8.2f} {t_panic:>9.2f}")
 
 # ═══════════════════════════════════════════════════════════════════
-# 5. SPANNING TEST: M2 on M1 (and reverse)
+# 5. SPANNING TEST: XGB on LR (and reverse)
 # ═══════════════════════════════════════════════════════════════════
 
 print("\n[ 6 ] Spanning Tests ...")
@@ -312,19 +312,19 @@ common = r_m2.index.intersection(r_m1.index)
 r_m2_c = r_m2.loc[common].values
 r_m1_c = r_m1.loc[common].values
 
-# M2 on M1
+# XGB on LR
 X_span = sm.add_constant(r_m1_c)
 res_m2_on_m1 = sm.OLS(r_m2_c, X_span).fit(cov_type='HAC', cov_kwds={'maxlags': 6})
-print(f"\n  M2 regressed on M1:")
+print(f"\n  XGB regressed on LR:")
 print(f"    Alpha: {res_m2_on_m1.params[0] * 12:.1%} (t={res_m2_on_m1.tvalues[0]:.2f}, p={res_m2_on_m1.pvalues[0]:.4f})")
-print(f"    Beta on M1: {res_m2_on_m1.params[1]:.3f}")
+print(f"    Beta on LR: {res_m2_on_m1.params[1]:.3f}")
 
-# M1 on M2
+# LR on XGB
 X_span2 = sm.add_constant(r_m2_c)
 res_m1_on_m2 = sm.OLS(r_m1_c, X_span2).fit(cov_type='HAC', cov_kwds={'maxlags': 6})
-print(f"\n  M1 regressed on M2:")
+print(f"\n  LR regressed on XGB:")
 print(f"    Alpha: {res_m1_on_m2.params[0] * 12:.1%} (t={res_m1_on_m2.tvalues[0]:.2f}, p={res_m1_on_m2.pvalues[0]:.4f})")
-print(f"    Beta on M2: {res_m1_on_m2.params[1]:.3f}")
+print(f"    Beta on XGB: {res_m1_on_m2.params[1]:.3f}")
 
 # ═══════════════════════════════════════════════════════════════════
 # 6. SUB-PERIOD IC STABILITY

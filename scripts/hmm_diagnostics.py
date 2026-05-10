@@ -561,7 +561,7 @@ tex_lines.append(r'\centering')
 tex_lines.append(r'\small')
 tex_lines.append(r'\begin{tabular}{r r r r r r}')
 tex_lines.append(r'\toprule')
-tex_lines.append(r'$\nu$ & LL (train) & LL (test) & BIC & Agreement & Corr($\pi$) \\')
+tex_lines.append(r'$\nu$ & LL (train) & LL (test) & BIC & Agreement & Corr($\\pi$) \\')
 tex_lines.append(r'\midrule')
 
 for idx, row in st_df.iterrows():
@@ -598,7 +598,7 @@ for idx, row in st_df.iterrows():
 
 tex_lines.append(r'\bottomrule')
 tex_lines.append(r'\end{tabular}')
-tex_lines.append(r"\caption{Student-$t$ vs.\ Normal emission HMM comparison. LL = log-likelihood; Agreement = fraction of months with identical binary regime classification as the Normal HMM; Corr($\pi$) = correlation of filtered panic probabilities.}")
+tex_lines.append(r"\caption{Student-$t$ vs.\ Normal emission HMM comparison. LL = log-likelihood; Agreement = fraction of months with identical binary regime classification as the Normal HMM; Corr($\\pi$) = correlation of filtered panic probabilities.}")
 tex_lines.append(r'\label{tab:student_t_hmm}')
 tex_lines.append(r'\end{table}')
 

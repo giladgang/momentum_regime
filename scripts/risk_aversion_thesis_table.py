@@ -210,7 +210,7 @@ tex_lines.append(r'\begin{table}[H]')
 tex_lines.append(r'\centering')
 tex_lines.append(r'\begin{tabular}{l l r r}')
 tex_lines.append(r'\toprule')
-tex_lines.append(r'Target family & Parameter & Sharpe & $\pi$ share \\')
+tex_lines.append(r'Target family & Parameter & Sharpe & $\\pi$ share \\')
 tex_lines.append(r'\midrule')
 
 # Map result names to table rows
@@ -243,7 +243,7 @@ for _, row in res_df.iterrows():
 
 tex_lines.append(r'\bottomrule')
 tex_lines.append(r'\end{tabular}')
-tex_lines.append(r"\caption{Risk-adjusted training targets and regime signal importance. ``$\pi$ share'' is the regime signal's fraction of total feature importance (remainder is momentum). All variants use 50 XGB seeds on the same sample as the main results.}")
+tex_lines.append(r"\caption{Risk-adjusted training targets and regime signal importance. ``$\\pi$ share'' is the regime signal's fraction of total feature importance (remainder is momentum). All variants use 50 XGB seeds on the same sample as the main results.}")
 tex_lines.append(r'\label{tab:risk_aversion}')
 tex_lines.append(r'\end{table}')
 
@@ -398,7 +398,7 @@ for i, row in enumerate(sh_rows):
 
 tex2.append(r'\bottomrule')
 tex2.append(r'\end{tabular}')
-tex2.append(r'\caption{Out-of-sample performance of XGBoost (M2) under alternative training targets (long-only construction). Every risk-adjusted target reduces returns faster than volatility.}')
+tex2.append(r'\caption{Out-of-sample performance of XGBoost (XGB) under alternative training targets (long-only construction). Every risk-adjusted target reduces returns faster than volatility.}')
 tex2.append(r'\label{tab:alt_targets}')
 tex2.append(r'\end{table}')
 

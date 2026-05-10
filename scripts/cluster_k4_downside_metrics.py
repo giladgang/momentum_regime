@@ -1,7 +1,7 @@
 """
 cluster_k4_downside_metrics.py
 ==============================
-Per-K=4-cluster downside risk metrics on M2 monthly returns.
+Per-K=4-cluster downside risk metrics on XGB monthly returns.
 
 "Max drawdown within cluster" convention:
   The member months of each cluster are extracted in date order and concatenated
@@ -13,7 +13,7 @@ Per-K=4-cluster downside risk metrics on M2 monthly returns.
 Metrics per cluster:
   max_drawdown      : peak-to-trough on the concatenated cluster-month subseries
   sortino_ratio     : annualised mean / annualised downside std (negative returns only)
-  pct_positive      : fraction of months with positive M2 return
+  pct_positive      : fraction of months with positive XGB return
   pct5/25/50/75/95  : percentiles of monthly returns
 
 Cross-checks (see VERIFICATION block):
@@ -86,7 +86,7 @@ def main():
     labels = pd.read_csv(LABELS_CSV, parse_dates=['date'])
     desc   = pd.read_csv(DESC_CSV)
 
-    # Use the pre-computed M2 L/S return series from the artefact.
+    # Use the pre-computed XGB L/S return series from the artefact.
     # This is the *same* series used by cluster_k4_descriptor_table.py, so
     # hit_rate and worst_month_return from that table are guaranteed to reconcile.
     # (Reconstructing from build_leg_returns_subset gives slightly different values

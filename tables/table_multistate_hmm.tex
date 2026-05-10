@@ -3,7 +3,7 @@
 \small
 \begin{tabular}{l r r r r}
 \toprule
- & \multicolumn{2}{c}{M1: LR} & \multicolumn{2}{c}{M2: XGB} \\
+ & \multicolumn{2}{c}{LR} & \multicolumn{2}{c}{XGB} \\
 \cmidrule(lr){2-3} \cmidrule(lr){4-5}
 $K$ & Mean Sharpe & Std & Mean Sharpe & Std \\
 \midrule
@@ -13,6 +13,6 @@ $K$ & Mean Sharpe & Std & Mean Sharpe & Std \\
 5 & -0.028 & 0.003 & 0.724 & 0.087 \\
 \bottomrule
 \end{tabular}
-\caption{Out-of-sample Sharpe ratios for HMMs with $K = 2, 3, 4, 5$ states (long-short). Each entry reports the mean and standard deviation across 5 independent Gibbs sampler seeds (2{,}000 iterations each). M1 is invariant to $K$. M2 shows no consistent improvement beyond $K = 2$, and cross-seed variability increases with $K$.}
+\caption{Out-of-sample Sharpe ratios for HMMs with $K = 2, 3, 4, 5$ states (long-short). Each entry reports the mean and standard deviation across 5 independent Gibbs sampler seeds (2{,}000 iterations each). LR is invariant to $K$. XGB shows no consistent improvement beyond $K = 2$, and cross-seed variability increases with $K$.}
 \label{tab:multistate_hmm}
 \end{table}

@@ -473,7 +473,7 @@ TABLES_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file
 os.makedirs(TABLES_DIR, exist_ok=True)
 
 # Compute the recession injection table matching the thesis:
-# Each row injects a recession of N months where M2 loses its average
+# Each row injects a recession of N months where XGB loses its average
 # losing panic-month return per month, at every possible insertion point.
 # MDD = worst-case maximum drawdown across all insertion points.
 
@@ -555,7 +555,7 @@ for row in stress_rows:
 
 tex_lines.append(r'\bottomrule')
 tex_lines.append(r'\end{tabular}')
-tex_lines.append(r"\caption{Prolonged bear market simulation. Each row injects a recession during which M2 loses " +
+tex_lines.append(r"\caption{Prolonged bear market simulation. Each row injects a recession during which XGB loses " +
                  f"{avg_panic_loss * 100:.2f}".replace('-', '') + r"\%" +
                  r" per month (its average losing panic-month return). MDD is the worst-case maximum drawdown across all possible insertion points.}")
 tex_lines.append(r'\label{tab:stress_scenarios}')

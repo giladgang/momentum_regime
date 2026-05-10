@@ -88,7 +88,7 @@ ax.set_xticks(x)
 ax.set_xticklabels([f'{h}' for h in horizons], fontsize=10)
 ax.set_xlabel('Lookback horizon (months)', fontsize=11)
 ax.set_ylabel('Median trailing momentum (%)', fontsize=11)
-ax.set_title('Long leg: what M2 buys', fontsize=12, fontweight='bold')
+ax.set_title('Long leg: what XGB buys', fontsize=12, fontweight='bold')
 ax.legend(fontsize=10)
 ax.grid(alpha=0.3)
 
@@ -102,11 +102,11 @@ ax.axhline(0, color='black', linewidth=0.6)
 ax.set_xticks(x)
 ax.set_xticklabels([f'{h}' for h in horizons], fontsize=10)
 ax.set_xlabel('Lookback horizon (months)', fontsize=11)
-ax.set_title('Short leg: what M2 sells', fontsize=12, fontweight='bold')
+ax.set_title('Short leg: what XGB sells', fontsize=12, fontweight='bold')
 ax.legend(fontsize=10)
 ax.grid(alpha=0.3)
 
-plt.suptitle('Momentum profile of M2 portfolio by regime',
+plt.suptitle('Momentum profile of XGB portfolio by regime',
              fontsize=14, fontweight='bold', y=1.02)
 plt.tight_layout()
 fig.savefig('plots/portfolio_by_horizon_long_short.png', dpi=150, bbox_inches='tight')

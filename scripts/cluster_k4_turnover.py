@@ -1,7 +1,7 @@
 """
 cluster_k4_turnover.py
 ======================
-Per-K=4-cluster basket turnover (Jaccard distance) for M2 long-leg picks.
+Per-K=4-cluster basket turnover (Jaccard distance) for XGB long-leg picks.
 
 Source: results/thesis/rule_path_labels.csv
   Each row (date, permno, rule_id) is a long-leg pick.

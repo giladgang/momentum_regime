@@ -14,7 +14,7 @@ Inputs:
   - results/thesis/zscore_short_by_month.csv
   - data/panel_with_regimes.parquet
   - artefacts/cs_artefacts_data.pkl
-  - results/thesis/fundamentals_returns.pkl   (for M2 monthly returns)
+  - results/thesis/fundamentals_returns.pkl   (for XGB monthly returns)
 
 Outputs:
   - plots/thesis/zscore_subregimes.png

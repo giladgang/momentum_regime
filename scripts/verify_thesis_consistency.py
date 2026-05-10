@@ -29,10 +29,10 @@ METRICS_PATH = ROOT / 'results' / 'PRODUCTION_METRICS.json'
 # Inline-number checks: (metric_section, metric_key, [latex_search_patterns])
 # Each pattern uses (?P<v>...) to capture the in-prose value to compare.
 CHECKS = [
-    # M2 Sharpe
+    # XGB Sharpe
     ('m2_perf', 'm2_sharpe', [
-        r'M2[^.]{0,150}?Sharpe(?: ratio)?(?: of)?[^.\d]{0,20}(?P<v>\d+\.\d+)',
-        r'Sharpe(?: ratio)?[^.\d]{0,20}(?P<v>\d+\.\d+)[^.]{0,80}?(?:M2|XGBoost)',
+        r'XGB[^.]{0,150}?Sharpe(?: ratio)?(?: of)?[^.\d]{0,20}(?P<v>\d+\.\d+)',
+        r'Sharpe(?: ratio)?[^.\d]{0,20}(?P<v>\d+\.\d+)[^.]{0,80}?(?:XGB|XGBoost)',
     ]),
     # NW t-stat
     ('m2_perf', 'm2_nw_t', [

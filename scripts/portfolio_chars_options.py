@@ -107,7 +107,7 @@ for bars in [bars_l, bars_s]:
 ax.set_xticks(x)
 ax.set_xticklabels(['Calm\n(108 months)', 'Panic\n(59 months)'], fontsize=11)
 ax.set_ylabel('Median 12-month momentum (%)', fontsize=11)
-ax.set_title('What M2 holds: 12-month trailing momentum by regime', fontsize=12, fontweight='bold')
+ax.set_title('What XGB holds: 12-month trailing momentum by regime', fontsize=12, fontweight='bold')
 ax.axhline(0, color='black', linewidth=0.6)
 ax.legend(fontsize=10, loc='upper right')
 ax.grid(axis='y', alpha=0.3)
@@ -158,7 +158,7 @@ for i, (regime, ax) in enumerate(zip(['Calm', 'Panic'], axes)):
         ax.set_ylabel('Median momentum (%)', fontsize=11)
         ax.legend(fontsize=9, loc='upper left')
 
-plt.suptitle('What M2 holds: portfolio momentum characteristics by regime',
+plt.suptitle('What XGB holds: portfolio momentum characteristics by regime',
              fontsize=13, fontweight='bold', y=1.02)
 plt.tight_layout()
 fig_c.savefig('plots/portfolio_chars_option_c.png', dpi=150, bbox_inches='tight')

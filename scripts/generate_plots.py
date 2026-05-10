@@ -91,12 +91,12 @@ test['score_m2_red'] = test['score_xgb']
 if USE_FUNDAMENTALS:
     test['score_m2_full'] = test['score_xgb']
 
-# Prepare features for M1
+# Prepare features for LR
 X_tr_red = train[REDUCED].values.astype(float)
 X_te_red = test[REDUCED].values.astype(float)
 y_tr = train['ret_fwd'].values.astype(float)
 
-# M1
+# LR
 imp = SimpleImputer(strategy='median')
 scaler = StandardScaler()
 X_tr_s = scaler.fit_transform(imp.fit_transform(X_tr_red))
@@ -129,11 +129,11 @@ pi_monthly = panel[['date', 'pi_filter']].dropna().drop_duplicates('date').set_i
 strategies = [
     ('Market', r_mkt, '-', 'grey', 1.5),
     ('Fixed 12-mo L/S', r_mom12, '--', 'brown', 1.0),
-    ('M1: LR', r_m1, '--', 'blue', 1.0),
-    ('M2: XGB (mom+pi)', r_m2_red, '-', 'red', 2.0),
+    ('LR', r_m1, '--', 'blue', 1.0),
+    ('XGB (mom+pi)', r_m2_red, '-', 'red', 2.0),
 ]
 if USE_FUNDAMENTALS:
-    strategies.append(('M2: XGB (full)', r_m2_full, '-', 'darkred', 1.5))
+    strategies.append(('XGB (full)', r_m2_full, '-', 'darkred', 1.5))
 
 for name, r, ls, c, lw in strategies:
     cum = (1 + r).cumprod()

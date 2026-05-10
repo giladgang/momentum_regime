@@ -276,7 +276,7 @@ splits = {
     '1990-2014 / 2015-2025': '2015-01-01',
 }
 
-print(f"\n  {'Split':<38s}  {'N test mo':>9s}  {'M1 Sharpe':>10s}  {'M2 Sharpe':>10s}  {'M2 Ret':>8s}  {'M2 Vol':>8s}")
+print(f"\n  {'Split':<38s}  {'N test mo':>9s}  {'LR Sharpe':>10s}  {'XGB Sharpe':>10s}  {'XGB Ret':>8s}  {'XGB Vol':>8s}")
 print("  " + "-" * 90)
 
 for name, cutoff in splits.items():
@@ -306,7 +306,7 @@ windows = [
 all_rolling_returns_lr = []
 all_rolling_returns_xgb = []
 
-print(f"\n  {'Window':<20s}  {'Train end':>10s}  {'Test':>12s}  {'M1 Sharpe':>10s}  {'M2 Sharpe':>10s}")
+print(f"\n  {'Window':<20s}  {'Train end':>10s}  {'Test':>12s}  {'LR Sharpe':>10s}  {'XGB Sharpe':>10s}")
 print("  " + "-" * 70)
 
 for train_label, test_start, test_end in windows:
@@ -353,7 +353,7 @@ test_base = df[df['date'] >= TRAIN_END].copy()
 
 # 3a: Baseline (real pi_filter)
 res_base = run_pipeline(train_base, test_base, FEATURES)
-print(f"\n  {'Signal':<35s}  {'M1 Sharpe':>10s}  {'M2 Sharpe':>10s}")
+print(f"\n  {'Signal':<35s}  {'LR Sharpe':>10s}  {'XGB Sharpe':>10s}")
 print("  " + "-" * 60)
 print(f"  {'Real pi_filter (baseline)':<35s}  {res_base['sh_lr']:>10.3f}  {res_base['sh_xgb']:>10.3f}")
 
@@ -439,7 +439,7 @@ print("=" * 90)
 
 # 4a: XGB with vs without pi_filter -- does the Sharpe change?
 print(f"\n  Part A: Does pi_filter improve XGB Sharpe ratio?")
-print(f"  {'Config':<35s}  {'M2 Sharpe':>10s}  {'M2 Ret':>8s}  {'M2 Vol':>8s}")
+print(f"  {'Config':<35s}  {'XGB Sharpe':>10s}  {'XGB Ret':>8s}  {'XGB Vol':>8s}")
 print("  " + "-" * 65)
 
 res_with = run_pipeline(train_base, test_base, FEATURES)

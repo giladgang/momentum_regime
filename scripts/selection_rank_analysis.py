@@ -1,7 +1,7 @@
 """
 selection_rank_analysis.py
 ==========================
-Analyzes what stocks M2 selects by computing the cross-sectional percentile
+Analyzes what stocks XGB selects by computing the cross-sectional percentile
 rank of long/short leg stocks at each of the 12 momentum horizons, split by
 calm vs panic regime.
 
@@ -158,8 +158,8 @@ plt.close(fig)
 
 # ── Chart 2: L/S with yearly bands ──
 fig, axes = plt.subplots(1, 2, figsize=(16, 6), sharey=True)
-for i, (leg, title) in enumerate([('long', 'Long leg: what M2 buys'),
-                                    ('short', 'Short leg: what M2 sells')]):
+for i, (leg, title) in enumerate([('long', 'Long leg: what XGB buys'),
+                                    ('short', 'Short leg: what XGB sells')]):
     ax = axes[i]
     for regime, color, marker in [('Calm', 'steelblue', 'o'), ('Panic', '#E53935', 's')]:
         sub = df[(df['Regime'] == regime) & (df['Leg'] == leg)].sort_values('Horizon')

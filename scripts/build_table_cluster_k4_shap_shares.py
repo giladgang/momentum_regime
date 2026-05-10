@@ -100,7 +100,7 @@ def main():
         r'\small',
         r'\begin{tabular}{l r r r r}',
         r'\toprule',
-        r'Cluster & $n$ & Long $\pi$ share & Short $\pi$ share & Combined $\pi$ share \\',
+        r'Cluster & $n$ & Long $\\pi$ share & Short $\\pi$ share & Combined $\\pi$ share \\',
         r'\midrule',
     ]
     tex_lines.extend(data_rows)

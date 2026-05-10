@@ -375,7 +375,7 @@ print("  LR weights saved: cs_lr_weights.png")
 
 # ── Ridge baseline (linear model, continuous-return target) ──────────────────
 # Isolates linearity from the classification target: identical features and
-# preprocessing to M1, identical target to M2. Detailed sensitivity sweep
+# preprocessing to LR, identical target to XGB. Detailed sensitivity sweep
 # across regularisation strengths (alpha in [0.01, 1000]) lives in
 # scripts/ridge_baseline_test.py and populates Appendix F.8.
 print("  Method 1b: Ridge (linearity control, alpha=1.0) ...")

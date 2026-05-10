@@ -1,11 +1,11 @@
 """
 bootstrap_analysis.py
 =====================
-Block bootstrap analysis for M2's Sharpe ratio and its significance vs benchmarks.
+Block bootstrap analysis for XGB's Sharpe ratio and its significance vs benchmarks.
 
 Three analyses:
   1. 95% CI for each strategy's Sharpe (block bootstrap, 12-month blocks)
-  2. Paired bootstrap test: is M2's Sharpe significantly higher than each benchmark?
+  2. Paired bootstrap test: is XGB's Sharpe significantly higher than each benchmark?
      Uses same resampled dates for both strategies so the comparison is paired.
   3. Regime-conditional bootstrap: CIs for calm and panic Sharpes separately.
 
@@ -61,9 +61,9 @@ name_m0, r_m0 = find_strategy(['m0', 'formula'])
 name_mom12, r_mom12 = find_strategy(['mom12', 'mom_12', '12-mo'])
 name_mom1, r_mom1 = find_strategy(['mom1', 'mom_1', '1-mo'])
 
-print(f"  M2:     {name_m2}  (n={len(r_m2) if r_m2 is not None else 0})")
-print(f"  M1:     {name_m1}")
-print(f"  M0:     {name_m0}")
+print(f"  XGB:     {name_m2}  (n={len(r_m2) if r_m2 is not None else 0})")
+print(f"  LR:     {name_m1}")
+print(f"  DET:     {name_m0}")
 print(f"  Mom12:  {name_mom12}")
 print(f"  Mom1:   {name_mom1}")
 
@@ -85,14 +85,14 @@ def block_bootstrap_indices(T, block_len, rng):
 print(f"\n[1/3] Bootstrap CIs for individual Sharpes ({N_BOOT} resamples, {BLOCK_LEN}-month blocks)")
 
 strategy_pool = {
-    'M2 (XGB)':           r_m2,
-    'M1 (LR)':            r_m1,
-    'M0 (Formula)':       r_m0,
+    'XGB':           r_m2,
+    'LR':            r_m1,
+    'DET':       r_m0,
     'Fixed 12-mo mom':    r_mom12,
     'Fixed 1-mo mom':     r_mom1,
 }
 
-# Align all to common index (M2's returns)
+# Align all to common index (XGB's returns)
 ref_index = r_m2.index
 aligned = {k: v.reindex(ref_index).values for k, v in strategy_pool.items()}
 T = len(ref_index)
@@ -126,18 +126,18 @@ for name, sharpes in boot_sharpes.items():
     })
 
 
-# ── 2. Paired bootstrap test: M2 vs each benchmark ──
-print(f"\n[2/3] Paired bootstrap: M2 Sharpe vs each benchmark")
+# ── 2. Paired bootstrap test: XGB vs each benchmark ──
+print(f"\n[2/3] Paired bootstrap: XGB Sharpe vs each benchmark")
 
 paired_results = []
-m2_boot = boot_sharpes['M2 (XGB)']
+m2_boot = boot_sharpes['XGB']
 print(f"\n  {'vs Benchmark':<20s}  {'Diff':>8s}  {'Diff 5% CI':>10s}  {'Diff 95% CI':>11s}  {'p-value':>8s}")
-for name in ['M1 (LR)', 'M0 (Formula)', 'Fixed 12-mo mom', 'Fixed 1-mo mom']:
+for name in ['LR', 'DET', 'Fixed 12-mo mom', 'Fixed 1-mo mom']:
     bench_boot = boot_sharpes[name]
     diff = m2_boot - bench_boot
-    point_diff = sharpe(aligned['M2 (XGB)']) - sharpe(aligned[name])
+    point_diff = sharpe(aligned['XGB']) - sharpe(aligned[name])
     lo, hi = np.percentile(diff, [2.5, 97.5])
-    # Two-sided p-value: fraction of resamples where diff <= 0 (M2 not better)
+    # Two-sided p-value: fraction of resamples where diff <= 0 (XGB not better)
     p_val = 2 * min((diff <= 0).mean(), (diff >= 0).mean())
     sig = '***' if p_val < 0.01 else '**' if p_val < 0.05 else '*' if p_val < 0.10 else ''
     print(f"  vs {name:<17s}  {point_diff:>8.3f}  {lo:>10.3f}  {hi:>11.3f}  {p_val:>8.4f} {sig}")
@@ -148,7 +148,7 @@ for name in ['M1 (LR)', 'M0 (Formula)', 'Fixed 12-mo mom', 'Fixed 1-mo mom']:
 
 
 # ── 3. Regime-conditional bootstrap ──
-print(f"\n[3/3] Regime-conditional bootstrap CIs for M2")
+print(f"\n[3/3] Regime-conditional bootstrap CIs for XGB")
 
 panel = pd.read_parquet(os.path.join(cfg.PANEL_WITH_REGIMES_PATH))
 panel['date'] = pd.to_datetime(panel['date'])
@@ -225,12 +225,12 @@ tex.append(r"\centering")
 tex.append(r"\small")
 tex.append(r"\begin{tabular}{l r r r}")
 tex.append(r"\toprule")
-tex.append(r" & Sharpe & 95\% CI & vs M2 ($p$) \\")
+tex.append(r" & Sharpe & 95\% CI & vs XGB ($p$) \\")
 tex.append(r"\midrule")
 
-# M2 row (no "vs M2" comparison)
+# XGB row (no "vs XGB" comparison)
 for r in ci_results:
-    if 'M2' in r['strategy']:
+    if 'XGB' in r['strategy']:
         tex.append(f"{r['strategy']} & {r['point_sharpe']:.2f} & "
                    f"[{r['ci_low']:.2f},\\,{r['ci_high']:.2f}] & --- \\\\")
         break
@@ -251,7 +251,7 @@ for p in paired_results:
             break
 
 tex.append(r"\midrule")
-tex.append(r"\multicolumn{4}{l}{\emph{M2 regime-conditional Sharpe}} \\[2pt]")
+tex.append(r"\multicolumn{4}{l}{\emph{XGB regime-conditional Sharpe}} \\[2pt]")
 calm_ci_lo = f"{calm_ci[0]:.2f}"
 calm_ci_hi = f"{calm_ci[1]:.2f}"
 panic_ci_lo = f"{panic_ci[0]:.2f}"
@@ -259,15 +259,15 @@ panic_ci_hi = f"{panic_ci[1]:.2f}"
 diff_ci_lo = f"{diff_ci[0]:.2f}"
 diff_ci_hi = f"{diff_ci[1]:.2f}"
 
-tex.append(f"M2 Calm ($n=${len(calm_returns)}) & {calm_point:.2f} & [{calm_ci_lo},\\,{calm_ci_hi}] & --- \\\\")
-tex.append(f"M2 Panic ($n=${len(panic_returns)}) & {panic_point:.2f} & [{panic_ci_lo},\\,{panic_ci_hi}] & --- \\\\")
+tex.append(f"XGB Calm ($n=${len(calm_returns)}) & {calm_point:.2f} & [{calm_ci_lo},\\,{calm_ci_hi}] & --- \\\\")
+tex.append(f"XGB Panic ($n=${len(panic_returns)}) & {panic_point:.2f} & [{panic_ci_lo},\\,{panic_ci_hi}] & --- \\\\")
 diff_sig = '$^{***}$' if diff_p < 0.01 else '$^{**}$' if diff_p < 0.05 else '$^{*}$' if diff_p < 0.10 else ''
 tex.append(f"Panic $-$ Calm & {panic_point - calm_point:.2f} & [{diff_ci_lo},\\,{diff_ci_hi}] & "
            f"{diff_p:.3f}{diff_sig} \\\\")
 
 tex.append(r"\bottomrule")
 tex.append(r"\end{tabular}")
-tex.append(r"\caption{Block bootstrap confidence intervals for Sharpe ratios and paired tests of M2's outperformance. Uses 12-month blocks and 10{,}000 resamples with a fixed seed. The ``vs M2 ($p$)'' column reports two-sided $p$-values from paired tests where both strategies are resampled on the same dates. $^{*}\,p<0.10$; $^{**}\,p<0.05$; $^{***}\,p<0.01$.}")
+tex.append(r"\caption{Block bootstrap confidence intervals for Sharpe ratios and paired tests of XGB's outperformance. Uses 12-month blocks and 10{,}000 resamples with a fixed seed. The ``vs XGB ($p$)'' column reports two-sided $p$-values from paired tests where both strategies are resampled on the same dates. $^{*}\,p<0.10$; $^{**}\,p<0.05$; $^{***}\,p<0.01$.}")
 tex.append(r"\label{tab:bootstrap}")
 tex.append(r"\end{table}")
 

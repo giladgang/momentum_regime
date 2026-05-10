@@ -89,9 +89,9 @@ test_df["date"] = pd.to_datetime(test_df["date"])
 pi_monthly = test_df.groupby("date")["pi_filter"].first()
 
 # ---------------------------------------------------------------------------
-# 4. Load M2 returns
+# 4. Load XGB returns
 # ---------------------------------------------------------------------------
-print("Loading M2 returns ...")
+print("Loading XGB returns ...")
 with open(RETURNS_PKL, "rb") as fh:
     ret_data = pickle.load(fh)
 m2_ret = ret_data["baseline_mom_pi"]["returns"]

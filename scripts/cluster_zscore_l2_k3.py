@@ -107,9 +107,9 @@ print(f"  Total months: {N} (calm={n_calm}, panic={n_panic})", flush=True)
 assert n_calm + n_panic == N, "SANITY FAIL: calm + panic != total"
 
 # ---------------------------------------------------------------------------
-# 3. Load M2 returns
+# 3. Load XGB returns
 # ---------------------------------------------------------------------------
-print("Loading M2 returns ...", flush=True)
+print("Loading XGB returns ...", flush=True)
 with open(RETURNS_PKL, "rb") as fh:
     ret_data = pickle.load(fh)
 m2_ret = ret_data["baseline_mom_pi"]["returns"]
@@ -181,7 +181,7 @@ print(f"\nAll-calm reference: {calm_mask.sum()} months", flush=True)
 # 8. Sharpe helper
 # ---------------------------------------------------------------------------
 def compute_sharpe(dates_subset):
-    """Block-bootstrap Sharpe for M2 returns on dates_subset."""
+    """Block-bootstrap Sharpe for XGB returns on dates_subset."""
     ret_cl = m2_ret.reindex(dates_subset).dropna()
     bbs = block_bootstrap_sharpe(ret_cl.values, block_size=BOOT_SZ,
                                  n_reps=N_BOOT, seed=BOOT_SEED)

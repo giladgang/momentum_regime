@@ -97,7 +97,7 @@ ax.set_xticks(x)
 ax.set_xticklabels(labels, fontsize=9)
 ax.set_xlabel('Feature', fontsize=11)
 ax.set_ylabel('Share of total importance (%)', fontsize=11)
-ax.set_title('How M2 allocates attention across features: calm vs panic',
+ax.set_title('How XGB allocates attention across features: calm vs panic',
              fontsize=13, fontweight='bold')
 ax.legend(fontsize=10)
 ax.grid(axis='y', alpha=0.3)

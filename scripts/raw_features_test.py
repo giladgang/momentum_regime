@@ -169,4 +169,4 @@ print("=" * 70)
 # LaTeX row ready to paste into table_performance.tex
 nw_str = f"{nw_t:.2f}{sig_stars(nw_p)}"
 print(f"\nLaTeX row:")
-print(f"M2: XGB (mom+raw) & {ar:.1%} & {av:.1%} & {sh:.2f} & [{ci_lo:.2f},\\,{ci_hi:.2f}] & {mdd:.1%} & {nw_str} & {final:.1f} \\\\")
+print(f"XGB (mom+raw) & {ar:.1%} & {av:.1%} & {sh:.2f} & [{ci_lo:.2f},\\,{ci_hi:.2f}] & {mdd:.1%} & {nw_str} & {final:.1f} \\\\")
