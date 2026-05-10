@@ -74,9 +74,9 @@ where $D=4$ is the number of features. After observing data, these prior hyperpa
 \paragraph{Transition matrix}
 Each row of the transition matrix is assigned an independent Dirichlet prior:
 \begin{equation}
-\mathbf{P}_{0,\cdot} \sim \text{Dir}(9,1),
+\mathbf{P}_{0,\cdot} \sim \text{Dir}(9,1)
 \qquad
-\mathbf{P}_{1,\cdot} \sim \text{Dir}(1,9).
+\mathbf{P}_{1,\cdot} \sim \text{Dir}(1,9)
 \label{eq:dirichlet_prior}
 \end{equation}
 Equivalently, in matrix form,
@@ -86,15 +86,15 @@ Equivalently, in matrix form,
 \left(\begin{array}{cc}
 9 & 1 \\
 1 & 9
-\end{array}\right).
+\end{array}\right)
 \]
-This prior favors persistence in both regimes: absent data, the prior mean transition matrix is
+This prior favors persistence in both regimes: without data, the prior mean transition matrix is
 \begin{equation}
 \mathbb{E}[\mathbf{P}] =
 \left(\begin{array}{cc}
-0.90 & 0.10 \\
-0.10 & 0.90
-\end{array}\right).
+0.9 & 0.1 \\
+0.1 & 0.9
+\end{array}\right)
 \label{eq:prior_mean_P}
 \end{equation}
 In other words, the prior expects each regime to continue with probability $0.9$, corresponding to an expected duration of roughly $10$ months. This prior is informative enough to discourage pathological solutions but weak enough to be overridden by the data.
