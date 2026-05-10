@@ -68,7 +68,7 @@ The aggregate split is reported by leg and horizon in Figure~\ref{fig:shap_per_h
     \label{fig:shap_per_horizon_by_leg}
 \end{figure}
 
-SHAP identifies \emph{which} horizons are decision-relevant but not the sign of the relationship. The same weight could reflect continuation, where high momentum predicts high return \citep{JegadeeshTitman1993}; reversal, where high momentum predicts low return; or state-dependent selection, where the same input is rewarded in one regime and penalised in another. The state-dependent case is what a tree-based model can encode and a linear model cannot. To identify which case applies, the next subsection turns to the cross-sectional characteristics of the stocks actually selected.
+SHAP shows which horizons matter, but not in which direction. The same SHAP weight could reflect \textbf{continuation} (high momentum predicts high return, the classical \citet{JegadeeshTitman1993} result), \textbf{reversal} (high momentum predicts low return), or \textbf{state-dependent selection} (the sign of the relationship flips with the regime). Only the third possibility requires a nonlinear model. A linear regression can encode constant continuation or constant reversal, but cannot encode a relationship whose sign depends on the regime. The next subsection identifies which of the three holds by examining the cross-sectional position of the stocks the model actually picks.
 
 \subsubsection{Cross-Sectional Z-Scores}\label{sec:heterogeneity_picks}
 
