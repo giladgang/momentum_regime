@@ -91,7 +91,7 @@ where $\tau_t^L$ and $\tau_t^S$ are the one-way turnover in the long and short l
 \end{equation}
 and each summation runs over all stocks appearing in either the new or previous portfolio for that leg. The 10 basis point cost reflects the transaction environment for a value-weighted, large-cap-biased strategy where NYSE breakpoints tilt toward liquid securities.
 
-It is important to note that transaction costs are applied \emph{post-hoc} as an accounting adjustment and are not incorporated into the models' training objectives. The cross-sectional models (DET, LR, and XGB) optimise stock-level prediction (classification accuracy or return forecasting) without knowledge of the previous portfolio, the resulting turnover, or the cost of rebalancing. This is standard practice in the empirical asset pricing literature \citep[e.g.,][]{FamaFrench2015, GHM2023}, where portfolio construction is treated as a fixed downstream step applied uniformly to all strategies. An end-to-end framework that jointly optimises stock selection and portfolio-level objectives (e.g., net-of-cost Sharpe ratio) would require a fundamentally different architecture, such as a reinforcement learning or differentiable portfolio optimisation layer, and remains a potential extension of this work.
+It is important to note that transaction costs are applied \emph{post-hoc} as an accounting adjustment and are not incorporated into the models' training objectives. The cross-sectional models (DET, LR, and XGB) optimize stock-level prediction (classification accuracy or return forecasting) without knowledge of the previous portfolio, the resulting turnover, or the cost of rebalancing. This is standard practice in the empirical asset pricing literature \citep[e.g.,][]{FamaFrench2015, GHM2023}, where portfolio construction is treated as a fixed downstream step applied uniformly to all strategies. An end-to-end framework that jointly optimizes stock selection and portfolio-level objectives (e.g., net-of-cost Sharpe ratio) would require a fundamentally different architecture, such as a reinforcement learning or differentiable portfolio optimization layer, and remains a potential extension of this work.
 
 \subsection{Performance Metrics}\label{app:evaluation}
 
@@ -136,7 +136,7 @@ To interpret the XGBoost model and assess the marginal contribution of each feat
 \begin{equation}
     \phi_j(\mathbf{x}) = \sum_{S \subseteq N \setminus \{j\}} \frac{|S|!\,(p - |S| - 1)!}{p!} \Big[f_{S \cup \{j\}}(\mathbf{x}) - f_S(\mathbf{x})\Big]
 \end{equation}
-where $N$ is the full feature set, $p = |N|$, and $f_S(\mathbf{x})$ is the expected model output when only features in $S$ are observed. For tree-based models, the TreeSHAP algorithm \citep{Lundberg2020} computes these values exactly in polynomial time. The overall importance of each feature is summarised as:
+where $N$ is the full feature set, $p = |N|$, and $f_S(\mathbf{x})$ is the expected model output when only features in $S$ are observed. For tree-based models, the TreeSHAP algorithm \citep{Lundberg2020} computes these values exactly in polynomial time. The overall importance of each feature is summarized as:
 \begin{equation}
     I_j = \frac{1}{n_{\text{test}}} \sum_{i=1}^{n_{\text{test}}} |\phi_j(\mathbf{x}_i)|
 \end{equation}
@@ -155,11 +155,11 @@ The pattern is consistent: returns fall faster than volatility under every risk 
 
 This appendix supplements the dual-utility specification in Section~\ref{sec:risk_aversion} with the volatility-forecast model, the high-$\gamma$ collapse mechanism, and the sweep grid.
 
-\paragraph{Volatility forecast} The expected-return forecast $\hat r_t^s$ comes from the XGBoost ensemble described in Section~\ref{sec:methodology}. The volatility forecast $\hat\sigma_t^s$ comes from a second XGBoost ensemble trained on the realised 12-month forward volatility
+\paragraph{Volatility forecast} The expected-return forecast $\hat r_t^s$ comes from the XGBoost ensemble described in Section~\ref{sec:methodology}. The volatility forecast $\hat\sigma_t^s$ comes from a second XGBoost ensemble trained on the realized 12-month forward volatility
 \[
     \sigma^s_{[t+1,\,t+12]} \;=\; \mathrm{std}\!\big(r^s_{t+1}, \ldots, r^s_{t+12}\big)
 \]
-using the same feature set augmented with trailing 12-month realised volatility. The 50-seed ensemble is trained on 1990--2010 and evaluated out-of-sample on 2011--2025.
+using the same feature set augmented with trailing 12-month realized volatility. The 50-seed ensemble is trained on 1990--2010 and evaluated out-of-sample on 2011--2025.
 
 \paragraph{Convergence to dollar-neutral noise at high $\gamma$} Stocks appearing in both top deciles of $u_{\text{long}}$ and $u_{\text{short}}$ (the overlap set, which grows with $\gamma$) are retained on both sides, and their contributions to the long and short books net out in $r_L - r_S$. This is the mechanism by which the long-short spread converges to zero as $\gamma$ rises beyond the useful range. At high $\gamma$, the volatility penalty dominates the return signal, low-$\hat\sigma$ stocks occupy both top deciles simultaneously, and the two legs become near-identical value-weighted low-volatility portfolios.
 
@@ -171,11 +171,11 @@ This section reports six robustness checks that complement the main results in S
 
 \subsection{Sub-Period Stability}\label{app:subperiod}
 
-To assess whether the main findings are driven by a single favourable sub-period, the test sample is split into three roughly equal windows: 2011--2015, 2016--2020, and 2021--2025.
+To assess whether the main findings are driven by a single favorable sub-period, the test sample is split into three roughly equal windows: 2011--2015, 2016--2020, and 2021--2025.
 
 \input{tables/table_subperiod}
 
-In long-short construction, XGB is the only strategy that produces positive Sharpe ratios in every sub-period (0.59, 1.04, 1.70). LR collapses in 2016--2020 (Sharpe $-$0.02) and turns negative in 2021--2025 ($-$0.38). Fixed 12-month momentum turns negative after 2015, consistent with the momentum crash mechanism documented by \citet{DanielMoskowitz2016}. XGB's strongest performance (1.70) is in 2021--2025, a period characterised by elevated volatility and multiple stress episodes, precisely the conditions where regime-conditional stock selection adds the most value.
+In long-short construction, XGB is the only strategy that produces positive Sharpe ratios in every sub-period (0.59, 1.04, 1.70). LR collapses in 2016--2020 (Sharpe $-$0.02) and turns negative in 2021--2025 ($-$0.38). Fixed 12-month momentum turns negative after 2015, consistent with the momentum crash mechanism documented by \citet{DanielMoskowitz2016}. XGB's strongest performance (1.70) is in 2021--2025, a period characterized by elevated volatility and multiple stress episodes, precisely the conditions where regime-conditional stock selection adds the most value.
 
 \subsection{Turnover and Transaction Cost Sensitivity}\label{app:turnover}
 
@@ -206,7 +206,7 @@ The baseline HMM uses $K = 2$ states (calm and panic). A natural question is whe
 
 In long-short construction, XGB shows no consistent improvement beyond $K = 2$. Cross-seed variability increases with $K$, and the intermediate states that emerge for $K \geq 3$ lack the persistence needed to provide a stable conditioning signal. With only 241 training months, the data cannot reliably separate more than two regimes for the purpose of downstream cross-sectional stock selection.
 
-Beyond estimation, $K = 2$ has an interpretability advantage. The two-state model produces a single continuous signal ($\pi_t^{\text{filter}}$) that XGBoost can condition on in a straightforward way: higher values indicate more stress. With $K \geq 3$, the additional states may capture dimensions of the economy that are orthogonal to the continuation-reversal mechanism, for example a ``growth'' state characterised by strong fundamentals but moderate stress indicators. Such a state would conflate two economically distinct situations (a genuine expansion vs.\ a recovery from panic) and could introduce noise into the regime signal, degrading the model's ability to distinguish continuation from reversal. The two-state framework avoids this by restricting the regime classification to a single dimension, the degree of market stress, which is the dimension most relevant to momentum's cross-sectional structure.
+Beyond estimation, $K = 2$ has an interpretability advantage. The two-state model produces a single continuous signal ($\pi_t^{\text{filter}}$) that XGBoost can condition on in a straightforward way: higher values indicate more stress. With $K \geq 3$, the additional states may capture dimensions of the economy that are orthogonal to the continuation-reversal mechanism, for example a ``growth'' state characterized by strong fundamentals but moderate stress indicators. Such a state would conflate two economically distinct situations (a genuine expansion vs.\ a recovery from panic) and could introduce noise into the regime signal, degrading the model's ability to distinguish continuation from reversal. The two-state framework avoids this by restricting the regime classification to a single dimension, the degree of market stress, which is the dimension most relevant to momentum's cross-sectional structure.
 
 \subsection{January Exclusion}\label{app:january}
 
@@ -226,7 +226,7 @@ In the baseline split (1990--2010 training, 2011--2025 test), XGB achieves a Sha
 
 \subsection{25-Year Expanding-Window Out-of-Sample Methodology}\label{app:expanding_window}
 
-The historical evidence reported in Section~\ref{sec:historical_stress} comes from a separate analysis from the one above: a 25-year out-of-sample backtest in which the full pipeline (HMM + XGBoost) is re-estimated every January, with annual retraining initialised in 1995 and each year's predictions made by a model trained only on data available through the prior December. Each retraining uses the production seed configuration: 200 HMM seeds (Gibbs sampler with 2000 iterations, 500 burn-in), 50 XGBoost seeds (depth 4, learning rate 0.05, 500 trees), and the same long-short construction described in Appendix~\ref{app:portfolio_construction}.
+The historical evidence reported in Section~\ref{sec:historical_stress} comes from a separate analysis from the one above: a 25-year out-of-sample backtest in which the full pipeline (HMM + XGBoost) is re-estimated every January, with annual retraining initialized in 1995 and each year's predictions made by a model trained only on data available through the prior December. Each retraining uses the production seed configuration: 200 HMM seeds (Gibbs sampler with 2000 iterations, 500 burn-in), 50 XGBoost seeds (depth 4, learning rate 0.05, 500 trees), and the same long-short construction described in Appendix~\ref{app:portfolio_construction}.
 
 The HMM's panic-state label is fixed by an economically motivated sign convention rather than the data-driven percentile comparison used elsewhere. The convention encodes the known direction of each feature in panic regimes: $-1$ for drawdown, $+1$ for cross-sectional dispersion, $-1$ for relative market participation, and $+1$ for the credit spread. The data-driven label-switching procedure used in the main pipeline is unstable on short training windows with few observed crisis months (under 20), so the fixed-sign fallback activates for retrainings before 2002. From 2002 onward the data-driven procedure resumes, by which point the training window contains the dot-com bust as a calibration anchor. The HMM seed loop is parallelised across CPU cores via \texttt{multiprocessing.Pool}; the parallel implementation is bit-identical to the serial reference (verified in the test suite by comparing per-seed pi-filter arrays).
 
@@ -248,11 +248,11 @@ To assess the sampling variability of XGB's Sharpe ratio and test its outperform
 
 \input{tables/table_bootstrap}
 
-XGB's Sharpe confidence interval is [0.67, 1.53], comfortably above zero, while every benchmark's interval straddles zero. The paired tests reject equality of Sharpe ratios between XGB and each benchmark at $p < 0.025$. Within XGB, the panic-period Sharpe exceeds the calm-period Sharpe in point estimate (1.53 vs 0.84), but with only 59 panic months the paired difference is not statistically significant ($p = 0.109$); the 95\% interval $[-0.16, 1.59]$ straddles zero. The point-estimate gap is consistent with the regime-conditional selection mechanism described in Section~\ref{sec:regime_results}, but its statistical confirmation would require a longer panic sample. These intervals describe sampling variability within the 2011--2025 sample; out-of-sample generalisation is addressed separately by the 25-year expanding-window backtest (Section~\ref{sec:historical_stress}) and the sub-period analysis (Appendix~\ref{app:subperiod}).
+XGB's Sharpe confidence interval is [0.67, 1.53], comfortably above zero, while every benchmark's interval straddles zero. The paired tests reject equality of Sharpe ratios between XGB and each benchmark at $p < 0.025$. Within XGB, the panic-period Sharpe exceeds the calm-period Sharpe in point estimate (1.53 vs 0.84), but with only 59 panic months the paired difference is not statistically significant ($p = 0.109$); the 95\% interval $[-0.16, 1.59]$ straddles zero. The point-estimate gap is consistent with the regime-conditional selection mechanism described in Section~\ref{sec:regime_results}, but its statistical confirmation would require a longer panic sample. These intervals describe sampling variability within the 2011--2025 sample; out-of-sample generalization is addressed separately by the 25-year expanding-window backtest (Section~\ref{sec:historical_stress}) and the sub-period analysis (Appendix~\ref{app:subperiod}).
 
 \subsection{Leg-Level CAPM Betas by Regime}\label{app:leg_betas}
 
-The D\&M comparison in Section~\ref{sec:stress_test} characterises XGB's contribution as stock selection rather than exposure scaling. A direct test of this framing is to compute leg-level CAPM betas separately by regime: if XGB reorganises which stocks it holds across regimes (cross-sectional re-ranking), the long-leg and short-leg betas should shift between calm and panic in opposite directions; if instead XGB mechanically scales exposure, both legs' betas should move together.
+The D\&M comparison in Section~\ref{sec:stress_test} characterizes XGB's contribution as stock selection rather than exposure scaling. A direct test of this framing is to compute leg-level CAPM betas separately by regime: if XGB reorganizes which stocks it holds across regimes (cross-sectional re-ranking), the long-leg and short-leg betas should shift between calm and panic in opposite directions; if instead XGB mechanically scales exposure, both legs' betas should move together.
 
 \input{tables/table_leg_betas}
 
@@ -260,7 +260,7 @@ The pattern in Table~\ref{tab:leg_betas} is consistent with the cross-sectional 
 
 \subsection{Per-cluster Feature Signature ($K=4$ Partition)}\label{app:cluster_k4_features}
 
-Section~\ref{sec:heterogeneity_picks} reports a $K=4$ partition of the 167 test months and characterises each cluster narratively. Table~\ref{tab:cluster_k4_features_appendix} provides the full per-cluster feature signature for completeness: cross-section context features (regime composition, momentum landscape, dispersion, skewness, recent strategy performance) computed at the month level and averaged across each cluster's months; long-leg pick raw momentum at each horizon, averaged across each cluster's months; and long-leg pick cross-sectional z-score (deviation from the cross-section mean at each horizon, in units of cross-section std) averaged across cluster months. Per-cluster Sharpes and other strategy outcomes appear in Table~\ref{tab:cluster_k4_descriptors} in the main text.
+Section~\ref{sec:heterogeneity_picks} reports a $K=4$ partition of the 167 test months and characterizes each cluster narratively. Table~\ref{tab:cluster_k4_features_appendix} provides the full per-cluster feature signature for completeness: cross-section context features (regime composition, momentum landscape, dispersion, skewness, recent strategy performance) computed at the month level and averaged across each cluster's months; long-leg pick raw momentum at each horizon, averaged across each cluster's months; and long-leg pick cross-sectional z-score (deviation from the cross-section mean at each horizon, in units of cross-section std) averaged across cluster months. Per-cluster Sharpes and other strategy outcomes appear in Table~\ref{tab:cluster_k4_descriptors} in the main text.
 
 \input{tables/table_cluster_k4_features_appendix}
 
@@ -307,7 +307,7 @@ Features that spike upward during crises receive $\text{sign}_j = +1$; features 
 \begin{equation}
 k^\ast = \arg\max_{k \in \{0,1\}} \sum_{j=1}^{D} \text{sign}_j \cdot \hat{\mu}_{k,j}
 \end{equation}
-The state labelled $k^\ast$ is designated as ``panic'' and the other as ``calm.''
+The state labeled $k^\ast$ is designated as ``panic'' and the other as ``calm.''
 
 \section{Convergence Diagnostics}\label{app:convergence}
 
@@ -326,13 +326,13 @@ The Gelman--Rubin $\hat{R}$ statistic \citep{GelmanRubin1992, Gelman2013} assess
 
 \subsection{Seed Convergence of the Regime Signal}\label{app:seed_convergence}
 
-Gelman--Rubin and the trace plots assess whether a single Gibbs chain has converged to its stationary posterior, but they do not quantify how many chains are needed to stabilise the \emph{downstream} Sharpe ratio. The regime signal $\pi_t^{\text{filter}}$ enters the pipeline as the average of $N_s$ seed-specific forward filters (Section~\ref{sec:implementation}), and because XGBoost is a nonlinear function of $\pi_t^{\text{filter}}$, MCMC noise in any individual chain does not cancel linearly.
+Gelman--Rubin and the trace plots assess whether a single Gibbs chain has converged to its stationary posterior, but they do not quantify how many chains are needed to stabilize the \emph{downstream} Sharpe ratio. The regime signal $\pi_t^{\text{filter}}$ enters the pipeline as the average of $N_s$ seed-specific forward filters (Section~\ref{sec:implementation}), and because XGBoost is a nonlinear function of $\pi_t^{\text{filter}}$, MCMC noise in any individual chain does not cancel linearly.
 
 To measure this dependence, we subsample $k \in \{1, 2, 3, 5, 10, 15, 20, 30, 50, 75, 100\}$ chains without replacement from the seed pool, average the forward filter over those $k$ chains, retrain the XGBoost ensemble on the resulting signal, and record the out-of-sample Sharpe. For each $k < 100$ we repeat on 30 random subsets; $k = 100$ exhausts the pool.
 
 \input{tables/table_seed_convergence}
 
-Two patterns emerge. First, the mean Sharpe rises from 1.04 at $k = 1$ to 1.12 at $k = 100$, so a single-chain point estimate understates the strategy's performance by roughly 0.08 in Sharpe units. The gap closes monotonically, with most of the lift realised by $k = 30$. Second, the interquartile range across random subsets collapses from 0.10 at $k = 1$ to 0.02 at $k = 50$: once $k \geq 50$, any two random subsets of the seed pool produce nearly the same XGBoost portfolio. The production configuration ($N_s = 200$) sits well inside this plateau, which is why the 1.11 Sharpe reported in Section~\ref{sec:results} is insensitive to which specific seeds were drawn. The practical implication is methodological rather than cosmetic: a single-chain HMM would not reliably support the main conclusions, so the seed ensemble is a requirement of the design, not a late-stage performance tuning.
+Two patterns emerge. First, the mean Sharpe rises from 1.04 at $k = 1$ to 1.12 at $k = 100$, so a single-chain point estimate understates the strategy's performance by roughly 0.08 in Sharpe units. The gap closes monotonically, with most of the lift realized by $k = 30$. Second, the interquartile range across random subsets collapses from 0.10 at $k = 1$ to 0.02 at $k = 50$: once $k \geq 50$, any two random subsets of the seed pool produce nearly the same XGBoost portfolio. The production configuration ($N_s = 200$) sits well inside this plateau, which is why the 1.11 Sharpe reported in Section~\ref{sec:results} is insensitive to which specific seeds were drawn. The practical implication is methodological rather than cosmetic: a single-chain HMM would not reliably support the main conclusions, so the seed ensemble is a requirement of the design, not a late-stage performance tuning.
 
 \section{International HMM Feature Selection}\label{app:intl_feature_selection}
 
@@ -356,5 +356,5 @@ Ten firm-level characteristics are computed from Compustat quarterly data (\text
     \item \textbf{Accruals:} The accrual component of earnings, $(\texttt{ibq}_{\text{TTM}} - \texttt{oancf}_{\text{TTM}}) / \texttt{atq}$, which captures the non-cash portion of reported earnings.
 \end{itemize}
 
-Fundamentals are winsorised at the 1st and 99th percentiles (5th and 95th for asset growth) using training-sample bounds. The cash-flow features (cfo\_a, fcf\_a, accruals) are available for roughly 83\% of stock-months; the remaining seven characteristics exceed 82\% coverage individually, and XGBoost handles any residual missingness natively via its default-branch logic.
+Fundamentals are winsorized at the 1st and 99th percentiles (5th and 95th for asset growth) using training-sample bounds. The cash-flow features (cfo\_a, fcf\_a, accruals) are available for roughly 83\% of stock-months; the remaining seven characteristics exceed 82\% coverage individually, and XGBoost handles any residual missingness natively via its default-branch logic.
 
