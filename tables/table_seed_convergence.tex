@@ -18,6 +18,6 @@ $k$ & $n_{\text{sub}}$ & Mean & Median & Std & P25 & P75 & Min & Max \\
 100 & 1  & 1.118 & 1.118 & 0.000 & 1.118 & 1.118 & 1.118 & 1.118 \\
 \bottomrule
 \end{tabular}
-\caption{XGBoost ensemble seed convergence. For each subset size $k$, we draw $n_{\text{sub}}$ random subsets of $k$ seeds from the full 100-seed pool, average their predictions, and report the resulting out-of-sample L/S Sharpe ratio. Mean Sharpe stabilizes by $k\approx 50$, justifying the production choice; standard deviation across subsets shrinks as $1/\sqrt{k}$.}
+\caption{HMM Gibbs-chain seed convergence of the downstream L/S Sharpe ratio. For each subset size $k$, we draw $n_{\text{sub}}$ random subsets of $k$ HMM seeds from a 100-seed pool, average their forward-filter outputs into $\pi_t^{\text{filter}}$, retrain the XGBoost ensemble on the averaged signal, and report the out-of-sample L/S Sharpe. The production configuration uses $N_s = 200$ HMM seeds; the 100-seed pool here is the subset over which the experiment is run. Mean Sharpe stabilizes around $k\approx 30$--$50$; standard deviation across subsets shrinks as $1/\sqrt{k}$.}
 \label{tab:seed_convergence}
 \end{table}

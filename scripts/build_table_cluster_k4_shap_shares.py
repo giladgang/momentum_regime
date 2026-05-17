@@ -32,7 +32,7 @@ TEX_PATH   = os.path.join(TABLES_DIR, 'table_cluster_k4_shap_shares.tex')
 
 CLUSTER_LABELS = {
     0: 'calm continuation',
-    1: 'mild continuation',
+    1: 'transition',
     2: 'post-panic recovery',
     3: 'deep crisis',
 }

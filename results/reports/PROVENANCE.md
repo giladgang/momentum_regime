@@ -54,8 +54,7 @@ No data assets.
 |---|---|---|---|
 | `plots/features_hmm.png` | figure | `scripts/plot_features_hmm.py` (Step 47) | HMM_FEATURES |
 | `plots/regime_probabilities.png` | figure | `scripts/hmm_model.py` | HMM_FEATURES, HMM_K_STATES |
-| `tables/table_features_summary.tex` | table | `scripts/hmm_model.py` | HMM_FEATURES |
-| `tables/table_feature_selection.tex` | table — **frozen at Apr 14 by decision** | Still `\input`-ed in `data_section.tex:73`. NOT regenerated post-Shumway: the 4-pass HMM feature-selection pipeline that produced the table picked DD+CS+DISP+REL_N as the winning combo, which is the production HMM feature set. Rerunning would shift every reported sub-Sharpe but not the qualitative selection. Per the 2026-04-27 decision, prose stays as-is; the CV winner discussion lives in the appendix via `table_hmm_cv`. | — (frozen) |
+| `tables/table_feature_selection.tex` | table — **frozen at Apr 14 by decision** | Still `\input`-ed in `data_section.tex:73`. NOT regenerated post-Shumway: the 4-pass HMM feature-selection pipeline that produced the table picked DD+CS+DISP+REL_N as the winning combo, which is the production HMM feature set. Rerunning would shift every reported sub-Sharpe but not the qualitative selection. Per the 2026-04-27 decision, prose stays as-is. | — (frozen) |
 | `tables/table_hmm_feature_ablation.tex` | table — **frozen at Apr 12 by decision** | Still `\input`-ed in `data_section.tex:77`. NOT regenerated post-Shumway. Per the 2026-04-27 decision: keep old numbers, don't mention CV in the main body. The qualitative pattern (which features matter most) is preserved. | HMM_FEATURES (frozen) |
 | `tables/table_hmm_separation.tex` | table | `scripts/hmm_diagnostics.py` | HMM_FEATURES |
 
@@ -67,24 +66,13 @@ No data assets.
 | `tables/table_subperiod.tex` | `scripts/main_results_analysis.py` | (same) |
 | `tables/table_regime_sharpe.tex` | `scripts/main_results_analysis.py` | (same) |
 | `tables/table_factor_alphas.tex` | `scripts/new_ls_analyses.py` | (same) |
-| `tables/table_kitchen_sink.tex` | `scripts/main_results_analysis.py` | MOM_FEATURES |
 | `tables/table_alt_targets.tex` | `scripts/main_results_analysis.py` | — |
 | `tables/table_alt_splits.tex` | `scripts/main_results_analysis.py` | TRAIN_END |
-| `tables/table_ic.tex` | `scripts/main_results_analysis.py` | — |
-| `tables/table_granger.tex` | `scripts/main_results_analysis.py` | — |
-| `tables/table_lr_coef.tex` | `scripts/main_results_analysis.py` | — |
 | `tables/table_shap.tex` | `scripts/main_results_analysis.py` | MOM_FEATURES, FUND_FEATURES |
-| `tables/table_placebo.tex` | `scripts/main_results_analysis.py` | — |
-| `tables/table_panic_subtypes.tex` | `scripts/panic_subtype_analysis.py` | — |
 | `tables/table_zscore_shap_detail.tex` | `scripts/selection_rank_analysis.py` | — |
-| `tables/table_ghm_comparison.tex` | `scripts/main_results_analysis.py` | — |
 | `tables/table_regime_signal_ablation.tex` | `scripts/main_results_analysis.py` | HMM_FEATURES |
 | `tables/table_xgb_hyperparams.tex` | `scripts/depth_vs_sharpe.py` | MAX_DEPTH |
 | `tables/table_cost_sensitivity.tex` | `scripts/main_results_analysis.py` | TRADING_FEE |
-| `tables/table_threshold_sensitivity.tex` | `scripts/main_results_analysis.py` | — |
-| `tables/table_stress_scenarios.tex` | `scripts/stress_test.py` | — |
-| `tables/table_xgb_cv.tex` | `scripts/xgb_cv.py` | XGB hyperparam grid |
-| `tables/table_hmm_cv.tex` | `scripts/hmm_cv.py` | HMM feature subsets |
 | `tables/table_expanding_subperiods.tex` | `scripts/build_table_expanding_subperiods.py` | TRAIN_END (rolling) |
 | `tables/table_leg_betas.tex` | `scripts/leg_betas_by_regime.py` | — |
 | `tables/table_combo_freq.tex` | `scripts/tree_combo_grouped.py` | — |
@@ -97,12 +85,35 @@ No data assets.
 | `tables/table_cluster_k4_shap_shares.tex` | `scripts/build_table_cluster_k4_shap_shares.py` (Step 51) — depends on Step 43 | — |
 | `tables/table_cluster_k4_short_leg.tex` | `scripts/build_table_cluster_k4_short_leg.py` (Step 52) — depends on Steps 40 + 41 | — |
 | `plots/cs_performance_regime_shaded.png` | `scripts/generate_plots.py` | — |
-| `plots/depth_vs_sharpe.png` | `scripts/depth_vs_sharpe.py` | MAX_DEPTH |
-| `plots/zscore_and_absshap_v3.png` | `scripts/selection_rank_analysis.py` | — |
-| `plots/zscore_panic_subtypes.png` | `scripts/panic_subtype_analysis.py` | — |
 | `plots/shap_per_horizon_by_leg.png` | `scripts/plot_shap_per_horizon_by_leg.py` (Step 44) — depends on Step 38 | — |
 | `plots/zscore_long_heatmap.png` | `scripts/plot_zscore_long_heatmap.py` (Step 45) — depends on Steps 18 + 39 | — |
 | `plots/zscore_l2_k4_panel_c{0..3}.png` | `scripts/plot_cluster_k4_individual_panels.py` (Step 46) — depends on Steps 2 + 18 + 39 | — |
+
+### Available but not cited in the body
+
+These assets are produced by the pipeline but not currently `\input{}`-ed or `\includegraphics`-ed by the thesis. They are kept available as exploratory outputs / candidates for future revisions; removing them does not affect the compiled PDF.
+
+| Asset | Source script |
+|---|---|
+| `tables/table_features_summary.tex` | `scripts/hmm_model.py` |
+| `tables/table_kitchen_sink.tex` | `scripts/main_results_analysis.py` |
+| `tables/table_ic.tex` | `scripts/main_results_analysis.py` |
+| `tables/table_granger.tex` | `scripts/main_results_analysis.py` |
+| `tables/table_lr_coef.tex` | `scripts/main_results_analysis.py` |
+| `tables/table_placebo.tex` | `scripts/main_results_analysis.py` |
+| `tables/table_panic_subtypes.tex` | `scripts/panic_subtype_analysis.py` |
+| `tables/table_ghm_comparison.tex` | `scripts/main_results_analysis.py` |
+| `tables/table_xgb_cv.tex` | `scripts/xgb_cv.py` |
+| `tables/table_hmm_cv.tex` | `scripts/hmm_cv.py` |
+| `tables/table_threshold_sensitivity.tex` | `scripts/main_results_analysis.py` |
+| `tables/table_stress_scenarios.tex` | `scripts/stress_test.py` |
+| `tables/table_risk_aversion.tex` | `scripts/risk_aversion_thesis_table.py` |
+| `tables/table_ridge.tex` | `scripts/ridge_baseline_test.py` |
+| `tables/table_performance_fund_row.tex` | `scripts/fundamentals_test.py` |
+| `plots/depth_vs_sharpe.png` | `scripts/depth_vs_sharpe.py` |
+| `plots/cs_avg_tree.png` | `scripts/cross_sectional_model.py` |
+| `plots/zscore_and_absshap_v3.png` | `scripts/selection_rank_analysis.py` |
+| `plots/zscore_panic_subtypes.png` | `scripts/panic_subtype_analysis.py` |
 
 ### Chapter 7 — Conclusion (`latex/conclusion.tex`)
 
@@ -120,12 +131,8 @@ No `\input` / `\includegraphics`. Numbers cited in prose only.
 | `tables/table_seed_convergence.tex` | `scripts/seed_convergence.py` |
 | `tables/table_sample_summary.tex` | `scripts/cross_sectional_model.py` |
 | `tables/table_fund_alphas.tex` | `scripts/fundamentals_test.py` |
-| `tables/table_performance_fund_row.tex` | `scripts/fundamentals_test.py` |
 | `tables/table_combo_long_cp.tex` | `scripts/tree_combo_grouped.py` |
 | `tables/table_combo_short_cp.tex` | `scripts/tree_combo_grouped.py` |
-| `tables/table_risk_aversion.tex` | `scripts/risk_aversion_thesis_table.py` |
-| `tables/table_ridge.tex` | `scripts/ridge_baseline_test.py` |
-| `plots/cs_avg_tree.png` | `scripts/cross_sectional_model.py` |
 | `plots/convergence_trace.png` | `scripts/hmm_model.py` |
 | `plots/risk_aversion_dual_util.pdf` | `scripts/plot_crra_dual_util.py` |
 

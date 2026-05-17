@@ -7,7 +7,7 @@
 
 This chapter introduces the inputs to the two-stage framework. The Stage~2 inputs are minimal by design: twelve trailing monthly returns paired with the regime signal (Section~\ref{sec:cs_features}), so that the Section~\ref{sec:results} mechanism story is not confounded with feature engineering. The discretionary choice lies in Stage~1: which four of nine candidate stress indicators the HMM should see. Section~\ref{sec:hmm_features} introduces the four winners (DD, DISP, REL\_N, CS), and Section~\ref{sec:feature_selection} documents the four-pass selection procedure that picks them, designed so each pass shrinks the candidate set on a different criterion (in-sample regime quality, downstream portfolio Sharpe, validation at higher seed counts, cross-seed stability) rather than on a single in-sample fit. Section~\ref{sec:hmm_output} reports the resulting regime signal $\pi_t^{\text{filter}}$ and confirms it tracks the dot-com bust, GFC, COVID, and 2022 episodes. Section~\ref{sec:intl_sample} re-runs the entire selection procedure on UK and Japanese equities and finds that different regions select different feature sets, demonstrating that the chapter's contribution is a transferable procedure rather than a US-specific feature artefact.
 
-The stock-level sample spans January 1990 to November 2025 and includes all ordinary common shares (CRSP share codes 10 and 11) listed on the NYSE, AMEX, or NASDAQ with a price above \$1.\footnote{The \$1 price floor admits small and illiquid stocks into the universe, but NYSE decile breakpoints and value-weighting within each leg attenuate their influence on the realized portfolio. NYSE breakpoints construct decile cutoffs from NYSE-listed stocks only and apply them across the full NYSE/AMEX/NASDAQ universe, preventing the small-cap-heavy AMEX/NASDAQ tails from dominating the extreme deciles. Value weighting assigns each stock a portfolio weight proportional to its market capitalisation. Both are standard conventions in the cross-sectional asset-pricing literature.} Following \citet{Shumway1997}, delisting returns are incorporated to prevent survivorship bias: actual delisting returns are used when available, and $-30\%$ is imputed for performance-related delistings with missing returns.\footnote{Full data sources and detailed variable definitions are provided in Appendix~\ref{app:data_summary}.} The sample is split into a training period (1990--2010) used to estimate all models and a test period (2011--2025, 167 months) used exclusively for out-of-sample evaluation. No model parameters are re-estimated during the test period. Table~\ref{tab:sample_summary} provides an overview.
+The stock-level sample spans January 1990 to November 2025 and includes all ordinary common shares (CRSP share codes 10 and 11) listed on the NYSE, AMEX, or NASDAQ with a price above \$1.\footnote{The \$1 price floor admits small and illiquid stocks into the universe, but NYSE decile breakpoints and value-weighting within each leg attenuate their influence on the realized portfolio. NYSE breakpoints construct decile cutoffs from NYSE-listed stocks only and apply them across the full NYSE/AMEX/NASDAQ universe, preventing the small-cap-heavy AMEX/NASDAQ tails from dominating the extreme deciles. Value weighting assigns each stock a portfolio weight proportional to its market capitalisation. Both are standard conventions in the cross-sectional asset-pricing literature.} Following \citet{Shumway1997}, delisting returns are incorporated to prevent survivorship bias: actual delisting returns are used when available, and $-30\%$ is imputed for performance-related delistings with missing returns.\footnote{Full data sources and detailed variable definitions are provided in Appendix~\ref{app:data_summary}.} The sample is split into a training period (1990--2010) used to estimate all models and a test period (2011--2024, 167 months) used exclusively for out-of-sample evaluation. No model parameters are re-estimated during the test period. Table~\ref{tab:sample_summary} provides an overview.
 
 \input{tables/table_sample_summary}
 
@@ -18,25 +18,25 @@ The HMM classifies market regimes using four monthly macrofinancial stress indic
 \begin{enumerate}
     \item \textbf{DD (Drawdown):} The percentage decline of the cumulative market price index from its rolling 12-month peak:
     \begin{equation}
-        DD_t = \frac{P_t - \max(P_{t-11}, \dots, P_t)}{\max(P_{t-11}, \dots, P_t)}
+        DD_t = \frac{P_t - \max(P_{t-11}, \dots, P_t)}{\max(P_{t-11}, \dots, P_t)}.
     \end{equation}
     DD directly measures the depth of ongoing market declines. \citet{DanielMoskowitz2016} show that momentum crashes are predictable from past market declines, making DD the natural anchor for regime identification.
 
     \item \textbf{DISP (Return Dispersion):} The log cross-sectional standard deviation of individual stock returns:
     \begin{equation}
-        DISP_t = \log\!\left(\text{std}_s(r_{s,t})\right)
+        DISP_t = \log\!\left(\text{std}_s(r_{s,t})\right).
     \end{equation}
     DISP captures cross-sectional \emph{disagreement} among stocks. During stress, individual stocks move in different directions rather than together, causing dispersion to spike.
 
     \item \textbf{REL\_N (Relative Market Participation):} The log ratio of the number of actively traded stocks to its trailing 12-month average:
     \begin{equation}
-        REL\_N_t = \log\!\left(\frac{N_t}{\frac{1}{12}\sum_{\ell=1}^{12} N_{t-\ell}}\right)
+        REL\_N_t = \log\!\left(\frac{N_t}{\frac{1}{12}\sum_{\ell=1}^{12} N_{t-\ell}}\right).
     \end{equation}
     REL\_N turns negative during crises when stocks delist, halt trading, or are acquired at elevated rates. It captures structural market damage that the other features do not measure.
 
     \item \textbf{CS (Credit Spread):} The difference between Moody's BAA and AAA corporate bond yields:
     \begin{equation}
-        CS_t = Y_t^{\text{BAA}} - Y_t^{\text{AAA}}
+        CS_t = Y_t^{\text{BAA}} - Y_t^{\text{AAA}}.
     \end{equation}
     The credit spread provides an independent signal from the corporate bond market, helping the HMM distinguish genuine stress episodes from equity-specific turbulence.
 \end{enumerate}
@@ -54,7 +54,7 @@ The four series co-move clearly around stress episodes: DD and REL\_N drop while
 
 \subsection{Feature Selection}\label{sec:feature_selection}
 
-The regime signal's ability to capture the shift in momentum's cross-sectional structure depends critically on which stress indicators the HMM observes. The selection problem has two constraints. First, market drawdown (DD) must be included. It is the most economically direct measure of the mechanism identified by \citet{DanielMoskowitz2016} (momentum crashes follow market declines), and it consistently emerges as the dominant regime-identifying feature. Second, the number of features is capped at four. With 241 training months, each regime has sufficient observations to estimate a 4-dimensional mean vector and covariance matrix (10 free covariance parameters per state). Increasing beyond four features risks estimation instability.
+The regime signal's ability to capture the shift in momentum's cross-sectional structure depends critically on which stress indicators the HMM observes. The selection problem has two constraints. First, market drawdown (DD) must be included. It is the most economically direct measure of the mechanism identified by \citet{DanielMoskowitz2016} (momentum crashes follow market declines), and it consistently emerges as the dominant regime-identifying feature. Second, the number of features is capped at four. With 240 training months, each regime has sufficient observations to estimate a 4-dimensional mean vector and covariance matrix (10 free covariance parameters per state). Increasing beyond four features risks estimation instability.
 
 \paragraph{Candidate pool}
 Nine monthly macrofinancial indicators, all available from 1990 onward, are considered:
@@ -76,7 +76,7 @@ In the fourth pass (\emph{stability check}), the finalists are tested for robust
 \paragraph{Selected features}
 The four-pass procedure converges on DD, DISP, REL\_N, and CS. The choice is driven by complementarity rather than peak Sharpe. DD is the most economically direct measure of stress and the strongest single-feature classifier (DD-only Sharpe 0.66 vs full-set 0.97 in Table~\ref{tab:hmm_feature_ablation}, Appendix~\ref{app:hmm_feature_tables}). Leave-one-out experiments in the same table show that REL\_N and DD are the two largest individual contributors to the full-set Sharpe (drops of $-$0.54 and $-$0.46 respectively when each is removed), confirming that REL\_N captures structural damage (delistings, trading halts, forced acquisitions) that drawdown alone misses. DISP and CS contribute marginally on a leave-one-out basis ($-$0.01 each in Sharpe). The full feature set has materially lower cross-partition $\sigma$ ($0.11$) than DD alone ($0.14$) (Table~\ref{tab:feature_selection}), and DISP (cross-sectional disagreement among stocks) and CS (corporate credit conditions) carry stress information that is independent of price drawdown and contributes to this stability.
 
-The four-feature combination ranks first on both single-experiment ensemble Sharpe and cross-partition mean Sharpe in Table~\ref{tab:feature_selection}. Sharpe ratios in that table are based on the selection pipeline's seed budget (10 HMM seeds, 20 XGBoost seeds), kept small so the procedure can search many candidate combinations within a reasonable compute budget. The production configuration runs the chosen combination at a much larger seed budget (200 HMM seeds, 50 XGBoost seeds), which raises the Sharpe to 1.11 (Section~\ref{sec:results}). The seed-convergence experiment in Appendix~\ref{app:seed_convergence} confirms that this lift is a saturation effect: averaging more Gibbs chains produces a cleaner regime signal $\pi_t^{\text{filter}}$, and the resulting Sharpe rises monotonically with the number of averaged chains, plateauing near $1.12$ from $k = 30$ chains onwards. The 200-chain production setting sits at that plateau.\footnote{Pass~2 evaluates feature sets on test-period Sharpe, so the selected specification partly reflects test outcomes. The Pass~4 final choice is made on cross-seed stability, and Tables~\ref{tab:feature_selection} and~\ref{tab:hmm_feature_ablation} show that all $D = 1$ to $D = 4$ counts and leave-one-out variants produce Sharpes from 0.57 to 0.91. The headline 1.11 should be read as the upper end of a tight range, not a point isolated by search.}
+The four-feature combination ranks first on both single-experiment ensemble Sharpe and cross-partition mean Sharpe in Table~\ref{tab:feature_selection}. Sharpe ratios in that table are based on the selection pipeline's seed budget (10 HMM seeds, 20 XGBoost seeds), kept small so the procedure can search many candidate combinations within a reasonable compute budget. The production configuration runs the chosen combination at a much larger seed budget (200 HMM seeds, 50 XGBoost seeds), which raises the Sharpe to 1.11 (Section~\ref{sec:results}). The seed-convergence experiment in Appendix~\ref{app:seed_convergence} confirms that this lift is a saturation effect: averaging more Gibbs chains produces a cleaner regime signal $\pi_t^{\text{filter}}$, and the resulting Sharpe rises broadly with the number of averaged chains, settling on a plateau near $1.09$--$1.10$ from $k = 30$ onwards and reaching $1.12$ at $k = 100$. The 200-chain production setting sits at that plateau.\footnote{Pass~2 evaluates feature sets on test-period Sharpe, so the selected specification partly reflects test outcomes. The Pass~4 final choice is made on cross-seed stability, and Tables~\ref{tab:feature_selection} and~\ref{tab:hmm_feature_ablation} show that all $D = 1$ to $D = 4$ counts and leave-one-out variants produce Sharpes from 0.57 to 0.91. The headline 1.11 should be read as the upper end of a tight range, not a point isolated by search.}
 
 \subsection{Regime Estimation Results}\label{sec:hmm_output}
 
@@ -109,7 +109,7 @@ The cross-sectional models rank stocks each month using momentum signals and the
 \paragraph{Momentum lookbacks}
 Twelve trailing momentum signals are computed for each stock, corresponding to lookback horizons of 1 to 12 months:
 \begin{equation}
-    \text{mom}_{k,t}^s = \prod_{\ell=1}^{k}(1 + r_{t-\ell}^s) - 1, \qquad k = 1, \dots, 12
+    \text{mom}_{k,t}^s = \prod_{\ell=1}^{k}(1 + r_{t-\ell}^s) - 1, \qquad k = 1, \dots, 12,
 \end{equation}
 where $r_{t-\ell}^s$ is the adjusted return of stock $s$ in month $t - \ell$. The current month's return is excluded from all lookbacks to avoid mechanical correlation with the forward return being predicted. Including all twelve horizons rather than a single lookback allows the models to learn how the full momentum term structure interacts with the regime signal.
 

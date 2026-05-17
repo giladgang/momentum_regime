@@ -50,7 +50,7 @@ $\pi_t^{\text{filter}}$ & HMM output & Filtered panic probability & Section~\ref
 
 \medskip
 \small
-\textbf{Notes:} All data accessed via WRDS. Compustat linked to CRSP via the CCM bridge table using primary link types (LU, LC). Fundamentals are lagged four months from fiscal quarter end to ensure real-time availability. The sample covers January 1990 to November 2025 (training: 1990--2010; test: 2011--2025).
+\textbf{Notes:} All data accessed via WRDS. Compustat linked to CRSP via the CCM bridge table using primary link types (LU, LC). Fundamentals are lagged four months from fiscal quarter end to ensure real-time availability. The sample covers January 1990 to November 2025 (training: 1990--2010; test: 2011--2024).
 \end{table}
 
 \section{HMM Feature Selection Tables}\label{app:hmm_feature_tables}
@@ -69,11 +69,11 @@ For each method, a long-short portfolio is constructed each month. Stocks are ra
 
 Portfolio weights within each leg are assigned proportionally to market equity (value-weighting):
 \begin{equation}
-    w_t^{s,L} = \frac{ME_t^s}{\sum_{s \in \mathcal{L}_t} ME_t^s}, \qquad w_t^{s,S} = \frac{ME_t^s}{\sum_{s \in \mathcal{S}_t} ME_t^s}
+    w_t^{s,L} = \frac{ME_t^s}{\sum_{s \in \mathcal{L}_t} ME_t^s}, \qquad w_t^{s,S} = \frac{ME_t^s}{\sum_{s \in \mathcal{S}_t} ME_t^s},
 \end{equation}
 where $\mathcal{L}_t$ and $\mathcal{S}_t$ are the sets of stocks in the long and short legs at month $t$, respectively. The long-short portfolio return is:
 \begin{equation}
-    r_t^{\text{LS}} = \sum_{s \in \mathcal{L}_t} w_t^{s,L} \cdot r_t^s - \sum_{s \in \mathcal{S}_t} w_t^{s,S} \cdot r_t^s
+    r_t^{\text{LS}} = \sum_{s \in \mathcal{L}_t} w_t^{s,L} \cdot r_t^s - \sum_{s \in \mathcal{S}_t} w_t^{s,S} \cdot r_t^s.
 \end{equation}
 Value-weighting tilts each leg toward large, liquid stocks, reducing the influence of small-cap return anomalies and improving implementability.
 
@@ -83,11 +83,11 @@ All portfolios are rebalanced monthly.
 
 A one-way transaction cost of $c = 10$ basis points is applied to the turnover in both the long and short legs at each rebalancing date. The net portfolio return at month $t$ is:
 \begin{equation}
-    r_t^{\text{net}} = r_t^{\text{gross}} - c \cdot (\tau_t^L + \tau_t^S)
+    r_t^{\text{net}} = r_t^{\text{gross}} - c \cdot (\tau_t^L + \tau_t^S),
 \end{equation}
 where $\tau_t^L$ and $\tau_t^S$ are the one-way turnover in the long and short legs, respectively:
 \begin{equation}
-    \tau_t^L = \frac{1}{2} \sum_{s} \left|w_{t}^{s,L,\text{new}} - w_{t-1}^{s,L,\text{prev}}\right|, \qquad \tau_t^S = \frac{1}{2} \sum_{s} \left|w_{t}^{s,S,\text{new}} - w_{t-1}^{s,S,\text{prev}}\right|
+    \tau_t^L = \frac{1}{2} \sum_{s} \left|w_{t}^{s,L,\text{new}} - w_{t-1}^{s,L,\text{prev}}\right|, \qquad \tau_t^S = \frac{1}{2} \sum_{s} \left|w_{t}^{s,S,\text{new}} - w_{t-1}^{s,S,\text{prev}}\right|,
 \end{equation}
 and each summation runs over all stocks appearing in either the new or previous portfolio for that leg. The 10 basis point cost reflects the transaction environment for a value-weighted, large-cap-biased strategy where NYSE breakpoints tilt toward liquid securities.
 
@@ -101,30 +101,30 @@ Strategy performance is assessed using four standard risk-adjusted metrics compu
 
 \textbf{Annualized return} The geometric annualized return over $n$ months is:
 \begin{equation}
-    R_{\text{ann}} = \left[\prod_{t=1}^{n}(1 + r_t)\right]^{12/n} - 1
+    R_{\text{ann}} = \left[\prod_{t=1}^{n}(1 + r_t)\right]^{12/n} - 1.
 \end{equation}
 
 \textbf{Annualized volatility} The annualized standard deviation of monthly returns:
 \begin{equation}
-    \sigma_{\text{ann}} = \sigma(r) \cdot \sqrt{12}
+    \sigma_{\text{ann}} = \sigma(r) \cdot \sqrt{12}.
 \end{equation}
 
-\textbf{Sharpe ratio} The annualized Sharpe ratio:\footnote{All Sharpe ratios in this thesis are computed using raw returns rather than excess returns above the risk-free rate. Since the same convention is applied to every strategy, relative comparisons and rankings are unaffected. The risk-free rate was near zero for most of the test period (2011--2021) and averaged roughly 2\% annualized over the full 2011--2025 window, so absolute Sharpe ratios are overstated by approximately 0.05--0.10.}
+\textbf{Sharpe ratio} The annualized Sharpe ratio:\footnote{All Sharpe ratios in this thesis are computed using raw returns rather than excess returns above the risk-free rate. Since the same convention is applied to every strategy, relative comparisons and rankings are unaffected. The risk-free rate was near zero for most of the test period (2011--2021) and averaged roughly 2\% annualized over the full 2011--2024 window, so absolute Sharpe ratios are overstated by approximately 0.05--0.10.}
 \begin{equation}
-    SR = \frac{\bar{r}}{\sigma(r)} \cdot \sqrt{12}
+    SR = \frac{\bar{r}}{\sigma(r)} \cdot \sqrt{12},
 \end{equation}
 where $\bar{r}$ is the mean monthly return. Sharpe is computed from the arithmetic monthly mean annualised by $\sqrt{12}$, while annualised returns reported elsewhere in this thesis are compound (geometric); under high volatility the two definitions of average return differ, so Sharpe should not be inferred from a table by dividing annualised return by annualised volatility (e.g.\ at depth~1 in the methodology hyperparameter sweep, the reported Sharpe is $0.53$ but $8.7\% / 19.4\% = 0.45$).
 
 \textbf{Maximum drawdown} Let $C_t = \prod_{\tau=1}^{t}(1 + r_\tau)$ denote the cumulative wealth path. The maximum drawdown is:
 \begin{equation}
-    MDD = \min_{1 \leq t \leq n} \frac{C_t - \max_{1 \leq \tau \leq t} C_\tau}{\max_{1 \leq \tau \leq t} C_\tau}
+    MDD = \min_{1 \leq t \leq n} \frac{C_t - \max_{1 \leq \tau \leq t} C_\tau}{\max_{1 \leq \tau \leq t} C_\tau}.
 \end{equation}
 
 \paragraph{Regime-Conditional Evaluation}\label{app:regime_eval}
 
 To assess whether the regime signal adds value beyond unconditional stock selection, performance is decomposed by market regime. Months are partitioned into calm ($\pi_t^{\text{filter}} < 0.5$) and panic ($\pi_t^{\text{filter}} \geq 0.5$) periods, and the Sharpe ratio is computed separately within each subset:
 \begin{equation}
-    SR_{\text{calm}} = \frac{\bar{r}_{\text{calm}}}{\sigma(r_{\text{calm}})} \cdot \sqrt{12}, \qquad SR_{\text{panic}} = \frac{\bar{r}_{\text{panic}}}{\sigma(r_{\text{panic}})} \cdot \sqrt{12}
+    SR_{\text{calm}} = \frac{\bar{r}_{\text{calm}}}{\sigma(r_{\text{calm}})} \cdot \sqrt{12}, \qquad SR_{\text{panic}} = \frac{\bar{r}_{\text{panic}}}{\sigma(r_{\text{panic}})} \cdot \sqrt{12}.
 \end{equation}
 This decomposition helps assess whether the strategy's alpha originates primarily from calm-period stock selection, panic-period risk avoidance, or both.
 
@@ -134,11 +134,11 @@ This decomposition helps assess whether the strategy's alpha originates primaril
 
 To interpret the XGBoost model and assess the marginal contribution of each feature, SHAP \citep[SHapley Additive exPlanations;][]{Lundberg2017} values are computed on the test set. The SHAP value of feature $j$ for observation $\mathbf{x}$ measures its average marginal contribution to the prediction across all possible feature orderings:
 \begin{equation}
-    \phi_j(\mathbf{x}) = \sum_{S \subseteq N \setminus \{j\}} \frac{|S|!\,(p - |S| - 1)!}{p!} \Big[f_{S \cup \{j\}}(\mathbf{x}) - f_S(\mathbf{x})\Big]
+    \phi_j(\mathbf{x}) = \sum_{S \subseteq N \setminus \{j\}} \frac{|S|!\,(p - |S| - 1)!}{p!} \Big[f_{S \cup \{j\}}(\mathbf{x}) - f_S(\mathbf{x})\Big],
 \end{equation}
 where $N$ is the full feature set, $p = |N|$, and $f_S(\mathbf{x})$ is the expected model output when only features in $S$ are observed. For tree-based models, the TreeSHAP algorithm \citep{Lundberg2020} computes these values exactly in polynomial time. The overall importance of each feature is summarized as:
 \begin{equation}
-    I_j = \frac{1}{n_{\text{test}}} \sum_{i=1}^{n_{\text{test}}} |\phi_j(\mathbf{x}_i)|
+    I_j = \frac{1}{n_{\text{test}}} \sum_{i=1}^{n_{\text{test}}} |\phi_j(\mathbf{x}_i)|.
 \end{equation}
 
 Two additional analyses are performed. First, the mean absolute SHAP value of $\pi_t^{\text{filter}}$ is computed separately for calm and panic months to assess whether the regime signal's influence varies across market states. Second, regime-specific XGBoost models are trained on calm-only and panic-only subsets of the training data, and their SHAP feature importances are compared to identify which features the model relies on differentially across regimes.
@@ -157,9 +157,9 @@ This appendix supplements the dual-utility specification in Section~\ref{sec:ris
 
 \paragraph{Volatility forecast} The expected-return forecast $\hat r_t^s$ comes from the XGBoost ensemble described in Section~\ref{sec:methodology}. The volatility forecast $\hat\sigma_t^s$ comes from a second XGBoost ensemble trained on the realized 12-month forward volatility
 \[
-    \sigma^s_{[t+1,\,t+12]} \;=\; \mathrm{std}\!\big(r^s_{t+1}, \ldots, r^s_{t+12}\big)
+    \sigma^s_{[t+1,\,t+12]} \;=\; \mathrm{std}\!\big(r^s_{t+1}, \ldots, r^s_{t+12}\big),
 \]
-using the same feature set augmented with trailing 12-month realized volatility. The 50-seed ensemble is trained on 1990--2010 and evaluated out-of-sample on 2011--2025.
+using the same feature set augmented with trailing 12-month realized volatility. The 50-seed ensemble is trained on 1990--2010 and evaluated out-of-sample on 2011--2024.
 
 \paragraph{Convergence to dollar-neutral noise at high $\gamma$} Stocks appearing in both top deciles of $u_{\text{long}}$ and $u_{\text{short}}$ (the overlap set, which grows with $\gamma$) are retained on both sides, and their contributions to the long and short books net out in $r_L - r_S$. This is the mechanism by which the long-short spread converges to zero as $\gamma$ rises beyond the useful range. At high $\gamma$, the volatility penalty dominates the return signal, low-$\hat\sigma$ stocks occupy both top deciles simultaneously, and the two legs become near-identical value-weighted low-volatility portfolios.
 
@@ -171,11 +171,11 @@ This section reports six robustness checks that complement the main results in S
 
 \subsection{Sub-Period Stability}\label{app:subperiod}
 
-To assess whether the main findings are driven by a single favorable sub-period, the test sample is split into three roughly equal windows: 2011--2015, 2016--2020, and 2021--2025.
+To assess whether the main findings are driven by a single favorable sub-period, the test sample is split into three roughly equal windows: 2011--2015, 2016--2020, and 2021--2024.
 
 \input{tables/table_subperiod}
 
-In long-short construction, XGB is the only strategy that produces positive Sharpe ratios in every sub-period (0.59, 1.04, 1.70). LR collapses in 2016--2020 (Sharpe $-$0.02) and turns negative in 2021--2025 ($-$0.38). Fixed 12-month momentum turns negative after 2015, consistent with the momentum crash mechanism documented by \citet{DanielMoskowitz2016}. XGB's strongest performance (1.70) is in 2021--2025, a period characterized by elevated volatility and multiple stress episodes, precisely the conditions where regime-conditional stock selection adds the most value.
+In long-short construction, XGB is the only strategy that produces positive Sharpe ratios in every sub-period (0.59, 1.04, 1.70). LR collapses in 2016--2020 (Sharpe $-$0.02) and turns negative in 2021--2024 ($-$0.38). Fixed 12-month momentum turns negative after 2015, consistent with the momentum crash mechanism documented by \citet{DanielMoskowitz2016}. XGB's strongest performance (1.70) is in 2021--2024, a period characterized by elevated volatility and multiple stress episodes, precisely the conditions where regime-conditional stock selection adds the most value.
 
 \subsection{Turnover and Transaction Cost Sensitivity}\label{app:turnover}
 
@@ -204,7 +204,7 @@ The baseline HMM uses $K = 2$ states (calm and panic). A natural question is whe
 
 \input{tables/table_multistate_hmm}
 
-In long-short construction, XGB shows no consistent improvement beyond $K = 2$. Cross-seed variability increases with $K$, and the intermediate states that emerge for $K \geq 3$ lack the persistence needed to provide a stable conditioning signal. With only 241 training months, the data cannot reliably separate more than two regimes for the purpose of downstream cross-sectional stock selection.
+In long-short construction, XGB shows no consistent improvement beyond $K = 2$. Cross-seed variability increases with $K$, and the intermediate states that emerge for $K \geq 3$ lack the persistence needed to provide a stable conditioning signal. With only 240 training months, the data cannot reliably separate more than two regimes for the purpose of downstream cross-sectional stock selection.
 
 Beyond estimation, $K = 2$ has an interpretability advantage. The two-state model produces a single continuous signal ($\pi_t^{\text{filter}}$) that XGBoost can condition on in a straightforward way: higher values indicate more stress. With $K \geq 3$, the additional states may capture dimensions of the economy that are orthogonal to the continuation-reversal mechanism, for example a ``growth'' state characterized by strong fundamentals but moderate stress indicators. Such a state would conflate two economically distinct situations (a genuine expansion vs.\ a recovery from panic) and could introduce noise into the regime signal, degrading the model's ability to distinguish continuation from reversal. The two-state framework avoids this by restricting the regime classification to a single dimension, the degree of market stress, which is the dimension most relevant to momentum's cross-sectional structure.
 
@@ -216,13 +216,13 @@ Momentum is known to reverse in January \citep{JegadeeshTitman1993}: past losers
 
 \section{External Validity}\label{app:external_validity}
 
-\subsection{Alternative Train/Test Splits}\label{app:alt_splits}
+\subsection{Baseline Train/Test Split}\label{app:alt_splits}
 
-Table~\ref{tab:alt_splits} reports the baseline train/test split performance. The 25-year expanding-window backtest (Section~\ref{sec:historical_stress}) provides further out-of-sample evidence across alternative training windows and prediction horizons.
+Table~\ref{tab:alt_splits} reports the baseline train/test split performance. Robustness across training windows and prediction horizons is provided separately by the 25-year expanding-window backtest (Section~\ref{sec:historical_stress}), which re-estimates the full pipeline annually and therefore subsumes a continuum of alternative splits.
 
 \input{tables/table_alt_splits}
 
-In the baseline split (1990--2010 training, 2011--2025 test), XGB achieves a Sharpe of 1.11 while LR collapses ($-$0.01), confirming the nonlinear regime-momentum interaction documented in Section~\ref{sec:performance_results}.
+In the baseline split (1990--2010 training, 2011--2024 test), XGB achieves a Sharpe of 1.11 while LR collapses ($-$0.01), confirming the nonlinear regime-momentum interaction documented in Section~\ref{sec:performance_results}.
 
 \subsection{25-Year Expanding-Window Out-of-Sample Methodology}\label{app:expanding_window}
 
@@ -253,7 +253,7 @@ To assess the sampling variability of XGB's Sharpe ratio and test its outperform
 
 \input{tables/table_bootstrap}
 
-XGB's Sharpe confidence interval is [0.67, 1.53], comfortably above zero, while every benchmark's interval straddles zero. The paired tests reject equality of Sharpe ratios between XGB and each benchmark at $p < 0.025$. Within XGB, the panic-period Sharpe exceeds the calm-period Sharpe in point estimate (1.53 vs 0.84), but with only 59 panic months the paired difference is not statistically significant ($p = 0.109$); the 95\% interval $[-0.16, 1.59]$ straddles zero. The point-estimate gap is consistent with the regime-conditional selection mechanism described in Section~\ref{sec:regime_results}, but its statistical confirmation would require a longer panic sample. These intervals describe sampling variability within the 2011--2025 sample; out-of-sample generalization is addressed separately by the 25-year expanding-window backtest (Section~\ref{sec:historical_stress}) and the sub-period analysis (Appendix~\ref{app:subperiod}).
+XGB's Sharpe confidence interval is [0.67, 1.53], comfortably above zero, while every benchmark's interval straddles zero. The paired tests reject equality of Sharpe ratios between XGB and each benchmark at $p < 0.025$. Within XGB, the panic-period Sharpe exceeds the calm-period Sharpe in point estimate (1.53 vs 0.84), but with only 59 panic months the paired difference is not statistically significant ($p = 0.109$); the 95\% interval $[-0.16, 1.59]$ straddles zero. The point-estimate gap is consistent with the regime-conditional selection mechanism described in Section~\ref{sec:regime_results}, but its statistical confirmation would require a longer panic sample. These intervals describe sampling variability within the 2011--2024 sample; out-of-sample generalization is addressed separately by the 25-year expanding-window backtest (Section~\ref{sec:historical_stress}) and the sub-period analysis (Appendix~\ref{app:subperiod}).
 
 \subsection{Leg-Level CAPM Betas by Regime}\label{app:leg_betas}
 
@@ -310,7 +310,7 @@ Because the four HMM features respond to stress in different directions, the exp
 \end{equation}
 Features that spike upward during crises receive $\text{sign}_j = +1$; features that decline receive $\text{sign}_j = -1$. The panic state is then identified as the regime $k \in \{0, 1\}$ whose posterior mean vector $\hat{\boldsymbol{\mu}}_k$ best aligns with the crisis direction:
 \begin{equation}
-k^\ast = \arg\max_{k \in \{0,1\}} \sum_{j=1}^{D} \text{sign}_j \cdot \hat{\mu}_{k,j}
+k^\ast = \arg\max_{k \in \{0,1\}} \sum_{j=1}^{D} \text{sign}_j \cdot \hat{\mu}_{k,j}.
 \end{equation}
 The state labeled $k^\ast$ is designated as ``panic'' and the other as ``calm.''
 
@@ -362,12 +362,12 @@ To measure this dependence, we subsample $k \in \{1, 2, 3, 5, 10, 15, 20, 30, 50
 
 \input{tables/table_seed_convergence}
 
-Two patterns emerge. First, the mean Sharpe rises from 1.04 at $k = 1$ to 1.12 at $k = 100$, so a single-chain point estimate understates the strategy's performance by roughly 0.08 in Sharpe units. The gap closes monotonically, with most of the lift realized by $k = 30$. Second, the interquartile range across random subsets collapses from 0.10 at $k = 1$ to 0.02 at $k = 50$: once $k \geq 50$, any two random subsets of the seed pool produce nearly the same XGBoost portfolio. The production configuration ($N_s = 200$) sits well inside this plateau, which is why the 1.11 Sharpe reported in Section~\ref{sec:results} is insensitive to which specific seeds were drawn. The practical implication is methodological rather than cosmetic: a single-chain HMM would not reliably support the main conclusions, so the seed ensemble is a requirement of the design, not a late-stage performance tuning.
+Two patterns emerge. First, the mean Sharpe rises from 1.04 at $k = 1$ to 1.12 at $k = 100$, so a single-chain point estimate understates the strategy's performance by roughly 0.08 in Sharpe units. The gap closes approximately monotonically (with minor non-monotonic dips at $k = 3$ and $k = 5$ before the trend resumes), and most of the lift is realized by $k = 30$. Second, the interquartile range across random subsets collapses from 0.10 at $k = 1$ to 0.02 at $k = 50$: once $k \geq 50$, any two random subsets of the seed pool produce nearly the same XGBoost portfolio. The production configuration ($N_s = 200$) sits well inside this plateau, which is why the 1.11 Sharpe reported in Section~\ref{sec:results} is insensitive to which specific seeds were drawn. The practical implication is methodological rather than cosmetic: a single-chain HMM would not reliably support the main conclusions, so the seed ensemble is a requirement of the design, not a late-stage performance tuning.
 
 \section{International HMM Feature Selection}\label{app:intl_feature_selection}
 
 \sloppy
-For the international robustness check (Section~\ref{sec:international}), the HMM feature set is selected per region using the same 4-pass procedure as the US production specification (Section~\ref{sec:feature_selection}): a quality screen on MCMC convergence and crisis-window alignment, a portfolio-Sharpe ranking on the surviving combinations, a definitive validation at higher seed counts, and an additional stability check across random seed partitions. The international candidate pool comprises the five locally-available stress features (DD, VOL, DISP, REL\_N, BANK\_REL); BANK\_REL is the value-weighted bank-sector excess return over the broad regional market, sign-flipped so high values indicate stress, and substitutes for the US-specific Moody's BAA-AAA spread. With DD required, the procedure evaluates fifteen combinations of size one to four. Both UK and Japan select \emph{DD+VOL+REL\_N} as the regional feature set. The transplanted-from-US template (DD+DISP+REL\_N+BANK\_REL) fails the Pass-1 quality screen for both regions (minimum effective sample size of 14 and 4 respectively), motivating per-region selection. Pass-by-pass CSV results and chosen-features JSON manifests are saved under \texttt{results/thesis/} with the prefix \texttt{intl\_<region>\_hmm}.
+For the international robustness check (Section~\ref{sec:international}), the HMM feature set is selected per region using the same 4-pass procedure as the US production specification (Section~\ref{sec:feature_selection}): a quality screen on MCMC convergence and crisis-window alignment, a portfolio-Sharpe ranking on the surviving combinations, a definitive validation at higher seed counts, and an additional stability check across random seed partitions. The international candidate pool comprises the five locally-available stress features (DD, VOL, DISP, REL\_N, BANK\_REL); BANK\_REL is the value-weighted bank-sector excess return over the broad regional market, sign-flipped so high values indicate stress, and substitutes for the US-specific Moody's BAA--AAA spread. With DD required, the procedure evaluates fifteen combinations of size one to four. Both UK and Japan select \emph{DD+VOL+REL\_N} as the regional feature set. The transplanted-from-US template (DD+DISP+REL\_N+BANK\_REL) fails the Pass-1 quality screen for both regions (minimum effective sample size of 14 and 4 respectively), motivating per-region selection. Pass-by-pass CSV results and chosen-features JSON manifests are saved under \texttt{results/thesis/} with the prefix \texttt{intl\_<region>\_hmm}.
 
 \section{Fundamental Feature Definitions}\label{app:fundamental_features}
 

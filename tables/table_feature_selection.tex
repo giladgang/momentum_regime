@@ -17,6 +17,6 @@ $D$ & Combination & Sharpe & Mean & $\sigma$ \\
 3 & DD+ADR+TERM & 0.57 & 0.69 & 0.07 \\
 \bottomrule
 \end{tabular}
-\caption{Top 10 feature combinations from the three-pass selection pipeline (long-short, 10 bps costs). $D$ = number of HMM features. Sharpe = ensemble Sharpe ratio (10 HMM seeds, 20 XGBoost seeds). Mean and $\sigma$ are the mean and standard deviation of the Sharpe ratio across 5 independent experiments with different seed partitions, measuring robustness to random initialisation. DD+DISP+REL\_N+CS ranks first on both ensemble Sharpe and stability mean.}
+\caption{Top 10 feature combinations from the four-pass selection pipeline (long-short, 10 bps costs). $D$ = number of HMM features. Sharpe = ensemble Sharpe ratio (10 HMM seeds, 20 XGBoost seeds). Mean and $\sigma$ are the mean and standard deviation of the Sharpe ratio across 20 independent experiments with different seed partitions, measuring robustness to random initialisation. DD+DISP+REL\_N+CS ranks first on both ensemble Sharpe and stability mean.}
 \label{tab:feature_selection}
 \end{table}

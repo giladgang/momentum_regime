@@ -13,6 +13,6 @@ $K$ & Mean Sharpe & Std & Mean Sharpe & Std \\
 5 & -0.028 & 0.003 & 0.724 & 0.087 \\
 \bottomrule
 \end{tabular}
-\caption{Out-of-sample Sharpe ratios for HMMs with $K = 2, 3, 4, 5$ states (long-short). Each entry reports the mean and standard deviation across 5 independent Gibbs sampler seeds (2{,}000 iterations each). LR is invariant to $K$. XGB shows no consistent improvement beyond $K = 2$, and cross-seed variability increases with $K$.}
+\caption{Out-of-sample Sharpe ratios for HMMs with $K = 2, 3, 4, 5$ states (long-short). The $K{=}2$ row uses the 200-seed production regime signal as the reference point (its Std is zero by construction). For $K = 3, 4, 5$ each entry reports the mean and standard deviation across 5 independent Gibbs sampler seeds (2{,}000 iterations each). LR is invariant to $K$. XGB shows no consistent improvement beyond $K = 2$, and cross-seed variability increases with $K$.}
 \label{tab:multistate_hmm}
 \end{table}
