@@ -234,7 +234,12 @@ Each retraining produces 12 monthly out-of-sample long-short returns, which are 
 
 \subsection{Factor Model Regressions}\label{app:factor_alphas}
 
-To test whether XGB's out-of-sample return is explained by known risk factors, monthly returns are regressed on five standard factor models: CAPM, Fama--French three-factor, Carhart four-factor, Fama--French five-factor, and a six-factor specification that augments FF5 with the momentum factor (UMD). Newey--West standard errors (6 lags) are used throughout. Table~\ref{tab:factor_alphas} reports the intercept (alpha) and its $t$-statistic under each specification; Table~\ref{tab:fund_alphas} repeats the exercise for the fund-augmented variant. Alphas that survive all five factor models indicate return that cannot be attributed to market, size, value, profitability, investment, or momentum exposure.
+To test whether XGB's out-of-sample return is explained by known risk factors, monthly long-short returns are regressed on five standard factor models: CAPM, Fama--French three-factor, Carhart four-factor, Fama--French five-factor, and a six-factor specification that augments FF5 with the momentum factor (UMD). Each regression takes the form
+\begin{equation}
+r_t^{LS} = \alpha + \boldsymbol{\beta}^\top \mathbf{f}_t + \varepsilon_t,
+\label{eq:factor_regression}
+\end{equation}
+where $\mathbf{f}_t$ is the factor return vector for the specification in question, $\boldsymbol{\beta}$ measures the strategy's exposure to each factor, and $\alpha$ is the average return earned in excess of what those exposures would mechanically generate. The null hypothesis $\alpha = 0$ states that the factor model fully explains the strategy's returns; rejecting it means the strategy earns return that no linear combination of the factors can replicate. Newey--West standard errors (6 lags) are used throughout to correct for residual autocorrelation and heteroskedasticity in monthly returns. Table~\ref{tab:factor_alphas} reports $\hat\alpha$ and its $t$-statistic under each specification; Table~\ref{tab:fund_alphas} repeats the exercise for the fund-augmented variant. Alphas that survive all five factor models indicate return that cannot be attributed to market, size, value, profitability, investment, or momentum exposure.
 
 \input{tables/table_factor_alphas}
 

@@ -178,8 +178,6 @@ The posterior hyperparameters are:
 \nu_n = \nu_0 + n_k \notag \\[6pt]
 \boldsymbol{\Psi}_n &= \boldsymbol{\Psi}_0 + \mathbf{S}_k + \frac{\kappa_0 n_k}{\kappa_n}(\bar{\mathbf{x}}_k-\mathbf{m}_0)(\bar{\mathbf{x}}_k-\mathbf{m}_0)^\top.
 \end{align}
-Since $\kappa_0 = 0.01 \ll n_k$, the posterior is driven almost entirely by the data.
-
 New regime parameters are then drawn from the updated posterior:
 $\boldsymbol{\Sigma}_k \sim \mathcal{IW}(\nu_n,\boldsymbol{\Psi}_n)$ and
 $\boldsymbol{\mu}_k \mid \boldsymbol{\Sigma}_k \sim \mathcal{N}(\mathbf{m}_n, \boldsymbol{\Sigma}_k / \kappa_n)$.
