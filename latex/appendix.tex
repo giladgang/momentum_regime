@@ -8,7 +8,7 @@ Three primary data sources are used. \textbf{CRSP} (Center for Research in Secur
 
 Following \citet{Shumway1997}, delisting returns are incorporated to prevent survivorship bias. When a stock is delisted, its actual delisting return is used if available; for performance-related delistings (CRSP codes 500--584) with missing returns, $-30\%$ is imputed.
 
-A comprehensive overview of all data variables is provided in Table~\ref{tab:data_summary}.
+Table~\ref{tab:data_summary} summarises all data variables.
 
 \begin{table}[H]
 \centering
@@ -91,7 +91,7 @@ where $\tau_t^L$ and $\tau_t^S$ are the one-way turnover in the long and short l
 \end{equation}
 and each summation runs over all stocks appearing in either the new or previous portfolio for that leg. The 10 basis point cost reflects the transaction environment for a value-weighted, large-cap-biased strategy where NYSE breakpoints tilt toward liquid securities.
 
-It is important to note that transaction costs are applied \emph{post-hoc} as an accounting adjustment and are not incorporated into the models' training objectives. The cross-sectional models (DET, LR, and XGB) optimize stock-level prediction (classification accuracy or return forecasting) without knowledge of the previous portfolio, the resulting turnover, or the cost of rebalancing. This is standard practice in the empirical asset pricing literature \citep[e.g.,][]{FamaFrench2015, GHM2023}, where portfolio construction is treated as a fixed downstream step applied uniformly to all strategies. An end-to-end framework that jointly optimizes stock selection and portfolio-level objectives (e.g., net-of-cost Sharpe ratio) would require a fundamentally different architecture, such as a reinforcement learning or differentiable portfolio optimization layer, and remains a potential extension of this work.
+Transaction costs are applied \emph{post-hoc} as an accounting adjustment and are not incorporated into the models' training objectives. The cross-sectional models (DET, LR, and XGB) optimize stock-level prediction (classification accuracy or return forecasting) without knowledge of the previous portfolio, the resulting turnover, or the cost of rebalancing. This is standard practice in the empirical asset pricing literature \citep[e.g.,][]{FamaFrench2015, GHM2023}, where portfolio construction is treated as a fixed downstream step applied uniformly to all strategies. An end-to-end framework that jointly optimizes stock selection and portfolio-level objectives (e.g., net-of-cost Sharpe ratio) would require a fundamentally different architecture, such as a reinforcement learning or differentiable portfolio optimization layer, and remains a potential extension of this work.
 
 \subsection{Performance Metrics}\label{app:evaluation}
 
@@ -287,11 +287,11 @@ The $K=4$ partition was defined on long-leg z-curves; applying the same labels t
 
 To verify that regime identification is robust to the choice of emission distribution, the HMM is re-estimated with multivariate Student-$t$ emissions across a grid of degrees of freedom $\nu \in \{3, 5, 7, 10, 15, 20, 30, 50, 100\}$.
 
-The Student-$t$ model is estimated via data augmentation \citep{Geweke1993}: each observation receives a latent weight $w_t \sim \text{Gamma}(\nu/2, \nu/2)$, so that $\mathbf{z}_t \mid s_t{=}k,\, w_t \sim \mathcal{N}(\boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k / w_t)$. Marginalising over $w_t$ yields a multivariate $t$ with $\nu$ degrees of freedom. Crucially, conditional on $w_t$ the emission is Gaussian, so the Normal-Inverse-Wishart conjugate updates carry over with weighted sufficient statistics, preserving the efficiency of the Gibbs sampler.
+The Student-$t$ model is estimated via data augmentation \citep{Geweke1993}: each observation receives a latent weight $w_t \sim \text{Gamma}(\nu/2, \nu/2)$, so that $\mathbf{z}_t \mid s_t{=}k,\, w_t \sim \mathcal{N}(\boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k / w_t)$. Marginalising over $w_t$ yields a multivariate $t$ with $\nu$ degrees of freedom. Conditional on $w_t$ the emission is Gaussian, so the Normal-Inverse-Wishart conjugate updates carry over with weighted sufficient statistics, preserving the efficiency of the Gibbs sampler.
 
 \input{tables/table_student_t_hmm}
 
-The Normal model achieves the lowest BIC (2257.3 vs.\ 2257.6 for the best Student-$t$ at $\nu = 100$), indicating no meaningful improvement from heavier tails. Regime classifications agree with the Normal HMM on at least 97.8\% of months across all $\nu$ values, and the correlation of filtered panic probabilities exceeds 0.98 everywhere. These results confirm that the Gaussian emission specification is robust for this application.
+The Normal model achieves the lowest BIC (2257.3 vs.\ 2257.6 for the best Student-$t$ at $\nu = 100$), indicating no meaningful improvement from heavier tails. Regime classifications agree with the Normal HMM on at least 97.8\% of months across all $\nu$ values, and the correlation of filtered panic probabilities exceeds 0.98 everywhere.
 
 \section{Label Switching: Sign Correction Procedure}\label{app:label_switching}
 
@@ -311,6 +311,19 @@ The state labeled $k^\ast$ is designated as ``panic'' and the other as ``calm.''
 
 \section{Convergence Diagnostics}\label{app:convergence}
 
+Convergence of the Gibbs sampler is assessed in two complementary ways: effective sample sizes (ESS) within each chain, and the Gelman--Rubin $\hat{R}$ statistic across independent chains. The two are complementary because ESS measures efficiency within a single chain but cannot detect whether different chains have converged to different posterior modes, while Gelman--Rubin compares chains but says nothing about within-chain autocorrelation. Trace plots provide a third, visual check.
+
+\paragraph{Effective Sample Size (ESS)}
+Because successive MCMC draws are autocorrelated, $n$ draws from the chain contain less information than $n$ independent samples. The ESS quantifies the number of truly independent draws the chain is equivalent to. For a post-burn-in chain of length $n$,
+\begin{equation}
+ESS
+=
+\frac{n}{1 + 2\sum_{\ell=1}^{L^\ast}\hat{\rho}(\ell)},
+\end{equation}
+where $\hat{\rho}(\ell)$ is the estimated autocorrelation at lag $\ell$,\footnote{$\hat{\rho}(\ell) = \frac{1}{(n-\ell)\,\hat{\sigma}^2}\sum_{i=1}^{n-\ell}(\theta_i - \bar{\theta})(\theta_{i+\ell} - \bar{\theta})$, where $\theta_i$ is the $i$-th post-burn-in draw, $\bar{\theta}$ its sample mean, and $\hat{\sigma}^2$ its sample variance.} and $L^\ast$ is the first lag at which the autocorrelation becomes negative. High ESS indicates that the chain provides many effectively independent posterior draws; an ESS of at least 100 per parameter is a common minimum for reliable posterior inference \citep{Gelman2013}.
+
+\paragraph{Trace plots}
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{plots/thesis/convergence_trace.png}
@@ -320,7 +333,19 @@ The state labeled $k^\ast$ is designated as ``panic'' and the other as ``calm.''
 
 \subsection{Gelman--Rubin Diagnostic}\label{app:gelman_rubin}
 
-The Gelman--Rubin $\hat{R}$ statistic \citep{GelmanRubin1992, Gelman2013} assesses convergence by comparing within-chain and between-chain variance across the five independent Gibbs sampler chains. For each parameter $\theta$, $\hat{R} = \sqrt{\hat{V}/W}$, where $W$ is the mean within-chain variance and $\hat{V} = \frac{n-1}{n}W + \frac{B}{n}$ combines within-chain variance with the between-chain variance $B$. Values near 1.0 indicate that the chains have converged to the same posterior distribution; $\hat{R} < 1.1$ is the standard threshold.
+The Gelman--Rubin $\hat{R}$ statistic \citep{GelmanRubin1992, Gelman2013} compares within-chain and between-chain variance across $M$ independent chains, each of length $n$. Let $s_m^2$ denote the variance of chain $m$ and $\bar{\theta}_m$ its mean. The within-chain variance is
+\begin{equation}
+    W = \frac{1}{M} \sum_{m=1}^{M} s_m^2,
+\end{equation}
+and the between-chain variance is
+\begin{equation}
+    B = \frac{n}{M-1} \sum_{m=1}^{M} (\bar{\theta}_m - \bar{\theta})^2,
+\end{equation}
+where $\bar{\theta} = \frac{1}{M}\sum_m \bar{\theta}_m$. If all chains have converged to the same posterior, $B$ should be small relative to $W$. The diagnostic combines these:
+\begin{equation}
+    \hat{R} = \sqrt{\frac{\hat{V}}{W}}, \qquad \hat{V} = \frac{n-1}{n}\,W + \frac{B}{n}.
+\end{equation}
+Values of $\hat{R}$ near 1.0 indicate convergence; the conventional threshold is $\hat{R} < 1.1$, with a stricter modern bound at $\hat{R} < 1.01$.
 
 \input{tables/table_gelman_rubin}
 
