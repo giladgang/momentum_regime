@@ -1386,13 +1386,15 @@ class TestRobustnessTables:
 
     def test_stress_baseline_mdd(self):
         tbl = _read("tables/table_stress_scenarios.tex")
-        val = float(_find_in_table(tbl, "Baseline", 3))
+        # MDD column moved from col 3 to col 2 after duplicate Loss columns
+        # were collapsed (commit db767d5).
+        val = float(_find_in_table(tbl, "Baseline", 2))
         # Post-Shumway: -24.8 → -23.0 (Shumway-coherent MDD attenuation).
         assert val == pytest.approx(-23.0, abs=1.0)
 
     def test_stress_24mo_mdd(self):
         tbl = _read("tables/table_stress_scenarios.tex")
-        val = float(_find_in_table(tbl, "24 months", 3))
+        val = float(_find_in_table(tbl, "24 months", 2))
         assert val == pytest.approx(-70, abs=2)
 
     def test_turnover_m2(self):
