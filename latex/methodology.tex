@@ -41,7 +41,7 @@ The Bayesian approach instead draws from the joint posterior:
 \[
 p\!\left(\{s_t\}_{t=1}^T,\; \{\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k\}_{k=0}^1,\; \mathbf{P} \,\middle|\, \mathbf{z}_{1:T}\right).
 \]
- The states and the parameters are coupled: the conditional distribution of each block given the other is tractable, but neither marginal is. Gibbs sampling \citep{AlbertChib1993, Hoff2009}, a Markov chain Monte Carlo (MCMC) method, exploits exactly that structure by alternating between three conditional updates: (i) the full hidden state path $\{s_t\}_{t=1}^T$ (given the emission parameters and the transition matrix), (ii) the emission parameters $(\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k)$ for each regime (given the state path), and (iii) the transition matrix $\mathbf{P}$ (given the state path). Conjugate priors ensure that each block can be sampled exactly from its conditional posterior.
+ The states and the parameters are coupled: the conditional distribution of each block given the other is tractable, but neither marginal is. Gibbs sampling \citep{AlbertChib1993, Hoff2009}, a Markov chain Monte Carlo (MCMC) method, exploits exactly that structure by alternating between three conditional updates: (i) the full hidden state path $\{s_t\}_{t=1}^T$ (given the emission parameters and the transition matrix), (ii) the emission parameters $(\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k)$ for each regime (given the state path and the transition matrix), and (iii) the transition matrix $\mathbf{P}$ (given the state path and the emission parameters). Conjugate priors ensure that each block can be sampled exactly from its conditional posterior.
 
 \subsubsection{Prior Specification}\label{sec:priors}
 
