@@ -128,7 +128,7 @@ The forward pass (the \emph{forward filter}) computes the filtered probability
 \[
 \alpha_t(k) = P(s_t = k \mid \mathbf{z}_{1:t}),
 \]
-the probability of being in state $k$ at time $t$ given all observations so far. This quantity is built in two sub-steps. First, a \emph{prediction step} asks: before seeing this month's data, how likely is each state? Since the previous state is unknown, the algorithm sums over both possibilities, weighting each by its filtered probability from the previous month and the transition probability:
+the probability of being in state $k$ at time $t$ given all observations so far. $\alpha_t(k)$ is built in two sub-steps. First, a \emph{prediction step} asks: before seeing this month's data, how likely is each state? Since the previous state is unknown, the algorithm sums over both possibilities, weighting each by its filtered probability from the previous month and the transition probability:
 \[
 \alpha_{t|t-1}(k) = \alpha_{t-1}(0)\,P_{0k} + \alpha_{t-1}(1)\,P_{1k}.
 \]
