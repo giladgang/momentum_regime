@@ -145,7 +145,7 @@ where $f(\mathbf{z}_t \mid s_t=k) = \mathcal{N}(\mathbf{z}_t;\boldsymbol{\mu}_k,
 \alpha_1(k) \propto f(\mathbf{z}_1 \mid s_1 = k).
 \]
 
-The filtered probabilities $\alpha_t(k)$ tell us how likely each regime is at every month given the data up to that month, but they say nothing about how consecutive months should connect. Sampling each $s_t$ independently from its $\alpha_t$ would ignore the transition matrix entirely and could produce paths that flip calm-panic-calm-panic from one month to the next, even though $\mathbf{P}$ implies that each regime typically persists for around ten months. The backward pass restores the Markov structure by sampling states in reverse: it draws $s_T$ first from the filtered probability $\alpha_T$, then each earlier $s_t$ is sampled conditional on the just-drawn $s_{t+1}$, so the transition probability $P_{s_t,\,s_{t+1}}$ enters every sampled link and the resulting path is internally consistent with $\mathbf{P}$.
+The filtered probabilities $\alpha_t(k)$ are marginals: they describe each month's regime in isolation, not how consecutive months connect. Sampling each $s_t$ independently from its $\alpha_t$ would ignore the transition matrix and could produce paths that flip regimes from one month to the next, in conflict with the strongly persistent $\mathbf{P}$. A second, backward pass is therefore needed to draw a full state path that respects $\mathbf{P}$.
 
 The backward pass proceeds in two steps:
 
