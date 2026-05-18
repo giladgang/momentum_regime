@@ -197,7 +197,7 @@ Sampling once from each of the two Dirichlet posteriors (one per regime) produce
 
 With all three blocks updated, the sampler returns to Step~1. After sufficient iterations the draws converge to samples from the joint posterior.
 
-\subsubsection{Implementation and Convergence}\label{sec:implementation}
+\subsubsection{Implementation and Seed Averaging}\label{sec:implementation}
 
 The Gibbs sampler is estimated on the training sample only. To reduce sensitivity to MCMC initialization, the full sampler is run independently with $N_s = 200$ different random seeds. Each chain is run for $M=2{,}000$ iterations with the initialization described above. The first $B=500$ iterations are discarded as burn-in, leaving $1{,}500$ posterior draws per seed.
 
