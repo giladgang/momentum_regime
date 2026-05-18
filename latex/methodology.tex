@@ -45,10 +45,8 @@ p\!\left(\{s_t\}_{t=1}^T,\; \{\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k\}_{k=0}^1
 
 \subsubsection{Prior Specification}\label{sec:priors}
 
-The priors encode two economic beliefs. First, before seeing the data, neither regime should be forced to have extreme values in any feature; the model should learn the characteristics of calm and panic states from the data. Second, regimes should be persistent rather than switching every few months. The first belief is realized in the prior on the emission parameters $(\boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k)$, the second in the prior on the transition matrix $\mathbf{P}$, specified below.
-
 \paragraph{Emission parameters}
-For each regime $k$, the mean vector and covariance matrix are given a conjugate Normal-Inverse-Wishart (NIW) prior:\footnote{The Inverse-Wishart is a probability distribution over positive-definite matrices, making it the natural prior for a covariance matrix. Every sample is guaranteed to be symmetric and positive-definite. The Normal-Inverse-Wishart combines this with a conditional Normal prior on the mean. The prior is called \emph{conjugate} because when the data are Gaussian, the posterior takes the same NIW form with updated hyperparameters, making each Gibbs update an exact draw rather than an approximation.}
+Before seeing the data, neither regime should be forced to have extreme values in any feature; the model should learn the characteristics of calm and panic states from the data. This is encoded by a conjugate Normal-Inverse-Wishart (NIW) prior on each regime's mean vector and covariance matrix:\footnote{The Inverse-Wishart is a probability distribution over positive-definite matrices, making it the natural prior for a covariance matrix. Every sample is guaranteed to be symmetric and positive-definite. The Normal-Inverse-Wishart combines this with a conditional Normal prior on the mean. The prior is called \emph{conjugate} because when the data are Gaussian, the posterior takes the same NIW form with updated hyperparameters, making each Gibbs update an exact draw rather than an approximation.}
 \begin{equation}
 \boldsymbol{\Sigma}_k \sim \mathcal{IW}(\nu_0,\boldsymbol{\Psi}_0),
 \qquad
@@ -72,7 +70,7 @@ where $D$ is the number of selected features. After observing data, these prior 
 \end{itemize}
 
 \paragraph{Transition matrix}
-Each row of the transition matrix is assigned an independent Dirichlet prior:
+Regimes should be persistent rather than switching every few months. This is encoded by assigning each row of the transition matrix an independent Dirichlet prior whose mass concentrates on the diagonal:
 \begin{equation}
 \mathbf{P}_{0,\cdot} \sim \text{Dir}(9,1)
 \qquad
