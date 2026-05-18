@@ -98,14 +98,14 @@ loop_bot = s3_y - sh/2 - 0.6
 # ═══════════════════════════════════════════
 # LOOP BOX (drawn first as background)
 # ═══════════════════════════════════════════
-loop_box = FancyBboxPatch((0.0, loop_bot), 11, loop_top - loop_bot,
+loop_box = FancyBboxPatch((-1.0, loop_bot), 13, loop_top - loop_bot,
                             boxstyle='round,pad=0.35', facecolor=LOOP_BG,
                             edgecolor=LOOP_EDGE, linewidth=2, linestyle='--', zorder=0)
 ax.add_patch(loop_box)
 loop_label_y = loop_top - 0.25
-ax.text(0.5, loop_label_y,
+ax.text(cx, loop_label_y,
         r'Repeat for $M = 2{,}000$ iterations  (first $B = 500$ discarded as burn-in)',
-        fontsize=FS, fontstyle='italic', color='#555577', va='top', fontweight='bold')
+        fontsize=FS, fontstyle='italic', color='#555577', va='top', ha='center', fontweight='bold')
 
 # ═══════════════════════════════════════════
 # STEP 1: FFBS
@@ -142,7 +142,7 @@ add_box(ax, cx, s3_y, sw, sh, [
 # Routed on the LEFT side of the loop box, with the horizontal feed-in placed
 # between the "Repeat for M=..." label and the Step 1 box.
 loop_bottom_y = s3_y - sh/2 - 0.7
-loop_x = 0.5
+loop_x = -0.2
 step1_top = s1_y + sh/2
 horiz_top_y = (loop_label_y - 0.55)   # well below the label baseline
 # Down from Step 3
@@ -158,7 +158,7 @@ ax.add_patch(FancyArrowPatch(
     posA=(cx, horiz_top_y), posB=(cx, step1_top + 0.05),
     arrowstyle='-|>', mutation_scale=14, linewidth=1.8,
     color=GREY, zorder=5))
-ax.text(loop_x - 0.55, (loop_bottom_y + s1_y) / 2, 'next\niteration',
+ax.text(loop_x - 0.6, (loop_bottom_y + s1_y) / 2, 'next\niteration',
         fontsize=FS, fontstyle='italic', color=GREY,
         ha='center', va='center', rotation=90,
         bbox=dict(boxstyle='round,pad=0.2', facecolor=LOOP_BG, edgecolor='none'))
