@@ -145,7 +145,7 @@ where $f(\mathbf{z}_t \mid s_t=k) = \mathcal{N}(\mathbf{z}_t;\boldsymbol{\mu}_k,
 \alpha_1(k) \propto f(\mathbf{z}_1 \mid s_1 = k).
 \]
 
-The forward pass tells us how likely each regime is at every month, but if we simply flipped a weighted coin independently at each $t$ we could produce implausible paths (for example, rapid calm-panic-calm-panic switching even though the transition matrix says regimes persist for roughly ten months). The backward pass prevents this by sampling states in reverse. Once a future state has been drawn, the current state is sampled conditional on it, so the entire path respects the Markov transition dynamics.
+The filtered probabilities $\alpha_t(k)$ tell us how likely each regime is at every month given the data up to that month, but they say nothing about how consecutive months should connect. Sampling each $s_t$ independently from its $\alpha_t$ would ignore the transition matrix entirely and could produce paths that flip calm-panic-calm-panic from one month to the next, even though $\mathbf{P}$ implies that each regime typically persists for around ten months. The backward pass restores the Markov structure by sampling states in reverse: it draws $s_T$ first from the filtered probability $\alpha_T$, then each earlier $s_t$ is sampled conditional on the just-drawn $s_{t+1}$, so the transition probability $P_{s_t,\,s_{t+1}}$ enters every sampled link and the resulting path is internally consistent with $\mathbf{P}$.
 
 The backward pass proceeds in two steps:
 
