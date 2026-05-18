@@ -19,8 +19,9 @@ The regime signal's ability to capture the shift in momentum's cross-sectional s
 \paragraph{Candidate pool}
 Nine monthly macrofinancial indicators, all available from 1990 onward, are considered:
 \begin{itemize}
-    \item \emph{Equity market:} market drawdown (DD), realized volatility (VOL), cross-sectional return dispersion (DISP), relative market participation (REL\_N), advance-decline ratio (ADR), and cross-sectional return skewness (SKEW).
-    \item \emph{Credit and macro:} BAA--AAA credit spread (CS), log VIX (LVIX), and the 10-year minus 2-year Treasury term spread (TERM).
+    \item \emph{Equity-market stress:} market drawdown (DD), realized volatility (VOL), and log VIX (LVIX).
+    \item \emph{Cross-sectional structure:} cross-sectional return dispersion (DISP), relative market participation (REL\_N), advance-decline ratio (ADR), and cross-sectional return skewness (SKEW).
+    \item \emph{Credit and rates:} BAA--AAA credit spread (CS) and the 10-year minus 2-year Treasury term spread (TERM).
 \end{itemize}
 All candidates are observable in real time at the end of each month and standardized to $z$-scores using training-period statistics.
 
@@ -33,14 +34,12 @@ In the third pass (\emph{definitive validation}), the surviving finalists are re
 
 In the fourth pass (\emph{stability check}), the finalists are tested for robustness across random seed partitions. A combination that achieves a high Sharpe on one lucky seed combination but collapses on another is unreliable. We run 20 independent experiments with different seed draws and classify combinations as stable ($\sigma < 0.10$), moderate ($0.10 \leq \sigma < 0.15$), or unstable ($\sigma \geq 0.15$).
 
-\paragraph{Selected features}
-The four-pass procedure converges on DD, DISP, REL\_N, and CS. The choice is driven by complementarity rather than peak Sharpe: DD is the strongest single-feature classifier (DD-only Sharpe 0.66 vs full-set 0.97; Table~\ref{tab:hmm_feature_ablation}, Appendix~\ref{app:hmm_feature_tables}), but the leave-one-out drops in the same table show that REL\_N is the next-largest contributor ($-$0.54), with DISP and CS adding marginally to Sharpe ($-$0.01 each) but carrying stress information that is independent of price drawdown, lowering the cross-partition $\sigma$ from $0.14$ to $0.11$ (Table~\ref{tab:feature_selection}). The four features are introduced in detail in Section~\ref{sec:hmm_features} below.
-
-The four-feature combination ranks first on both single-experiment ensemble Sharpe and cross-partition mean Sharpe in Table~\ref{tab:feature_selection}. Sharpe ratios in that table use the selection-pipeline seed budget (10 HMM seeds, 20 XGBoost seeds), kept small so the procedure can search many combinations. The production configuration uses a much larger budget (200 HMM, 50 XGBoost), which lifts the Sharpe to 1.11 (Section~\ref{sec:results}); the seed-convergence experiment in Appendix~\ref{app:seed_convergence} confirms this is a saturation effect rather than a tuning artefact.\footnote{Pass~2 evaluates feature sets on test-period Sharpe, so the selected specification partly reflects test outcomes. The Pass~4 final choice is made on cross-seed stability, and Tables~\ref{tab:feature_selection} and~\ref{tab:hmm_feature_ablation} show that all $D = 1$ to $D = 4$ counts and leave-one-out variants produce Sharpes from 0.57 to 0.91. The headline 1.11 should be read as the upper end of a tight range, not a point isolated by search.}
+\paragraph{Selected set}
+Pass~4 selects DD, DISP, REL\_N, and CS as the production set, ranking first on both single-experiment ensemble Sharpe and cross-partition mean Sharpe in Table~\ref{tab:feature_selection}. Sharpe ratios in that table use the selection-pipeline seed budget (10 HMM seeds, 20 XGBoost seeds), kept small so the procedure can search many combinations. The production configuration uses a much larger budget (200 HMM, 50 XGBoost), which lifts the Sharpe to 1.11 (Section~\ref{sec:results}); the seed-convergence experiment in Appendix~\ref{app:seed_convergence} confirms this is a saturation effect rather than a tuning artefact.\footnote{Pass~2 evaluates feature sets on test-period Sharpe, so the selected specification partly reflects test outcomes. The Pass~4 final choice is made on cross-seed stability, and Tables~\ref{tab:feature_selection} and~\ref{tab:hmm_feature_ablation} show that all $D = 1$ to $D = 4$ counts and leave-one-out variants produce Sharpes from 0.57 to 0.91. The headline 1.11 should be read as the upper end of a tight range, not a point isolated by search.}
 
 \subsection{HMM Input Features}\label{sec:hmm_features}
 
-The four selected indicators each capture a distinct dimension of market stress:
+The choice of DD, DISP, REL\_N, and CS is driven by complementarity rather than peak Sharpe: DD is the strongest single-feature classifier (DD-only Sharpe 0.66 vs full-set 0.97; Table~\ref{tab:hmm_feature_ablation}, Appendix~\ref{app:hmm_feature_tables}), but the leave-one-out drops in the same table show that REL\_N is the next-largest contributor ($-$0.54), with DISP and CS adding marginally to Sharpe ($-$0.01 each) but carrying stress information that is independent of price drawdown, lowering the cross-partition $\sigma$ from $0.14$ to $0.11$ (Table~\ref{tab:feature_selection}). Each captures a distinct dimension of market stress:
 \begin{enumerate}
     \item \textbf{DD (Drawdown):} The percentage decline of the cumulative market price index from its rolling 12-month peak:
     \begin{equation}
