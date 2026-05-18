@@ -109,15 +109,13 @@ The Gibbs sampler requires starting values for the emission parameters and the t
 where $n_k$ is the number of months assigned to regime $k$. The initial transition matrix is set to the prior mean, $\mathbf{P}^{(0)} = \mathbb{E}[\mathbf{P}]$ (Equation~\ref{eq:prior_mean_P}). These initial parameters give the first forward pass (described below) emission densities that can distinguish the two states.
 
 \paragraph{Iterative updates}
-Each iteration cycles through three conditional updates: the latent state path $\{s_t\}_{t=1}^T$, the emission parameters $(\boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k)$, and the transition matrix $\mathbf{P}$. Each block is sampled from its full conditional distribution, with the other two blocks held fixed at their current values; for Steps~2 and~3 this distribution takes the conjugate Bayes form $\text{posterior} \propto \text{likelihood} \times \text{prior}$, while Step~1 (FFBS) samples the state path jointly from its full conditional via the forward-filtering backward-sampling recursion described below. The likelihood factor that appears throughout is the Gaussian emission density $f(\mathbf{z}_t \mid s_t = k) = \mathcal{N}(\mathbf{z}_t; \boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k)$, the plausibility of the observed feature vector $\mathbf{z}_t$ under regime $k$. Figure~\ref{fig:gibbs_diagram} summarises the cycle graphically; the steps below derive each update in turn.
+Each iteration cycles through three conditional updates: the latent state path $\{s_t\}_{t=1}^T$, the emission parameters $(\boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k)$, and the transition matrix $\mathbf{P}$. Each block is sampled from its full conditional distribution, with the other two blocks held fixed at their current values; for Steps~2 and~3 this distribution takes the conjugate Bayes form $\text{posterior} \propto \text{likelihood} \times \text{prior}$, while Step~1 (FFBS) samples the state path jointly from its full conditional via the forward-filtering backward-sampling recursion described below. The likelihood factor that appears throughout is the Gaussian emission density $f(\mathbf{z}_t \mid s_t = k) = \mathcal{N}(\mathbf{z}_t; \boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k)$, the plausibility of the observed feature vector $\mathbf{z}_t$ under regime $k$. The cycle is summarised graphically below; the steps that follow derive each update in turn.
 
 \begin{figure}[H]
     \centering
-    \vspace{-0.5cm}
-    \includegraphics[width=0.88\textwidth]{plots/thesis/gibbs_sampling_diagram.pdf}
     \vspace{-0.3cm}
-    \caption{Flowchart of the Gibbs sampler. The dashed loop repeats for $M = 2{,}000$ iterations ($B = 500$ burn-in). Each box shows the conditional posterior being sampled and which parameters are held fixed.}
-    \label{fig:gibbs_diagram}
+    \includegraphics[width=\textwidth]{plots/thesis/gibbs_sampling_diagram.pdf}
+    \vspace{-0.3cm}
 \end{figure}
 
 \paragraph{Step 1: Sampling the hidden state path via FFBS}

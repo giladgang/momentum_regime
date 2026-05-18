@@ -107,9 +107,9 @@ ax.text(0.5, loop_top - 0.25,
 # STEP 1: FFBS
 # ═══════════════════════════════════════════
 add_box(ax, cx, s1_y, sw, sh, [
-    (r'Step 1: Sample the hidden state path  (FFBS)', 13.5, BLUE, True),
+    (r'Step 1: Sample the hidden state path  (FFBS)', 16, BLUE, True),
     ('', 2, TEXT_DARK, False),
-    (r'Holds $\boldsymbol{\mu}_k,\, \boldsymbol{\Sigma}_k,\, \mathbf{P}$ fixed', 10, PURPLE, False),
+    (r'Holds $\boldsymbol{\mu}_k,\, \boldsymbol{\Sigma}_k,\, \mathbf{P}$ fixed', 12, PURPLE, False),
 ], STEP1_FILL, STEP1_EDGE)
 
 arrow_down(ax, cx, s1_y - sh/2, s1_y - sh/2 - step_gap, BLUE)
@@ -118,9 +118,9 @@ arrow_down(ax, cx, s1_y - sh/2, s1_y - sh/2 - step_gap, BLUE)
 # STEP 2: NIW update
 # ═══════════════════════════════════════════
 add_box(ax, cx, s2_y, sw, sh, [
-    (r'Step 2: Update the emission parameters  (NIW posterior)', 13.5, PURPLE, True),
+    (r'Step 2: Update the emission parameters  (NIW posterior)', 16, PURPLE, True),
     ('', 2, TEXT_DARK, False),
-    (r'Holds $\{s_t\}$ and $\mathbf{P}$ fixed', 10, PURPLE, False),
+    (r'Holds $\{s_t\}$ and $\mathbf{P}$ fixed', 12, PURPLE, False),
 ], STEP2_FILL, STEP2_EDGE)
 
 arrow_down(ax, cx, s2_y - sh/2, s2_y - sh/2 - step_gap, PURPLE)
@@ -129,9 +129,9 @@ arrow_down(ax, cx, s2_y - sh/2, s2_y - sh/2 - step_gap, PURPLE)
 # STEP 3: Dirichlet update
 # ═══════════════════════════════════════════
 add_box(ax, cx, s3_y, sw, sh, [
-    (r'Step 3: Update the transition matrix  (Dirichlet posterior)', 13.5, '#9B2226', True),
+    (r'Step 3: Update the transition matrix  (Dirichlet posterior)', 16, '#9B2226', True),
     ('', 2, TEXT_DARK, False),
-    (r'Holds $\{s_t\},\, \boldsymbol{\mu}_k,\, \boldsymbol{\Sigma}_k$ fixed', 10, PURPLE, False),
+    (r'Holds $\{s_t\},\, \boldsymbol{\mu}_k,\, \boldsymbol{\Sigma}_k$ fixed', 12, PURPLE, False),
 ], STEP3_FILL, STEP3_EDGE)
 
 # ── Loop-back arrow ──
