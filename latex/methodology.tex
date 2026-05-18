@@ -193,7 +193,7 @@ The sampled path is scanned to count transitions, $n_{ij} = \sum_{t=2}^T \mathds
 \text{Dir}\!\big(\alpha_{i0} + n_{i0},\; \alpha_{i1} + n_{i1}\big).
 \label{eq:dirichlet_update}
 \end{equation}
-The pseudo-counts are $(9, 1)$ for the calm-state transitions and $(1, 9)$ for the panic-state transitions, so even before observing data the prior expects each regime to persist with probability $0.9$; the observed counts shift the expectation but rarely overturn the persistence pattern.
+The Dirichlet prior set earlier in this section places pseudo-counts $(9, 1)$ on the calm-state transitions and $(1, 9)$ on the panic-state transitions, encoding an expected persistence of $0.9$ in each regime before any data are observed; the observed transition counts shift the expectation but rarely overturn the persistence pattern.
 
 With all three blocks updated, the sampler returns to Step~1. After sufficient iterations the draws converge to samples from the joint posterior.
 
