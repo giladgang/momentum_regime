@@ -191,7 +191,7 @@ The sampled path is scanned to count transitions: $n_{ij} = \sum_{t=2}^T \mathds
 \text{Dir}\space\!\big(\alpha_{i0} + n_{i0},\; \alpha_{i1} + n_{i1}\big).
 \label{eq:dirichlet_update}
 \end{equation}
-For row 0 (calm), the prior pseudo-counts are $(\alpha_{00}, \alpha_{01}) = (9, 1)$ from Equation~\eqref{eq:dirichlet_prior}, so the posterior becomes $\text{Dir}(9 + 140,\; 1 + 10) = \text{Dir}(149,\; 11)$. The expected persistence probability under this posterior is $149/160 = 0.93$, reflecting that the data reinforced the prior belief in regime persistence. A new transition matrix row is then drawn from this Dirichlet distribution, and the same procedure is applied independently to row 1 (panic).
+For row 0 (calm), the prior pseudo-counts are $(\alpha_{00}, \alpha_{01}) = (9, 1)$ from Equation~\eqref{eq:dirichlet_prior}, so the posterior becomes $\text{Dir}(9 + 140,\; 1 + 10) = \text{Dir}(149,\; 11)$. The expected persistence probability under this posterior is $149/160 = 0.93$, reflecting that the data reinforced the prior belief in regime persistence. A new transition matrix row is then drawn from this Dirichlet distribution. Row 1, the panic-to-calm and panic-to-panic probabilities $(P_{10}, P_{11})$, is updated by the same procedure but with the symmetric Dir$(1, 9)$ prior, yielding an expected panic persistence of roughly $0.9$.
 
 With all three blocks updated, the sampler returns to Step~1. After sufficient iterations the draws converge to samples from the joint posterior.
 
