@@ -161,7 +161,7 @@ P(s_t = k \mid s_{t+1}, \mathbf{z}_{1:t}) = \frac{\alpha_t(k)\,P_{k,s_{t+1}}}
 {\alpha_t(0)\,P_{0,s_{t+1}} + \alpha_t(1)\,P_{1,s_{t+1}}}.
 \label{eq:backward_sampling}
 \end{equation}
-For example, if the forward filter assigns high probability to calm at time $t$ ($\alpha_t(0)$ is large) and the already-sampled $s_{t+1}$ is also calm (so $P_{0,0}$ is large), then the numerator for $k=0$ dominates and the algorithm will very likely sample $s_t = 0$.
+For example, if the forward filter assigns high probability to calm at time $t$ ($\alpha_t(0)$ is large) and the already-sampled $s_{t+1}$ is also calm (so $P_{0,0}$ is large), then the product $\alpha_t(0)\,P_{0,0}$ dwarfs $\alpha_t(1)\,P_{1,0}$, the conditional probability of $s_t = 0$ approaches one, and the algorithm very likely samples $s_t = 0$.
 
 The output of the full FFBS procedure is one draw from the posterior over state paths. Across Gibbs iterations, different paths are sampled, exploring the full posterior uncertainty.
 
