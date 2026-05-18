@@ -186,14 +186,14 @@ $\boldsymbol{\mu}_k \mid \boldsymbol{\Sigma}_k \sim \mathcal{N}(\mathbf{m}_n, \b
 
 \paragraph{Step 3: Updating the transition matrix}
 
-The sampled path is scanned to count transitions: $n_{ij} = \sum_{t=2}^T \mathds{1}(s_{t-1}=i,\, s_t=j)$ records how many times the path moved from state $i$ to state $j$. For example, if the sampled path contains 140 calm-to-calm transitions and 10 calm-to-panic transitions, then $n_{00} = 140$ and $n_{01} = 10$. These observed counts are added to the Dirichlet prior pseudo-counts to obtain the posterior:
+The sampled path is scanned to count transitions, $n_{ij} = \sum_{t=2}^T \mathds{1}(s_{t-1}=i,\, s_t=j)$, the number of times the path moved from state $i$ to state $j$. Each row of the transition matrix is then drawn from its own Dirichlet posterior:
 \begin{equation}
 \mathbf{P}_{i,\cdot} \mid \{s_t\}
 \sim
-\text{Dir}\space\!\big(\alpha_{i0} + n_{i0},\; \alpha_{i1} + n_{i1}\big).
+\text{Dir}\!\big(\alpha_{i0} + n_{i0},\; \alpha_{i1} + n_{i1}\big).
 \label{eq:dirichlet_update}
 \end{equation}
-For the calm-to-X transition probabilities the prior pseudo-counts are $(9, 1)$ from Equation~\eqref{eq:dirichlet_prior}, so the posterior becomes $\text{Dir}(9 + 140,\; 1 + 10) = \text{Dir}(149,\; 11)$. The expected calm-persistence probability under this posterior is $149/160 = 0.93$, reflecting that the data reinforced the prior belief in regime persistence. A new pair of transition probabilities is then drawn from this Dirichlet distribution. The panic-to-X transition probabilities are updated by the same procedure with the symmetric $\text{Dir}(1, 9)$ prior, yielding an expected panic persistence of roughly $0.9$.
+The pseudo-counts are $(9, 1)$ for the calm-state transitions and $(1, 9)$ for the panic-state transitions, so even before observing data the prior expects each regime to persist with probability $0.9$; the observed counts shift the expectation but rarely overturn the persistence pattern.
 
 With all three blocks updated, the sampler returns to Step~1. After sufficient iterations the draws converge to samples from the joint posterior.
 
