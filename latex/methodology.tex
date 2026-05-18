@@ -193,7 +193,7 @@ The sampled path is scanned to count transitions, $n_{ij} = \sum_{t=2}^T \mathds
 \text{Dir}\!\big(\alpha_{i0} + n_{i0},\; \alpha_{i1} + n_{i1}\big).
 \label{eq:dirichlet_update}
 \end{equation}
-A new pair of transition probabilities is then drawn from each Dirichlet posterior, and the two rows are stacked to give the updated transition matrix $\mathbf{P}$ that will be held fixed during the next iteration's state-path sampling. Because the prior is strongly tilted toward persistence, the sampled $\mathbf{P}$ tracks the data while staying anchored around a persistent diagonal even on short or noisy paths.
+Sampling once from each of the two Dirichlet posteriors (one per regime) produces the updated transition matrix $\mathbf{P}$, which is held fixed during the next iteration's state-path sampling. Because the prior is strongly tilted toward persistence, the sampled $\mathbf{P}$ tracks the data while staying anchored around a persistent diagonal even on short or noisy paths.
 
 With all three blocks updated, the sampler returns to Step~1. After sufficient iterations the draws converge to samples from the joint posterior.
 
