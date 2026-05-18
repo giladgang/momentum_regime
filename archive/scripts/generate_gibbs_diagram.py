@@ -30,9 +30,9 @@ EQ_COLOR = '#333333'
 plt.rcParams['font.family'] = 'sans-serif'
 plt.rcParams['font.sans-serif'] = ['Helvetica', 'Arial', 'DejaVu Sans']
 
-fig, ax = plt.subplots(1, 1, figsize=(11, 18))
+fig, ax = plt.subplots(1, 1, figsize=(11, 14))
 ax.set_xlim(-1.5, 12.5)
-ax.set_ylim(-26, 2.5)
+ax.set_ylim(-19, 2.5)
 ax.set_aspect('equal')
 ax.axis('off')
 
@@ -64,7 +64,7 @@ def arrow_down(ax, x, y1, y2, color=GREY, lw=2):
 
 cx = 5.5
 sw = 9.0
-step_gap = 1.1
+step_gap = 1.0
 
 # ═══════════════════════════════════════════
 # INIT
@@ -83,9 +83,9 @@ arrow_down(ax, cx, init_y - init_h/2, init_y - init_h/2 - 1.5, INIT_EDGE)
 # Compute step positions
 # ═══════════════════════════════════════════
 loop_top = -1.2
-sh = 4.0
+sh = 2.2
 
-s1_y = loop_top - 1.2 - sh/2
+s1_y = loop_top - 1.0 - sh/2
 s2_y = s1_y - sh/2 - step_gap - sh/2
 s3_y = s2_y - sh/2 - step_gap - sh/2
 
@@ -107,12 +107,7 @@ ax.text(0.5, loop_top - 0.25,
 # STEP 1: FFBS
 # ═══════════════════════════════════════════
 add_box(ax, cx, s1_y, sw, sh, [
-    ('Step 1: Assign each month to a regime  (FFBS)', 14, BLUE, True),
-    ('', 3, TEXT_DARK, False),
-    ('', 2, TEXT_DARK, False),
-    (r'$P(s_t \mid \mathbf{z}_{1:T}) \;\propto\; f(\mathbf{z}_t \mid s_t) \;\cdot\; P(s_t \mid s_{t-1})$', 13, EQ_COLOR, False),
-    ('', 1, TEXT_DARK, False),
-    (r'posterior $\;\;\;\;\;\propto\;\;\;\;$ likelihood $\times$ transition prior', 10.5, GREY, False),
+    (r'Step 1: Sample the hidden state path  (FFBS)', 13.5, BLUE, True),
     ('', 2, TEXT_DARK, False),
     (r'Holds $\boldsymbol{\mu}_k,\, \boldsymbol{\Sigma}_k,\, \mathbf{P}$ fixed', 10, PURPLE, False),
 ], STEP1_FILL, STEP1_EDGE)
@@ -123,12 +118,7 @@ arrow_down(ax, cx, s1_y - sh/2, s1_y - sh/2 - step_gap, BLUE)
 # STEP 2: NIW update
 # ═══════════════════════════════════════════
 add_box(ax, cx, s2_y, sw, sh, [
-    ('Step 2: Learn what each regime looks like  (NIW)', 14, PURPLE, True),
-    ('', 3, TEXT_DARK, False),
-    ('', 2, TEXT_DARK, False),
-    (r'$p(\boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k \mid \mathbf{z}_k) \;\propto\; \prod_{t:\,s_t=k} \mathcal{N}(\mathbf{z}_t;\, \boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k) \;\cdot\; \mathrm{NIW}(\mathbf{m}_0, \kappa_0, \nu_0, \boldsymbol{\Psi}_0)$', 11.5, EQ_COLOR, False),
-    ('', 1, TEXT_DARK, False),
-    (r'posterior $\;\;\;\;\;\;\;\propto\;\;\;\;\;\;$ likelihood $\times$ conjugate prior', 10.5, GREY, False),
+    (r'Step 2: Update the emission parameters  (NIW posterior)', 13.5, PURPLE, True),
     ('', 2, TEXT_DARK, False),
     (r'Holds $\{s_t\}$ and $\mathbf{P}$ fixed', 10, PURPLE, False),
 ], STEP2_FILL, STEP2_EDGE)
@@ -139,12 +129,7 @@ arrow_down(ax, cx, s2_y - sh/2, s2_y - sh/2 - step_gap, PURPLE)
 # STEP 3: Dirichlet update
 # ═══════════════════════════════════════════
 add_box(ax, cx, s3_y, sw, sh, [
-    ('Step 3: Learn how often regimes switch  (Dirichlet)', 14, '#9B2226', True),
-    ('', 3, TEXT_DARK, False),
-    ('', 2, TEXT_DARK, False),
-    (r'$p(\mathbf{P}_{i,\cdot} \mid \{s_t\}) \;\propto\; \prod_t \; P_{i,\,s_t}^{\;\,n_{ij}} \;\;\cdot\;\; \mathrm{Dir}(\boldsymbol{\alpha}_i)$', 12, EQ_COLOR, False),
-    ('', 1, TEXT_DARK, False),
-    (r'posterior $\;\;\propto\;\;\;\;\;\;$ likelihood $\;\;\times\;\;$ conjugate prior', 10.5, GREY, False),
+    (r'Step 3: Update the transition matrix  (Dirichlet posterior)', 13.5, '#9B2226', True),
     ('', 2, TEXT_DARK, False),
     (r'Holds $\{s_t\},\, \boldsymbol{\mu}_k,\, \boldsymbol{\Sigma}_k$ fixed', 10, PURPLE, False),
 ], STEP3_FILL, STEP3_EDGE)
@@ -202,9 +187,9 @@ add_box(ax, cx, out_y, 10.0, out_h, [
     (r'Apply forward filter with posterior means $\;\rightarrow\; \pi_t^{\,\mathrm{filter}}$', 11, TEXT_DARK, False),
 ], OUTPUT_FILL, OUTPUT_EDGE)
 
-plt.savefig('gibbs_sampling_diagram.png', dpi=300, bbox_inches='tight',
+plt.savefig('plots/thesis/gibbs_sampling_diagram.png', dpi=300, bbox_inches='tight',
             facecolor='white', edgecolor='none', pad_inches=0.15)
-plt.savefig('gibbs_sampling_diagram.pdf', bbox_inches='tight',
+plt.savefig('plots/thesis/gibbs_sampling_diagram.pdf', bbox_inches='tight',
             facecolor='white', edgecolor='none', pad_inches=0.15)
 plt.close()
-print('Saved gibbs_sampling_diagram.png and .pdf')
+print('Saved plots/thesis/gibbs_sampling_diagram.png and .pdf')
