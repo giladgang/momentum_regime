@@ -46,7 +46,7 @@ p\!\left(\{s_t\}_{t=1}^T,\; \{\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k\}_{k=0}^1
 \subsubsection{Prior Specification}\label{sec:priors}
 
 \paragraph{Emission parameters}
-Before seeing the data, neither regime should be forced to have extreme values in any feature; the model should learn the characteristics of calm and panic states from the data. This is encoded by a conjugate Normal-Inverse-Wishart (NIW) prior on each regime's mean vector and covariance matrix:\footnote{The Inverse-Wishart is a probability distribution over positive-definite matrices, making it the natural prior for a covariance matrix. Every sample is guaranteed to be symmetric and positive-definite. The Normal-Inverse-Wishart combines this with a conditional Normal prior on the mean. The prior is called \emph{conjugate} because when the data are Gaussian, the posterior takes the same NIW form with updated hyperparameters, making each Gibbs update an exact draw rather than an approximation.}
+Before seeing the data, neither regime should be forced to have extreme values in any feature; the model should learn the characteristics of calm and panic states from the data. This is encoded by a conjugate Normal-Inverse-Wishart (NIW) prior on each regime's mean vector and covariance matrix:\footnote{The Inverse-Wishart is a probability distribution over positive-definite matrices, making it the natural prior for a covariance matrix. Every sample is guaranteed to be symmetric and positive-definite. The Normal-Inverse-Wishart combines this with a conditional Normal prior on the mean.}
 \begin{equation}
 \boldsymbol{\Sigma}_k \sim \mathcal{IW}(\nu_0,\boldsymbol{\Psi}_0),
 \qquad
