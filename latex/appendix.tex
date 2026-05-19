@@ -21,8 +21,8 @@ Variable & Source & Description & Used in \\
 \multicolumn{4}{l}{\emph{Stock-level variables}} \\
 Monthly returns & CRSP \texttt{msf} & Adjusted holding-period returns & Sections~\ref{sec:methodology}, \ref{sec:results} \\
 Price, shares out. & CRSP \texttt{msf} & For market equity computation & Section~\ref{sec:data} \\
-Exchange, share codes & CRSP \texttt{msf} & Universe filtering (codes 10, 11) & Section~\ref{sec:stage2} \\
-Delisting returns & CRSP \texttt{msedelist} & Survivorship bias correction & Section~\ref{sec:stage2} \\
+Exchange, share codes & CRSP \texttt{msf} & Universe filtering (codes 10, 11) & Section~\ref{sec:data} \\
+Delisting returns & CRSP \texttt{msedelist} & Survivorship bias correction & Section~\ref{sec:data} \\
 Book equity (\texttt{ceqq}) & Compustat \texttt{fundq} & Book-to-market, ROE & Appendix~\ref{app:fundamental_features} \\
 Total assets (\texttt{atq}) & Compustat \texttt{fundq} & Asset growth, gross profit, CF ratios & Appendix~\ref{app:fundamental_features} \\
 Income (\texttt{ibq}) & Compustat \texttt{fundq} & ROE, earnings growth, accruals & Appendix~\ref{app:fundamental_features} \\
@@ -50,7 +50,7 @@ $\pi_t^{\text{filter}}$ & HMM output & Filtered panic probability & Section~\ref
 
 \medskip
 \small
-\textbf{Notes:} All data accessed via WRDS. Compustat linked to CRSP via the CCM bridge table using primary link types (LU, LC). Fundamentals are lagged four months from fiscal quarter end to ensure real-time availability. The sample covers January 1990 to November 2024 (training: 1990--2010; test: 2011--2024).
+\textbf{Notes:} All data accessed via WRDS. Compustat linked to CRSP via the CCM bridge table using primary link types (LU, LC). Fundamentals are lagged four months from fiscal quarter end to ensure real-time availability. The sample covers January 1990 to November 2024 (training: 1990--2010, 240 months; test: 2011--2024, 167 months).
 \end{table}
 
 \section{HMM Feature Selection Tables}\label{app:hmm_feature_tables}
@@ -95,7 +95,7 @@ Transaction costs are applied \emph{post-hoc} as an accounting adjustment and ar
 
 \subsection{Performance Metrics}\label{app:evaluation}
 
-\paragraph{Standard Metrics}\label{app:standard_metrics}
+\paragraph{Standard Metrics}
 
 Strategy performance is assessed using four standard risk-adjusted metrics computed on monthly net-of-fee returns.
 
@@ -120,7 +120,7 @@ where $\bar{r}$ is the mean monthly return. Sharpe is computed from the arithmet
     MDD = \min_{1 \leq t \leq n} \frac{C_t - \max_{1 \leq \tau \leq t} C_\tau}{\max_{1 \leq \tau \leq t} C_\tau}.
 \end{equation}
 
-\paragraph{Regime-Conditional Evaluation}\label{app:regime_eval}
+\paragraph{Regime-Conditional Evaluation}
 
 To assess whether the regime signal adds value beyond unconditional stock selection, performance is decomposed by market regime. Months are partitioned into calm ($\pi_t^{\text{filter}} < 0.5$) and panic ($\pi_t^{\text{filter}} \geq 0.5$) periods, and the Sharpe ratio is computed separately within each subset:
 \begin{equation}
@@ -128,7 +128,7 @@ To assess whether the regime signal adds value beyond unconditional stock select
 \end{equation}
 This decomposition helps assess whether the strategy's alpha originates primarily from calm-period stock selection, panic-period risk avoidance, or both.
 
-\section{Feature Importance Methods}\label{app:feature_importance}
+\section{Feature Importance Methods}
 
 \subsection{SHAP Values for XGBoost}\label{app:shap}
 
@@ -145,15 +145,15 @@ Two additional analyses are performed. First, the mean absolute SHAP value of $\
 
 \section{Alternative Training Targets for XGBoost}\label{app:alt_targets}
 
-Section~\ref{sec:risk_aversion} argues that embedding a risk penalty directly in the XGBoost training target degrades performance, motivating the CRRA specification used in the main text. Table~\ref{tab:alt_targets} shows this degradation is not an artefact of the mean-variance functional form: the same pattern appears under three families of training targets with varying risk tolerance.
+Section~\ref{sec:risk_aversion_control} argues that embedding a risk penalty directly in the XGBoost training target degrades performance, motivating the CRRA specification used in the main text. Table~\ref{tab:alt_targets} shows this degradation is not an artefact of the mean-variance functional form: the same pattern appears under three families of training targets with varying risk tolerance.
 
 \input{tables/table_alt_targets}
 
-The pattern is consistent: returns fall faster than volatility under every risk penalty, regardless of functional form. The mildest adjustments (mean-variance with $\gamma = 0.5$, Sharpe-like with $a = 0.5$) come closest to the baseline but still underperform. This confirms that the diagnostic in Section~\ref{sec:risk_aversion} is not specific to the mean-variance utility formulation; the single-model training-target approach is structurally unsuited to incorporating risk aversion in a long-short setting, which the CRRA dual-utility framework resolves.
+The pattern is consistent: returns fall faster than volatility under every risk penalty, regardless of functional form. The mildest adjustments (mean-variance with $\gamma = 0.5$, Sharpe-like with $a = 0.5$) come closest to the baseline but still underperform. This confirms that the diagnostic in Section~\ref{sec:risk_aversion_control} is not specific to the mean-variance utility formulation; the single-model training-target approach is structurally unsuited to incorporating risk aversion in a long-short setting, which the CRRA dual-utility framework resolves.
 
 \section{CRRA Dual-Utility Construction}\label{app:crra_construction}
 
-This appendix supplements the dual-utility specification in Section~\ref{sec:risk_aversion} with the volatility-forecast model, the high-$\gamma$ collapse mechanism, and the sweep grid.
+This appendix supplements the dual-utility specification in Section~\ref{sec:risk_aversion_control} with the volatility-forecast model, the high-$\gamma$ collapse mechanism, and the sweep grid.
 
 \paragraph{Volatility forecast} The expected-return forecast $\hat r_t^s$ comes from the XGBoost ensemble described in Section~\ref{sec:methodology}. The volatility forecast $\hat\sigma_t^s$ comes from a second XGBoost ensemble trained on the realized 12-month forward volatility
 \[
@@ -218,7 +218,7 @@ Momentum is known to reverse in January \citep{JegadeeshTitman1993}: past losers
 
 \subsection{Baseline Train/Test Split}\label{app:alt_splits}
 
-Table~\ref{tab:alt_splits} reports the baseline train/test split performance. Robustness across training windows and prediction horizons is provided separately by the 25-year expanding-window backtest (Section~\ref{sec:historical_stress}), which re-estimates the full pipeline annually and therefore subsumes a continuum of alternative splits.
+Table~\ref{tab:alt_splits} reports the baseline train/test split performance. Robustness across training windows and prediction horizons is provided separately by the 25-year expanding-window backtest (Appendix~\ref{app:expanding_window} below, also reported in Section~\ref{sec:historical_stress}), which re-estimates the full pipeline annually and therefore subsumes a continuum of alternative splits.
 
 \input{tables/table_alt_splits}
 
@@ -226,7 +226,7 @@ In the baseline split (1990--2010 training, 2011--2024 test), XGB achieves a Sha
 
 \subsection{25-Year Expanding-Window Out-of-Sample Methodology}\label{app:expanding_window}
 
-The historical evidence reported in Section~\ref{sec:historical_stress} comes from a separate analysis from the one above: a 25-year out-of-sample backtest in which the full pipeline (HMM + XGBoost) is re-estimated every January, with annual retraining initialized in 1995 and each year's predictions made by a model trained only on data available through the prior December. Each retraining uses the production seed configuration: 200 HMM seeds (Gibbs sampler with 2000 iterations, 500 burn-in), 50 XGBoost seeds (depth 4, learning rate 0.05, 500 trees), and the same long-short construction described in Appendix~\ref{app:portfolio_construction}.
+The historical evidence reported in Section~\ref{sec:historical_stress} comes from a separate analysis from the one above: a 25-year out-of-sample backtest in which the full pipeline (HMM + XGBoost) is re-estimated every January, with annual retraining initialized in 1995 and each year's predictions made by a model trained only on data available through the prior December. Each retraining uses the production seed configuration described in Section~\ref{sec:methodology} (200 HMM seeds, 50 XGBoost seeds) and the same long-short construction described in Appendix~\ref{app:portfolio_construction}.
 
 The HMM's panic-state label is fixed by an economically motivated sign convention rather than the data-driven percentile comparison used elsewhere. The convention encodes the known direction of each feature in panic regimes: $-1$ for drawdown, $+1$ for cross-sectional dispersion, $-1$ for relative market participation, and $+1$ for the credit spread. The data-driven label-switching procedure used in the main pipeline is unstable on short training windows with few observed crisis months (under 20), so the fixed-sign fallback activates for retrainings before 2002. From 2002 onward the data-driven procedure resumes, by which point the training window contains the dot-com bust as a calibration anchor. The HMM seed loop is parallelised across CPU cores via \texttt{multiprocessing.Pool}; the parallel implementation is bit-identical to the serial reference (verified in the test suite by comparing per-seed pi-filter arrays).
 
@@ -253,7 +253,7 @@ To assess the sampling variability of XGB's Sharpe ratio and test its outperform
 
 \input{tables/table_bootstrap}
 
-XGB's Sharpe confidence interval is [0.67, 1.53], comfortably above zero, while every benchmark's interval straddles zero. The paired tests reject equality of Sharpe ratios between XGB and each benchmark at $p < 0.025$. Within XGB, the panic-period Sharpe exceeds the calm-period Sharpe in point estimate (1.53 vs 0.84), but with only 59 panic months the paired difference is not statistically significant ($p = 0.109$); the 95\% interval $[-0.16, 1.59]$ straddles zero. The point-estimate gap is consistent with the regime-conditional selection mechanism described in Section~\ref{sec:regime_results}, but its statistical confirmation would require a longer panic sample. These intervals describe sampling variability within the 2011--2024 sample; out-of-sample generalization is addressed separately by the 25-year expanding-window backtest (Section~\ref{sec:historical_stress}) and the sub-period analysis (Appendix~\ref{app:subperiod}).
+XGB's Sharpe confidence interval is [0.67, 1.53], comfortably above zero, while every benchmark's interval straddles zero. The paired tests reject equality of Sharpe ratios between XGB and each benchmark at $p < 0.025$. Within XGB, the panic-period Sharpe exceeds the calm-period Sharpe in point estimate (1.53 vs 0.84), but with only 59 panic months the paired difference is not statistically significant ($p = 0.109$); the 95\% interval $[-0.16, 1.59]$ straddles zero. The point-estimate gap is consistent with the regime-conditional selection mechanism described in Section~\ref{sec:regime_results}, but its statistical confirmation would require a longer panic sample. These intervals describe sampling variability within the 2011--2024 sample; out-of-sample generalization is addressed separately by the 25-year expanding-window backtest (Section~\ref{sec:historical_stress}; methodology in Appendix~\ref{app:expanding_window}) and the sub-period analysis (Appendix~\ref{app:subperiod}).
 
 \subsection{Leg-Level CAPM Betas by Regime}\label{app:leg_betas}
 
@@ -318,7 +318,8 @@ The state labeled $k^\ast$ is designated as ``panic'' and the other as ``calm.''
 
 Convergence of the Gibbs sampler is assessed in two complementary ways: effective sample sizes (ESS) within each chain, and the Gelman--Rubin $\hat{R}$ statistic across independent chains. The two are complementary because ESS measures efficiency within a single chain but cannot detect whether different chains have converged to different posterior modes, while Gelman--Rubin compares chains but says nothing about within-chain autocorrelation. Trace plots provide a third, visual check.
 
-\paragraph{Effective Sample Size (ESS)}
+\subsection{Effective Sample Size (ESS)}\label{app:ess}
+
 Because successive MCMC draws are autocorrelated, $n$ draws from the chain contain less information than $n$ independent samples. The ESS quantifies the number of truly independent draws the chain is equivalent to. For a post-burn-in chain of length $n$,
 \begin{equation}
 ESS
@@ -327,7 +328,7 @@ ESS
 \end{equation}
 where $\hat{\rho}(\ell)$ is the estimated autocorrelation at lag $\ell$,\footnote{$\hat{\rho}(\ell) = \frac{1}{(n-\ell)\,\hat{\sigma}^2}\sum_{i=1}^{n-\ell}(\theta_i - \bar{\theta})(\theta_{i+\ell} - \bar{\theta})$, where $\theta_i$ is the $i$-th post-burn-in draw, $\bar{\theta}$ its sample mean, and $\hat{\sigma}^2$ its sample variance.} and $L^\ast$ is the first lag at which the autocorrelation becomes negative. High ESS indicates that the chain provides many effectively independent posterior draws; an ESS of at least 100 per parameter is a common minimum for reliable posterior inference \citep{Gelman2013}.
 
-\paragraph{Trace plots}
+\subsection{Trace plots}\label{app:trace_plots}
 
 \begin{figure}[H]
     \centering
