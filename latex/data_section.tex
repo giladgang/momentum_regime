@@ -68,7 +68,7 @@ The choice of DD, DISP, REL\_N, and CS is driven by complementarity rather than 
 
 All four features are winsorized at the 1st and 99th percentiles\footnote{Winsorizing at the 1st and 99th percentiles caps any value below the 1st percentile at that bound and any value above the 99th percentile at that bound, limiting the influence of outliers without discarding the observations.} using training-sample statistics, and standardized to zero mean and unit variance.
 
-The four series co-move clearly around stress episodes: DD and REL\_N drop while DISP and CS spike during the 2000--2002 dot-com bust, the 2007--2009 Global Financial Crisis, the March 2020 COVID shock, and the 2022 Fed-hiking cycle, with the shaded NBER recession bands aligning with the largest of these joint excursions. This co-movement makes a single hidden-state variable viable in the HMM.
+The four series co-move around stress episodes: DD and REL\_N drop while DISP and CS spike during the 2000--2002 dot-com bust, the 2007--2009 Global Financial Crisis, the March 2020 COVID shock, and the 2022 Fed-hiking cycle, with the shaded NBER recession bands aligning with the largest of these joint excursions. This co-movement makes a single hidden-state variable viable in the HMM.
 
 \begin{figure}[H]
     \centering

@@ -132,7 +132,7 @@ This decomposition helps assess whether the strategy's alpha originates primaril
 
 \subsection{SHAP Values for XGBoost}\label{app:shap}
 
-To interpret the XGBoost model and assess the marginal contribution of each feature, SHAP \citep[SHapley Additive exPlanations;][]{Lundberg2017} values are computed on the test set. The SHAP value of feature $j$ for observation $\mathbf{x}$ measures its average marginal contribution to the prediction across all possible feature orderings:
+To interpret the XGBoost model and assess the marginal contribution of each feature, SHAP values \citep{Lundberg2017} are computed on the test set. The SHAP value of feature $j$ for observation $\mathbf{x}$ measures its average marginal contribution to the prediction across all possible feature orderings:
 \begin{equation}
     \phi_j(\mathbf{x}) = \sum_{S \subseteq N \setminus \{j\}} \frac{|S|!\,(p - |S| - 1)!}{p!} \Big[f_{S \cup \{j\}}(\mathbf{x}) - f_S(\mathbf{x})\Big],
 \end{equation}
@@ -226,7 +226,7 @@ In the baseline split (1990--2010 training, 2011--2024 test), XGB achieves a Sha
 
 \subsection{25-Year Expanding-Window Out-of-Sample Methodology}\label{app:expanding_window}
 
-The historical evidence reported in Section~\ref{sec:historical_stress} comes from a separate analysis from the one above: a 25-year out-of-sample backtest in which the full pipeline (HMM + XGBoost) is re-estimated every January, with annual retraining initialized in 1995 and each year's predictions made by a model trained only on data available through the prior December. Each retraining uses the production seed configuration described in Section~\ref{sec:methodology} (200 HMM seeds, 50 XGBoost seeds) and the same long-short construction described in Appendix~\ref{app:portfolio_construction}.
+The historical evidence reported in Section~\ref{sec:historical_stress} comes from a separate analysis from the one above: a 25-year out-of-sample backtest in which the full pipeline (HMM + XGBoost) is re-estimated every January, with annual retraining initialized in 2000 and each year's predictions made by a model trained only on data available through the prior December. Each retraining uses the production seed configuration described in Section~\ref{sec:methodology} (200 HMM seeds, 50 XGBoost seeds) and the same long-short construction described in Appendix~\ref{app:portfolio_construction}.
 
 The HMM's panic-state label is fixed by an economically motivated sign convention rather than the data-driven percentile comparison used elsewhere. The convention encodes the known direction of each feature in panic regimes: $-1$ for drawdown, $+1$ for cross-sectional dispersion, $-1$ for relative market participation, and $+1$ for the credit spread. The data-driven label-switching procedure used in the main pipeline is unstable on short training windows with few observed crisis months (under 20), so the fixed-sign fallback activates for retrainings before 2002. From 2002 onward the data-driven procedure resumes, by which point the training window contains the dot-com bust as a calibration anchor. The HMM seed loop is parallelised across CPU cores via \texttt{multiprocessing.Pool}; the parallel implementation is bit-identical to the serial reference (verified in the test suite by comparing per-seed pi-filter arrays).
 
