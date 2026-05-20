@@ -506,24 +506,23 @@ abl_tex = [
     r'\begin{table}[H]',
     r'\centering',
     r'\small',
-    r'\begin{tabular}{l c c c c c c c}',
+    r'\begin{tabular}{l c c c c c}',
     r'\toprule',
-    r' & Feat. & Sharpe & Calm & Panic & $\beta$ & NW $t$ & Fund SHAP \\',
+    r' & Feat. & Sharpe & Calm & Panic & Fund SHAP \\',
     r'\midrule',
 ]
 for r in results:
     label = LABEL_MAP.get(r['name'], r['name'])
-    beta = r.get('beta', np.nan)
     fund = r.get('fund_share', 0.0)
     abl_tex.append(
         f"{label:<35s} & {r['n_features']:>2d} & {r['sharpe']:.2f} & "
         f"{r['sharpe_calm']:.2f} & {r['sharpe_panic']:.2f} & "
-        f"{beta:.2f} & {_fmt_nwt(r):<14s} & {fund:.0f}\\% \\\\"
+        f"{fund:.0f}\\% \\\\"
     )
 abl_tex += [
     r'\bottomrule',
     r'\end{tabular}',
-    r"\caption{Feature-set ablation (50-seed XGBoost ensembles, production hyperparameters). Full Sharpe, calm-period Sharpe, and panic-period Sharpe are reported alongside market beta and the Newey-West $t$-statistic on the raw monthly return (6 lags, testing $H_0$: mean $=0$), matching the convention of Table~\ref{tab:performance}. ``Fund SHAP'' is the share of total SHAP attention absorbed by the ten fundamental features.}",
+    r"\caption{Feature-set ablation (50-seed XGBoost ensembles, production hyperparameters). Full Sharpe is reported alongside calm-period and panic-period Sharpe. ``Fund SHAP'' is the share of total SHAP attention absorbed by the ten fundamental features.}",
     r'\label{tab:fund_ablation}',
     r'\end{table}',
     '',
