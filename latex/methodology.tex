@@ -22,7 +22,7 @@ The evolution of the hidden state follows a first-order Markov chain with a $2 \
 \begin{equation}
     \mathbf{P} = \left(\begin{array}{cc} P_{00} & P_{01} \\ P_{10} & P_{11} \end{array}\right),
 \end{equation}
-where $P_{ij} = P(s_t = j \mid s_{t-1} = i)$ and each row sums to one. The diagonal elements $P_{00}$ (calm persistence) and $P_{11}$ (panic persistence) govern how likely each regime is to continue into the next month.
+where $P_{ij} = P(s_t = j \mid s_{t-1} = i)$ and each row sums to one. The diagonal elements $P_{00}$ (calm persistence) and $P_{11}$ (panic persistence) govern how likely each regime is to continue into the next month: the expected duration of regime $k$ is $1/(1 - P_{kk})$ months, so a persistence of $0.95$ corresponds to a regime that lasts roughly $20$ months on average.
 
 \begin{figure}[H]
     \centering
@@ -246,7 +246,7 @@ The simplest approach exploits the economic intuition that the optimal momentum 
 \end{equation}
 The first equation sets the lookback horizon as a function of the regime. The second compounds the past $\ell_t$ monthly returns into a stock score. Stocks are then ranked by this score. The top decile forms the long leg and the bottom decile the short leg, as described in Appendix~\ref{app:portfolio_construction}.
 
-At the calm extreme ($\pi_t^{\text{filter}} \approx 0$), $\ell_t = 12$: stocks are ranked by their 12-month cumulative return, with the top decile entering the long leg and the bottom the short. This is the canonical \citet{JegadeeshTitman1993} 12-month momentum strategy. At the panic extreme ($\pi_t^{\text{filter}} \approx 1$), $\ell_t = 1$: the ranking shifts to the most recent monthly return, the horizon at which the short-horizon return dynamics documented by \citet{Jegadeesh1990} and \citet{Lehmann1990} are strongest. Between these extremes, the lookback smoothly interpolates.
+At the calm extreme ($\pi_t^{\text{filter}} \approx 0$), $\ell_t = 12$: stocks are ranked by their 12-month cumulative return, with the top decile entering the long leg and the bottom the short. This recovers the 12-month cross-sectional momentum signal of \citet{JegadeeshTitman1993}. At the panic extreme ($\pi_t^{\text{filter}} \approx 1$), $\ell_t = 1$: the ranking shifts to the most recent monthly return, the horizon at which the short-horizon return dynamics documented by \citet{Jegadeesh1990} and \citet{Lehmann1990} are strongest. Between these extremes, the lookback smoothly interpolates.
 
 \paragraph{LR: Logistic Regression}\label{sec:method1}
 

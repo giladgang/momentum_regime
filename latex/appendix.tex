@@ -128,6 +128,18 @@ To assess whether the regime signal adds value beyond unconditional stock select
 \end{equation}
 This decomposition helps assess whether the strategy's alpha originates primarily from calm-period stock selection, panic-period risk avoidance, or both.
 
+\paragraph{Per-Cluster Sharpe}
+
+The cluster Sharpes reported in Section~\ref{sec:heterogeneity_picks} apply the standard Sharpe formula to the months in each cluster. Let $M_C$ denote the set of months assigned to cluster $C$, let $r_t$ be the long-short monthly portfolio return at month $t$, and let $n_C = |M_C|$. The point-estimate cluster Sharpe is
+\[
+\mathrm{Sharpe}_C = \frac{\bar{r}_{M_C}}{\sigma(r_{M_C})} \cdot \sqrt{12},
+\]
+where
+\[
+\bar{r}_{M_C} = \frac{1}{n_C} \sum_{t \in M_C} r_t, \qquad \sigma(r_{M_C}) = \sqrt{\frac{1}{n_C - 1} \sum_{t \in M_C} (r_t - \bar{r}_{M_C})^2}.
+\]
+The denominator is therefore the unbiased sample standard deviation of the in-cluster long-short monthly returns; annualisation by $\sqrt{12}$ follows the monthly-to-annual convention used throughout this thesis. Confidence intervals come from a block bootstrap (block size~6, 5{,}000 reps) on the in-cluster return series.
+
 \section{Feature Importance Methods}
 
 \subsection{SHAP Values for XGBoost}\label{app:shap}
@@ -149,11 +161,11 @@ Section~\ref{sec:risk_aversion_control} argues that embedding a risk penalty dir
 
 \input{tables/table_alt_targets}
 
-The pattern is consistent: returns fall faster than volatility under every risk penalty, regardless of functional form. The mildest adjustments (mean-variance with $\gamma = 0.5$, Sharpe-like with $a = 0.5$) come closest to the baseline but still underperform. This confirms that the diagnostic in Section~\ref{sec:risk_aversion_control} is not specific to the mean-variance utility formulation; the single-model training-target approach is structurally unsuited to incorporating risk aversion in a long-short setting, which the CRRA dual-utility framework resolves.
+The pattern is consistent: returns fall faster than volatility under every risk penalty, regardless of functional form. The mildest adjustments (mean-variance with $\gamma = 0.5$, Sharpe-like with $a = 0.5$) come closest to the baseline but still underperform. This confirms that the diagnostic in Section~\ref{sec:risk_aversion_control} is not specific to the mean-variance utility formulation; the single-model training-target approach is structurally unsuited to incorporating risk aversion in a long-short setting, which the long-and-short CRRA construction resolves.
 
-\section{CRRA Dual-Utility Construction}\label{app:crra_construction}
+\section{Long and Short CRRA Utilities}\label{app:crra_construction}
 
-This appendix supplements the dual-utility specification in Section~\ref{sec:risk_aversion_control} with the volatility-forecast model, the high-$\gamma$ collapse mechanism, and the sweep grid.
+This appendix supplements the long-and-short utility specification in Section~\ref{sec:risk_aversion_control} with the volatility-forecast model, the high-$\gamma$ collapse mechanism, and the sweep grid.
 
 \paragraph{Volatility forecast} The expected-return forecast $\hat r_t^s$ comes from the XGBoost ensemble described in Section~\ref{sec:methodology}. The volatility forecast $\hat\sigma_t^s$ comes from a second XGBoost ensemble trained on the realized 12-month forward volatility
 \[
@@ -298,7 +310,7 @@ The Student-$t$ model is estimated via data augmentation \citep{Geweke1993}: eac
 
 The Normal model achieves the lowest BIC (2257.3 vs.\ 2257.6 for the best Student-$t$ at $\nu = 100$), indicating no meaningful improvement from heavier tails. Regime classifications agree with the Normal HMM on at least 97.8\% of months across all $\nu$ values, and the correlation of filtered panic probabilities exceeds 0.98 everywhere.
 
-\section{Label Switching: Sign Correction Procedure}\label{app:label_switching}
+\section{Label Sign Correction}\label{app:label_switching}
 
 Because the four HMM features respond to stress in different directions, the expected direction of each feature during stress is determined empirically. For each feature $j$, the 95th percentile is computed separately on training months falling within known crisis windows (the dot-com bust of 2000--2002 and the Global Financial Crisis of 2007--2009) and on all remaining training months:
 \begin{equation}
