@@ -246,7 +246,7 @@ The simplest approach exploits the economic intuition that the optimal momentum 
 \end{equation}
 The first equation sets the lookback horizon as a function of the regime. The second compounds the past $\ell_t$ monthly returns into a stock score. Stocks are then ranked by this score. The top decile forms the long leg and the bottom decile the short leg, as described in Appendix~\ref{app:portfolio_construction}.
 
-When $\pi_t^{\text{filter}} \approx 0$ (calm), $\ell_t = 12$ and the score is the cumulative return over the past 12 months, recovering the canonical 12-month momentum signal of \citet{JegadeeshTitman1993}. When $\pi_t^{\text{filter}} \approx 1$ (panic), $\ell_t = 1$ and the score is the return over the most recent month, the lookback at which the short-horizon return dynamics documented by \citet{Jegadeesh1990} and \citet{Lehmann1990} are strongest. At intermediate values of $\pi_t^{\text{filter}}$, the lookback smoothly interpolates between these two extremes.
+At the calm extreme ($\pi_t^{\text{filter}} \approx 0$), $\ell_t = 12$: stocks are ranked by their 12-month cumulative return, with the top decile entering the long leg and the bottom the short. This is the canonical \citet{JegadeeshTitman1993} 12-month momentum strategy. At the panic extreme ($\pi_t^{\text{filter}} \approx 1$), $\ell_t = 1$: the ranking shifts to the most recent monthly return, the horizon at which the short-horizon return dynamics documented by \citet{Jegadeesh1990} and \citet{Lehmann1990} are strongest. Between these extremes, the lookback smoothly interpolates.
 
 \paragraph{LR: Logistic Regression}\label{sec:method1}
 
