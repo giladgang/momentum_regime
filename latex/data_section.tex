@@ -91,9 +91,9 @@ Averaging $\pi_t^{\text{filter}}$ across many independent Gibbs chains stabilize
 \paragraph{Regime separation and filtered probability}
 Table~\ref{tab:hmm_separation} reports the posterior regime means estimated on the 1990--2010 training period. All four features exhibit statistically significant separation between calm and panic (95\% credible intervals excluding zero),\footnote{A $95\%$ credible interval is the Bayesian range covering the parameter with $95\%$ probability; excluding zero means the panic--calm mean difference on each feature is reliably distinct from zero.} confirming that the four-feature emission space resolves cleanly into two distinct clusters.
 
-Figure~\ref{fig:regime_probabilities} plots the resulting filtered probability $\pi_t^{\text{filter}}$ (constructed as in Section~\ref{sec:trading_signal}) over the full 1990--2024 sample. The signal spikes at the 2000--2002 dot-com bust, the 2007--2009 GFC, the March 2020 COVID shock, and the 2022 Fed-hiking cycle, and stays near zero during the 2003--2007 and 2013--2019 calm windows. The dashed vertical line marks the train/test split, with the post-2011 portion held out for out-of-sample evaluation.
-
 \input{tables/table_hmm_separation}
+
+Figure~\ref{fig:regime_probabilities} plots the resulting filtered probability $\pi_t^{\text{filter}}$ (constructed as in Section~\ref{sec:trading_signal}) over the full 1990--2024 sample. The signal spikes at the 2000--2002 dot-com bust, the 2007--2009 GFC, the March 2020 COVID shock, and the 2022 Fed-hiking cycle, and stays near zero during the 2003--2007 and 2013--2019 calm windows. The dashed vertical line marks the train/test split, with the post-2011 portion held out for out-of-sample evaluation.
 
 \begin{figure}[H]
     \centering
@@ -115,6 +115,6 @@ where $r_{t-\ell}^s$ is the adjusted return of stock $s$ in month $t - \ell$. Th
 
 \subsection{International Sample}\label{sec:intl_sample}
 
-For the robustness check in Section~\ref{sec:international}, the same pipeline is applied to UK and Japanese equities from Compustat Global over the same 1990--2024 window. The HMM feature set is re-selected per region using the four-pass procedure described in Section~\ref{sec:feature_selection}, run separately on each market's data. The candidate pool substitutes \texttt{BANK\_REL} (the value-weighted bank-sector excess return over the broad regional market, sign-flipped so high values indicate stress) for the US-specific Moody's BAA--AAA spread (CS), and both regions select \emph{DD+VOL+REL\_N}. Long and short legs are formed from unconditional decile breakpoints across all listed stocks, since no NYSE-equivalent tier exists for either market. Per-region selection details and stability checks are in Appendix~\ref{app:intl_feature_selection}.
+For the robustness check in Section~\ref{sec:international}, the same pipeline is applied to UK and Japanese equities from Compustat Global over the same 1990--2024 window. The HMM feature set is re-selected per region using the four-pass procedure described in Section~\ref{sec:feature_selection}, run separately on each market's data, with the candidate pool adapted to use locally available stress indicators. Both regions select \emph{DD+VOL+REL\_N}. Long and short legs are formed from unconditional decile breakpoints across all listed stocks, since no NYSE-equivalent tier exists for either market. Per-region selection details and stability checks are in Appendix~\ref{app:intl_feature_selection}.
 
 With the regime signal and the cross-sectional features in place, the next chapter evaluates the three portfolio-construction methods out-of-sample and opens up the chosen model's selections.
