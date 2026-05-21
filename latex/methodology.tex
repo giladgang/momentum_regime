@@ -35,13 +35,13 @@ where $P_{ij} = P(s_t = j \mid s_{t-1} = i)$ and each row sums to one. The diago
 
 The standard frequentist alternative is the Baum--Welch algorithm \citep{Baum1970}, a special case of Expectation-Maximization \citep{Dempster1977}, which finds maximum likelihood point estimates.
 
-Maximum likelihood estimation of regime-switching HMMs has several known shortcomings for the present application. The likelihood surface is multimodal, with at minimum two equivalent global optima arising from the invariance of the likelihood under state relabeling. Additionally, expectation maximization can converge to degenerate solutions in which one regime collapses around a single observation \citep{FruhwirthSchnatter2006}. Both problems are exacerbated for rare regimes, where the asymptotic standard errors that frequentist inference relies on are unreliable because few observations support the rare-state estimates, and the standard regularity conditions can fail because the persistence parameters $P_{00}$ and $P_{11}$ are unidentified when the two regimes' means and covariances coincide and the information matrix becomes singular at that point \citep[footnote 12]{Hamilton1989}. The Bayesian approach addresses these issues directly. Posterior sampling integrates over parameter uncertainty rather than relying on a point estimate. Conjugate priors regularize rare-regime estimates with explicit, defensible weights (Section~\ref{sec:priors}). And convergence diagnostics across multiple chains (Appendix~\ref{app:convergence}) diagnose multimodality that would otherwise go unnoticed under a single EM run.
+Maximum likelihood estimation of regime-switching HMMs has several known shortcomings for the present application. The likelihood surface is multimodal, with at minimum two equivalent global optima arising from the invariance of the likelihood under state relabeling. Additionally, expectation maximization can converge to degenerate solutions in which one regime collapses around a single observation \citep{FruhwirthSchnatter2006}. Both problems are exacerbated for rare regimes. The asymptotic standard errors that frequentist inference relies on become unreliable when few observations support the rare-state estimates, and the standard regularity conditions can fail outright: the persistence parameters $P_{00}$ and $P_{11}$ are unidentified when the two regimes' means and covariances coincide, and the information matrix becomes singular at that point \citep[footnote 12]{Hamilton1989}. The Bayesian approach addresses these issues directly. Posterior sampling integrates over parameter uncertainty rather than relying on a point estimate. Conjugate priors regularize rare-regime estimates with explicit, defensible weights (Section~\ref{sec:priors}). And convergence diagnostics across multiple chains (Appendix~\ref{app:convergence}) diagnose multimodality that would otherwise go unnoticed under a single EM run.
 
 The Bayesian approach instead draws from the joint posterior:
 \[
 p\!\left(\{s_t\}_{t=1}^T,\; \{\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k\}_{k=0}^1,\; \mathbf{P} \,\middle|\, \mathbf{z}_{1:T}\right).
 \]
- The states and the parameters are coupled: the conditional distribution of each block given the other is tractable, but neither marginal is. Gibbs sampling \citep{AlbertChib1993, Hoff2009}, a Markov chain Monte Carlo (MCMC) method, exploits exactly that structure by alternating between three conditional updates over the state path, the emission parameters, and the transition matrix. Conjugate priors ensure that each block can be sampled exactly from its conditional posterior.
+ The states and the parameters are coupled: we can sample from the distribution of one block given the other, but not from either block on its own. Gibbs sampling \citep{AlbertChib1993, Hoff2009}, a Markov chain Monte Carlo (MCMC) method, exploits exactly that structure by alternating between three conditional updates over the state path, the emission parameters, and the transition matrix. Conjugate priors ensure that each block can be sampled exactly from its conditional posterior.
 
 \subsubsection{Prior Specification}\label{sec:priors}
 
@@ -65,7 +65,7 @@ where $D$ is the number of selected features. After observing data, these prior 
 \begin{itemize}
     \item $\mathbf{m}_0$ is the prior guess for each regime's mean vector. $\mathbf{m}_0 = \mathbf{0}$ is the natural prior given that the features are standardized. Without data, neither regime is presumed to center away from zero.
     \item $\kappa_0$ controls how strongly the prior mean $\mathbf{m}_0$ is trusted relative to the data. The very small value $\kappa_0 = 0.01$ makes this prior nearly uninformative, so the posterior mean is driven overwhelmingly by the observed data.
-    \item $\nu_0$ is the degrees of freedom of the Inverse-Wishart prior, interpretable as the number of pseudo-observations the prior is worth. The value $\nu_0 = D + 2$ is the smallest that yields a proper prior with finite mean; a larger choice tightens the prior around $\mathbf{I}_D$.
+    \item $\nu_0$ sets the Inverse-Wishart prior's degrees of freedom, interpretable as the number of pseudo-observations the prior is worth. The value $\nu_0 = D + 2$ is the smallest that yields a proper prior with finite mean; a larger choice tightens the prior around $\mathbf{I}_D$.
     \item $\boldsymbol{\Psi}_0$ is the scale matrix of the Inverse-Wishart prior. It is calibrated so that the prior expected covariance equals the identity matrix, $\mathbb{E}[\boldsymbol{\Sigma}_k] = \boldsymbol{\Psi}_0 / (\nu_0 - D - 1) = \mathbf{I}_D$, implying unit marginal variance and no cross-feature correlation before observing the data.
 \end{itemize}
 
@@ -100,7 +100,7 @@ The prior expects each regime to continue with probability $0.9$, corresponding 
 \subsubsection{Gibbs Sampling Algorithm}\label{sec:gibbs_sampler}
 
 \paragraph{Initialization}
-The Gibbs sampler requires starting values for the emission parameters and the transition matrix. A crude binary partition based on a single stress indicator is used:\footnote{The choice of initialization has negligible impact on the posterior. The sampler is run for 2{,}000 iterations with 500 discarded as burn-in, and convergence diagnostics (Section~\ref{sec:hmm_output}, Appendix~\ref{app:convergence}) confirm that the chain mixes well regardless of the starting partition.} months in the more stressed half are initially assigned to the panic state ($s_t=1$), and the remaining months to the calm state ($s_t=0$). The initial emission parameters are then computed from each group:
+The Gibbs sampler requires starting values for the emission parameters and the transition matrix. A crude binary partition based on a single stress indicator is used:\footnote{The choice of initialization has negligible impact on the posterior. The sampler is run for 2{,}000 iterations with 500 discarded as burn-in, and convergence diagnostics (Section~\ref{sec:hmm_output}, Appendix~\ref{app:convergence}) confirm that the chain mixes well regardless of the starting partition.} months above the indicator's median (the more stressed half) are initially assigned to the panic state ($s_t=1$), and the rest to the calm state ($s_t=0$). The initial emission parameters are then computed from each group:
 \[
 \boldsymbol{\mu}_k^{(0)} = \frac{1}{n_k}\sum_{t:\,s_t=k}\mathbf{z}_t,
 \qquad
@@ -205,15 +205,15 @@ For each seed, posterior mean parameters $\bar{\boldsymbol{\mu}}_k$, $\bar{\bold
 \begin{equation}
 \pi_t^{\text{filter}} = \frac{1}{N_s} \sum_{s=1}^{N_s} \pi_{t,s}^{\text{filter}}.
 \end{equation}
-This averaging across MCMC chains is a methodological requirement, not a performance optimization. Single-chain estimates exhibit substantial across-seed variability that collapses as the number of averaged chains grows; the 200-seed production configuration sits where the ensemble metric has converged (Appendix~\ref{app:seed_convergence}). Out-of-sample metrics reported later should therefore be interpreted as ensemble-averaged quantities across chain initializations rather than single-chain point estimates.
+Averaging across MCMC chains is a methodological requirement, not a performance optimization. A single Gibbs chain produces a noisy regime signal whose downstream Sharpe varies meaningfully across random initializations; averaging across chains reduces this noise, and the variance shrinks as more chains are added. At 200 chains the Sharpe has effectively stabilized; adding more chains changes it negligibly (Appendix~\ref{app:seed_convergence}). All out-of-sample numbers reported below are computed from this 200-chain ensemble, not from a single chain.
 
 \subsubsection{Regime Identification and Trading Signal}\label{sec:regime_signal}
 
 \paragraph{Label Switching and Regime Naming}\label{sec:label_switching}
 
-In a two-state HMM, the labels $0$ and $1$ are intrinsically arbitrary. Relabeling the states leaves the likelihood unchanged. The HMM therefore identifies two clusters in the $D$-dimensional feature space without knowing which one should be called panic. To break the symmetry, the feature behavior during externally-defined historical crisis windows is used as a reference: each feature receives an expected sign during stress (the direction in which it moves during a crisis relative to calm periods), and the cluster whose posterior mean vector best aligns with that pattern is designated as ``panic'' and the other as ``calm''. The specific windows and sign assignments are listed in Appendix~\ref{app:label_switching}. If the Gibbs sampler assigns the panic characteristics to state~$0$ rather than state~$1$, the labels are swapped so that $\pi_t^{\text{filter}}$ always represents the probability of the panic state. The crisis windows enter only at this naming step. The HMM identifies its two clusters from the emission features without ever seeing the windows; the windows are used solely to decide which of the two emergent clusters carries the ``panic'' label.
+In a two-state HMM, the labels $0$ and $1$ are intrinsically arbitrary. Relabeling the states leaves the likelihood unchanged, so the HMM identifies two clusters in the $D$-dimensional feature space without knowing which one should be called panic. To break this symmetry, each feature is assigned an expected sign during stress (the direction in which it moves during historical crisis windows relative to calm periods), and the cluster whose posterior mean vector best aligns with that pattern is designated as ``panic'' and the other as ``calm''. The specific windows and sign assignments are listed in Appendix~\ref{app:label_switching}. The HMM itself never sees these windows during training; they enter only at the post-estimation naming step.
 
-A caveat follows from this naming convention. The HMM identifies two regimes by clustering on the emission features, and the label ``panic'' is then assigned to the cluster whose posterior mean aligns with crisis directions. The label therefore reflects a statistical resemblance to historical crisis periods rather than a directly observed market state.
+The naming has no effect on the regime estimation itself: the two clusters and their boundaries are identical regardless of which is called calm or panic. What the naming controls is the interpretation of the subsequent analysis, which state we treat as the stress regime when reading off mechanism descriptions, conditional Sharpes, and cluster characterizations downstream. The label ``panic'' therefore reflects a statistical resemblance to historical crisis periods rather than a directly observed market state.
 
 \paragraph{Filtered Regime Probability}\label{sec:trading_signal}
 
@@ -246,7 +246,7 @@ The simplest approach exploits the economic intuition that the optimal momentum 
 \end{equation}
 The first equation sets the lookback horizon as a function of the regime. The second compounds the past $\ell_t$ monthly returns into a stock score. Stocks are then ranked by this score. The top decile forms the long leg and the bottom decile the short leg, as described in Appendix~\ref{app:portfolio_construction}.
 
-When $\pi_t^{\text{filter}} \approx 0$ (calm), $\ell_t = 12$, recovering the standard 12-month momentum signal that captures return continuation \citep{JegadeeshTitman1993}. When $\pi_t^{\text{filter}} \approx 1$ (panic), $\ell_t = 1$, switching to a 1-month signal that exploits the short-horizon reversal documented in \citet{Jegadeesh1990} and \citet{Lehmann1990}. At intermediate values, the lookback smoothly interpolates between these extremes.
+When $\pi_t^{\text{filter}} \approx 0$ (calm), $\ell_t = 12$ and the score reduces to the trailing 12-month return, recovering the canonical 12-month momentum signal of \citet{JegadeeshTitman1993}. When $\pi_t^{\text{filter}} \approx 1$ (panic), $\ell_t = 1$ and the score reduces to the trailing 1-month return, the lookback at which the short-horizon return dynamics documented by \citet{Jegadeesh1990} and \citet{Lehmann1990} are strongest. At intermediate values of $\pi_t^{\text{filter}}$, the lookback smoothly interpolates between these two extremes.
 
 \paragraph{LR: Logistic Regression}\label{sec:method1}
 
@@ -254,7 +254,11 @@ A logistic regression classifier is trained to predict whether a stock's forward
 \begin{equation}
     P(y_t^s = 1 \mid \mathbf{x}_t^s) = \sigma(\boldsymbol{\beta}^\top \tilde{\mathbf{x}}_t^s),
 \end{equation}
-where $y_t^s = \mathds{1}(r_{t+1}^s > \text{median}_s\{r_{t+1}^s\})$ is a binary label indicating whether stock $s$ outperforms the cross-sectional median in the following month. The feature vector $\tilde{\mathbf{x}}_t^s = (mom_{1,t}^s, \dots, mom_{12,t}^s, \pi_t^{\text{filter}})$ contains the 12 momentum lookbacks and the regime signal, standardized using training-set means and standard deviations. The model is estimated by maximizing the $\ell_2$-regularized log-likelihood:
+where $y_t^s = \mathds{1}(r_{t+1}^s > \text{median}_s\{r_{t+1}^s\})$ is a binary label indicating whether stock $s$ outperforms the cross-sectional median in the following month. The feature vector
+\[
+\tilde{\mathbf{x}}_t^s = (mom_{1,t}^s, \dots, mom_{12,t}^s, \pi_t^{\text{filter}})
+\]
+contains the 12 momentum lookbacks and the regime signal, standardized using training-set means and standard deviations. The model is estimated by maximizing the $\ell_2$-regularized log-likelihood:
 \begin{equation}
     \hat{\boldsymbol{\beta}} = \arg\max_{\boldsymbol{\beta}} \left[\sum_{i} \Big(y_i \log \sigma(\boldsymbol{\beta}^\top \tilde{\mathbf{x}}_i) + (1 - y_i) \log(1 - \sigma(\boldsymbol{\beta}^\top \tilde{\mathbf{x}}_i))\Big) - \frac{1}{2C} \|\boldsymbol{\beta}\|_2^2\right],
 \end{equation}
