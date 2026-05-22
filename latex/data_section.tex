@@ -88,6 +88,7 @@ The Gelman--Rubin $\hat{R}$ checks whether chains started from different initial
 
 Averaging $\pi_t^{\text{filter}}$ across many independent Gibbs chains stabilizes the regime signal: each chain carries its own seed-specific MCMC noise, and averaging cancels that noise across chains. Table~\ref{tab:seed_convergence} (Appendix~\ref{app:seed_convergence}) shows the resulting downstream Sharpe rises with the number of averaged chains and plateaus around 30; the 200-chain production setting sits well inside that plateau, so the regime signal is not seed-limited.
 
+\clearpage
 \paragraph{Regime separation and filtered probability}
 Table~\ref{tab:hmm_separation} reports the posterior regime means estimated on the 1990--2010 training period. All four features exhibit statistically significant separation between calm and panic (95\% credible intervals excluding zero),\footnote{A $95\%$ credible interval is the Bayesian range covering the parameter with $95\%$ probability; excluding zero means the panic--calm mean difference on each feature is reliably distinct from zero.} confirming that the four-feature emission space resolves cleanly into two distinct clusters.
 
