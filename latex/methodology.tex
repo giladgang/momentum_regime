@@ -22,7 +22,7 @@ The evolution of the hidden state follows a Markov chain with a $2 \times 2$ tra
 \begin{equation}
     \mathbf{P} = \left(\begin{array}{cc} P_{00} & P_{01} \\ P_{10} & P_{11} \end{array}\right),
 \end{equation}
-where $P_{ij} = P(s_t = j \mid s_{t-1} = i)$ and each row sums to one. The diagonal elements $P_{00}$ (calm persistence) and $P_{11}$ (panic persistence) govern how likely each regime is to continue into the next month: the expected duration of regime $k$ is $1/(1 - P_{kk})$ months, so a persistence of $0.95$ corresponds to a regime that lasts roughly $20$ months on average.
+where $P_{ij} = P(s_t = j \mid s_{t-1} = i)$ and each row sums to one. The diagonal elements $P_{00}$ (calm persistence) and $P_{11}$ (panic persistence) govern how likely each regime is to continue into the next month. The expected duration of regime $k$ is $1/(1 - P_{kk})$ months, so a persistence of $0.95$ corresponds to a regime that lasts roughly $20$ months on average.
 
 \begin{figure}[H]
     \centering
