@@ -165,7 +165,7 @@ For example, if the forward filter assigns high probability to calm at time $t$ 
 
 The output of the full FFBS procedure is one draw from the posterior over state paths. Across Gibbs iterations, different paths are sampled, exploring the full posterior uncertainty.
 
-The backward pass is used only during training: the sampled state path it produces feeds the conjugate Gibbs updates of the emission and transition parameters. The trading signal $\pi_t^{\text{filter}}$ relies solely on the forward filter.\footnote{The forward filter uses only observations $\mathbf{z}_{1:t}$ (past and present) at each month $t$, never future months $\mathbf{z}_{t+1:T}$, so no look-ahead information leaks into the trading signal. The smoothed counterpart $P(s_t \mid \mathbf{z}_{1:T})$, which would condition on the full sample, is not used.}
+The backward pass is used only during training. The sampled state path it produces feeds the conjugate Gibbs updates of the emission and transition parameters. The trading signal $\pi_t^{\text{filter}}$ relies solely on the forward filter.\footnote{The forward filter uses only observations $\mathbf{z}_{1:t}$ (past and present) at each month $t$, never future months $\mathbf{z}_{t+1:T}$, so no look-ahead information leaks into the trading signal. The smoothed counterpart $P(s_t \mid \mathbf{z}_{1:T})$, which would condition on the full sample, is not used.}
 
 \paragraph{Step 2: Updating the emission parameters}
 

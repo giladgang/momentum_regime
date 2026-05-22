@@ -214,7 +214,7 @@ In long-short construction, XGB's average monthly one-way turnover is 132.3\%, r
 
 \input{tables/table_cost_sensitivity}
 
-XGB remains profitable across all cost levels tested: even at 50\,bps one-way (five times the baseline), its Sharpe ratio is 0.78. All other strategies become unprofitable at moderate cost levels. The baseline 10\,bps assumption is reasonable for a value-weighted strategy using NYSE breakpoints, which tilts toward the most liquid names.
+XGB remains profitable across all cost levels tested. Even at 50\,bps one-way (five times the baseline), its Sharpe ratio is 0.78. All other strategies become unprofitable at moderate cost levels. The baseline 10\,bps assumption is reasonable for a value-weighted strategy using NYSE breakpoints, which tilts toward the most liquid names.
 
 \subsection{Model Sensitivity}\label{app:xgb_sensitivity}
 
@@ -233,7 +233,7 @@ The baseline HMM uses $K = 2$ states (calm and panic). A natural question is whe
 
 In long-short construction, XGB shows no consistent improvement beyond $K = 2$. Cross-seed variability increases with $K$, and the intermediate states that emerge for $K \geq 3$ lack the persistence needed to provide a stable conditioning signal. With only 240 training months, the data cannot reliably separate more than two regimes for the purpose of downstream cross-sectional stock selection.
 
-Beyond estimation, $K = 2$ has an interpretability advantage. The two-state model produces a single continuous signal ($\pi_t^{\text{filter}}$) that XGBoost can condition on in a straightforward way: higher values indicate more stress. With $K \geq 3$, the additional states may capture dimensions of the economy that are orthogonal to the continuation-reversal mechanism, for example a ``growth'' state characterized by strong fundamentals but moderate stress indicators. Such a state would conflate two economically distinct situations (a genuine expansion vs.\ a recovery from panic) and could introduce noise into the regime signal, degrading the model's ability to distinguish continuation from reversal. The two-state framework avoids this by restricting the regime classification to a single dimension, the degree of market stress, which is the dimension most relevant to momentum's cross-sectional structure.
+Beyond estimation, $K = 2$ has an interpretability advantage. The two-state model produces a single continuous signal ($\pi_t^{\text{filter}}$) that XGBoost can condition on in a straightforward way, with higher values indicating more stress. With $K \geq 3$, the additional states may capture dimensions of the economy that are orthogonal to the continuation-reversal mechanism, for example a ``growth'' state characterized by strong fundamentals but moderate stress indicators. Such a state would conflate two economically distinct situations (a genuine expansion vs.\ a recovery from panic) and could introduce noise into the regime signal, degrading the model's ability to distinguish continuation from reversal. The two-state framework avoids this by restricting the regime classification to a single dimension, the degree of market stress, which is the dimension most relevant to momentum's cross-sectional structure.
 
 \subsection{January Exclusion}\label{app:january}
 
