@@ -153,6 +153,21 @@ where $N$ is the full feature set, $p = |N|$, and $f_S(\mathbf{x})$ is the expec
     I_j = \frac{1}{n_{\text{test}}} \sum_{i=1}^{n_{\text{test}}} |\phi_j(\mathbf{x}_i)|.
 \end{equation}
 
+Two aggregations of $I_j$ appear in the main text. The first is the \emph{total $|\text{SHAP}|$ share}, each feature's contribution as a fraction of overall importance:
+\begin{equation}
+    \text{share}_j = \frac{I_j}{\sum_{k=1}^{13} I_k}.
+\end{equation}
+The 46\% figure reported for $\pi_t^{\text{filter}}$ in Section~\ref{sec:horizon_evidence} is $\text{share}_{\pi}$ computed across the full test set.
+
+The second is the \emph{per-horizon momentum share by leg} plotted in Figure~\ref{fig:shap_per_horizon_by_leg}, which restricts attention to the twelve momentum horizons within a single leg-regime cell. For leg $\ell \in \{\text{long}, \text{short}\}$, regime $r \in \{\text{calm}, \text{panic}\}$, and horizon $h \in \{1, \ldots, 12\}$,
+\begin{equation}
+    s_{\ell, r, h} = \frac{\sum_{i \in \mathcal{I}_{\ell, r}} |\phi_h(\mathbf{x}_i)|}{\sum_{h' = 1}^{12} \sum_{i \in \mathcal{I}_{\ell, r}} |\phi_{h'}(\mathbf{x}_i)|},
+\end{equation}
+where $\mathcal{I}_{\ell, r}$ is the set of test observations in leg $\ell$ and regime $r$. By construction the twelve shares within each $(\ell, r)$ sum to one. Pooling across regimes weighted by observation count gives the leg-level shares displayed in Figure~\ref{fig:shap_per_horizon_by_leg}:
+\begin{equation}
+    s_{\ell, h} = \frac{\sum_r n_{\ell, r} \, s_{\ell, r, h}}{\sum_r n_{\ell, r}}, \qquad n_{\ell, r} = |\mathcal{I}_{\ell, r}|.
+\end{equation}
+
 Two additional analyses are performed. First, the mean absolute SHAP value of $\pi_t^{\text{filter}}$ is computed separately for calm and panic months to assess whether the regime signal's influence varies across market states. Second, regime-specific XGBoost models are trained on calm-only and panic-only subsets of the training data, and their SHAP feature importances are compared to identify which features the model relies on differentially across regimes.
 
 \section{Alternative Training Targets for XGBoost}\label{app:alt_targets}

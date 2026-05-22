@@ -63,7 +63,7 @@ def main() -> None:
     ax.set_xticks(x)
     ax.set_xticklabels([str(h) for h in horizons])
     ax.set_xlabel('Momentum horizon (months)')
-    ax.set_ylabel('SHAP share (\\%)' if plt.rcParams.get('text.usetex') else 'SHAP share (%)')
+    ax.set_ylabel('Share of momentum $|$SHAP$|$ (\\%)' if plt.rcParams.get('text.usetex') else 'Share of momentum |SHAP| (%)')
     ax.legend(loc='upper left', frameon=False)
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
