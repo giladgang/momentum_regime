@@ -23,7 +23,7 @@ A further specification confirms that the limiting factor is linearity itself. H
     \label{fig:cumulative}
 \end{figure}
 
-The regime-conditional view (Table~\ref{tab:regime_sharpe}) shows where this advantage comes from: XGB's panic Sharpe ($1.53$) is roughly double its calm Sharpe ($0.84$), exactly the regime-conditioning pattern the architecture is designed to produce, and exactly where unconditional momentum is known to crash.\footnote{The point-estimate gap is not statistically significant at the $5\%$ level on the 59 available panic months (block-bootstrap paired test, $p = 0.109$; Appendix~\ref{app:bootstrap}); confirmation would require a longer panic sample. The same table shows every benchmark trailing XGB by a wide margin in panic (LR: $0.39$, Fixed 12-mo: $0.05$, against XGB's $1.53$).}
+The regime-conditional view (Table~\ref{tab:regime_sharpe}) shows where this advantage comes from. In panic, exactly where unconditional momentum is known to crash, XGB earns a Sharpe of $1.53$. In calm, where the conventional continuation signal is strongest, it earns $0.84$. The panic figure is roughly double the calm one, exactly the regime-conditioning pattern the architecture is designed to produce.\footnote{The point-estimate gap is not statistically significant at the $5\%$ level on the 59 available panic months (block-bootstrap paired test, $p = 0.109$; Appendix~\ref{app:bootstrap}); confirmation would require a longer panic sample. The same table shows every benchmark trailing XGB by a wide margin in panic (LR: $0.39$, Fixed 12-mo: $0.05$, against XGB's $1.53$).}
 
 \input{tables/table_regime_sharpe}
 
