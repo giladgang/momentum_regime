@@ -147,7 +147,7 @@ where $f(\mathbf{z}_t \mid s_t=k) = \mathcal{N}(\mathbf{z}_t;\boldsymbol{\mu}_k,
 \alpha_1(k) \propto f(\mathbf{z}_1 \mid s_1 = k).
 \]
 
-The filtered probabilities $\alpha_t(k)$ are marginals: they describe each month's regime in isolation, not how consecutive months connect. Sampling each $s_t$ independently from its $\alpha_t$ would ignore the transition matrix and could produce paths that flip regimes from one month to the next, in conflict with the strongly persistent $\mathbf{P}$. A second, backward pass is therefore needed to draw a full state path that respects $\mathbf{P}$. The backward pass proceeds in two steps:
+The filtered probabilities $\alpha_t(k)$ are marginals: they describe each month's regime in isolation, not how consecutive months connect. Sampling each $s_t$ independently from its $\alpha_t$ would ignore the transition matrix and could produce paths that flip regimes from one month to the next, in conflict with $\mathbf{P}$. A second, backward pass is therefore needed to draw a full state path that respects $\mathbf{P}$. The backward pass proceeds in two steps:
 
 \paragraph{Terminal state} At $t = T$, the filtered probability already conditions on all observations, so the terminal state is drawn directly:
 \[
