@@ -11,7 +11,7 @@ Cross-sectional momentum is one of the most robust anomalies in empirical financ
 
 This thesis examines that possibility. The regime signal acts as a \emph{context variable}: it carries no direct return-predictive content, but conditions how a nonlinear cross-sectional model uses the momentum term structure in a given market state.
 
-\paragraph{Research question} The thesis asks how the cross-sectional structure of momentum changes between calm and panic regimes, and what mechanism drives that change.
+\paragraph{Research question} The thesis asks how the cross-sectional structure of momentum changes between calm and panic regimes, and what selection rule drives that change.
 
 \paragraph{Approach} The question is answered in two steps. First, a Bayesian Hidden Markov Model (HMM) is estimated on four monthly macrofinancial stress indicators (drawdown, return dispersion, relative market participation, and credit spread), producing a filtered probability of market panic that updates monthly. This regime signal is combined with the twelve momentum horizons inside an XGBoost cross-sectional stock-selection model, benchmarked against a deterministic formula and a logistic regression, and evaluated out-of-sample on 2011--2024 U.S. equities in long-short construction. Second, the XGBoost selection rule is opened up month by month with a per-feature contribution analysis and a clustering of long-leg cross-sectional z-curves, identifying the role the regime signal plays in selection.
 
