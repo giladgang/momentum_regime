@@ -147,7 +147,7 @@ where $f(\mathbf{z}_t \mid s_t=k) = \mathcal{N}(\mathbf{z}_t;\boldsymbol{\mu}_k,
 \alpha_1(k) \propto f(\mathbf{z}_1 \mid s_1 = k).
 \]
 
-The filtered probabilities $\alpha_t(k)$ are marginals: they describe each month's regime in isolation, not how consecutive months connect. Sampling each $s_t$ independently from its $\alpha_t$ would ignore the transition matrix and could produce paths that flip regimes from one month to the next, in conflict with the strongly persistent $\mathbf{P}$. A second, backward pass is therefore needed to draw a full state path that respects $\mathbf{P}$. The backward pass proceeds in two steps:
+The filtered probabilities $\alpha_t(k)$ are marginals. They describe each month's regime in isolation, not how consecutive months connect. Sampling each $s_t$ independently from its $\alpha_t$ would ignore the transition matrix and could produce paths that flip regimes from one month to the next, in conflict with the strongly persistent $\mathbf{P}$. A second, backward pass is therefore needed to draw a full state path that respects $\mathbf{P}$. The backward pass proceeds in two steps:
 
 \paragraph{Terminal state} At $t = T$, the filtered probability already conditions on all observations, so the terminal state is drawn directly:
 \[
@@ -213,7 +213,7 @@ Averaging across MCMC chains is a methodological requirement, not a performance 
 
 In a two-state HMM, the labels $0$ and $1$ are intrinsically arbitrary. Relabeling the states leaves the likelihood unchanged, so the HMM identifies two clusters in the $D$-dimensional feature space without knowing which one should be called panic. To break this symmetry, each feature is assigned an expected sign during stress (the direction in which it moves during historical crisis windows relative to calm periods), and the cluster whose posterior mean vector best aligns with that pattern is designated as ``panic'' and the other as ``calm''. The specific windows and sign assignments are listed in Appendix~\ref{app:label_switching}. The HMM itself never sees these windows during training; they enter only at the post-estimation naming step.
 
-The naming has no effect on the regime estimation itself: the two clusters and their boundaries are identical regardless of which is called calm or panic. What the naming controls is the interpretation of the subsequent analysis, which state we treat as the stress regime when reading off mechanism descriptions, conditional Sharpes, and cluster characterizations downstream. The label ``panic'' therefore reflects a statistical resemblance to historical crisis periods rather than a directly observed market state.
+The naming has no effect on the regime estimation itself. The two clusters and their boundaries are identical regardless of which is called calm or panic. What the naming controls is the interpretation of the subsequent analysis, which state we treat as the stress regime when reading off mechanism descriptions, conditional Sharpes, and cluster characterizations downstream. The label ``panic'' therefore reflects a statistical resemblance to historical crisis periods rather than a directly observed market state.
 
 \paragraph{Filtered Regime Probability}\label{sec:trading_signal}
 

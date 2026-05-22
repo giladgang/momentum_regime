@@ -190,7 +190,7 @@ u_{\text{long}}^s  &= +\,\mathrm{sign}(\hat r^s)\,\log\!\big(1 + |\hat r^s|/\var
 u_{\text{short}}^s &= -\,\mathrm{sign}(\hat r^s)\,\log\!\big(1 + |\hat r^s|/\varepsilon\big) \;-\; \gamma\,\log(\hat\sigma^s),
 \end{aligned}
 \end{equation}
-where $\hat r^s$ is the XGBoost forward-return prediction, $\hat\sigma^s$ a forward-volatility forecast from a parallel XGBoost model trained on realized 12-month volatility, and $\varepsilon = 0.01$. Each month the model picks stocks that maximize these utilities. Longs are the top decile of $u_{\text{long}}$ across the full cross-section, shorts are the top decile of $u_{\text{short}}$. Full specification, including the volatility-forecast model, is in Appendix~\ref{app:crra_construction}.
+where $\hat r^s$ is the XGBoost forward-return prediction, $\hat\sigma^s$ a forward-volatility forecast from a parallel XGBoost model trained on realized 12-month volatility, and $\varepsilon = 0.01$. Each month the model picks stocks that maximize these utilities. Longs are the top decile of $u_{\text{long}}$ across the universe of stocks, shorts are the top decile of $u_{\text{short}}$. Full specification, including the volatility-forecast model, is in Appendix~\ref{app:crra_construction}.
 
 \begin{figure}[H]
     \centering
