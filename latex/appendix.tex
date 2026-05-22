@@ -172,13 +172,13 @@ Two additional analyses are performed. First, the mean absolute SHAP value of $\
 
 \section{Alternative Training Targets for XGBoost}\label{app:alt_targets}
 
-Section~\ref{sec:risk_aversion_control} argues that embedding a risk penalty directly in the XGBoost training target degrades performance, motivating the CRRA specification used in the main text. Table~\ref{tab:alt_targets} shows this degradation is not an artefact of the mean-variance functional form: the same pattern appears under three families of training targets with varying risk tolerance.
+Section~\ref{sec:risk_aversion_control} argues that embedding a risk penalty directly in the XGBoost training target degrades performance, motivating the per-direction utility specification used in the main text. Table~\ref{tab:alt_targets} shows this degradation is not an artefact of the mean-variance functional form: the same pattern appears under three families of training targets with varying risk tolerance.
 
 \input{tables/table_alt_targets}
 
-The pattern is consistent: returns fall faster than volatility under every risk penalty, regardless of functional form. The mildest adjustments (mean-variance with $\gamma = 0.5$, Sharpe-like with $a = 0.5$) come closest to the baseline but still underperform. This confirms that the diagnostic in Section~\ref{sec:risk_aversion_control} is not specific to the mean-variance utility formulation; the single-model training-target approach is structurally unsuited to incorporating risk aversion in a long-short setting, which the long-and-short CRRA construction resolves.
+The pattern is consistent: returns fall faster than volatility under every risk penalty, regardless of functional form. The mildest adjustments (mean-variance with $\gamma = 0.5$, Sharpe-like with $a = 0.5$) come closest to the baseline but still underperform. This confirms that the diagnostic in Section~\ref{sec:risk_aversion_control} is not specific to the mean-variance utility formulation; the single-model training-target approach is structurally unsuited to incorporating risk aversion in a long-short setting, which the long-and-short utility construction resolves.
 
-\section{Long and Short CRRA Utilities}\label{app:crra_construction}
+\section{Long-Short Utility Construction}\label{app:crra_construction}
 
 This appendix supplements the long-and-short utility specification in Section~\ref{sec:risk_aversion_control} with the volatility-forecast model, the high-$\gamma$ collapse mechanism, and the sweep grid.
 
