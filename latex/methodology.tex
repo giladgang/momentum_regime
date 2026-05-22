@@ -74,9 +74,9 @@ where $D$ is the number of selected features. After observing data, these prior 
 \paragraph{Transition matrix}
 Regimes should be persistent rather than switching every few months. This is encoded by assigning each row of the transition matrix an independent Dirichlet prior whose mass concentrates on the diagonal:
 \begin{equation}
-\mathbf{P}_{0,\cdot} \sim \text{Dir}(9,1),
+\mathbf{P}_{0,\cdot} \sim \operatorname{Dir}(9,1),
 \qquad
-\mathbf{P}_{1,\cdot} \sim \text{Dir}(1,9).
+\mathbf{P}_{1,\cdot} \sim \operatorname{Dir}(1,9).
 \label{eq:dirichlet_prior}
 \end{equation}
 Equivalently, in matrix form,
@@ -190,7 +190,7 @@ The sampled path is scanned to count transitions, $n_{ij} = \sum_{t=2}^T \mathds
 \begin{equation}
 \mathbf{P}_{i,\cdot} \mid \{s_t\}
 \sim
-\text{Dir}\!\big(\alpha_{i0} + n_{i0},\; \alpha_{i1} + n_{i1}\big).
+\operatorname{Dir}\bigl(\alpha_{i0} + n_{i0},\; \alpha_{i1} + n_{i1}\bigr).
 \label{eq:dirichlet_update}
 \end{equation}
 Sampling once from each of the two Dirichlet posteriors (one per regime) produces the updated transition matrix $\mathbf{P}$, which is held fixed during the next iteration's state-path sampling. Because the prior is strongly tilted toward persistence, the sampled $\mathbf{P}$ tracks the data while staying anchored around a persistent diagonal even on short or noisy paths.
