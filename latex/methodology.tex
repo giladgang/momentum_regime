@@ -24,7 +24,7 @@ The evolution of the hidden state follows a first-order Markov chain with a $2 \
 \end{equation}
 where $P_{ij} = P(s_t = j \mid s_{t-1} = i)$ and each row sums to one. The diagonal elements $P_{00}$ (calm persistence) and $P_{11}$ (panic persistence) govern how likely each regime is to continue into the next month: the expected duration of regime $k$ is $1/(1 - P_{kk})$ months, so a persistence of $0.95$ corresponds to a regime that lasts roughly $20$ months on average.
 
-\begin{figure}[H]
+\begin{figure}[!htbp]
     \centering
     \includegraphics[width=\textwidth]{plots/thesis/markov_chain_diagram.png}
     \caption{Architecture of the two-state Hidden Markov Model. Hidden states (Calm/Panic) evolve via transition probabilities $P_{ij}$ and emit the observation vector $\mathbf{z}_t \in \mathbb{R}^D$. The forward filter inverts this process to produce $\pi_t^{\text{filter}} = P(s_t = 1 \mid \mathbf{z}_{1:t})$. The lower panel shows an example state sequence illustrating regime persistence and abrupt transitions.}
