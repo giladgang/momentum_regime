@@ -1082,7 +1082,6 @@ def _train_single_feature(feat):
         xgb_s.fit(X_tr, y_tr_val)
         preds += xgb_s.predict(X_te)
     preds /= len(XGB_SEEDS)
-    te = te.copy()
     te[f'score_{feat}_only'] = preds
     return build_port(te, f'score_{feat}_only')
 
