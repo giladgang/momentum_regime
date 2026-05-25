@@ -35,6 +35,8 @@ Figure~\ref{fig:cumulative} visualizes the same pattern through cumulative wealt
 
 The regime signal is essential. Removing $\pi_t^{\text{filter}}$ and retraining on the 12 momentum features alone drops the Sharpe to 0.43 (Table~\ref{tab:regime_signal_ablation}). Replacing $\pi_t^{\text{filter}}$ with the four raw stress indicators (DD, DISP, REL\_N, CS) performs even worse (Sharpe 0.26). With four additional dimensions the model must reconstruct the regime structure at each split, while the HMM distils those indicators into a single dimension that one tree split can condition on. The HMM's role is not to provide a convenient feature but to solve regime identification \emph{before} stock selection, freeing the cross-sectional model to use the regime signal rather than construct it.
 
+Even reducing the raw stress indicators to a single feature does not match the HMM. Across the four HMM inputs tested singly, the best (relative market participation, REL\_N) gives Sharpe 0.75 and the conventional drawdown indicator (DD) gives 0.47, neither approaching the HMM's 1.11. The simple regime classifiers used in the asset-pricing literature, such as the up/down state of \citet{Cooper2004} from trailing market returns or single-threshold drawdown rules, are essentially raw single-feature signals of this kind. The HMM is performing regime classification, a task XGB cannot perform from raw stress data, and the added cost of the upstream HMM stage is therefore justified rather than optional.
+
 \input{tables/table_regime_signal_ablation}
 
 

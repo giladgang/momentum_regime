@@ -352,6 +352,34 @@ def parse_table_fund_alphas():
     return out
 
 
+def parse_table_regime_signal_ablation():
+    """Parse the regime-signal ablation table (Table 5).
+
+    Exposes Sharpe ratios for each variant so the abstract and Section 5.1.2
+    can cite specific numbers (HMM, REL_N-only, DD-only, no-signal, 4-raw).
+    """
+    text = _read('tables/table_regime_signal_ablation.tex')
+    if not text:
+        return {}
+    out = {}
+    label_to_key = [
+        ('XGB + $\\pi_t^{\\text{filter}}$ (HMM)', 'hmm'),
+        ('XGB + REL\\_N only', 'reln_only'),
+        ('XGB + DD only', 'dd_only'),
+        ('XGB (no regime signal)', 'no_signal'),
+        ('XGB + raw indicators (DD, DISP, REL\\_N, CS)', 'four_raw'),
+    ]
+    for label, key in label_to_key:
+        r = _parse_row(text, label)
+        if not r:
+            continue
+        out[f'{key}_ann_ret'] = {'value': _to_float(r[1])}
+        out[f'{key}_ann_vol'] = {'value': _to_float(r[2])}
+        out[f'{key}_sharpe'] = {'value': _to_float(r[3])}
+        out[f'{key}_mdd'] = {'value': _to_float(r[4])}
+    return out
+
+
 def parse_residual_diagnostics():
     """Parse `results/thesis/factor_residual_diagnostics.csv` for Appendix H.3.
 
@@ -434,6 +462,7 @@ PARSERS = {
     'january':         parse_table_january,
     'seed_convergence': parse_table_seed_convergence,
     'fund_alphas':     parse_table_fund_alphas,
+    'regime_signal_ablation': parse_table_regime_signal_ablation,
     'residual_diagnostics': parse_residual_diagnostics,
     'international':   parse_intl_summary,
 }

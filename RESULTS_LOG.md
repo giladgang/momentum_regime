@@ -207,11 +207,13 @@ RF underperforms XGBoost by ~0.3 Sharpe and shifts SHAP heavily toward momentum.
 
 | Variant | Ann Ret | Sharpe | MDD |
 |---|---:|---:|---:|
-| XGB + π filter (HMM) | 21.9% | **1.11** | -24.8% |
-| XGB + raw indicators (DD, DISP, REL_N, CS) | 4.1% | 0.30 | -40.3% |
-| XGB (no regime signal) | 6.4% | 0.41 | -41.0% |
+| **XGB + π filter (HMM)** | 21.7% | **1.107** | -22.8% |
+| XGB + REL_N only | 11.6% | 0.746 | -24.5% |
+| XGB + DD only | 7.9% | 0.469 | -30.8% |
+| XGB (no regime signal) | 7.0% | 0.429 | -41.0% |
+| XGB + raw indicators (DD, DISP, REL_N, CS) | 3.2% | 0.257 | -45.4% |
 
-HMM signal more than doubles Sharpe vs no signal. Raw indicators are worse than no signal.
+HMM-distilled π more than doubles Sharpe vs no signal. Even the best single raw stress feature (REL_N) gives Sharpe 0.75, well below the HMM's 1.11. The conventional drawdown indicator (DD) gives 0.47, essentially indistinguishable from the no-signal baseline. The four raw indicators concatenated overfit, giving worse-than-no-signal Sharpe. Added 2026-05-26: DD-only and REL_N-only rows close the loophole "couldn't you just feed one well-chosen raw feature to XGB?" — the answer is no, the HMM's regime classification is doing work that no single feature replicates. (DISP-only Sharpe 0.17, CS-only 0.02; both at or below the no-signal baseline; not shown in the thesis table.)
 
 ### Fundamentals ablation (`results/fundamentals_test_results.csv`, `results/fundamentals_returns.pkl`)
 

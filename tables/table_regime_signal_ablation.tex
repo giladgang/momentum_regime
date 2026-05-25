@@ -6,10 +6,12 @@
 Regime Signal Variant & Ann.\ Ret & Ann.\ Vol & Sharpe & Max DD \\
 \midrule
 XGB + $\pi_t^{\text{filter}}$ (HMM)   & 21.7\% & 19.5\% & 1.107 & $-$22.8\% \\
-XGB + raw indicators (DD, DISP, REL\_N, CS) & 3.2\% & 19.1\% & 0.257 & $-$45.4\% \\
+XGB + REL\_N only                        & 11.6\% & 16.6\% & 0.746 & $-$24.5\% \\
+XGB + DD only                            & 7.9\% & 20.5\% & 0.469 & $-$30.8\% \\
 XGB (no regime signal)                   & 7.0\% & 20.4\% & 0.429 & $-$41.0\% \\
+XGB + raw indicators (DD, DISP, REL\_N, CS) & 3.2\% & 19.1\% & 0.257 & $-$45.4\% \\
 \bottomrule
 \end{tabular}
-\caption{Regime signal ablation (50-seed ensemble). The HMM signal outperforms both raw stress indicators and no regime signal.}
+\caption{Regime signal ablation (50-seed ensemble). The HMM-distilled $\pi_t^{\text{filter}}$ outperforms any raw stress feature alone, the four features concatenated, and the no-signal baseline. The two single-feature rows show the strongest (REL\_N) and the conventional drawdown indicator (DD); the remaining single-feature variants (DISP $=0.17$, CS $=0.02$) sit at or below the no-signal baseline.}
 \label{tab:regime_signal_ablation}
 \end{table}

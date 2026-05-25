@@ -1,22 +1,34 @@
 # Metrics diff report
 
-Generated: 2026-05-25T16:07:44  
-Total metrics tracked: 243
+Generated: 2026-05-26T00:19:03  
+Total metrics tracked: 263
 
 ## ⚙️ Config knobs
 
 No config knobs changed since last run.
 
-## 📊 Metrics that changed (8)
+## 📊 Metrics that changed (20)
 
 | Metric (section.key) | Old | New | Δ | Likely config |
 |---|---|---|---|---|
-| `residual_diagnostics.xgb_ff6_lb12_p` | *(new)* | 0.1315 | — | — |
-| `residual_diagnostics.xgb_ff6_lb12_stat` | *(new)* | 17.5060 | — | — |
-| `residual_diagnostics.xgb_ff6_lb6_p` | *(new)* | 0.0967 | — | — |
-| `residual_diagnostics.xgb_ff6_lb6_stat` | *(new)* | 10.7424 | — | — |
-| `residual_diagnostics.xgb_ff6_t_nw12` | *(new)* | 4.8793 | — | — |
-| `residual_diagnostics.xgb_ff6_t_nw24` | *(new)* | 4.7391 | — | — |
-| `residual_diagnostics.xgb_ff6_t_nw3` | *(new)* | 4.7708 | — | — |
-| `residual_diagnostics.xgb_ff6_t_nw6` | *(new)* | 4.8121 | — | — |
+| `regime_signal_ablation.dd_only_ann_ret` | *(new)* | 7.9000 | — | — |
+| `regime_signal_ablation.dd_only_ann_vol` | *(new)* | 20.5000 | — | — |
+| `regime_signal_ablation.dd_only_mdd` | *(new)* | -30.8000 | — | — |
+| `regime_signal_ablation.dd_only_sharpe` | *(new)* | 0.4690 | — | — |
+| `regime_signal_ablation.four_raw_ann_ret` | *(new)* | 3.2000 | — | — |
+| `regime_signal_ablation.four_raw_ann_vol` | *(new)* | 19.1000 | — | — |
+| `regime_signal_ablation.four_raw_mdd` | *(new)* | -45.4000 | — | — |
+| `regime_signal_ablation.four_raw_sharpe` | *(new)* | 0.2570 | — | — |
+| `regime_signal_ablation.hmm_ann_ret` | *(new)* | 21.7000 | — | — |
+| `regime_signal_ablation.hmm_ann_vol` | *(new)* | 19.5000 | — | — |
+| `regime_signal_ablation.hmm_mdd` | *(new)* | -22.8000 | — | — |
+| `regime_signal_ablation.hmm_sharpe` | *(new)* | 1.1070 | — | — |
+| `regime_signal_ablation.no_signal_ann_ret` | *(new)* | 7.0000 | — | — |
+| `regime_signal_ablation.no_signal_ann_vol` | *(new)* | 20.4000 | — | — |
+| `regime_signal_ablation.no_signal_mdd` | *(new)* | -41.0000 | — | — |
+| `regime_signal_ablation.no_signal_sharpe` | *(new)* | 0.4290 | — | — |
+| `regime_signal_ablation.reln_only_ann_ret` | *(new)* | 11.6000 | — | — |
+| `regime_signal_ablation.reln_only_ann_vol` | *(new)* | 16.6000 | — | — |
+| `regime_signal_ablation.reln_only_mdd` | *(new)* | -24.5000 | — | — |
+| `regime_signal_ablation.reln_only_sharpe` | *(new)* | 0.7460 | — | — |
 

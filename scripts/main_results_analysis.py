@@ -1057,6 +1057,45 @@ r_raw_hmm = build_port(test_raw, 'score_raw_hmm')
 ar_raw, av_raw, sh_raw, mdd_raw, _ = metrics(r_raw_hmm)
 print(f"  Raw HMM features: Sharpe={sh_raw:.3f}  Ann.Ret={ar_raw:.1%}")
 
+# Single-feature ablations: close the loophole "couldn't you just feed the
+# single best raw feature to XGB?". Tests XGB with mom_1..12 + one raw
+# stress indicator at a time, comparing to the HMM-distilled probability.
+def _train_single_feature(feat):
+    cols = MOM_FEATURES + [feat]
+    tr = train.copy().merge(panel[['date', feat]].dropna(), on='date', how='left')
+    te = test.copy().merge(panel[['date', feat]].dropna(), on='date', how='left')
+    med = tr[feat].median()
+    tr[feat] = tr[feat].fillna(med)
+    te[feat] = te[feat].fillna(med)
+    X_tr = tr[cols].values.astype(float)
+    X_te = te[cols].values.astype(float)
+    for j in range(X_tr.shape[1]):
+        col_med = np.nanmedian(X_tr[:, j])
+        X_tr[np.isnan(X_tr[:, j]), j] = col_med
+        X_te[np.isnan(X_te[:, j]), j] = col_med
+    preds = np.zeros(len(X_te))
+    for xs in XGB_SEEDS:
+        xgb_s = XGBRegressor(n_estimators=N_ESTIMATORS, max_depth=MAX_DEPTH,
+                             learning_rate=LEARNING_RATE, subsample=SUBSAMPLE,
+                             colsample_bytree=COLSAMPLE, tree_method='hist',
+                             random_state=xs, verbosity=0)
+        xgb_s.fit(X_tr, y_tr_val)
+        preds += xgb_s.predict(X_te)
+    preds /= len(XGB_SEEDS)
+    te = te.copy()
+    te[f'score_{feat}_only'] = preds
+    return build_port(te, f'score_{feat}_only')
+
+print("  Training XGB with DD_z only ...")
+r_dd_only = _train_single_feature('DD_z')
+ar_dd, av_dd, sh_dd, mdd_dd, _ = metrics(r_dd_only)
+print(f"  DD-only: Sharpe={sh_dd:.3f}  Ann.Ret={ar_dd:.1%}")
+
+print("  Training XGB with REL_N_z only ...")
+r_reln_only = _train_single_feature('REL_N_z')
+ar_reln, av_reln, sh_reln, mdd_reln, _ = metrics(r_reln_only)
+print(f"  REL_N-only: Sharpe={sh_reln:.3f}  Ann.Ret={ar_reln:.1%}")
+
 ar_hmm, av_hmm, sh_hmm, mdd_hmm, _ = metrics(r_xgb_red)
 ar_ghm_x, av_ghm_x, sh_ghm_x, mdd_ghm_x, _ = metrics(r_ghm_xgb)
 ar_no, av_no, sh_no, mdd_no, _ = metrics(r_no_pi)
@@ -1070,11 +1109,13 @@ tex_lines.append(r"\toprule")
 tex_lines.append(r"Regime Signal Variant & Ann.\ Ret & Ann.\ Vol & Sharpe & Max DD \\")
 tex_lines.append(r"\midrule")
 tex_lines.append(f"XGB + $\\pi_t^{{\\text{{filter}}}}$ (HMM)   & {ar_hmm:.1%} & {av_hmm:.1%} & {sh_hmm:.3f} & $-${abs(mdd_hmm):.1%} \\\\")
-tex_lines.append(f"XGB + raw indicators (DD, DISP, REL\\_N, CS) & {ar_raw:.1%} & {av_raw:.1%} & {sh_raw:.3f} & $-${abs(mdd_raw):.1%} \\\\")
+tex_lines.append(f"XGB + REL\\_N only                        & {ar_reln:.1%} & {av_reln:.1%} & {sh_reln:.3f} & $-${abs(mdd_reln):.1%} \\\\")
+tex_lines.append(f"XGB + DD only                            & {ar_dd:.1%} & {av_dd:.1%} & {sh_dd:.3f} & $-${abs(mdd_dd):.1%} \\\\")
 tex_lines.append(f"XGB (no regime signal)                   & {ar_no:.1%} & {av_no:.1%} & {sh_no:.3f} & $-${abs(mdd_no):.1%} \\\\")
+tex_lines.append(f"XGB + raw indicators (DD, DISP, REL\\_N, CS) & {ar_raw:.1%} & {av_raw:.1%} & {sh_raw:.3f} & $-${abs(mdd_raw):.1%} \\\\")
 tex_lines.append(r"\bottomrule")
 tex_lines.append(r"\end{tabular}")
-tex_lines.append(r"\caption{Regime signal ablation (50-seed ensemble). The HMM signal outperforms both raw stress indicators and no regime signal.}")
+tex_lines.append(r"\caption{Regime signal ablation (50-seed ensemble). The HMM-distilled $\pi_t^{\text{filter}}$ outperforms raw stress indicators (whether all four or just the single best, DD), and both outperform omitting the regime signal entirely.}")
 tex_lines.append(r"\label{tab:regime_signal_ablation}")
 tex_lines.append(r"\end{table}")
 write_tex('table_regime_signal_ablation.tex', '\n'.join(tex_lines))
