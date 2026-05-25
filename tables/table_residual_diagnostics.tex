@@ -1,0 +1,34 @@
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{l l r r r r}
+\toprule
+ &  &  & \multicolumn{2}{c}{LB(6)} & LB(12) \\
+\cmidrule(lr){4-5}\cmidrule(lr){6-6}
+Strategy & Model & $T$ & $Q_6$ & $p$ & $p$ \\
+\midrule
+XGB & CAPM & 167 & 8.23 & 0.221 & 0.211 \\
+XGB & FF3 & 167 & 9.45 & 0.150 & 0.128 \\
+XGB & Carhart & 167 & 10.46 & 0.106 & 0.142 \\
+XGB & FF5 & 167 & 9.65 & 0.140 & 0.125 \\
+XGB & FF6 & 167 & 10.74 & 0.097 & 0.132 \\
+D\&M & CAPM & 167 & 2.94 & 0.817 & 0.936 \\
+D\&M & FF3 & 167 & 2.82 & 0.831 & 0.947 \\
+D\&M & Carhart & 167 & 2.88 & 0.824 & 0.943 \\
+D\&M & FF5 & 167 & 2.32 & 0.888 & 0.965 \\
+D\&M & FF6 & 167 & 2.18 & 0.903 & 0.969 \\
+WML & CAPM & 167 & 6.16 & 0.406 & 0.180 \\
+WML & FF3 & 167 & 7.46 & 0.281 & 0.110 \\
+WML & Carhart & 167 & 6.84 & 0.336 & 0.112 \\
+WML & FF5 & 167 & 7.13 & 0.309 & 0.121 \\
+WML & FF6 & 167 & 6.87 & 0.333 & 0.121 \\
+LR & CAPM & 167 & 2.67 & 0.849 & 0.089 \\
+LR & FF3 & 167 & 2.36 & 0.884 & 0.091 \\
+LR & Carhart & 167 & 2.34 & 0.886 & 0.087 \\
+LR & FF5 & 167 & 2.71 & 0.844 & 0.125 \\
+LR & FF6 & 167 & 2.71 & 0.844 & 0.124 \\
+\bottomrule
+\end{tabular}
+\caption{Ljung--Box residual diagnostics for the factor regressions in Table~\ref{tab:factor_alphas}. $Q_6$ is the Ljung--Box statistic at lag 6; $p$-values are reported at lag 6 and lag 12. Across every (strategy, model) pair we fail to reject the null of no residual autocorrelation at the 5\% level. The Newey--West truncation of six lags used throughout the thesis is empirically supported.}
+\label{tab:residual_diagnostics}
+\end{table}

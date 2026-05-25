@@ -91,7 +91,7 @@ def parse_table_performance():
         return {}
     # Row labels in the production table
     rows = {
-        'm2':       'XGB (mom+$\\pi$)',
+        'm2':       'XGB',
         'm1':       'LR',
         'm0':       'DET',
         'fixed_12': 'Fixed 12-mo mom',
@@ -146,7 +146,7 @@ def parse_table_regime_sharpe():
     if not text:
         return {}
     out = {}
-    rows = {'m2': 'XGB (mom+$\\pi$)', 'm1': 'LR', 'm0': 'DET',
+    rows = {'m2': 'XGB', 'm1': 'LR', 'm0': 'DET',
             'fixed_12': 'Fixed 12-mo mom', 'fixed_1': 'Fixed 1-mo mom', 'market': 'Market'}
     for key, label in rows.items():
         r = _parse_row(text, label)
@@ -352,6 +352,31 @@ def parse_table_fund_alphas():
     return out
 
 
+def parse_residual_diagnostics():
+    """Parse `results/thesis/factor_residual_diagnostics.csv` for Appendix H.3.
+
+    Exposes the headline XGB FF6 Ljung--Box statistics and NW lag-stability
+    t-statistics so they can be cited as \\newcommand macros in thesis prose.
+    """
+    import pandas as pd
+    path = ROOT / 'results/thesis/factor_residual_diagnostics.csv'
+    if not path.exists():
+        return {}
+    df = pd.read_csv(path)
+    out = {}
+    xgb_ff6 = df[(df['strategy'] == 'XGB') & (df['model'] == 'FF6')]
+    if not xgb_ff6.empty:
+        r = xgb_ff6.iloc[0]
+        for col in ('LB6_stat', 'LB6_p', 'LB12_stat', 'LB12_p'):
+            if col in r.index and pd.notna(r[col]):
+                out[f'xgb_ff6_{col.lower()}'] = {'value': float(r[col])}
+        for L in (3, 6, 12, 24):
+            col = f't_nw{L}'
+            if col in r.index and pd.notna(r[col]):
+                out[f'xgb_ff6_{col}'] = {'value': float(r[col])}
+    return out
+
+
 def parse_intl_summary():
     """Parse UK/JP intl summary CSVs. Strategy column uses 'method2_xgb' for XGB.
     Compounded total return is computed from the per-strategy monthly returns CSV."""
@@ -409,6 +434,7 @@ PARSERS = {
     'january':         parse_table_january,
     'seed_convergence': parse_table_seed_convergence,
     'fund_alphas':     parse_table_fund_alphas,
+    'residual_diagnostics': parse_residual_diagnostics,
     'international':   parse_intl_summary,
 }
 

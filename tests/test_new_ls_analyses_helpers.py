@@ -175,3 +175,146 @@ class TestGetAlphas:
         assert out['CAPM']['alpha'] == pytest.approx(0.12, abs=0.02)
         # t-stat highly significant
         assert out['CAPM']['t'] > 4.0
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Residual diagnostic helpers — added 2026-05-25 for NW(6) assumption validation
+# (Appendix H.3 residual diagnostics)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+
+class TestResidualDiagnosticInvariants:
+    """Source-level pins for the three new diagnostic helpers."""
+
+    @pytest.fixture(scope='class')
+    def src(self):
+        with open(SCRIPT_PATH) as f:
+            return f.read()
+
+    def test_has_ljung_box_diagnostic(self, src):
+        assert 'def ljung_box_diagnostic' in src
+
+    def test_has_nw_lag_stability(self, src):
+        assert 'def nw_lag_stability' in src
+
+    def test_has_acf_plot_grid(self, src):
+        assert 'def plot_residual_acf_grid' in src
+
+    def test_lb_uses_statsmodels_acorr(self, src):
+        assert 'acorr_ljungbox' in src
+
+    def test_nw_lag_stability_sweeps_multiple_lags(self, src):
+        """Pin the {3, 6, 12, 24} default sweep used in the appendix."""
+        assert '(3, 6, 12, 24)' in src or '[3, 6, 12, 24]' in src
+
+    def test_writes_residual_diagnostics_csv(self, src):
+        """Diagnostic block must save the per-(strategy, model) results."""
+        assert 'factor_residual_diagnostics.csv' in src
+
+    def test_writes_acf_figure_to_thesis(self, src):
+        """ACF figure for Appendix H.3 must land in plots/thesis/."""
+        assert 'factor_residual_acf' in src
+        assert 'PLOTS_THESIS_DIR' in src
+
+    def test_writes_residual_diagnostics_tex_table(self, src):
+        """LB table must be generated as a thesis-grade .tex file."""
+        assert 'table_residual_diagnostics' in src
+
+
+class TestLjungBoxDiagnostic:
+
+    @pytest.fixture
+    def lb_fn(self):
+        ns = {'sm': sm}
+        return _extract_function(SCRIPT_PATH, 'ljung_box_diagnostic',
+                                 namespace=ns)
+
+    def test_returns_keys_for_each_lag(self, lb_fn):
+        rng = np.random.default_rng(0)
+        resid = rng.normal(0, 0.04, 200)
+        out = lb_fn(resid, lags=(6, 12))
+        assert set(out.keys()) == {'LB6_stat', 'LB6_p', 'LB12_stat', 'LB12_p'}
+        for v in out.values():
+            assert np.isfinite(v)
+
+    def test_white_noise_fails_to_reject(self, lb_fn):
+        """For Gaussian white noise, LB should not strongly reject. Under H0
+        p-values are uniform on (0,1), so ~5% of single-seed draws land below
+        0.05 by chance — we use the looser p > 0.01 threshold (would fail
+        only 1% of the time under H0) to make the test robust to seed."""
+        rng = np.random.default_rng(42)
+        resid = rng.normal(0, 0.04, 300)
+        out = lb_fn(resid, lags=(6, 12))
+        assert out['LB6_p'] > 0.01
+        assert out['LB12_p'] > 0.01
+
+    def test_ar1_residuals_reject(self, lb_fn):
+        """Strongly autocorrelated AR(1) residuals (φ=0.5) should reject LB."""
+        rng = np.random.default_rng(7)
+        T = 400
+        e = np.zeros(T)
+        for t in range(1, T):
+            e[t] = 0.5 * e[t-1] + rng.normal(0, 0.04)
+        out = lb_fn(e, lags=(6, 12))
+        assert out['LB6_p'] < 0.01
+        assert out['LB12_p'] < 0.01
+
+
+class TestNWLagStability:
+
+    @pytest.fixture
+    def nw_fn(self):
+        ns = {'sm': sm}
+        return _extract_function(SCRIPT_PATH, 'nw_lag_stability',
+                                 namespace=ns)
+
+    def test_returns_t_per_lag(self, nw_fn):
+        rng = np.random.default_rng(0)
+        T = 200
+        y = 0.01 + rng.normal(0, 0.04, T)
+        X = sm.add_constant(rng.normal(0, 0.04, (T, 2)))
+        out = nw_fn(y, X, lags=(3, 6, 12, 24))
+        assert set(out.keys()) == {'t_nw3', 't_nw6', 't_nw12', 't_nw24'}
+        for v in out.values():
+            assert np.isfinite(v)
+
+    def test_t_stat_stable_under_white_residuals(self, nw_fn):
+        """When residuals are white noise the t-stat on the intercept
+        should be similar across NW lag choices."""
+        rng = np.random.default_rng(0)
+        T = 400
+        y = 0.01 + rng.normal(0, 0.04, T)
+        X = np.ones((T, 1))
+        out = nw_fn(y, X, lags=(3, 6, 12, 24))
+        ts = list(out.values())
+        # Stability under white noise: range across lags should be small
+        assert (max(ts) - min(ts)) < 1.0
+
+
+class TestPlotResidualACFGrid:
+
+    @pytest.fixture
+    def plot_fn(self):
+        # Provide plt and plot_acf inside the namespace so the extracted
+        # function can find them.
+        import matplotlib
+        matplotlib.use('Agg')
+        import matplotlib.pyplot as plt
+        from statsmodels.graphics.tsaplots import plot_acf
+        ns = {'plt': plt, 'plot_acf': plot_acf}
+        return _extract_function(SCRIPT_PATH, 'plot_residual_acf_grid',
+                                 namespace=ns)
+
+    def test_creates_file(self, plot_fn, tmp_path):
+        rng = np.random.default_rng(0)
+        residuals = {
+            'A': rng.normal(0, 0.04, 150),
+            'B': rng.normal(0, 0.04, 150),
+            'C': rng.normal(0, 0.04, 150),
+            'D': rng.normal(0, 0.04, 150),
+        }
+        save_path = tmp_path / 'test_acf.png'
+        plot_fn(residuals, str(save_path), lags=24, suptitle='Test ACF')
+        assert save_path.exists()
+        # File should have non-trivial size (matplotlib PNG > 5 KB typically)
+        assert save_path.stat().st_size > 5_000

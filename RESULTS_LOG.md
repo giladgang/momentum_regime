@@ -31,6 +31,33 @@ Test period: **2011-01 to 2025-11** (167 months). Long-short, NYSE decile breakp
 | FF5 | 23.4 | 4.56 | -0.15 | +0.08 | -0.21 | | +0.05 | +0.12 |
 | **FF6** | **24.7** | **4.78** | -0.20 | +0.01 | -0.30 | -0.24 | -0.00 | +0.21 |
 
+### Residual diagnostics for NW(6) (`table_residual_diagnostics`)
+
+Source: `results/thesis/factor_residual_diagnostics.csv` (Step 7,
+`scripts/new_ls_analyses.py`). Added 2026-05-25 in response to Denis's
+question on whether NW(6) is empirically supported by the residuals.
+
+Ljung--Box portmanteau test on residuals of each factor regression. All
+20 (strategy × model) pairs fail to reject the null of no residual
+autocorrelation at the 5% level.
+
+| Strategy | Model | T | LB(6) Q | LB(6) p | LB(12) p |
+|---|---|---:|---:|---:|---:|
+| XGB | CAPM | 167 | 8.23 | 0.221 | 0.211 |
+| XGB | FF3 | 167 | 9.45 | 0.150 | 0.128 |
+| XGB | Carhart | 167 | 10.46 | 0.106 | 0.142 |
+| XGB | FF5 | 167 | 9.65 | 0.140 | 0.125 |
+| **XGB** | **FF6** | 167 | **10.74** | **0.097** | **0.132** |
+| D&M | FF6 | 167 | 2.18 | 0.903 | 0.969 |
+| WML | FF6 | 167 | 6.87 | 0.333 | 0.121 |
+| LR  | FF6 | 167 | 2.71 | 0.844 | 0.124 |
+
+NW lag-stability for the headline XGB FF6 regression: t-stat on α at
+maxlags ∈ {3, 6, 12, 24} is **{4.77, 4.81, 4.88, 4.74}** — flat across
+a 4× sweep, confirming lag truncation doesn't affect inference.
+
+ACF figure: `plots/thesis/factor_residual_acf_ff6.{png,pdf}`.
+
 ### Bootstrap CIs and paired tests (`table_bootstrap`)
 
 Block bootstrap (12-month blocks, 10,000 resamples, seed 42).

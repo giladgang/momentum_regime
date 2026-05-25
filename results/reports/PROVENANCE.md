@@ -66,6 +66,8 @@ No data assets.
 | `tables/table_subperiod.tex` | `scripts/main_results_analysis.py` | (same) |
 | `tables/table_regime_sharpe.tex` | `scripts/main_results_analysis.py` | (same) |
 | `tables/table_factor_alphas.tex` | `scripts/new_ls_analyses.py` | (same) |
+| `tables/table_residual_diagnostics.tex` | `scripts/new_ls_analyses.py` (Appendix H.3) | — |
+| `plots/thesis/factor_residual_acf_ff6.{png,pdf}` | `scripts/new_ls_analyses.py` (Appendix H.3) | — |
 | `tables/table_alt_targets.tex` | `scripts/main_results_analysis.py` | — |
 | `tables/table_alt_splits.tex` | `scripts/main_results_analysis.py` | TRAIN_END |
 | `tables/table_shap.tex` | `scripts/main_results_analysis.py` | MOM_FEATURES, FUND_FEATURES |
