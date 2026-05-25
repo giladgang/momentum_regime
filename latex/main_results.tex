@@ -51,7 +51,6 @@ Adding the ten fundamentals on top of the production feature set reduces Sharpe 
 Fundamentals describe firm-level characteristics whose cross-sectional ranking does not flip with the market regime the way the optimal momentum tilt does. A high-B/M stock is a high-B/M stock in both regimes, so fundamentals cannot reproduce the panic-side reversal that drives the baseline's panic Sharpe (Table~\ref{tab:fund_ablation}, fund-only and fund $+\,\pi$ rows). Adding them on top of the regime-momentum signal therefore dilutes an essential mechanism rather than complementing it. A regime-conditional feature-set design that routes fundamentals into calm-regime predictions and momentum into panic-regime predictions is discussed in Section~\ref{sec:future_work}.
 
 
-\clearpage
 \subsection{The Regime-Momentum Mechanism}\label{sec:regime_results}
 
 This section examines the XGBoost model's internals, reading the structure of the regime-momentum signal directly off its per-month selections.
