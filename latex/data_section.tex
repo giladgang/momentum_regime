@@ -77,6 +77,8 @@ The four series co-move around stress episodes. DD and REL\_N drop while DISP an
     \label{fig:features_hmm}
 \end{figure}
 
+Panic regimes are characterized by deep market drawdowns, elevated cross-sectional dispersion in stock returns, reduced market participation, and widened credit spreads. Calm regimes show shallow or no drawdown, narrow return dispersion, broad participation, and tight credit spreads.
+
 \subsection{Regime Estimation Results}\label{sec:hmm_output}
 
 \paragraph{Sampler convergence}
@@ -90,7 +92,7 @@ Averaging $\pi_t^{\text{filter}}$ across many independent Gibbs chains stabilize
 
 \clearpage
 \paragraph{Regime separation and filtered probability}
-Panic regimes are characterized by deep market drawdowns, elevated cross-sectional dispersion in stock returns, reduced market participation, and widened credit spreads. Calm regimes show shallow or no drawdown, narrow return dispersion, broad participation, and tight credit spreads. Table~\ref{tab:hmm_separation} reports the posterior regime means estimated on the 1990--2010 training period. All four features exhibit statistically significant separation between calm and panic (95\% credible intervals excluding zero),\footnote{A $95\%$ credible interval is the Bayesian range covering the parameter with $95\%$ probability; excluding zero means the panic--calm mean difference on each feature is reliably distinct from zero.} confirming that the four-feature emission space resolves cleanly into two distinct clusters.
+Table~\ref{tab:hmm_separation} reports the posterior regime means estimated on the 1990--2010 training period. All four features exhibit statistically significant separation between calm and panic (95\% credible intervals excluding zero),\footnote{A $95\%$ credible interval is the Bayesian range covering the parameter with $95\%$ probability; excluding zero means the panic--calm mean difference on each feature is reliably distinct from zero.} confirming that the four-feature emission space resolves cleanly into two distinct clusters.
 
 \input{tables/table_hmm_separation}
 
