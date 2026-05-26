@@ -125,7 +125,7 @@ def main():
     tex.append(
         r'\caption{Sub-period decomposition of the expanding-window '
         r'out-of-sample backtest, 2000--2024. Annual retraining is '
-        r'initialised in 1995 using all data available through the prior '
+        r'initialized in 2000 using all data available through the prior '
         r'December. Market is the value-weighted CRSP market (Mkt-RF + RF, '
         r'Fama-French monthly factors).}'
     )

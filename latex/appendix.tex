@@ -113,7 +113,7 @@ Strategy performance is assessed using four standard risk-adjusted metrics compu
 \begin{equation}
     SR = \frac{\bar{r}}{\sigma(r)} \cdot \sqrt{12},
 \end{equation}
-where $\bar{r}$ is the mean monthly return. Sharpe is computed from the arithmetic monthly mean annualised by $\sqrt{12}$, while annualised returns reported elsewhere in this thesis are compound (geometric); under high volatility the two definitions of average return differ, so Sharpe should not be inferred from a table by dividing annualised return by annualised volatility (e.g.\ at depth~1 in the methodology hyperparameter sweep, the reported Sharpe is $0.53$ but $8.7\% / 19.4\% = 0.45$).
+where $\bar{r}$ is the mean monthly return. Sharpe is computed from the arithmetic monthly mean annualized by $\sqrt{12}$, while annualized returns reported elsewhere in this thesis are compound (geometric); under high volatility the two definitions of average return differ, so Sharpe should not be inferred from a table by dividing annualized return by annualized volatility (e.g.\ at depth~1 in the methodology hyperparameter sweep, the reported Sharpe is $0.53$ but $8.7\% / 19.4\% = 0.45$).
 
 \textbf{Maximum drawdown} Let $C_t = \prod_{\tau=1}^{t}(1 + r_\tau)$ denote the cumulative wealth path. The maximum drawdown is:
 \begin{equation}
@@ -323,7 +323,7 @@ Combined long-and-short SHAP shares are $0.50$, $0.46$, $0.54$, $0.24$ for clust
 \input{tables/table_cluster_k4_shap_shares}
 
 \paragraph{Short-leg structure (future work)}
-The $K=4$ partition was defined on long-leg z-curves; applying the same labels to the short leg shows the short basket is structurally distinct from a negated long-leg, with short-vs-negated-long correlations of $+0.94$, $+0.89$, $+0.19$, and $-0.84$ for clusters 1--4 (Table~\ref{tab:cluster_k4_short_leg}). The month-1 short-leg spike in cluster 4 ($+0.57$) is consistent with \citet{Nagel2012}'s finding that short-horizon reversal returns spike during high-volatility periods: month 1 carries $10.6\%$ of panic short-leg momentum SHAP versus $5.3\%$ in calm. A full short-leg analysis is left to future work.
+The $K=4$ partition was defined on long-leg z-curves; applying the same labels to the short leg shows the short basket is structurally distinct from a negated long leg, with short-vs-negated-long correlations of $+0.94$, $+0.89$, $+0.19$, and $-0.84$ for clusters 1--4 (Table~\ref{tab:cluster_k4_short_leg}). The month-1 short-leg spike in cluster 4 ($+0.57$) is consistent with \citet{Nagel2012}'s finding that short-horizon reversal returns spike during high-volatility periods: month 1 carries $10.6\%$ of panic short-leg momentum SHAP versus $5.3\%$ in calm. A full short-leg analysis is left to future work.
 
 \input{tables/table_cluster_k4_short_leg}
 
@@ -423,7 +423,7 @@ Ten firm-level characteristics are computed from Compustat quarterly data (\text
     \item \textbf{Log market equity:} Natural logarithm of market capitalisation (price $\times$ shares outstanding), lagged one month.
     \item \textbf{Operating cash flow over assets (cfo\_a):} Trailing twelve-month operating cash flow (\texttt{oancfy}, converted to quarterly and summed) scaled by total assets.
     \item \textbf{Free cash flow over assets (fcf\_a):} Trailing twelve-month operating cash flow minus trailing twelve-month capital expenditure (\texttt{capxy}), scaled by total assets.
-    \item \textbf{Accruals:} The accrual component of earnings, $(\texttt{ibq}_{\text{TTM}} - \texttt{oancf}_{\text{TTM}}) / \texttt{atq}$, which captures the non-cash portion of reported earnings.
+    \item \textbf{Accruals:} The accrual component of earnings, $(\texttt{ibq}_{\text{TTM}} - \texttt{oancfy}_{\text{TTM}}) / \texttt{atq}$, which captures the non-cash portion of reported earnings.
 \end{itemize}
 
 Fundamentals are winsorized at the 1st and 99th percentiles (5th and 95th for asset growth) using training-sample bounds. The cash-flow features (cfo\_a, fcf\_a, accruals) are available for roughly 83\% of stock-months; the remaining seven characteristics exceed 82\% coverage individually, and XGBoost handles any residual missingness natively via its default-branch logic.
