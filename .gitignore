@@ -8,6 +8,7 @@ data/
 .venv/
 .venv-2/
 __pycache__/
+.superpowers/
 
 # LaTeX build artifacts
 *.aux
