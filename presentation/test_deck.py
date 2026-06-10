@@ -36,3 +36,11 @@ def test_primitives_build_a_titled_slide_with_notes():
     assert "Hello" in titles
     assert s.notes_slide.notes_text_frame.text == "say hi"
     assert len(prs.slides) == 1
+
+
+def test_rasterize_produces_pngs():
+    from presentation.rasterize_assets import ensure_pngs
+    paths = ensure_pngs()
+    assert set(paths) >= {"logo", "gibbs", "acf", "riskav"}
+    for key, p in paths.items():
+        assert p.exists() and p.stat().st_size > 1000, f"{key} png missing/empty"
