@@ -104,10 +104,11 @@ def s06_results(prs, A):
     tf = L._box(s, Inches(8.7), Inches(4.0), Inches(4.2), Inches(2.4)).text_frame
     L._set(tf.paragraphs[0], f"Six-factor alpha {C.FF6_ALPHA}", 20, color=L.GOOD, bold=True)
     L._set(tf.add_paragraph(), f"t = {C.FF6_T}", 16, color=L.MUTE)
+    L._set(tf.add_paragraph(), f"Panic {C.PANIC_SHARPE:.2f}  vs  calm {C.CALM_SHARPE:.2f}  Sharpe", 16, color=L.GOOD, bold=True)
     L._set(tf.add_paragraph(), f"Remove pi -> Sharpe {C.SHARPE_NO_PI:.2f}", 14, color=L.INK)
     L._set(tf.add_paragraph(), f"Fixed mom. MDD {C.MDD_FIX12}", 14, color=L.BAD)
     L.takeaway(s, "XGB is the only row clearing every conventional t-stat threshold; the linear baseline on identical features collapses.")
-    L.notes(s, "Credibility first. Alpha survives FF6 (cancels mechanical winner tilt). The advantage concentrates in the shaded panic months - that motivates the mechanism.")
+    L.notes(s, "Credibility first. Alpha survives FF6 (cancels mechanical winner tilt). The advantage concentrates in the shaded panic months. Panic Sharpe 1.53 roughly doubles calm 0.84 - it pays best exactly where momentum crashes - but the gap is not statistically significant (p=0.109, 59 panic months), so frame it as directional, not a clean 2x.")
 
 
 def s07_mechanism_flip(prs, A):
