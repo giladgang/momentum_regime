@@ -18,3 +18,21 @@ def test_stale_gadi_numbers_are_not_used():
     blob = " ".join(str(v) for v in vars(C).values() if isinstance(v, (str, int, float, list)))
     for bad in forbidden:
         assert bad not in blob, f"stale value {bad!r} present in content.py"
+
+
+def test_primitives_build_a_titled_slide_with_notes():
+    from pptx import Presentation
+    from pptx.util import Inches
+    from presentation import deck_lib as L
+    prs = Presentation()
+    prs.slide_width, prs.slide_height = L.SLIDE_W, L.SLIDE_H
+    s = L.content_slide(
+        prs, title_text="Hello",
+        bullets_items=["one", ("two", L.GOOD)],
+        table_rows=[["A", "B"], ["1", "2"]],
+        takeaway_text="done", notes_text="say hi",
+    )
+    titles = [sh.text_frame.text for sh in s.shapes if sh.has_text_frame]
+    assert "Hello" in titles
+    assert s.notes_slide.notes_text_frame.text == "say hi"
+    assert len(prs.slides) == 1
