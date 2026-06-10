@@ -9,6 +9,8 @@ data/
 .venv-2/
 __pycache__/
 .superpowers/
+presentation/assets/
+presentation/*.pptx
 
 # LaTeX build artifacts
 *.aux
