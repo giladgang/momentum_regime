@@ -44,3 +44,18 @@ def test_rasterize_produces_pngs():
     assert set(paths) >= {"logo", "gibbs", "acf", "riskav"}
     for key, p in paths.items():
         assert p.exists() and p.stat().st_size > 1000, f"{key} png missing/empty"
+
+
+def test_main_deck_structure():
+    from presentation.build_defense_deck import build_presentation
+    from presentation import content as C
+    prs = build_presentation()
+    # 11 main + 1 divider + 12 backup
+    assert len(prs.slides) == C.EXPECTED_MAIN + 1 + C.EXPECTED_BACKUP
+    # every slide has a non-empty title (first text shape) ...
+    for i, s in enumerate(prs.slides):
+        texts = [sh.text_frame.text for sh in s.shapes if sh.has_text_frame and sh.text_frame.text]
+        assert texts, f"slide {i} has no text"
+    # ... and every MAIN slide carries speaker notes
+    for i, s in enumerate(list(prs.slides)[:C.EXPECTED_MAIN]):
+        assert s.notes_slide.notes_text_frame.text.strip(), f"main slide {i} missing notes"
