@@ -10,6 +10,8 @@
 
 **Spec:** `docs/superpowers/specs/2026-06-10-thesis-defense-deck-design.md`
 
+**Environment:** Run every `python`/`pytest` command with `.venv/bin/python` (the canonical lock env: PyMuPDF, pytest, numpy 2.4.3 all match `requirements.lock`). Bare `python` resolves to a different interpreter that lacks these. `python-pptx==1.0.2` was added to the lock for this work.
+
 ---
 
 ## File structure
