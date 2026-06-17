@@ -1,0 +1,23 @@
+[cfg] seeds=10 max_iter=200 subsample=all hidden=(32, 16, 8)
+[1/4] Loading artefact ...
+  train rows=1,161,014 test rows=557,087 features=['mom_1', 'mom_2', 'mom_3', 'mom_4', 'mom_5', 'mom_6', 'mom_7', 'mom_8', 'mom_9', 'mom_10', 'mom_11', 'mom_12', 'pi_filter']
+[2/4] Training MLP ensemble (10 seeds) ...
+  seed 0: n_iter=69 val_best=0.01288
+  seed 1: n_iter=87 val_best=0.01532
+  seed 2: n_iter=46 val_best=0.01208
+  seed 3: n_iter=30 val_best=0.01014
+  seed 4: n_iter=81 val_best=0.01436
+  seed 5: n_iter=67 val_best=0.01218
+  seed 6: n_iter=53 val_best=0.01277
+  seed 7: n_iter=44 val_best=0.01196
+  seed 8: n_iter=34 val_best=0.01065
+  seed 9: n_iter=59 val_best=0.01376
+[3/4] Building L/S portfolio ...
+[4/4] Results
+
+Strategy        Ann.Ret  Ann.Vol  Sharpe    MaxDD  SR-calm  SR-panic   #mo
+------------------------------------------------------------------------------
+XGB (thesis)     21.7%   19.5%    1.11  -22.8%     0.84      1.53   167
+MLP              14.7%   20.5%    0.77  -26.9%     0.71      0.88   167
+
+Saved MLP monthly returns: /Users/giladgang/momentum_regime/results/diagnostic/nn_mlp_returns_2026-06-16.csv

@@ -1,0 +1,26 @@
+[cfg] seeds=3 max_iter=200 hidden=(32, 16, 8)
+[1/4] Loading artefact ...
+  train=(1161014, 13) test=(557087, 13) base features=13
+[2/4] Training variants ...
+  [B] done (13 feat, winsor=True, mem=[])
+  [C] done (18 feat, winsor=True, mem=['pi_lag1', 'pi_lag3', 'pi_lag6', 'pi_delta1', 'panic_dur'])
+  [D] done (16 feat, winsor=True, mem=['pi_lag1', 'pi_lag3', 'pi_lag6'])
+  [E] done (14 feat, winsor=True, mem=['pi_delta1'])
+  [F] done (14 feat, winsor=True, mem=['panic_dur'])
+[3/4] Metrics
+
+Strategy          Ann.Ret  Ann.Vol  Sharpe    MaxDD  SR-calm  SR-panic
+--------------------------------------------------------------------------
+XGB (thesis)       21.7%   19.5%    1.11  -22.8%     0.84      1.53
+B: winsor base     12.3%   18.9%    0.71  -22.8%     0.44      1.11
+C: +all memory      8.4%   20.1%    0.50  -49.4%     0.48      0.54
+D: +lags only      12.2%   18.9%    0.70  -23.6%     0.48      1.01
+E: +delta only      8.6%   19.0%    0.53  -28.6%     0.39      0.72
+F: +panic_dur only   10.8%   18.9%    0.64  -26.4%     0.47      0.88
+
+[4/4] Deltas vs XGB (Sharpe):
+  B: winsor base   -0.40
+  C: +all memory   -0.61
+  D: +lags only    -0.41
+  E: +delta only   -0.58
+  F: +panic_dur only -0.47

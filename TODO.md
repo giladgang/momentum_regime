@@ -14,6 +14,12 @@
 
 ---
 
+## 💡 Concepts to remember
+
+- [ ] **Variance is about wiggle, not level.** Variance measures wiggle around the trend, not the level of the trend. A stock that rises 50% perfectly smoothly (same % every month) has variance ≈ 0 — identical to a smooth 20% riser. (Context: SPMO vs XGB. XGB's higher vol was roughly proportional to its higher return, i.e. like ~1.3x leverage, which is why the Sharpe stayed tied at 1.00. Raw return differed, risk-adjusted did not.)
+
+---
+
 ## 🛑 HARD STOP — thesis edits (awaiting Gilad row-by-row greenlight)
 
 Two distinct types of work. Tackle them differently.

@@ -1,0 +1,20 @@
+[cfg] seeds=3 max_iter=200 hidden=(32, 16, 8)
+[1/4] Loading artefact ...
+  train=(1161014, 13) test=(557087, 13) base features=13
+[2/4] Training variants ...
+  [A] done (13 feat, winsor=False, memory=False)
+  [B] done (13 feat, winsor=True, memory=False)
+  [C] done (18 feat, winsor=True, memory=True)
+[3/4] Metrics
+
+Strategy          Ann.Ret  Ann.Vol  Sharpe    MaxDD  SR-calm  SR-panic
+--------------------------------------------------------------------------
+XGB (thesis)       21.7%   19.5%    1.11  -22.8%     0.84      1.53
+A: MLP raw         12.6%   19.8%    0.69  -22.7%     0.55      0.90
+B: MLP winsor      12.3%   18.9%    0.71  -22.8%     0.44      1.11
+C: B + memory       8.4%   20.1%    0.50  -49.4%     0.48      0.54
+
+[4/4] Deltas vs XGB (Sharpe):
+  A: MLP raw       -0.41
+  B: MLP winsor    -0.40
+  C: B + memory    -0.61

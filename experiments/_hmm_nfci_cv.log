@@ -1,0 +1,49 @@
+panel rows 408 | NFCI non-null 408 | NFCI span 1990-12-31..2024-11-29
+building stock panel ...
+  stocks 1,718,101 rows in 8s
+  DD+CS+DISP+REL_N       fold1(1997-1999) CV Sharpe=+0.614  [95s]
+  DD+CS+DISP+REL_N       fold2(1999-2001) CV Sharpe=+0.060  [218s]
+  DD+CS+DISP+REL_N       fold3(2001-2003) CV Sharpe=-0.430  [366s]
+  DD+CS+DISP+REL_N       fold4(2003-2005) CV Sharpe=+0.920  [544s]
+  DD+CS+DISP+REL_N       fold5(2005-2007) CV Sharpe=+0.310  [755s]
+  => DD+CS+DISP+REL_N       mean CV Sharpe +0.295 (fold std 0.463)
+
+  DD+DISP+REL_N+NFCI     fold1(1997-1999) CV Sharpe=+0.356  [846s]
+  DD+DISP+REL_N+NFCI     fold2(1999-2001) CV Sharpe=+0.360  [966s]
+  DD+DISP+REL_N+NFCI     fold3(2001-2003) CV Sharpe=-0.579  [1115s]
+  DD+DISP+REL_N+NFCI     fold4(2003-2005) CV Sharpe=+0.891  [1294s]
+  DD+DISP+REL_N+NFCI     fold5(2005-2007) CV Sharpe=+0.859  [1496s]
+  => DD+DISP+REL_N+NFCI     mean CV Sharpe +0.377 (fold std 0.531)
+
+  DD+REL_N+CS+NFCI       fold1(1997-1999) CV Sharpe=+0.046  [1587s]
+  DD+REL_N+CS+NFCI       fold2(1999-2001) CV Sharpe=+0.470  [1707s]
+  DD+REL_N+CS+NFCI       fold3(2001-2003) CV Sharpe=-0.328  [1859s]
+  DD+REL_N+CS+NFCI       fold4(2003-2005) CV Sharpe=+0.723  [2035s]
+  DD+REL_N+CS+NFCI       fold5(2005-2007) CV Sharpe=+0.305  [2251s]
+  => DD+REL_N+CS+NFCI       mean CV Sharpe +0.243 (fold std 0.361)
+
+  DD+CS+NFCI             fold1(1997-1999) CV Sharpe=-0.589  [2342s]
+  DD+CS+NFCI             fold2(1999-2001) CV Sharpe=+0.254  [2468s]
+  DD+CS+NFCI             fold3(2001-2003) CV Sharpe=-0.452  [2627s]
+  DD+CS+NFCI             fold4(2003-2005) CV Sharpe=+0.838  [2817s]
+  DD+CS+NFCI             fold5(2005-2007) CV Sharpe=+0.608  [3019s]
+  => DD+CS+NFCI             mean CV Sharpe +0.132 (fold std 0.566)
+
+  DD+NFCI                fold1(1997-1999) CV Sharpe=+1.040  [3110s]
+  DD+NFCI                fold2(1999-2001) CV Sharpe=+0.360  [3231s]
+  DD+NFCI                fold3(2001-2003) CV Sharpe=-0.599  [3385s]
+  DD+NFCI                fold4(2003-2005) CV Sharpe=+1.315  [3559s]
+  DD+NFCI                fold5(2005-2007) CV Sharpe=+0.320  [3765s]
+  => DD+NFCI                mean CV Sharpe +0.487 (fold std 0.665)
+
+saved /Users/giladgang/momentum_regime/results/cv/hmm_nfci_cv.csv
+
+======================================================================
+  CLEAN CV VERDICT  (train-only folds 1997-2007; no test-set tuning)
+======================================================================
+  * DD+NFCI                mean CV Sharpe +0.487 (fold std 0.665)  +0.193 vs prod
+  * DD+DISP+REL_N+NFCI     mean CV Sharpe +0.377 (fold std 0.531)  +0.083 vs prod
+    DD+CS+DISP+REL_N       mean CV Sharpe +0.295 (fold std 0.463)  +0.000 vs prod  <- PRODUCTION
+  * DD+REL_N+CS+NFCI       mean CV Sharpe +0.243 (fold std 0.361)  -0.051 vs prod
+  * DD+CS+NFCI             mean CV Sharpe +0.132 (fold std 0.566)  -0.163 vs prod
+======================================================================

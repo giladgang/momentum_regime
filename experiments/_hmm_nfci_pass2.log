@@ -1,0 +1,20 @@
+loading cs_artefacts ...
+Pass-2 on 5 combos (5 HMM x 10 XGB seeds)
+
+  DD+CS+DISP+REL_N           [PRODUCTION    ]  XGB L/S Sharpe = 0.918   [231s, tot 231s]
+  DD+DISP+REL_N+NFCI         [swap CS->NFCI ]  XGB L/S Sharpe = 0.279   [231s, tot 461s]
+  DD+REL_N+CS+NFCI           [best 4-feat   ]  XGB L/S Sharpe = 0.952   [250s, tot 712s]
+  DD+CS+NFCI                 [best 3-feat   ]  XGB L/S Sharpe = 0.792   [259s, tot 971s]
+  DD+NFCI                    [best 2-feat   ]  XGB L/S Sharpe = 0.449   [277s, tot 1248s]
+
+saved /Users/giladgang/momentum_regime/results/cv/hmm_nfci_pass2.csv
+
+================================================================
+  PASS-2 VERDICT (downstream L/S Sharpe)
+================================================================
+  * DD+REL_N+CS+NFCI           0.952  (+0.035 vs prod)
+    DD+CS+DISP+REL_N           0.918  (+0.000 vs prod)  <- PRODUCTION
+  * DD+CS+NFCI                 0.792  (-0.126 vs prod)
+  * DD+NFCI                    0.449  (-0.469 vs prod)
+  * DD+DISP+REL_N+NFCI         0.279  (-0.638 vs prod)
+================================================================

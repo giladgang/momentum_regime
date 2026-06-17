@@ -1,0 +1,19 @@
+\begin{table}[H]
+\centering
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l c c c c c c c}
+\toprule
+ & Feat. & Sharpe & Calm & Panic & $\beta$ & NW $t$ & Fund SHAP \\
+\midrule
+Baseline (mom $+\ \pi$)             & 13 & 1.11 & 0.84 & 1.53 & 0.45 & 4.37$^{***}$  & 0\% \\
+Baseline $+$ 10 fundamentals       & 23 & 0.89 & 0.69 & 1.18 & 0.07 & 3.56$^{***}$  & 44\% \\
+Fundamentals only                   & 10 & 0.59 & 0.86 & 0.38 & 0.19 & 1.91$^{*}$    & 100\% \\
+Fundamentals $+\ \pi$               & 11 & 0.64 & 0.59 & 0.72 & 0.03 & 2.14$^{**}$   & 60\% \\
+Momentum $+$ fund.\ (no $\pi$)      & 22 & 0.63 & 0.68 & 0.57 & 0.16 & 2.86$^{***}$  & 54\% \\
+\bottomrule
+\end{tabular}%
+}
+\caption{Feature-set ablation (50-seed XGBoost ensembles, production hyperparameters). Full Sharpe, calm-period Sharpe, and panic-period Sharpe are reported alongside market beta and the Newey-West $t$-statistic on the raw monthly return (6 lags, testing $H_0$: mean $=0$), matching the convention of Table~\ref{tab:performance}. ``Fund SHAP'' is the share of total SHAP attention absorbed by the ten fundamental features.}
+\label{tab:fund_ablation}
+\end{table}

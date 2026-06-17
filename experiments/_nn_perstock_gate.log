@@ -1,0 +1,17 @@
+[cfg] seeds=5 max_iter=200 hidden=(32, 16, 8)
+[1/4] Loading artefact ...
+[2/4] Building per-stock lags ...
+  added 6 per-stock lag features: ['mom_1_slag1', 'mom_1_slag2', 'mom_1_slag3', 'pi_filter_slag1', 'pi_filter_slag2', 'pi_filter_slag3']
+[3/4] Training ...
+  [B] done (13 feat)
+  [G] done (19 feat)
+[4/4] Results
+
+Strategy                Sharpe    MaxDD  SR-calm  SR-panic
+------------------------------------------------------------
+XGB (thesis)              1.11  -22.8%     0.84      1.53
+B: winsor base            0.68  -20.2%     0.53      0.91
+G: + per-stock lags       0.82  -25.6%     0.58      1.16
+
+Gate: G=0.82 vs B=0.68 (delta +0.14), G MaxDD=-25.6%
+DECISION RULE -> SKIP LSTM  (pursue iff G>=0.95 and MaxDD>=-25%)

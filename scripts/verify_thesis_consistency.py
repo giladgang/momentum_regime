@@ -26,10 +26,11 @@ ROOT = Path(__file__).parent.parent
 METRICS_PATH = ROOT / 'results' / 'PRODUCTION_METRICS.json'
 
 
-# Inline-number checks: (metric_section, metric_key, [latex_search_patterns])
+# Inline-number checks: (metric_section, metric_key, [latex_search_patterns], field='value')
 # Each pattern uses (?P<v>...) to capture the in-prose value to compare.
+# Optional 4th element overrides which entry field to compare (e.g. 't' for t-stats).
 CHECKS = [
-    # XGB Sharpe
+    # XGB Sharpe (full sample)
     ('m2_perf', 'm2_sharpe', [
         r'XGB[^.]{0,150}?Sharpe(?: ratio)?(?: of)?[^.\d]{0,20}(?P<v>\d+\.\d+)',
         r'Sharpe(?: ratio)?[^.\d]{0,20}(?P<v>\d+\.\d+)[^.]{0,80}?(?:XGB|XGBoost)',
@@ -38,6 +39,7 @@ CHECKS = [
     ('m2_perf', 'm2_nw_t', [
         r'Newey[--]?West[^.]{0,80}?(?:t|t-stat)(?:istic)?(?:[^.\d]{0,15})(?P<v>\d+\.\d+)',
     ]),
+
     # Factor alphas (annualised %)
     ('factor_alphas', 'capm_alpha', [
         r'CAPM[^.]{0,80}?alpha(?:[^.\d]{0,15})(?P<v>\d+\.\d+)\\?%?',
@@ -49,9 +51,60 @@ CHECKS = [
     ('factor_alphas', 'carhart_alpha', [
         r'Carhart[^.]{0,80}?(?:alpha|\$\\alpha\$)(?:[^.\d]{0,15})(?P<v>\d+\.\d+)\\?%?',
     ]),
-    # Bootstrap
+
+    # Factor-alpha t-statistics: prose form "($t = 4.81$)" near the alpha mention
+    ('factor_alphas', 'capm_alpha', [
+        r'CAPM[^.]{0,120}?\$?t\$?\s*=\s*(?P<v>\d+\.\d+)',
+    ], 't'),
+    ('factor_alphas', 'ff6_alpha', [
+        r'(?:FF6|six-factor)[^.]{0,120}?\$?t\$?\s*=\s*(?P<v>\d+\.\d+)',
+    ], 't'),
+    ('factor_alphas', 'carhart_alpha', [
+        r'Carhart[^.]{0,120}?\$?t\$?\s*=\s*(?P<v>\d+\.\d+)',
+    ], 't'),
+
+    # Regime-conditional Sharpes for XGB. Tight phrasing required (Sharpe of N,
+    # earns N) and an XGB anchor to keep collisions with other models' rows down.
+    ('regime_sharpe', 'm2_panic', [
+        r'(?:XGB|XGBoost|production model)[^.]{0,40}?(?:earns?|Sharpe of)[^.\d]{0,15}(?P<v>\d+\.\d+)[^.]{0,80}?panic',
+        r'In panic[^.]{0,150}?(?:XGB|XGBoost)[^.]{0,40}?(?:earns?|Sharpe of)[^.\d]{0,15}(?P<v>\d+\.\d+)',
+        r'panic-(?:period|regime|conditional) Sharpe of[^.\d]{0,15}(?P<v>\d+\.\d+)',
+    ]),
+    ('regime_sharpe', 'm2_calm', [
+        r'(?:XGB|XGBoost|production model)[^.]{0,40}?(?:earns?|Sharpe of)[^.\d]{0,15}(?P<v>\d+\.\d+)[^.]{0,80}?calm',
+        r'In calm[^.]{0,150}?(?:XGB|XGBoost)[^.]{0,40}?(?:earns?|Sharpe of)[^.\d]{0,15}(?P<v>\d+\.\d+)',
+        r'calm-(?:period|regime|conditional) Sharpe of[^.\d]{0,15}(?P<v>\d+\.\d+)',
+    ]),
+
+    # Panic subtypes (calm / panic-crash / panic-recovery decomposition)
+    ('panic_subtypes', 'panic_recovery_sharpe', [
+        r'panic[ -]recover(?:y|ies)[^.]{0,80}?Sharpe[^.\d]{0,20}(?P<v>\d+\.\d+)',
+    ]),
+    ('panic_subtypes', 'panic_recovery_ann_ret', [
+        r'panic[ -]recover(?:y|ies)[^.]{0,80}?(?:return|annualised|annualized)[^.\d]{0,20}(?P<v>\d+\.\d+)\\?%?',
+    ]),
+    ('panic_subtypes', 'panic_crash_sharpe', [
+        r'panic[ -]crash(?:es)?[^.]{0,80}?Sharpe[^.\d]{0,30}(?P<v>-?\d+\.\d+)',
+    ]),
+
+    # Sub-period XGB Sharpes (2011-15 / 2016-20 / 2021-25). Require XGB anchor.
+    ('subperiod', 'm2_2011_2015', [
+        r'(?:XGB|XGBoost)[^.]{0,80}?2011[-–]+(?:20)?15[^.]{0,40}?Sharpe[^.\d]{0,15}(?P<v>\d+\.\d+)',
+        r'2011[-–]+(?:20)?15[^.]{0,40}?(?:XGB|XGBoost)[^.]{0,40}?Sharpe[^.\d]{0,15}(?P<v>\d+\.\d+)',
+    ]),
+    ('subperiod', 'm2_2016_2020', [
+        r'(?:XGB|XGBoost)[^.]{0,80}?2016[-–]+(?:20)?20[^.]{0,40}?Sharpe[^.\d]{0,15}(?P<v>\d+\.\d+)',
+        r'2016[-–]+(?:20)?20[^.]{0,40}?(?:XGB|XGBoost)[^.]{0,40}?Sharpe[^.\d]{0,15}(?P<v>\d+\.\d+)',
+    ]),
+    ('subperiod', 'm2_2021_2025', [
+        r'(?:XGB|XGBoost)[^.]{0,80}?2021[-–]+(?:20)?2[45][^.]{0,40}?Sharpe[^.\d]{0,15}(?P<v>\d+\.\d+)',
+        r'2021[-–]+(?:20)?2[45][^.]{0,40}?(?:XGB|XGBoost)[^.]{0,40}?Sharpe[^.\d]{0,15}(?P<v>\d+\.\d+)',
+    ]),
+
+    # Bootstrap m2 Sharpe point estimate. Require nearby "bootstrap" or "CI"
+    # so we no longer compare every bracket pair against 1.11.
     ('bootstrap', 'm2_sharpe', [
-        r"\\?\[\s*(?P<v>\d+\.\d+)[,\s]+\d+\.\d+\s*\\?\]",  # generic [x, y] interval — too noisy alone, but ok with section context above
+        r'(?:bootstrap|confidence interval|CI)[^.]{0,150}?\\?\[\s*(?P<v>\d+\.\d+)[,\s]+\d+\.\d+\s*\\?\]',
     ]),
 ]
 
@@ -79,11 +132,16 @@ def main():
     for tex_path in sorted((ROOT / 'latex').rglob('*.tex')):
         rel = tex_path.relative_to(ROOT)
         text = tex_path.read_text()
-        for section, key, patterns in CHECKS:
+        for check in CHECKS:
+            if len(check) == 4:
+                section, key, patterns, field = check
+            else:
+                section, key, patterns = check
+                field = 'value'
             entry = metrics.get(section, {}).get(key)
             if not entry:
                 continue
-            canonical = entry.get('value')
+            canonical = entry.get(field)
             for pat in patterns:
                 for m in re.finditer(pat, text, flags=re.DOTALL):
                     try:

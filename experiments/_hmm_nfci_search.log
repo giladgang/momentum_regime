@@ -1,0 +1,145 @@
+Loading panel + extra features ...
+  NFCI merged: 647 months non-null, train z mean 0.00 sd 1.00
+  Features available (10): ['DD_z', 'VOL_z', 'DISP_z', 'REL_N_z', 'CS_z', 'LVIX_z', 'ADR_z', 'SKEW_z', 'TERM_z', 'NFCI_z']
+  Total combos: 130  (37 contain NFCI)
+
+  [  1/130] DD                               ESS=  1069 sig=1 Dot-com=0.90 GFC=0.86 COVID=0.99 Non-crisis=0.09 Calm 2013-19=0.14 PASS [36s, 1 passed]
+  [  2/130] DD+VOL                           ESS=   529 sig=2 Dot-com=0.89 GFC=0.86 COVID=0.98 Non-crisis=0.09 Calm 2013-19=0.13 PASS [72s, 2 passed]
+  [  3/130] DD+DISP                          ESS=  1015 sig=2 Dot-com=0.92 GFC=0.87 COVID=1.00 Non-crisis=0.09 Calm 2013-19=0.16 PASS [109s, 3 passed]
+  [  4/130] DD+REL_N                         ESS=   723 sig=2 Dot-com=0.90 GFC=0.86 COVID=0.95 Non-crisis=0.10 Calm 2013-19=0.10 PASS [143s, 4 passed]
+  [  5/130] DD+CS                            ESS=   334 sig=2 Dot-com=0.82 GFC=0.87 COVID=0.86 Non-crisis=0.09 Calm 2013-19=0.15 PASS [180s, 5 passed]
+  [  7/130] DD+ADR                           ESS=  1232 sig=2 Dot-com=0.90 GFC=0.87 COVID=0.99 Non-crisis=0.09 Calm 2013-19=0.19 PASS [252s, 6 passed]
+  [  8/130] DD+SKEW                          ESS=  1177 sig=2 Dot-com=0.93 GFC=0.89 COVID=0.75 Non-crisis=0.09 Calm 2013-19=0.11 PASS [288s, 7 passed]
+  [  9/130] DD+TERM                          ESS=   702 sig=2 Dot-com=0.90 GFC=0.86 COVID=0.97 Non-crisis=0.09 Calm 2013-19=0.13 PASS [324s, 8 passed]
+  [ 10/130] DD+NFCI                          ESS=   246 sig=2 Dot-com=0.93 GFC=0.95 COVID=0.99 Non-crisis=0.09 Calm 2013-19=0.12 PASS [361s, 9 passed]
+  [ 11/130] DD+VOL+DISP                      ESS=   856 sig=3 Dot-com=0.98 GFC=0.86 COVID=1.00 Non-crisis=0.12 Calm 2013-19=0.13 PASS [398s, 10 passed]
+  [ 12/130] DD+VOL+REL_N                     ESS=   517 sig=3 Dot-com=0.90 GFC=0.87 COVID=0.93 Non-crisis=0.10 Calm 2013-19=0.08 PASS [433s, 11 passed]
+  [ 13/130] DD+VOL+CS                        ESS=   564 sig=3 Dot-com=0.85 GFC=0.86 COVID=0.85 Non-crisis=0.10 Calm 2013-19=0.14 PASS [469s, 12 passed]
+  [ 15/130] DD+VOL+ADR                       ESS=   142 sig=3 Dot-com=0.88 GFC=0.86 COVID=0.83 Non-crisis=0.11 Calm 2013-19=0.15 PASS [541s, 13 passed]
+  [ 16/130] DD+VOL+SKEW                      ESS=   749 sig=3 Dot-com=0.93 GFC=0.89 COVID=0.74 Non-crisis=0.10 Calm 2013-19=0.11 PASS [577s, 14 passed]
+  [ 18/130] DD+VOL+NFCI                      ESS=   131 sig=3 Dot-com=0.91 GFC=0.95 COVID=0.91 Non-crisis=0.09 Calm 2013-19=0.09 PASS [649s, 15 passed]
+  [ 19/130] DD+DISP+REL_N                    ESS=   603 sig=3 Dot-com=0.99 GFC=0.85 COVID=1.00 Non-crisis=0.19 Calm 2013-19=0.12 PASS [684s, 16 passed]
+  [ 20/130] DD+DISP+CS                       ESS=   370 sig=3 Dot-com=0.86 GFC=0.86 COVID=0.95 Non-crisis=0.10 Calm 2013-19=0.15 PASS [720s, 17 passed]
+  [ 22/130] DD+DISP+ADR                      ESS=  1020 sig=3 Dot-com=0.90 GFC=0.87 COVID=0.93 Non-crisis=0.10 Calm 2013-19=0.19 PASS [792s, 18 passed]
+  [ 23/130] DD+DISP+SKEW                     ESS=  1187 sig=3 Dot-com=0.99 GFC=0.87 COVID=0.75 Non-crisis=0.11 Calm 2013-19=0.11 PASS [828s, 19 passed]
+  [ 24/130] DD+DISP+TERM                     ESS=   866 sig=2 Dot-com=1.00 GFC=0.86 COVID=1.00 Non-crisis=0.09 Calm 2013-19=0.18 PASS [864s, 20 passed]
+  [ 25/130] DD+DISP+NFCI                     ESS=   642 sig=3 Dot-com=1.00 GFC=1.00 COVID=1.00 Non-crisis=0.11 Calm 2013-19=0.14 PASS [900s, 21 passed]
+  [ 26/130] DD+REL_N+CS                      ESS=   799 sig=3 Dot-com=0.84 GFC=0.86 COVID=0.78 Non-crisis=0.09 Calm 2013-19=0.14 PASS [935s, 22 passed]
+  [ 27/130] DD+REL_N+LVIX                    ESS=   557 sig=3 Dot-com=0.99 GFC=1.00 COVID=0.91 Non-crisis=0.27 Calm 2013-19=0.09 PASS [970s, 23 passed]
+  [ 28/130] DD+REL_N+ADR                     ESS=  1102 sig=2 Dot-com=0.87 GFC=0.85 COVID=0.77 Non-crisis=0.11 Calm 2013-19=0.11 PASS [1005s, 24 passed]
+  [ 29/130] DD+REL_N+SKEW                    ESS=   365 sig=3 Dot-com=0.91 GFC=0.86 COVID=0.71 Non-crisis=0.10 Calm 2013-19=0.08 PASS [1040s, 25 passed]
+  [ 30/130] DD+REL_N+TERM                    ESS=  1246 sig=3 Dot-com=0.74 GFC=0.85 COVID=0.67 Non-crisis=0.44 Calm 2013-19=0.16 fail [1075s, 25 passed]
+  [ 31/130] DD+REL_N+NFCI                    ESS=   308 sig=3 Dot-com=1.00 GFC=1.00 COVID=0.78 Non-crisis=0.14 Calm 2013-19=0.07 PASS [1110s, 26 passed]
+  [ 32/130] DD+CS+LVIX                       ESS=   739 sig=3 Dot-com=0.84 GFC=0.86 COVID=0.85 Non-crisis=0.10 Calm 2013-19=0.13 PASS [1146s, 27 passed]
+  [ 33/130] DD+CS+ADR                        ESS=   253 sig=3 Dot-com=0.86 GFC=0.86 COVID=0.80 Non-crisis=0.10 Calm 2013-19=0.17 PASS [1182s, 28 passed]
+  [ 34/130] DD+CS+SKEW                       ESS=  1182 sig=3 Dot-com=0.89 GFC=0.88 COVID=0.75 Non-crisis=0.10 Calm 2013-19=0.12 PASS [1219s, 29 passed]
+  [ 35/130] DD+CS+TERM                       ESS=   954 sig=3 Dot-com=0.75 GFC=0.85 COVID=0.76 Non-crisis=0.10 Calm 2013-19=0.12 PASS [1255s, 30 passed]
+  [ 36/130] DD+CS+NFCI                       ESS=   218 sig=3 Dot-com=0.91 GFC=0.95 COVID=0.96 Non-crisis=0.09 Calm 2013-19=0.15 PASS [1291s, 31 passed]
+  [ 37/130] DD+LVIX+ADR                      ESS=   463 sig=3 Dot-com=0.89 GFC=0.86 COVID=0.80 Non-crisis=0.10 Calm 2013-19=0.14 PASS [1328s, 32 passed]
+  [ 38/130] DD+LVIX+SKEW                     ESS=   242 sig=3 Dot-com=1.00 GFC=1.00 COVID=0.75 Non-crisis=0.21 Calm 2013-19=0.09 PASS [1364s, 33 passed]
+  [ 39/130] DD+LVIX+TERM                     ESS=  1500 sig=3 Dot-com=1.00 GFC=1.00 COVID=1.00 Non-crisis=0.09 Calm 2013-19=0.15 PASS [1400s, 34 passed]
+  [ 40/130] DD+LVIX+NFCI                     ESS=    48 sig=3 Dot-com=0.94 GFC=0.99 COVID=0.95 Non-crisis=0.10 Calm 2013-19=0.09 fail [1436s, 34 passed]
+  [ 41/130] DD+ADR+SKEW                      ESS=  1097 sig=3 Dot-com=0.92 GFC=0.87 COVID=0.75 Non-crisis=0.10 Calm 2013-19=0.13 PASS [1473s, 35 passed]
+  [ 42/130] DD+ADR+TERM                      ESS=   899 sig=3 Dot-com=0.89 GFC=0.86 COVID=0.97 Non-crisis=0.10 Calm 2013-19=0.19 PASS [1509s, 36 passed]
+  [ 43/130] DD+ADR+NFCI                      ESS=   534 sig=3 Dot-com=0.90 GFC=0.95 COVID=0.95 Non-crisis=0.09 Calm 2013-19=0.16 PASS [1545s, 37 passed]
+  [ 44/130] DD+SKEW+TERM                     ESS=   923 sig=3 Dot-com=0.94 GFC=0.88 COVID=0.75 Non-crisis=0.10 Calm 2013-19=0.11 PASS [1581s, 38 passed]
+  [ 45/130] DD+SKEW+NFCI                     ESS=   730 sig=3 Dot-com=0.99 GFC=1.00 COVID=0.75 Non-crisis=0.09 Calm 2013-19=0.10 PASS [1617s, 39 passed]
+  [ 47/130] DD+VOL+DISP+REL_N                ESS=   526 sig=4 Dot-com=0.97 GFC=0.86 COVID=1.00 Non-crisis=0.18 Calm 2013-19=0.10 PASS [1688s, 40 passed]
+  [ 48/130] DD+VOL+DISP+CS                   ESS=   137 sig=4 Dot-com=0.90 GFC=0.88 COVID=0.99 Non-crisis=0.09 Calm 2013-19=0.15 PASS [1724s, 41 passed]
+  [ 50/130] DD+VOL+DISP+ADR                  ESS=    89 sig=4 Dot-com=0.90 GFC=0.88 COVID=0.83 Non-crisis=0.09 Calm 2013-19=0.16 PASS [1797s, 42 passed]
+  [ 51/130] DD+VOL+DISP+SKEW                 ESS=   270 sig=4 Dot-com=0.99 GFC=0.90 COVID=0.75 Non-crisis=0.12 Calm 2013-19=0.11 PASS [1833s, 43 passed]
+  [ 52/130] DD+VOL+DISP+TERM                 ESS=   259 sig=3 Dot-com=1.00 GFC=0.90 COVID=1.00 Non-crisis=0.09 Calm 2013-19=0.18 PASS [1869s, 44 passed]
+  [ 53/130] DD+VOL+DISP+NFCI                 ESS=   859 sig=4 Dot-com=1.00 GFC=1.00 COVID=1.00 Non-crisis=0.11 Calm 2013-19=0.14 PASS [1905s, 45 passed]
+  [ 54/130] DD+VOL+REL_N+CS                  ESS=   807 sig=4 Dot-com=0.85 GFC=0.88 COVID=0.79 Non-crisis=0.08 Calm 2013-19=0.12 PASS [1940s, 46 passed]
+  [ 56/130] DD+VOL+REL_N+ADR                 ESS=   687 sig=3 Dot-com=0.88 GFC=0.85 COVID=0.78 Non-crisis=0.10 Calm 2013-19=0.08 PASS [2009s, 47 passed]
+  [ 57/130] DD+VOL+REL_N+SKEW                ESS=   285 sig=4 Dot-com=0.91 GFC=0.88 COVID=0.74 Non-crisis=0.11 Calm 2013-19=0.06 PASS [2043s, 48 passed]
+  [ 58/130] DD+VOL+REL_N+TERM                ESS=   274 sig=4 Dot-com=0.74 GFC=0.85 COVID=0.57 Non-crisis=0.36 Calm 2013-19=0.05 PASS [2078s, 49 passed]
+  [ 59/130] DD+VOL+REL_N+NFCI                ESS=    84 sig=4 Dot-com=0.98 GFC=1.00 COVID=0.90 Non-crisis=0.10 Calm 2013-19=0.07 PASS [2112s, 50 passed]
+  [ 60/130] DD+VOL+CS+LVIX                   ESS=   705 sig=4 Dot-com=0.92 GFC=0.88 COVID=0.91 Non-crisis=0.09 Calm 2013-19=0.14 PASS [2149s, 51 passed]
+  [ 61/130] DD+VOL+CS+ADR                    ESS=   949 sig=4 Dot-com=0.92 GFC=0.86 COVID=0.84 Non-crisis=0.09 Calm 2013-19=0.15 PASS [2185s, 52 passed]
+  [ 62/130] DD+VOL+CS+SKEW                   ESS=   251 sig=4 Dot-com=0.94 GFC=0.90 COVID=0.75 Non-crisis=0.09 Calm 2013-19=0.12 PASS [2221s, 53 passed]
+  [ 64/130] DD+VOL+CS+NFCI                   ESS=   213 sig=4 Dot-com=0.95 GFC=0.95 COVID=0.95 Non-crisis=0.09 Calm 2013-19=0.15 PASS [2293s, 54 passed]
+  [ 65/130] DD+VOL+LVIX+ADR                  ESS=   549 sig=4 Dot-com=0.92 GFC=0.88 COVID=0.98 Non-crisis=0.10 Calm 2013-19=0.18 PASS [2329s, 55 passed]
+  [ 66/130] DD+VOL+LVIX+SKEW                 ESS=   733 sig=4 Dot-com=0.96 GFC=0.91 COVID=0.75 Non-crisis=0.10 Calm 2013-19=0.11 PASS [2365s, 56 passed]
+  [ 67/130] DD+VOL+LVIX+TERM                 ESS=  1253 sig=4 Dot-com=1.00 GFC=1.00 COVID=0.99 Non-crisis=0.09 Calm 2013-19=0.14 PASS [2401s, 57 passed]
+  [ 68/130] DD+VOL+LVIX+NFCI                 ESS=    68 sig=4 Dot-com=0.96 GFC=0.98 COVID=0.95 Non-crisis=0.10 Calm 2013-19=0.09 PASS [2438s, 58 passed]
+  [ 69/130] DD+VOL+ADR+SKEW                  ESS=   862 sig=4 Dot-com=0.94 GFC=0.89 COVID=0.75 Non-crisis=0.10 Calm 2013-19=0.14 PASS [2474s, 59 passed]
+  [ 70/130] DD+VOL+ADR+TERM                  ESS=     6 sig=3 Dot-com=0.75 GFC=0.85 COVID=0.76 Non-crisis=0.26 Calm 2013-19=0.13 fail [2510s, 59 passed]
+  [ 71/130] DD+VOL+ADR+NFCI                  ESS=   355 sig=4 Dot-com=0.90 GFC=0.95 COVID=0.93 Non-crisis=0.09 Calm 2013-19=0.15 PASS [2546s, 60 passed]
+  [ 72/130] DD+VOL+SKEW+TERM                 ESS=   237 sig=3 Dot-com=0.98 GFC=0.96 COVID=0.75 Non-crisis=0.11 Calm 2013-19=0.16 PASS [2582s, 61 passed]
+  [ 73/130] DD+VOL+SKEW+NFCI                 ESS=   419 sig=4 Dot-com=0.97 GFC=1.00 COVID=0.75 Non-crisis=0.09 Calm 2013-19=0.10 PASS [2618s, 62 passed]
+  [ 74/130] DD+VOL+TERM+NFCI                 ESS=   114 sig=4 Dot-com=0.75 GFC=0.93 COVID=0.73 Non-crisis=0.10 Calm 2013-19=0.07 PASS [2654s, 63 passed]
+  [ 75/130] DD+DISP+REL_N+CS                 ESS=  1185 sig=4 Dot-com=0.98 GFC=0.85 COVID=1.00 Non-crisis=0.14 Calm 2013-19=0.15 PASS [2689s, 64 passed]
+  [ 76/130] DD+DISP+REL_N+LVIX               ESS=   437 sig=4 Dot-com=1.00 GFC=0.99 COVID=0.99 Non-crisis=0.26 Calm 2013-19=0.08 PASS [2724s, 65 passed]
+  [ 77/130] DD+DISP+REL_N+ADR                ESS=  1244 sig=3 Dot-com=0.99 GFC=0.85 COVID=1.00 Non-crisis=0.15 Calm 2013-19=0.13 PASS [2758s, 66 passed]
+  [ 78/130] DD+DISP+REL_N+SKEW               ESS=  1136 sig=4 Dot-com=1.00 GFC=0.85 COVID=0.75 Non-crisis=0.21 Calm 2013-19=0.08 PASS [2793s, 67 passed]
+  [ 79/130] DD+DISP+REL_N+TERM               ESS=  1322 sig=3 Dot-com=1.00 GFC=0.85 COVID=1.00 Non-crisis=0.13 Calm 2013-19=0.13 PASS [2827s, 68 passed]
+  [ 80/130] DD+DISP+REL_N+NFCI               ESS=  1206 sig=4 Dot-com=1.00 GFC=1.00 COVID=1.00 Non-crisis=0.20 Calm 2013-19=0.10 PASS [2862s, 69 passed]
+  [ 81/130] DD+DISP+CS+LVIX                  ESS=   427 sig=4 Dot-com=0.89 GFC=0.86 COVID=0.99 Non-crisis=0.09 Calm 2013-19=0.13 PASS [2898s, 70 passed]
+  [ 82/130] DD+DISP+CS+ADR                   ESS=   258 sig=4 Dot-com=0.88 GFC=0.86 COVID=0.83 Non-crisis=0.09 Calm 2013-19=0.14 PASS [2934s, 71 passed]
+  [ 83/130] DD+DISP+CS+SKEW                  ESS=   362 sig=4 Dot-com=0.96 GFC=0.88 COVID=0.75 Non-crisis=0.10 Calm 2013-19=0.12 PASS [2970s, 72 passed]
+  [ 84/130] DD+DISP+CS+TERM                  ESS=   430 sig=3 Dot-com=0.99 GFC=0.87 COVID=1.00 Non-crisis=0.10 Calm 2013-19=0.19 PASS [3006s, 73 passed]
+  [ 85/130] DD+DISP+CS+NFCI                  ESS=   148 sig=4 Dot-com=0.91 GFC=0.95 COVID=0.99 Non-crisis=0.09 Calm 2013-19=0.14 PASS [3042s, 74 passed]
+  [ 86/130] DD+DISP+LVIX+ADR                 ESS=   537 sig=4 Dot-com=0.90 GFC=0.86 COVID=0.94 Non-crisis=0.10 Calm 2013-19=0.14 PASS [3079s, 75 passed]
+  [ 88/130] DD+DISP+LVIX+TERM                ESS=  1349 sig=4 Dot-com=1.00 GFC=1.00 COVID=1.00 Non-crisis=0.09 Calm 2013-19=0.15 PASS [3151s, 76 passed]
+  [ 89/130] DD+DISP+LVIX+NFCI                ESS=  1008 sig=4 Dot-com=1.00 GFC=1.00 COVID=1.00 Non-crisis=0.11 Calm 2013-19=0.11 PASS [3187s, 77 passed]
+  [ 90/130] DD+DISP+ADR+SKEW                 ESS=   118 sig=4 Dot-com=0.95 GFC=0.87 COVID=0.75 Non-crisis=0.10 Calm 2013-19=0.12 PASS [3223s, 78 passed]
+  [ 91/130] DD+DISP+ADR+TERM                 ESS=  1068 sig=4 Dot-com=0.94 GFC=0.87 COVID=0.99 Non-crisis=0.09 Calm 2013-19=0.17 PASS [3259s, 79 passed]
+  [ 92/130] DD+DISP+ADR+NFCI                 ESS=   610 sig=4 Dot-com=0.91 GFC=0.95 COVID=0.97 Non-crisis=0.09 Calm 2013-19=0.16 PASS [3295s, 80 passed]
+  [ 93/130] DD+DISP+SKEW+TERM                ESS=   965 sig=3 Dot-com=1.00 GFC=0.87 COVID=0.75 Non-crisis=0.10 Calm 2013-19=0.11 PASS [3332s, 81 passed]
+  [ 95/130] DD+DISP+TERM+NFCI                ESS=  1002 sig=3 Dot-com=1.00 GFC=1.00 COVID=1.00 Non-crisis=0.09 Calm 2013-19=0.15 PASS [3404s, 82 passed]
+  [ 96/130] DD+REL_N+CS+LVIX                 ESS=   750 sig=4 Dot-com=0.81 GFC=0.88 COVID=0.76 Non-crisis=0.09 Calm 2013-19=0.13 PASS [3438s, 83 passed]
+  [ 97/130] DD+REL_N+CS+ADR                  ESS=  1107 sig=3 Dot-com=0.84 GFC=0.86 COVID=0.78 Non-crisis=0.09 Calm 2013-19=0.14 PASS [3473s, 84 passed]
+  [ 98/130] DD+REL_N+CS+SKEW                 ESS=   802 sig=4 Dot-com=0.87 GFC=0.87 COVID=0.75 Non-crisis=0.08 Calm 2013-19=0.10 PASS [3508s, 85 passed]
+  [100/130] DD+REL_N+CS+NFCI                 ESS=   399 sig=4 Dot-com=0.99 GFC=1.00 COVID=0.79 Non-crisis=0.09 Calm 2013-19=0.13 PASS [3577s, 86 passed]
+  [101/130] DD+REL_N+LVIX+ADR                ESS=  1019 sig=3 Dot-com=0.89 GFC=0.85 COVID=0.76 Non-crisis=0.11 Calm 2013-19=0.09 PASS [3612s, 87 passed]
+  [102/130] DD+REL_N+LVIX+SKEW               ESS=  1061 sig=3 Dot-com=1.00 GFC=1.00 COVID=0.75 Non-crisis=0.27 Calm 2013-19=0.06 PASS [3647s, 88 passed]
+  [103/130] DD+REL_N+LVIX+TERM               ESS=  1061 sig=3 Dot-com=1.00 GFC=1.00 COVID=0.98 Non-crisis=0.10 Calm 2013-19=0.10 PASS [3681s, 89 passed]
+  [105/130] DD+REL_N+ADR+SKEW                ESS=   992 sig=3 Dot-com=0.91 GFC=0.86 COVID=0.75 Non-crisis=0.11 Calm 2013-19=0.09 PASS [3751s, 90 passed]
+  [107/130] DD+REL_N+ADR+NFCI                ESS=   429 sig=3 Dot-com=0.91 GFC=0.99 COVID=0.76 Non-crisis=0.10 Calm 2013-19=0.08 PASS [3820s, 91 passed]
+  [109/130] DD+REL_N+SKEW+NFCI               ESS=   995 sig=4 Dot-com=1.00 GFC=1.00 COVID=0.71 Non-crisis=0.12 Calm 2013-19=0.07 PASS [3889s, 92 passed]
+  [110/130] DD+REL_N+TERM+NFCI               ESS=   920 sig=4 Dot-com=0.74 GFC=1.00 COVID=0.64 Non-crisis=0.34 Calm 2013-19=0.05 PASS [3924s, 93 passed]
+  [111/130] DD+CS+LVIX+ADR                   ESS=  1039 sig=4 Dot-com=0.86 GFC=0.87 COVID=0.78 Non-crisis=0.11 Calm 2013-19=0.15 PASS [3960s, 94 passed]
+  [112/130] DD+CS+LVIX+SKEW                  ESS=   721 sig=4 Dot-com=1.00 GFC=0.97 COVID=0.75 Non-crisis=0.13 Calm 2013-19=0.13 PASS [3996s, 95 passed]
+  [113/130] DD+CS+LVIX+TERM                  ESS=  1131 sig=4 Dot-com=0.74 GFC=0.88 COVID=0.75 Non-crisis=0.27 Calm 2013-19=0.15 PASS [4032s, 96 passed]
+  [114/130] DD+CS+LVIX+NFCI                  ESS=   155 sig=4 Dot-com=0.90 GFC=0.95 COVID=0.89 Non-crisis=0.10 Calm 2013-19=0.16 PASS [4069s, 97 passed]
+  [115/130] DD+CS+ADR+SKEW                   ESS=  1192 sig=4 Dot-com=0.89 GFC=0.90 COVID=0.75 Non-crisis=0.10 Calm 2013-19=0.13 PASS [4105s, 98 passed]
+  [116/130] DD+CS+ADR+TERM                   ESS=   297 sig=3 Dot-com=0.76 GFC=0.86 COVID=0.76 Non-crisis=0.10 Calm 2013-19=0.14 PASS [4141s, 99 passed]
+  [117/130] DD+CS+ADR+NFCI                   ESS=   650 sig=4 Dot-com=0.88 GFC=0.95 COVID=0.93 Non-crisis=0.09 Calm 2013-19=0.18 PASS [4179s, 100 passed]
+  [118/130] DD+CS+SKEW+TERM                  ESS=    93 sig=4 Dot-com=0.88 GFC=0.90 COVID=0.75 Non-crisis=0.10 Calm 2013-19=0.13 PASS [4216s, 101 passed]
+  [119/130] DD+CS+SKEW+NFCI                  ESS=   457 sig=4 Dot-com=0.97 GFC=1.00 COVID=0.75 Non-crisis=0.09 Calm 2013-19=0.13 PASS [4252s, 102 passed]
+  [120/130] DD+CS+TERM+NFCI                  ESS=   144 sig=4 Dot-com=0.76 GFC=0.93 COVID=0.76 Non-crisis=0.09 Calm 2013-19=0.14 PASS [4289s, 103 passed]
+  [121/130] DD+LVIX+ADR+SKEW                 ESS=   186 sig=4 Dot-com=0.93 GFC=0.89 COVID=0.75 Non-crisis=0.10 Calm 2013-19=0.10 PASS [4325s, 104 passed]
+  [122/130] DD+LVIX+ADR+TERM                 ESS=  1183 sig=4 Dot-com=1.00 GFC=1.00 COVID=0.94 Non-crisis=0.10 Calm 2013-19=0.16 PASS [4361s, 105 passed]
+  [123/130] DD+LVIX+ADR+NFCI                 ESS=   398 sig=4 Dot-com=0.91 GFC=0.96 COVID=0.79 Non-crisis=0.10 Calm 2013-19=0.11 PASS [4399s, 106 passed]
+  [124/130] DD+LVIX+SKEW+TERM                ESS=   626 sig=4 Dot-com=1.00 GFC=1.00 COVID=0.75 Non-crisis=0.09 Calm 2013-19=0.12 PASS [4436s, 107 passed]
+  [125/130] DD+LVIX+SKEW+NFCI                ESS=   628 sig=4 Dot-com=0.99 GFC=1.00 COVID=0.75 Non-crisis=0.09 Calm 2013-19=0.08 PASS [4472s, 108 passed]
+  [126/130] DD+LVIX+TERM+NFCI                ESS=   878 sig=4 Dot-com=0.74 GFC=0.95 COVID=0.70 Non-crisis=0.10 Calm 2013-19=0.06 PASS [4509s, 109 passed]
+  [127/130] DD+ADR+SKEW+TERM                 ESS=  1067 sig=4 Dot-com=0.92 GFC=0.88 COVID=0.75 Non-crisis=0.10 Calm 2013-19=0.14 PASS [4545s, 110 passed]
+  [128/130] DD+ADR+SKEW+NFCI                 ESS=   502 sig=4 Dot-com=0.95 GFC=0.96 COVID=0.75 Non-crisis=0.10 Calm 2013-19=0.13 PASS [4582s, 111 passed]
+  [129/130] DD+ADR+TERM+NFCI                 ESS=  1039 sig=3 Dot-com=0.75 GFC=0.92 COVID=0.75 Non-crisis=0.10 Calm 2013-19=0.11 PASS [4618s, 112 passed]
+  [130/130] DD+SKEW+TERM+NFCI                ESS=   705 sig=3 Dot-com=0.97 GFC=1.00 COVID=0.75 Non-crisis=0.09 Calm 2013-19=0.11 PASS [4655s, 113 passed]
+
+saved /Users/giladgang/momentum_regime/results/cv/hmm_nfci_feature_search_pass1.csv
+
+==============================================================================
+  NFCI VERDICT
+==============================================================================
+  combos tested 130 | passed 113 | of which contain NFCI: 33
+  DD+NFCI alone: ESS=246 n_sig=2 passed=True
+  PRODUCTION DD+CS+DISP+REL_N: ESS=1185 n_sig=4 ll=-960 passed=True
+
+  top passed combos by log-likelihood (NFCI marked *):
+      DD                                 ESS=  1069 sig=1 ll=-227
+    * DD+NFCI                            ESS=   246 sig=2 ll=-302
+      DD+CS                              ESS=   334 sig=2 ll=-419
+    * DD+CS+NFCI                         ESS=   218 sig=3 ll=-430
+    * DD+REL_N+NFCI                      ESS=   308 sig=3 ll=-496
+      DD+REL_N                           ESS=   723 sig=2 ll=-507
+      DD+VOL                             ESS=   529 sig=2 ll=-519
+      DD+ADR                             ESS=  1232 sig=2 ll=-525
+      DD+SKEW                            ESS=  1177 sig=2 ll=-550
+    * DD+VOL+NFCI                        ESS=   131 sig=3 ll=-561
+      DD+DISP                            ESS=  1015 sig=2 ll=-563
+      DD+TERM                            ESS=   702 sig=2 ll=-574
+==============================================================================

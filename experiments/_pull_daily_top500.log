@@ -1,0 +1,10 @@
+connecting to wrds-pgdata.wharton.upenn.edu:9737/wrds as giladgang ...
+Traceback (most recent call last):
+  File "/Users/giladgang/momentum_regime/experiments/_pull_daily_top500.py", line 31, in <module>
+    conn = psycopg2.connect(host=host, port=port, dbname=dbname, user=user,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/giladgang/momentum_regime/.venv/lib/python3.12/site-packages/psycopg2/__init__.py", line 122, in connect
+    conn = _connect(dsn, connection_factory=connection_factory, **kwasync)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.OperationalError: connection to server at "wrds-pgdata.wharton.upenn.edu" (165.123.60.118), port 9737 failed: timeout expired
+
