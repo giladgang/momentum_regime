@@ -350,11 +350,11 @@ tex = []
 tex.append(r'\begin{table}[H]')
 tex.append(r'\centering')
 tex.append(r'\small')
-tex.append(r'\begin{tabular}{l l r r r r}')
+tex.append(r'\begin{tabular}{l l r r r r r}')
 tex.append(r'\toprule')
-tex.append(r' &  &  & \multicolumn{2}{c}{LB(6)} & LB(12) \\')
-tex.append(r'\cmidrule(lr){4-5}\cmidrule(lr){6-6}')
-tex.append(r'Strategy & Model & $T$ & $Q_6$ & $p$ & $p$ \\')
+tex.append(r' &  &  & \multicolumn{2}{c}{LB(6)} & \multicolumn{2}{c}{LB(12)} \\')
+tex.append(r'\cmidrule(lr){4-5}\cmidrule(lr){6-7}')
+tex.append(r'Strategy & Model & $T$ & $Q_6$ & $p$ & $Q_{12}$ & $p$ \\')
 tex.append(r'\midrule')
 for r_row in diag_rows:
     # Escape '&' in strategy name for LaTeX (e.g. "D&M" -> "D\&M")
@@ -362,14 +362,16 @@ for r_row in diag_rows:
     tex.append(
         f"{strat_tex} & {r_row['model']} & "
         f"{r_row['T']} & {r_row['LB6_stat']:.2f} & "
-        f"{r_row['LB6_p']:.3f} & {r_row['LB12_p']:.3f} \\\\"
+        f"{r_row['LB6_p']:.3f} & {r_row['LB12_stat']:.2f} & "
+        f"{r_row['LB12_p']:.3f} \\\\"
     )
 tex.append(r'\bottomrule')
 tex.append(r'\end{tabular}')
 tex.append(
     r"\caption{Ljung--Box residual diagnostics for the factor regressions in "
-    r"Table~\ref{tab:factor_alphas}. $Q_6$ is the Ljung--Box statistic at lag 6; "
-    r"$p$-values are reported at lag 6 and lag 12. Across every (strategy, model) "
+    r"Table~\ref{tab:factor_alphas}. $Q_6$ and $Q_{12}$ are the Ljung--Box "
+    r"statistics at lags 6 and 12, each reported with its $p$-value. "
+    r"Across every (strategy, model) "
     r"pair we fail to reject the null of no residual autocorrelation at the 5\% "
     r"level. The Newey--West truncation of six lags used throughout the thesis "
     r"is empirically supported.}"
