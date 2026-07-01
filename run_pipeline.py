@@ -315,6 +315,12 @@ def main():
         20: ('scripts/build_table_expanding_subperiods.py',
              'STEP 20: Build expanding-window sub-period table (depends on Step 19)'),
 
+        21: ('scripts/plot_xgb_depth_cv.py',
+             'STEP 21: Appendix tree-depth figure, CV vs test '
+             '(plots/thesis/xgb_depth_cv.{pdf,png}, fig:xgb_depth_cv). Consumes Step 14 '
+             'depth_results.csv and results/cv/xgb_depth_cv_1to6.csv (built by '
+             'scripts/plot_xgb_depth_cv_simple.py from the separate scripts/xgb_cv.py CV run)'),
+
         # Auxiliary continued — thesis-cited but separate from main_results_analysis
         # ─ FUNDAMENTALS ABLATION
         25: ('scripts/fundamentals_test.py',

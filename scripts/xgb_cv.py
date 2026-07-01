@@ -285,8 +285,12 @@ def emit_latex_table(summary, out_path, n_seeds, fee):
          + f'Each cell is the net-of-fee ({fee*10000:.0f} bps) long-short '
            r'Sharpe from an ensemble of '
          + f'{n_seeds} XGBoost seeds, matching the production pipeline '
-           r'with fewer seeds for CV tractability. The selected configuration '
-           r'is the top row.}'),
+           r'with fewer seeds for CV tractability. The best configurations at '
+           r'depths~3 and~4 lie within one across-fold standard deviation of '
+           r'each other, so no depth is separable by cross-validation; depth~4 '
+           r'is adopted on interaction-order grounds '
+           r'(Appendix~\ref{app:depth_selection}), not by cross-validation '
+           r'selection.}'),
         r'\label{tab:xgb_cv}',
         r'\end{table}',
     ]

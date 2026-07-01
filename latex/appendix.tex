@@ -218,12 +218,29 @@ XGB remains profitable across all cost levels tested. Even at 50\,bps one-way (f
 
 \subsection{Model Sensitivity}\label{app:xgb_sensitivity}
 
-The XGBoost model uses hyperparameters selected via cross-validation on the training set. To verify that the results are not an artefact of a particular configuration, Table~\ref{tab:xgb_hyperparams} reports out-of-sample performance under alternative tree depths, learning rates, and ensemble sizes.
+The XGBoost hyperparameters are set on the training period and stress-tested out of sample; tree depth in particular is analysed in Appendix~\ref{app:depth_selection}. To verify that the results are not an artefact of a particular configuration, Table~\ref{tab:xgb_hyperparams} reports out-of-sample performance under alternative tree depths, learning rates, and ensemble sizes.
 
 \input{tables/table_xgb_hyperparams}
 
 \paragraph{Hyperparameter sensitivity}
-At the baseline depth of 4, the Sharpe ratio ranges from 0.89 to 1.11 across learning rate and ensemble size variations. Performance peaks at depth 4 and falls off on either side (see Section~\ref{sec:depth_analysis} for the depth analysis). The results confirm that XGB's performance is not an artefact of a particular hyperparameter configuration.
+At the baseline depth of 4, the Sharpe ratio ranges from 0.89 to 1.11 across learning rate and ensemble size variations. Performance peaks at depth 4 and falls off on either side (see Appendix~\ref{app:depth_selection} for the depth analysis). The results confirm that XGB's performance is not an artefact of a particular hyperparameter configuration.
+
+\subsection{Tree Depth and Interaction Order}\label{app:depth_selection}
+
+The maximum tree depth is the order of feature interactions the model can represent: a decision path of length $d$ conditions on $d$ features jointly. Depth therefore controls whether the regime signal interacts with single momentum horizons or with the joint configuration of several. Depth~4 is the smallest order at which one path can gate on the regime (depth~1) and then combine three momentum horizons (depths~2 to~4), a regime-conditioned read of term-structure shape rather than of one horizon in isolation. This is the interaction the mechanism of Section~\ref{sec:heterogeneity_picks} turns on.
+
+Figure~\ref{fig:xgb_depth_cv} reports two views of the depth response, both at the production hyperparameters (learning rate $0.05$, $500$ trees). The left panel is a five-fold expanding-window cross-validation on the training period (1990--2010), each fold trained on an initial window and validated on the following two years, scored by net-of-fee long-short validation Sharpe. The right panel is the out-of-sample sensitivity sweep on the 2011--2024 test window (Table~\ref{tab:xgb_hyperparams}). In cross-validation the depth response is flat: validation Sharpe sits between $0.44$ and $0.52$ across all six depths, a spread far smaller than the across-fold standard deviation of roughly $0.7$, so no depth is statistically separable from another in sample. Allowing each depth its own best learning rate and tree count does not change this: the best per-depth configurations still fall within fold noise of one another, and the single best configuration in the entire grid lies at depth~3 (validation Sharpe $0.60$ against $0.58$ at depth~4), a lead of $0.02$ that is negligible against the same noise. Cross-validation cannot resolve the depth.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{plots/thesis/xgb_depth_cv.pdf}
+    \caption{XGBoost tree-depth response at the production hyperparameters (learning rate $0.05$, $500$ trees). Left: five-fold expanding-window cross-validation validation Sharpe on the training period (1990--2010); the response is flat across depths, all within the across-fold standard deviation of roughly $0.7$, so no depth is separable in sample. Right: out-of-sample long-short Sharpe on the 2011--2024 test window, which peaks at depth~4. Depth~4 (blue) is the adopted depth.}
+    \label{fig:xgb_depth_cv}
+\end{figure}
+
+On the evaluation window the depth response is more pronounced, though this is the same window on which the headline result is reported: out-of-sample Sharpe rises from $0.53$ at depth~1 to a peak of $1.11$ at depth~4, then falls to $0.92$ and $0.90$ at depths~5 and~6. This rise is consistent with the interaction-order account above, the third within-regime level adding signal, while the decline beyond depth~4 is consistent with the added order capturing noise rather than signal. We adopt depth~4 because it is the smallest interaction order that completes the regime-conditioned term-structure read; the out-of-sample peak corroborates this a-priori choice but, coming from the evaluation window, is treated as corroboration rather than as the selection criterion. The mechanism itself is qualitatively the same across depths~3 and~4, so the choice within that pair does not affect the reported results.
+
+Finally, the depth choice is independent of the number of selection modes recovered in Section~\ref{sec:heterogeneity_picks}. The value $K=4$ is a $K$-means partition of the long-leg cross-sectional z-curves, computed on the model's monthly picks and chosen on economic grounds; it is not a property of the tree depth, and the same partition could be applied to the picks of a shallower model. The evidence for the regime-momentum mechanism, namely the SHAP attribution, the z-curves, and the leg-level betas, likewise does not rest on the depth. Depth~4 sets the model's capacity to express the mechanism, not the number of modes the downstream clustering reports.
 
 \subsection{Number of Hidden States}\label{app:num_states}
 

@@ -137,6 +137,7 @@ No `\input` / `\includegraphics`. Numbers cited in prose only.
 | `tables/table_combo_short_cp.tex` | `scripts/tree_combo_grouped.py` |
 | `plots/convergence_trace.png` | `scripts/hmm_model.py` |
 | `plots/risk_aversion_dual_util.pdf` | `scripts/plot_crra_dual_util.py` |
+| `plots/thesis/xgb_depth_cv.{pdf,png}` (fig:xgb_depth_cv, App. depth selection) | `scripts/plot_xgb_depth_cv.py` (Step 21); consumes `depth_results.csv` from `scripts/depth_vs_sharpe.py` (Step 14) and `results/cv/xgb_depth_cv_1to6.csv` from `scripts/plot_xgb_depth_cv_simple.py`, which builds on the separate `scripts/xgb_cv.py` CV run. Config: MAX_DEPTH, LEARNING_RATE, N_ESTIMATORS |
 
 ---
 
