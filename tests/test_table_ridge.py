@@ -79,8 +79,16 @@ def test_caption_sharpe_matches_ols_row(csv, tex):
     assert float(m.group(1)) == pytest.approx(abs(round(ols_sharpe, 2)))
 
 
-def test_appendix_inputs_table_ridge():
-    with open(APPENDIX_PATH) as f:
-        appendix = f.read()
-    assert r'\input{tables/table_ridge}' in appendix
-    assert r'\label{app:ridge}' in appendix
+def test_table_ridge_not_included_in_thesis():
+    """Per Gilad's decision (2026-07-05) the ridge sweep stays a diagnostic
+    artifact: OLS appears as a row in tab:performance only, and
+    table_ridge is NOT \\input anywhere in the thesis."""
+    latex_dir = os.path.join(REPO, 'latex')
+    tex_files = [os.path.join(REPO, 'main.tex')] + [
+        os.path.join(latex_dir, f) for f in os.listdir(latex_dir)
+        if f.endswith('.tex')
+    ]
+    for path in tex_files:
+        with open(path) as f:
+            assert 'table_ridge' not in f.read(), \
+                f'{path} references table_ridge'

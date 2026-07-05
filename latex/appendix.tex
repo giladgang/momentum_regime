@@ -242,14 +242,6 @@ On the evaluation window the depth response is more pronounced, though this is t
 
 Finally, the depth choice is independent of the number of selection modes recovered in Section~\ref{sec:heterogeneity_picks}. The value $K=4$ is a $K$-means partition of the long-leg cross-sectional z-curves, computed on the model's monthly picks and chosen on economic grounds; it is not a property of the tree depth, and the same partition could be applied to the picks of a shallower model. The evidence for the regime-momentum mechanism, namely the SHAP attribution, the z-curves, and the leg-level betas, likewise does not rest on the depth. Depth~4 sets the model's capacity to express the mechanism, not the number of modes the downstream clustering reports.
 
-\subsection{Ridge Regularisation Sweep for the Linear Baseline}\label{app:ridge}
-
-Table~\ref{tab:performance} shows that the plain OLS regression on the continuous forward-return target collapses out of sample. A natural question is whether regularisation rescues the linear model. Table~\ref{tab:ridge} repeats the exercise with ridge regression at regularisation strengths spanning four orders of magnitude, on the same features and the same continuous target.
-
-\input{tables/table_ridge}
-
-Performance is essentially invariant to regularisation: every ridge variant reproduces the OLS Sharpe of $-$0.58 up to $\alpha = 100$, and even $\alpha = 1{,}000$ moves it only to $-$0.54. The training panel is very large relative to the parameter count (thirteen coefficients), so at these strengths the ridge penalty leaves the estimated coefficient vector, and hence the cross-sectional decile ranking, essentially unchanged; there is no estimation variance for regularisation to reduce. Together with the LR row (linear functional form, classification target), the sweep isolates the source of the linear failure documented in Section~\ref{sec:performance_results}: it is the linear functional form itself, not the choice of training target and not estimation noise. Because $\pi_t^{\text{filter}}$ is constant across stocks within a month, a linear score shifts every stock equally and cannot reorder the cross-section as the regime changes; representing the regime-momentum interaction requires the nonlinearity that XGB provides.
-
 \subsection{Number of Hidden States}\label{app:num_states}
 
 The baseline HMM uses $K = 2$ states (calm and panic). A natural question is whether finer regime granularity (for example, distinguishing mild corrections from severe crises) would improve the downstream portfolio models. Table~\ref{tab:multistate_hmm} reports out-of-sample Sharpe ratios for $K = 2, 3, 4, 5$, each averaged over five representative Gibbs sampler seeds (the production regime signal averages 200 seeds, but five suffice for this diagnostic).

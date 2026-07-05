@@ -188,7 +188,7 @@ Long leg: all 39 entries positive (model buys higher-z stocks in calm, lower-z i
 
 Ridge fails at any regularisation. Linearity is the binding constraint, not the classification target.
 
-**Update 2026-07-05:** rerun against the current production artefacts (May 7) gives OLS/Ridge Sharpe -0.58, Ann Ret -11.1%, MDD -82.0% (table numbers above are the April run; `tables/table_ridge.tex` carries the current values). The plain OLS result was promoted to `tab:performance` (see the OLS baseline row entry below), and the full sweep table is included in the appendix as `tab:ridge` (App. app:ridge, "Ridge Regularisation Sweep for the Linear Baseline"). Caption is now generated from the computed OLS Sharpe (stale $-$0.57 fixed); LR row label cleaned to "LR (classification)". Guarded by `tests/test_table_ridge.py`.
+**Update 2026-07-05:** rerun against the current production artefacts (May 7) gives OLS/Ridge Sharpe -0.58, Ann Ret -11.1%, MDD -82.0% (table numbers above are the April run; `tables/table_ridge.tex` carries the current values). The plain OLS result was promoted to `tab:performance` (see the OLS baseline row entry below). Per Gilad's decision the ridge sweep table stays a diagnostic artifact and is NOT included in the thesis (briefly added to the appendix, then reverted same day). Generator fixes retained: caption Sharpe computed from data (stale $-$0.57 fixed), LR row label cleaned to "LR (classification)". `tests/test_table_ridge.py` guards tex/csv consistency and asserts table_ridge is not referenced from any thesis .tex.
 
 ### OLS baseline row (`table_performance`, `results/thesis/ols_monthly_returns.csv`)
 
