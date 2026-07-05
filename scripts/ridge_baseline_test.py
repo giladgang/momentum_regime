@@ -203,7 +203,7 @@ for alpha in alphas_to_test:
 
 # LR and XGB from artefacts
 strats = artefacts['strategies_lo']
-for name_key, label in [('Method 1: LR', 'LR (LR, classification)'),
+for name_key, label in [('Method 1: LR', 'LR (classification)'),
                          ('Method 2: XGB', 'XGB')]:
     if name_key in strats:
         r = strats[name_key]
@@ -277,13 +277,15 @@ for row in rows:
     sr_p = fmt_sharpe(row['sr_panic'])
     line = f"{m} & {a_tex} & {sh} & {ar} & {av} & {mdd} & {sr_c} / {sr_p} \\\\"
     # Add midrule before LR
-    if m == 'LR (LR, classification)':
+    if m == 'LR (classification)':
         tex_lines.append(r'\midrule')
     tex_lines.append(line)
 
 tex_lines.append(r'\bottomrule')
 tex_lines.append(r'\end{tabular}')
-tex_lines.append(r'\caption{Ridge regression baseline predicting continuous forward returns (same target as XGB). The Sharpe of $-$0.57 is robust across all regularisation strengths.}')
+tex_lines.append(r'\caption{Ridge regression baseline predicting continuous forward returns (same target as XGB). The Sharpe of '
+                 + (f'$-${abs(sh_o):.2f}' if sh_o < 0 else f'{sh_o:.2f}')
+                 + r' is robust across all regularisation strengths.}')
 tex_lines.append(r'\label{tab:ridge}')
 tex_lines.append(r'\end{table}')
 
