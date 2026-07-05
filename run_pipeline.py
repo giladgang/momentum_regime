@@ -321,6 +321,11 @@ def main():
              'depth_results.csv and results/cv/xgb_depth_cv_1to6.csv (built by '
              'scripts/plot_xgb_depth_cv_simple.py from the separate scripts/xgb_cv.py CV run)'),
 
+        22: ('scripts/ols_baseline_row.py',
+             'STEP 22: OLS baseline row for tab:performance — inserts/refreshes the '
+             'OLS row in table_performance.tex, writes ols_monthly_returns.csv '
+             '(depends on Step 3)'),
+
         # Auxiliary continued — thesis-cited but separate from main_results_analysis
         # ─ FUNDAMENTALS ABLATION
         25: ('scripts/fundamentals_test.py',

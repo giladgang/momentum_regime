@@ -94,6 +94,7 @@ def parse_table_performance():
         'm2':       'XGB',
         'm1':       'LR',
         'm0':       'DET',
+        'ols':      'OLS',
         'fixed_12': 'Fixed 12-mo mom',
         'fixed_1':  'Fixed 1-mo mom',
         'market':   'Market',

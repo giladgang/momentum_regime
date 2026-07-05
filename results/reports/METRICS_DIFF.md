@@ -1,34 +1,21 @@
 # Metrics diff report
 
-Generated: 2026-05-26T00:19:03  
-Total metrics tracked: 263
+Generated: 2026-07-05T16:20:45  
+Total metrics tracked: 270
 
 ## ⚙️ Config knobs
 
 No config knobs changed since last run.
 
-## 📊 Metrics that changed (20)
+## 📊 Metrics that changed (7)
 
 | Metric (section.key) | Old | New | Δ | Likely config |
 |---|---|---|---|---|
-| `regime_signal_ablation.dd_only_ann_ret` | *(new)* | 7.9000 | — | — |
-| `regime_signal_ablation.dd_only_ann_vol` | *(new)* | 20.5000 | — | — |
-| `regime_signal_ablation.dd_only_mdd` | *(new)* | -30.8000 | — | — |
-| `regime_signal_ablation.dd_only_sharpe` | *(new)* | 0.4690 | — | — |
-| `regime_signal_ablation.four_raw_ann_ret` | *(new)* | 3.2000 | — | — |
-| `regime_signal_ablation.four_raw_ann_vol` | *(new)* | 19.1000 | — | — |
-| `regime_signal_ablation.four_raw_mdd` | *(new)* | -45.4000 | — | — |
-| `regime_signal_ablation.four_raw_sharpe` | *(new)* | 0.2570 | — | — |
-| `regime_signal_ablation.hmm_ann_ret` | *(new)* | 21.7000 | — | — |
-| `regime_signal_ablation.hmm_ann_vol` | *(new)* | 19.5000 | — | — |
-| `regime_signal_ablation.hmm_mdd` | *(new)* | -22.8000 | — | — |
-| `regime_signal_ablation.hmm_sharpe` | *(new)* | 1.1070 | — | — |
-| `regime_signal_ablation.no_signal_ann_ret` | *(new)* | 7.0000 | — | — |
-| `regime_signal_ablation.no_signal_ann_vol` | *(new)* | 20.4000 | — | — |
-| `regime_signal_ablation.no_signal_mdd` | *(new)* | -41.0000 | — | — |
-| `regime_signal_ablation.no_signal_sharpe` | *(new)* | 0.4290 | — | — |
-| `regime_signal_ablation.reln_only_ann_ret` | *(new)* | 11.6000 | — | — |
-| `regime_signal_ablation.reln_only_ann_vol` | *(new)* | 16.6000 | — | — |
-| `regime_signal_ablation.reln_only_mdd` | *(new)* | -24.5000 | — | — |
-| `regime_signal_ablation.reln_only_sharpe` | *(new)* | 0.7460 | — | — |
+| `m2_perf.ols_ann_ret` | -11.0652 | -11.1000 | -0.0348 | MAX_DEPTH, LEARNING_RATE, N_ESTIMATORS, XGB_SEEDS, MOM_FEATURES, TRADING_FEE |
+| `m2_perf.ols_ann_vol` | 17.3792 | 17.4000 | +0.0208 | MAX_DEPTH, LEARNING_RATE, N_ESTIMATORS, XGB_SEEDS, MOM_FEATURES, TRADING_FEE |
+| `m2_perf.ols_beta` | 0.2684 | 0.2700 | +0.0016 | MAX_DEPTH, LEARNING_RATE, N_ESTIMATORS, XGB_SEEDS, MOM_FEATURES, TRADING_FEE |
+| `m2_perf.ols_final_dollar` | 0.1955 | 0.2000 | +0.0045 | MAX_DEPTH, LEARNING_RATE, N_ESTIMATORS, XGB_SEEDS, MOM_FEATURES, TRADING_FEE |
+| `m2_perf.ols_max_dd` | -82.0112 | -82.0000 | +0.0112 | MAX_DEPTH, LEARNING_RATE, N_ESTIMATORS, XGB_SEEDS, MOM_FEATURES, TRADING_FEE |
+| `m2_perf.ols_nw_t` | -2.2536 | -2.2500 | +0.0036 | MAX_DEPTH, LEARNING_RATE, N_ESTIMATORS, XGB_SEEDS, MOM_FEATURES, TRADING_FEE |
+| `m2_perf.ols_sharpe` | -0.5833 | -0.5800 | +0.0033 | MAX_DEPTH, LEARNING_RATE, N_ESTIMATORS, XGB_SEEDS, MOM_FEATURES, TRADING_FEE |
 

@@ -111,6 +111,7 @@ def render_table_performance(metrics):
         ('Fixed 1-mo mom',      'fixed_1'),
         ('DET',         'm0'),
         ('LR',              'm1'),
+        ('OLS',             'ols'),
         ('XGB (mom+$\\pi$)', 'm2'),
     ]
     sec = 'm2_perf'

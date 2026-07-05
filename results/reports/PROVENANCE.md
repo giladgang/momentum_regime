@@ -62,7 +62,8 @@ No data assets.
 
 | Asset | Source script | Config knob |
 |---|---|---|
-| `tables/table_performance.tex` | `scripts/main_results_analysis.py` | MAX_DEPTH, LEARNING_RATE, N_ESTIMATORS, XGB_SEEDS, MOM_FEATURES |
+| `tables/table_performance.tex` | `scripts/main_results_analysis.py` (Step 3); OLS row inserted by `scripts/ols_baseline_row.py` (Step 22) | MAX_DEPTH, LEARNING_RATE, N_ESTIMATORS, XGB_SEEDS, MOM_FEATURES |
+| `results/thesis/ols_monthly_returns.csv` | `scripts/ols_baseline_row.py` (Step 22) | TRADING_FEE |
 | `tables/table_subperiod.tex` | `scripts/main_results_analysis.py` | (same) |
 | `tables/table_regime_sharpe.tex` | `scripts/main_results_analysis.py` | (same) |
 | `tables/table_factor_alphas.tex` | `scripts/new_ls_analyses.py` | (same) |
