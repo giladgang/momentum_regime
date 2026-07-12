@@ -146,6 +146,17 @@ S2 ≈ 1-2 overnights; S3 ≈ 1 overnight (~25 distinct (year,combo) HMM fits at
 thesis walk-forward chains are independent and can run on any idle night
 once their three audit fixes are applied.
 
+## Registered expectations (2026-07-13, before any S2/S3 result was read)
+
+E1. argmax churns: >= 4 distinct combos across 2011-2025.
+E2. Gross active value: IR(score_pi, argmax) > IR(score_nopi) on the stitched walk.
+E3. Neither of those gross IRs exceeds 0.8 (large-cap momentum is weaker).
+E4. Regime value concentrates in panic months: mean monthly active return of
+    the argmax strategy in pi >= 0.5 months exceeds its calm-month mean.
+E5. rule_r selects weakly-fewer distinct combos than argmax.
+Scored HIT/MISS in the S4 report either way; no rule/combo adoption based on
+these outcomes.
+
 ## Known expectations to manage
 
 Momentum is historically weaker in large caps — the regime/timing angle,
