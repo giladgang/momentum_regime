@@ -1,0 +1,54 @@
+"""Applied paper study config. ALL knobs live here (spec 2026-07-13)."""
+import os
+import sys
+
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if REPO not in sys.path:
+    sys.path.insert(0, REPO)
+import config as repo_config                                    # noqa: E402
+
+# ── data sources: swap EXT_DIR to ext2026 when the WRDS refresh lands ──
+EXT_DIR = os.path.join(REPO, 'experiments/results/ext2025')
+PANEL_EXT = os.path.join(EXT_DIR, 'panel_ext.parquet')          # macro, ..2025-11
+STOCK_EXT = os.path.join(EXT_DIR, 'crsp_msf_ext.parquet')       # stocks, ..2025-12
+
+RESULTS = os.path.join(REPO, 'paper/results')
+DATA_OUT = os.path.join(RESULTS, 'data')
+PANEL_PARQUET = os.path.join(DATA_OUT, 'panel.parquet')
+STOCKS_PARQUET = os.path.join(DATA_OUT, 'stocks.parquet')
+XSEC_DIR = os.path.join(RESULTS, 'xsec')
+FOLD_CELLS_CSV = os.path.join(RESULTS, 'fold_cells.csv')
+SELECTIONS_CSV = os.path.join(RESULTS, 'selections.csv')
+RETURNS_CSV = os.path.join(RESULTS, 'walk_returns.csv')
+
+PANEL_START = '1990-12-01'
+EVAL_YEARS = list(range(2011, 2026))        # 2025 partial (formation Jan-Nov)
+UNIVERSE_N = 1000
+UNIVERSE_N_ROBUST = 500
+PRICE_MIN = 1.0
+DECILE_FRAC = 0.10
+
+SEL_HMM_SEEDS = repo_config.HMM_SEEDS[:3]
+SEL_XGB_SEEDS = repo_config.XGB_SEEDS[:5]
+EVAL_HMM_SEEDS = repo_config.HMM_SEEDS[:50]
+EVAL_XGB_SEEDS = repo_config.XGB_SEEDS[:20]
+N_ITER, N_BURNIN = 2000, 500
+
+POOL_CSV = os.path.join(REPO, 'experiments/results/wf_pool.csv')
+COST_GRID_BPS = [5, 10, 20]
+
+# fold = (id, val_start, val_end); train partition = panel < val_start
+BIENNIAL_FOLDS = [
+    (1, '1997-01-01', '1999-01-01'),
+    (2, '1999-01-01', '2001-01-01'),
+    (3, '2001-01-01', '2003-01-01'),
+    (4, '2003-01-01', '2005-01-01'),
+    (5, '2005-01-01', '2007-01-01'),
+    (6, '2007-01-01', '2009-07-01'),
+    (7, '2009-07-01', '2011-01-01'),
+]
+ANNUAL_FOLDS = [(100 + k, f'{2010 + k}-01-01', f'{2011 + k}-01-01')
+                for k in range(1, 15)]      # 101..114 validate 2011..2024
+# fold usable for trading year Y iff VAL_END[fold] <= Y
+VAL_END = {**{1: 1999, 2: 2001, 3: 2003, 4: 2005, 5: 2007, 6: 2009, 7: 2011},
+           **{100 + k: 2011 + k for k in range(1, 15)}}
