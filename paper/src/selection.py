@@ -93,11 +93,11 @@ def append_row(path, row):
                                header=not os.path.exists(path), index=False)
 
 
-def select_years(cells):
+def select_years(cells, years=None):
     per_fold = cells.groupby(['combo', 'fold'])['val_ir'].mean().unstack()
     D = pd.Series({c: c.count('+') + 1 for c in per_fold.index})
     rows = []
-    for Y in C.EVAL_YEARS:
+    for Y in (years or C.EVAL_YEARS):
         folds = [f for f in per_fold.columns if C.VAL_END.get(f, 9999) <= Y]
         sub = per_fold[folds]
         mean = sub.mean(axis=1)

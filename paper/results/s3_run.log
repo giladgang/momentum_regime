@@ -1,0 +1,164 @@
+ year   rule          combo  cv_mean  n_folds  n_eligible
+ 2011 argmax         DD+VOL 0.677335        7          18
+ 2011 rule_r             DD 0.615404        7          18
+ 2012 argmax   DD+SKEW+TERM 0.572833        8          20
+ 2012 rule_r             DD 0.482010        8          20
+ 2013 argmax         DD+VOL 0.479153        9          13
+ 2013 rule_r             DD 0.282056        9          13
+ 2014 argmax         DD+VOL 0.561635       10          10
+ 2014 rule_r             DD 0.357627       10          10
+ 2015 argmax         DD+VOL 0.490030       11          10
+ 2015 rule_r             DD 0.377092       11          10
+ 2016 argmax         DD+VOL 0.328322       12          21
+ 2016 rule_r             DD 0.298379       12          21
+ 2017 argmax DD+VOL+CS+LVIX 0.393253       13          20
+ 2017 rule_r             DD 0.371442       13          20
+ 2018 argmax   DD+LVIX+TERM 0.347548       14          16
+ 2018 rule_r             DD 0.293654       14          16
+ 2019 argmax   DD+LVIX+TERM 0.388347       15          10
+ 2019 rule_r             DD 0.263245       15          10
+ 2020 argmax  DD+REL_N+LVIX 0.371967       16          10
+ 2020 rule_r             DD 0.220774       16          10
+ 2021 argmax  DD+REL_N+LVIX 0.485726       17          14
+ 2021 rule_r             DD 0.339660       17          14
+ 2022 argmax  DD+REL_N+LVIX 0.316669       18          20
+ 2022 rule_r             DD 0.229197       18          20
+ 2023 argmax     DD+CS+LVIX 0.350944       19          16
+ 2023 rule_r             DD 0.246988       19          16
+ 2024 argmax     DD+CS+LVIX 0.391206       20          18
+ 2024 rule_r             DD 0.307525       20          18
+ 2025 argmax DD+VOL+CS+LVIX 0.410451       21          21
+ 2025 rule_r             DD 0.336458       21          21
+[walk] === 2011 DD (rules ['rule_r']) ===
+[walk]   12 months  IR=-0.30  active=-4.4%/yr
+[walk] === 2011 DD+VOL (rules ['argmax']) ===
+[walk]   12 months  IR=-0.18  active=-2.6%/yr
+[walk] === 2012 DD (rules ['rule_r']) ===
+[walk]   12 months  IR=-1.15  active=-11.0%/yr
+[walk] === 2012 DD+SKEW+TERM (rules ['argmax']) ===
+[walk]   12 months  IR=-1.18  active=-10.0%/yr
+[walk] === 2013 DD (rules ['rule_r']) ===
+[walk]   12 months  IR=+0.95  active=+7.8%/yr
+[walk] === 2013 DD+VOL (rules ['argmax']) ===
+[walk]   12 months  IR=+0.76  active=+4.9%/yr
+[walk] === 2014 DD (rules ['rule_r']) ===
+[walk]   12 months  IR=-0.08  active=-0.8%/yr
+[walk] === 2014 DD+VOL (rules ['argmax']) ===
+[walk]   12 months  IR=+0.03  active=+0.4%/yr
+[walk] === 2015 DD (rules ['rule_r']) ===
+[walk]   12 months  IR=-1.03  active=-10.0%/yr
+[walk] === 2015 DD+VOL (rules ['argmax']) ===
+[walk]   12 months  IR=-0.54  active=-2.6%/yr
+[walk] === 2016 DD (rules ['rule_r']) ===
+[walk]   12 months  IR=+2.01  active=+8.1%/yr
+[walk] === 2016 DD+VOL (rules ['argmax']) ===
+[walk]   12 months  IR=+1.07  active=+7.2%/yr
+[walk] === 2017 DD (rules ['rule_r']) ===
+[walk]   12 months  IR=-1.36  active=-9.4%/yr
+[walk] === 2017 DD+VOL+CS+LVIX (rules ['argmax']) ===
+[walk]   12 months  IR=-1.62  active=-13.3%/yr
+[walk] === 2018 DD (rules ['rule_r']) ===
+[walk]   12 months  IR=-0.22  active=-2.8%/yr
+[walk] === 2018 DD+LVIX+TERM (rules ['argmax']) ===
+[walk]   12 months  IR=+0.56  active=+8.8%/yr
+[walk] === 2019 DD (rules ['rule_r']) ===
+[walk]   12 months  IR=-1.14  active=-9.6%/yr
+[walk] === 2019 DD+LVIX+TERM (rules ['argmax']) ===
+[walk]   12 months  IR=-1.07  active=-11.1%/yr
+[walk] === 2020 DD (rules ['rule_r']) ===
+[walk]   12 months  IR=+2.23  active=+31.0%/yr
+[walk] === 2020 DD+REL_N+LVIX (rules ['argmax']) ===
+[walk]   12 months  IR=+2.33  active=+37.9%/yr
+[walk] === 2021 DD (rules ['rule_r']) ===
+[walk]   12 months  IR=-1.54  active=-11.6%/yr
+[walk] === 2021 DD+REL_N+LVIX (rules ['argmax']) ===
+[walk]   12 months  IR=-3.22  active=-32.7%/yr
+[walk] === 2022 DD (rules ['rule_r']) ===
+[walk]   12 months  IR=+0.75  active=+13.2%/yr
+[walk] === 2022 DD+REL_N+LVIX (rules ['argmax']) ===
+[walk]   12 months  IR=+0.99  active=+16.9%/yr
+[walk] === 2023 DD (rules ['rule_r']) ===
+[walk]   12 months  IR=+1.61  active=+27.6%/yr
+[walk] === 2023 DD+CS+LVIX (rules ['argmax']) ===
+[walk]   12 months  IR=+0.47  active=+7.7%/yr
+[walk] === 2024 DD (rules ['rule_r']) ===
+[walk]   12 months  IR=+1.14  active=+14.0%/yr
+[walk] === 2024 DD+CS+LVIX (rules ['argmax']) ===
+[walk]   12 months  IR=-0.09  active=-1.2%/yr
+[walk] === 2025 DD (rules ['rule_r']) ===
+[walk]   11 months  IR=-0.32  active=-5.0%/yr
+[walk] === 2025 DD+VOL+CS+LVIX (rules ['argmax']) ===
+[walk]   11 months  IR=-1.88  active=-16.4%/yr
+[walk] DONE
+# Applied study: headline results (GROSS; costs land in S5)
+
+Convention: information through month-end t, positions formed at t close, return earned over t+1. Universe: point-in-time top-1000 by market cap; long-only fully-invested top-decile, value-weighted. Full-table reporting.
+
+## Headline (monthly, stitched 2011-01..2025-11)
+
+       series  n_months  ann_ret  ann_vol  sharpe  max_dd    te     ir  up_capture  down_capture  beta36_mean
+xgb_pi_argmax       179    0.123    0.217   0.644  -0.380 0.123 -0.026       1.117         1.268        1.212
+xgb_pi_rule_r       179    0.156    0.216   0.778  -0.324 0.120  0.211       1.161         1.145        1.224
+     xgb_nopi       179    0.142    0.223   0.709  -0.431 0.130  0.118       1.172         1.243        1.269
+     mom_12_1       179    0.152    0.207   0.791  -0.306 0.125  0.163       1.099         1.053        1.133
+ vw_benchmark       179    0.141    0.144   0.992  -0.243 0.000    NaN       1.000         1.000        1.000
+
+## Regime split (pi >= 0.5 = panic)
+
+       series regime   n  mean_active_mo  sharpe
+xgb_pi_argmax  panic  54          0.0107  1.2152
+xgb_pi_argmax   calm 125         -0.0050  0.2580
+xgb_pi_rule_r  panic  54          0.0135  1.3472
+xgb_pi_rule_r   calm 125         -0.0028  0.4162
+     xgb_nopi  panic  54          0.0139  1.3798
+     xgb_nopi   calm 125         -0.0042  0.2883
+     mom_12_1  panic  54          0.0053  1.1863
+     mom_12_1   calm 125          0.0001  0.5737
+
+## Selection paths
+
+ year         argmax rule_r
+ 2011         DD+VOL     DD
+ 2012   DD+SKEW+TERM     DD
+ 2013         DD+VOL     DD
+ 2014         DD+VOL     DD
+ 2015         DD+VOL     DD
+ 2016         DD+VOL     DD
+ 2017 DD+VOL+CS+LVIX     DD
+ 2018   DD+LVIX+TERM     DD
+ 2019   DD+LVIX+TERM     DD
+ 2020  DD+REL_N+LVIX     DD
+ 2021  DD+REL_N+LVIX     DD
+ 2022  DD+REL_N+LVIX     DD
+ 2023     DD+CS+LVIX     DD
+ 2024     DD+CS+LVIX     DD
+ 2025 DD+VOL+CS+LVIX     DD
+
+## Concentration (argmax strategy)
+
+ year  max_weight  eff_n
+ 2011       0.072 42.868
+ 2012       0.348  7.210
+ 2013       0.142 21.619
+ 2014       0.130 23.647
+ 2015       0.122 25.953
+ 2016       0.153 20.037
+ 2017       0.123 24.294
+ 2018       0.185 16.074
+ 2019       0.103 23.371
+ 2020       0.183 15.615
+ 2021       0.112 26.538
+ 2022       0.164 18.037
+ 2023       0.213 10.638
+ 2024       0.338  6.222
+ 2025       0.156 18.221
+
+## Registered expectations (spec 2026-07-13)
+
+E1: argmax distinct combos = 6 (>=4) -> HIT
+E2: IR(pi)=-0.03 > IR(nopi)=0.12 -> MISS
+E3: max gross IR = 0.12 (<= 0.8) -> HIT
+E4: panic mean active +1.07%/mo vs calm -0.50%/mo -> HIT
+E5: rule_r distinct 1 <= argmax 6 -> HIT
+
+Saved: /Users/giladgang/momentum_regime/paper/results/applied_summary.md

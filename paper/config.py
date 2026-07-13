@@ -48,7 +48,8 @@ BIENNIAL_FOLDS = [
     (7, '2009-07-01', '2011-01-01'),
 ]
 ANNUAL_FOLDS = [(100 + k, f'{2010 + k}-01-01', f'{2011 + k}-01-01')
-                for k in range(1, 15)]      # 101..114 validate 2011..2024
-# fold usable for trading year Y iff VAL_END[fold] <= Y
+                for k in range(1, 16)]      # 101..115 validate 2011..2025
+# fold usable for trading year Y iff VAL_END[fold] <= Y; fold 115 (VAL_END
+# 2026) only feeds the live-2026 appendix selection, never EVAL_YEARS <= 2025
 VAL_END = {**{1: 1999, 2: 2001, 3: 2003, 4: 2005, 5: 2007, 6: 2009, 7: 2011},
-           **{100 + k: 2011 + k for k in range(1, 15)}}
+           **{100 + k: 2011 + k for k in range(1, 16)}}

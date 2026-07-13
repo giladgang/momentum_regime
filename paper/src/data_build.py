@@ -25,10 +25,6 @@ def build():
                              columns=['permno', 'date', 'ret_adj', 'prc',
                                       'shrcd', 'exchcd', 'me'])
     stocks['date'] = pd.to_datetime(stocks['date'])
-    stocks = stocks.sort_values(['permno', 'date']).reset_index(drop=True)
-    stocks = stocks[stocks['shrcd'].isin([10, 11])]
-    stocks = stocks[stocks['exchcd'].isin([1, 2, 3])]
-    stocks = stocks[stocks['prc'].abs() > C.PRICE_MIN].reset_index(drop=True)
 
     # ext months (2025-*) lack `me`; fill from v2 mthcap (mthcap/1000 == me
     # units — enforced on the overlap months where both exist)
@@ -45,6 +41,19 @@ def build():
     stocks['me'] = stocks['me'].fillna(stocks['me_v2'])
     stocks.drop(columns=['me_v2', 'ym'], inplace=True)
 
+    stocks = build_stock_frame(stocks, max_date=panel['date'].max())
+    stocks.to_parquet(C.STOCKS_PARQUET, index=False)
+    print(f'[data_build] panel {panel.date.min().date()}..{panel.date.max().date()} '
+          f'| stocks {len(stocks):,} rows ..{stocks.date.max().date()}')
+
+
+def build_stock_frame(stocks, max_date):
+    """Universe filters + momentum features + ret_fwd (validated ext-loader
+    logic). Expects columns permno, date, ret_adj, prc, shrcd, exchcd, me."""
+    stocks = stocks.sort_values(['permno', 'date']).reset_index(drop=True)
+    stocks = stocks[stocks['shrcd'].isin([10, 11])]
+    stocks = stocks[stocks['exchcd'].isin([1, 2, 3])]
+    stocks = stocks[stocks['prc'].abs() > C.PRICE_MIN].reset_index(drop=True)
     stocks['_lr'] = np.log1p(stocks['ret_adj'].clip(lower=-0.999))
     stocks['_lr_s1'] = stocks.groupby('permno')['_lr'].shift(1)
     for lb in range(1, 13):
@@ -56,11 +65,9 @@ def build():
     stocks['ret_fwd'] = stocks.groupby('permno')['ret_adj'].transform(
         lambda x: x.shift(-1))
     moms = [f'mom_{lb}' for lb in range(1, 13)]
-    stocks = stocks.dropna(subset=['ret_fwd', 'me'] + moms).reset_index(drop=True)
-    stocks = stocks[stocks['date'] <= panel['date'].max()]
-    stocks.to_parquet(C.STOCKS_PARQUET, index=False)
-    print(f'[data_build] panel {panel.date.min().date()}..{panel.date.max().date()} '
-          f'| stocks {len(stocks):,} rows ..{stocks.date.max().date()}')
+    stocks = stocks.dropna(subset=['ret_fwd', 'me'] + moms
+                           ).reset_index(drop=True)
+    return stocks[stocks['date'] <= max_date]
 
 
 def load_panel():
