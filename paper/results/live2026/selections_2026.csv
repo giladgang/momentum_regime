@@ -1,0 +1,3 @@
+year,rule,combo,cv_mean,n_folds,n_eligible
+2026,argmax,DD+DISP+TERM,0.3655244518861274,22,22
+2026,rule_r,DD,0.2719603815492777,22,22
