@@ -12,8 +12,11 @@ EXT_DIR = os.path.join(REPO, 'experiments/results/ext2025')
 PANEL_EXT = os.path.join(EXT_DIR, 'panel_ext.parquet')          # macro, ..2025-11
 STOCK_EXT = os.path.join(EXT_DIR, 'crsp_msf_ext.parquet')       # stocks, ..2025-12
 
-RESULTS = os.path.join(REPO, 'paper/results')
-DATA_OUT = os.path.join(RESULTS, 'data')
+# PAPER_RESULTS_DIR / PAPER_UNIVERSE_N env overrides drive robustness reruns
+# (e.g. top-500) into a separate results tree; data files stay shared.
+RESULTS = os.path.join(REPO, os.environ.get('PAPER_RESULTS_DIR',
+                                            'paper/results'))
+DATA_OUT = os.path.join(REPO, 'paper/results/data')
 PANEL_PARQUET = os.path.join(DATA_OUT, 'panel.parquet')
 STOCKS_PARQUET = os.path.join(DATA_OUT, 'stocks.parquet')
 XSEC_DIR = os.path.join(RESULTS, 'xsec')
@@ -23,7 +26,7 @@ RETURNS_CSV = os.path.join(RESULTS, 'walk_returns.csv')
 
 PANEL_START = '1990-12-01'
 EVAL_YEARS = list(range(2011, 2026))        # 2025 partial (formation Jan-Nov)
-UNIVERSE_N = 1000
+UNIVERSE_N = int(os.environ.get('PAPER_UNIVERSE_N', '1000'))
 UNIVERSE_N_ROBUST = 500
 PRICE_MIN = 1.0
 DECILE_FRAC = 0.10
