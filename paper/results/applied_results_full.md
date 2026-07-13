@@ -63,6 +63,7 @@ dd_only (pi rule_r)    0.78  0.21
   no_signal (no-pi)    0.71  0.12                                                                                                                                                                 
            four_raw    0.72  0.12                 0.26                                                                                                                      5-seed ablation budget
                 ghm    0.81  0.27                 None                                                                                                                      5-seed ablation budget
+         ghm_20seed    0.71  0.10                                                                                                                                           5-seed ablation budget
                fund    0.69 -0.13                 None                                                                                 5-seed ablation budget; 2011-2024, fundamentals absent 2025
           reln_only     NaN   NaN                 0.75 DEGENERATE in applied window: REL_N-only HMM pi==1.0 for all months post-2000 (shrinking universe); feature is constant => equals no_signal
 
