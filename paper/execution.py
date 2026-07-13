@@ -57,8 +57,8 @@ def _target_weights(g, members, cap=None):
     return dict(zip(sorted(members), w))
 
 
-def _members(g, score_col, policy, prev, pi_t, pi_prev):
-    """Target membership per policy. g indexed rows of month t."""
+def _members(g, score_col, policy, prev, pi_t, pi_prev, mi=0):
+    """Target membership per policy. g indexed rows of month t; mi = month index."""
     n = len(g)
     k = max(int(n * C.DECILE_FRAC), 1)
     ranked = g.sort_values([score_col, 'permno'],
@@ -95,6 +95,39 @@ def _members(g, score_col, policy, prev, pi_t, pi_prev):
         keep = {p for p in prev if p in univ}
         fill = [p for p in ranked if p not in keep][:max(k - len(keep), 0)]
         return keep | set(fill)
+    if name == 'freq':
+        # unconditional reduced-frequency rebalance every `arg` months
+        if mi % arg == 0 or not prev:
+            return set(ranked[:k])
+        keep = {p for p in prev if p in univ}
+        fill = [p for p in ranked if p not in keep][:max(k - len(keep), 0)]
+        return keep | set(fill)
+    if name == 'regime_patient':
+        # THE PRODUCT: benchmark (or wide-band tilt) in calm; one decisive
+        # reorganization into the model basket when pi crosses enter;
+        # no-sell freeze inside panic; one reorganization home when pi
+        # falls below exit (hysteresis).
+        enter, exit_, calm_mode = arg['enter'], arg['exit'], arg['calm']
+        in_panic = arg['state']
+        if in_panic['on']:
+            if pi_t < exit_:
+                in_panic['on'] = False          # reorganize home
+            else:                               # freeze (forced exits only)
+                keep = {p for p in prev if p in univ}
+                fill = [p for p in ranked
+                        if p not in keep][:max(k - len(keep), 0)]
+                return keep | set(fill)
+        else:
+            if pi_t >= enter:
+                in_panic['on'] = True           # reorganize into the basket
+                return set(ranked[:k])
+        if calm_mode == 'bench':
+            return univ
+        # calm momentum tilt with wide band (40%)
+        keepable = {p for p in prev if p in univ and rank_pct[p] <= 0.40}
+        fill = [p for p in ranked
+                if p not in keepable][:max(k - len(keepable), 0)]
+        return keepable | set(fill)
     raise ValueError(name)
 
 
@@ -102,7 +135,7 @@ def simulate(x, policy, score_col='score_pi', cap=None):
     """Returns (monthly df, ledger df). policy = (name, arg)."""
     rows, ledger = [], []
     hold, prev_ret, pi_prev = {}, {}, None
-    for t, g in x.groupby('date', sort=True):
+    for mi, (t, g) in enumerate(x.groupby('date', sort=True)):
         pi_t = float(g['pi'].iloc[0])
         univ = set(g['permno'])
         med_mom = float(g[g['permno'].isin(hold)]['mom_12'].median()) \
@@ -112,7 +145,7 @@ def simulate(x, policy, score_col='score_pi', cap=None):
         tot = sum(drift.values()) or 1.0
         drift = {p: w / tot for p, w in drift.items()}
 
-        members = _members(g, score_col, policy, set(hold), pi_t, pi_prev)
+        members = _members(g, score_col, policy, set(hold), pi_t, pi_prev, mi)
         tgt = _target_weights(g, members, cap)
 
         traded = 0.0
@@ -267,5 +300,134 @@ def main():
     print('\nSaved ->', S5)
 
 
+def simulate_blend(x, mode, base_w, rf=None, pi_map=None, lam_map=None):
+    """Holdings-level blend comparators (tier 3).
+    base_w: dict date -> {permno: weight} of the risky book (capped).
+    pi_scale: w = pi*book + (1-pi)*benchmark. bsc: w = lam*book + (1-lam)*cash(RF).
+    Same drift-adjusted accounting; traded volume counts stock legs."""
+    rows = []
+    hold, cash, prev_ret, prev_rf = {}, 0.0, {}, 0.0
+    for t, g in x.groupby('date', sort=True):
+        ret_map = g.set_index('permno')['ret_fwd']
+        drift = {p: w * (1 + prev_ret.get(p, 0.0)) for p, w in hold.items()}
+        dc = cash * (1 + prev_rf)
+        tot = (sum(drift.values()) + dc) or 1.0
+        drift = {p: w / tot for p, w in drift.items()}
+        dc /= tot
+        book = base_w[t]
+        if mode == 'pi_scale':
+            pi_t = float(pi_map[t])
+            bench_w = _target_weights(g, set(g['permno']), None)
+            tgt = {p: pi_t * book.get(p, 0.0) + (1 - pi_t) * bench_w.get(p, 0.0)
+                   for p in set(book) | set(bench_w)}
+            tgt_cash = 0.0
+        else:                                   # bsc
+            lam = float(lam_map[t])
+            tgt = {p: lam * w for p, w in book.items()}
+            tgt_cash = 1 - lam
+        traded = float(sum(abs(tgt.get(p, 0.0) - drift.get(p, 0.0))
+                           for p in set(tgt) | set(drift)))
+        rf_t = float(rf[t]) if rf is not None else 0.0
+        gross = float(sum(w * ret_map.get(p, 0.0) for p, w in tgt.items())
+                      + tgt_cash * rf_t)
+        rows.append({'date': t, 'gross': gross, 'turnover': traded / 2,
+                     'traded': traded, 'pi': float(g['pi'].iloc[0])})
+        hold, cash = tgt, tgt_cash
+        prev_ret = {p: float(ret_map.get(p, 0.0)) for p in tgt}
+        prev_rf = rf_t
+    return pd.DataFrame(rows).set_index('date')
+
+
+def product_main():
+    """Regime-Patient Momentum vs the three comparator tiers (flat engine).
+    All runs 5%-capped (the product recipe); registered comparator grid."""
+    os.makedirs(S5, exist_ok=True)
+    x = load_xsec()
+    br = pd.read_csv(C.RETURNS_CSV, parse_dates=['date'])
+    bench = br[br.rule == 'rule_r'].set_index('date')['bench_ret']
+    walk = br[br.rule == 'rule_r'].set_index('date')['strat_ret']
+    mon_g, _ = simulate(x, ('monthly', None))
+    assert (mon_g['gross'] - walk.reindex(mon_g.index)).abs().max() < 1e-10
+    bench_sim, _ = simulate(x, ('benchmark', None))
+    nb_to = bench_sim['turnover']
+
+    ff = pd.read_parquet('data/ff_factors.parquet')['RF']
+    ff.index = ff.index + pd.offsets.MonthEnd(0)
+    months = sorted(x['date'].unique())
+    rf = {t: float(ff.reindex([pd.Timestamp(t) + pd.offsets.MonthEnd(1)]
+                              ).iloc[0] or 0.0) for t in months}
+
+    runs = {}
+    def patient(exit_, calm):
+        return ('regime_patient', {'enter': 0.5, 'exit': exit_,
+                                   'calm': calm, 'state': {'on': False}})
+    for ex in (0.4, 0.3):
+        for calm in ('bench', 'tilt'):
+            key = f'PRODUCT_patient(x{ex},{calm})'
+            runs[key], _ = simulate(x, patient(ex, calm), cap=0.05)
+    for key, pol, sc in [('mom_monthly', ('monthly', None), 'mom_12')] + \
+            [(f'mom_band{b}', ('band', b), 'mom_12') for b in (20, 30, 40)] + \
+            [(f'mom_freq{k}', ('freq', k), 'mom_12') for k in (3, 6, 12)]:
+        runs[key], _ = simulate(x, pol, score_col=sc, cap=0.05)
+    runs['pi_monthly_capped'], _ = simulate(x, ('monthly', None), cap=0.05)
+
+    # tier 3 blends
+    pi_map = x.groupby('date')['pi'].first()
+    base_pi = {}
+    for t, g in x.groupby('date', sort=True):
+        k = max(int(len(g) * C.DECILE_FRAC), 1)
+        top = g.sort_values(['score_pi', 'permno'],
+                            ascending=[False, True]).head(k)
+        base_pi[t] = _target_weights(g, set(top['permno']), 0.05)
+    base_mom = {}
+    for t, g in x.groupby('date', sort=True):
+        k = max(int(len(g) * C.DECILE_FRAC), 1)
+        top = g.sort_values(['mom_12', 'permno'],
+                            ascending=[False, True]).head(k)
+        base_mom[t] = _target_weights(g, set(top['permno']), 0.05)
+    runs['ALT_pi_scale'] = simulate_blend(x, 'pi_scale', base_pi,
+                                          rf=rf, pi_map=pi_map)
+    mom_series = runs['mom_monthly']['gross']
+    sig = mom_series.expanding(12).std().shift(1) * np.sqrt(12)
+    lam = (0.15 / sig).clip(upper=1.0).fillna(1.0)
+    runs['ALT_bsc_mom'] = simulate_blend(x, 'bsc', base_mom, rf=rf,
+                                         lam_map=lam.to_dict())
+
+    rows, net10 = [], {}
+    for key, r in runs.items():
+        act_g = r['gross'] - bench.reindex(r.index)
+        row = {'strategy': key, 'to_mo': r['turnover'].mean(),
+               'gross_ir': M.ir(r['gross'], bench)}
+        for c in (5, 10, 20):
+            net = r['gross'] - r['traded'] * c / 1e4
+            net_b = bench - nb_to.reindex(bench.index) * 2 * c / 1e4
+            row[f'net_ir_{c}bp'] = M.ir(net, net_b)
+            if c == 10:
+                net10[key] = M.active(net, net_b)
+        vol = r['traded'].mean() - 2 * nb_to.mean()
+        row['breakeven_bp'] = act_g.mean() / vol * 1e4 if vol > 0 else np.inf
+        rows.append(row)
+    tab = pd.DataFrame(rows)
+    best_t2 = tab[tab.strategy.str.startswith('mom_')] \
+        .set_index('strategy')['net_ir_10bp'].idxmax()
+    cis = []
+    for key in tab['strategy']:
+        lo, hi = paired_block_bootstrap(net10[key], net10[best_t2])
+        cis.append(f'[{lo * 12:+.3f},{hi * 12:+.3f}]')
+    tab[f'd_vs_{best_t2}_CI'] = cis
+    tab['bench_ir_ref'] = 0.0
+    tab = tab.round(3)
+    tab.to_csv(os.path.join(S5, 'product_comparison.csv'), index=False)
+    print(f'(paired CIs vs best tier-2 at 10bp = {best_t2})')
+    print(tab.to_string(index=False))
+    print('\nSaved ->', os.path.join(S5, 'product_comparison.csv'))
+
+
 if __name__ == '__main__':
-    main()
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--product', action='store_true')
+    if ap.parse_args().product:
+        product_main()
+    else:
+        main()
