@@ -97,7 +97,21 @@ Two thesis-cited z-score CSVs stayed pre-Shumway because their generators weren'
 - Never rerun a thesis-published number without the original seed unless the
   rerun *is* the experiment.
 
+## Applied paper study (paper/)
+- The applied study (expanding window, long-only, top-1000) is a SEPARATE
+  deliverable. Its code lives in `paper/`, its results in `paper/results/`,
+  on branch `paper/applied-study`.
+- The practitioner paper will be a NEW manuscript (location:
+  `paper/manuscript/`, to be created when writing starts). The thesis
+  (`main.tex`, `latex/`) is INSPIRATION ONLY for it — never edit thesis
+  files to produce the paper, never reuse thesis numbers where the applied
+  config has its own.
+- Nothing under `scripts/`, `results/`, `tables/`, `latex/`, `data/` may be
+  modified by applied-study work (verified clean as of 2026-07-13).
+
 ## Data integrity
+- Ask Gilad before any attempt to access WRDS (wrds package connections, WRDS
+  credentials, or the web portal). Never initiate a WRDS session unprompted.
 - Features at time *t* use only information available at *t* (or earlier, if
   there's a publication lag).
 - Train/test splits are time-ordered, never random.
