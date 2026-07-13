@@ -1,5 +1,23 @@
 # Potential additions to the paper (running register — notes, not prose)
 
+## 0. THE MESSAGE (Gilad's framing directive, 2026-07-13)
+The paper's product is not the model — it is a WHEN-NOT-TO-TRADE rule:
+"In market condition X (regime probability elevated: deep drawdown with
+recovery dynamics), a stock with profile Y (large-cap holding that has
+fallen hard, e.g. Nvidia/Meta/Netflix 2022) does NOT have to be sold —
+although most systematic frameworks would sell it." The model is the
+detector/evidence machinery; the rule is the deliverable. Evidence: no-sell
+beats forced selling (IR 0.28 vs 0.19); counterfactual sells are a wash;
+non-trading costs nothing gross and saves the round-trip at the market's
+worst prices. Contrary-philosophy table: momentum exits (rank collapse),
+trend/CTA (price below MA), vol-targeting & risk parity (sigma spike),
+stop-loss/VaR limits (drawdown), window dressing (reporting), tax-loss
+harvesting (year-end in panic). Aligned: value/contrarian, fixed-weight
+rebalancers. Caveats that must travel: rule is portfolio-level and
+regime-conditional (in calm, selling losers is right — that's momentum);
+"don't sell" is supported, "buy the deepest losers" is not (entry-bucket
+table).
+
 Each entry: claim candidate, backing table, and the honesty caveat that must
 travel with it. Prose starts only after Gilad's numbers review.
 
