@@ -18,7 +18,7 @@ after the main run finishes (Gilad's call).
 | 3 | Yearly combo rule | Plain argmax (highest mean per-fold validation metric); RULE R (1-SE parsimony) computed alongside as a comparison row |
 | 4 | Selection CV objective | Re-run fold grid in the applied setting: long-only top-decile IR vs the VW top-1000 benchmark |
 | 5 | TC / execution channel | Built AFTER the main run as pure post-processing; the run must persist full monthly cross-sections to make that possible |
-| 6 | Data | WRDS refresh through mid-2026 FIRST (Gilad runs/authorizes the pull); refreshed data is the PRIMARY dataset, not a bonus |
+| 6 | Data | WRDS refresh through mid-2026 FIRST (Gilad runs/authorizes the pull); refreshed data is the PRIMARY dataset, not a bonus. RESOLVED 2026-07-13: subscription is the CRSP ANNUAL cut (max 2025-12-31; crspm/crspq monthly/quarterly schemas exist but are permission-denied) — the ext2025 pull already contains everything accessible, so the study runs on the maximal dataset. Re-check after CRSP's next annual cut or if crspm/crspq access is added |
 | 7 | Code home | New self-contained `paper/` package in this repo; thesis pipeline untouched |
 | 8 | Mandate | Fully invested, always; no π-scaled cash overlay (benchmark-relative claim, not market timing) |
 | 9 | Architecture | Port validated machinery into `paper/` with bit-reproduction gates (not importlib-wrapping, not an unanchored rewrite) |
