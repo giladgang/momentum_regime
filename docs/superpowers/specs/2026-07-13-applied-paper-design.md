@@ -94,6 +94,9 @@ Comparator set on the same universe/weighting: (i) VW top-1000 benchmark,
 costs enter in S5 per executed turnover under each policy.
 
 **S5 — TC / execution analysis (post-run; detailed design deferred).**
+REGISTERED 2026-07-13 before any net result was read: policy ladder, band
+grid, accounting semantics and cost engines are fixed in
+docs/superpowers/plans/2026-07-13-s5-execution.md; full grid reported.
 From saved cross-sections only, no refits: one-way turnover accounting,
 cost grid (5/10/20 bps) + breakeven bps, capacity table (days-to-trade for
 a $1B book at 10% ADV participation), then the execution-policy frontier —
