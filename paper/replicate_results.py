@@ -230,9 +230,11 @@ def stage_assemble():
         p = os.path.join(ABL_DIR, f)
         if os.path.exists(p):
             d = pd.read_csv(p, parse_dates=['date']).set_index('date')
-            abl_row(name, d['strat_ret'], d['bench_ret'],
-                    note='5-seed ablation budget'
-                    + ('; 2011-2024, fundamentals absent 2025' if name == 'fund' else ''))
+            note = ('FULL 20-seed budget (fair comparison)'
+                    if name == 'ghm_20seed' else '5-seed ablation budget')
+            if name == 'fund':
+                note += '; 2011-2024, fundamentals absent 2025'
+            abl_row(name, d['strat_ret'], d['bench_ret'], note=note)
     rows.append({'variant': 'reln_only', 'sharpe': np.nan, 'ir': np.nan,
                  'thesis_LS_sharpe_ref': refs['reln_only'],
                  'note': 'DEGENERATE in applied window: REL_N-only HMM pi==1.0 '
