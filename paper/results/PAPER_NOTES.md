@@ -118,6 +118,41 @@ applied_results_full.md.
   panic band 15 (tight re-rank), not 10 (full liquidation) — panic alpha
   needs re-ranking but tolerates a small hold buffer.
 
+### 8b. Robustness battery + novelty check (2026-07-14, same session)
+- Direction robust, no winner's curse: pre-registered corner (40,15) vs
+  mirror (15,40) CI [+0.001,+0.041] excludes zero @10bp; tight-panic wins
+  10/10 mirror pairs (sign p=.001) at EVERY cost level 0-50bp; best cell is
+  (40,15) at every cost level; gap vs best fixed band stable +0.08..0.10.
+- pi threshold 0.4/0.5/0.6: net IR 0.384/0.389/0.385 — insensitive.
+- Honest weak points: split-half — ALL policies have negative net active
+  2011-2017 (few panics), everything earned 2018-2025; within H1 conditional
+  slightly trails fixed wide band. Absolute net active (40,15) vs index
+  t=1.40 (NOT significant — the policy claim is significant, vs monthly
+  t=2.99; the market-beating claim is not, as with the factor alphas).
+  At measured large-cap costs (~1-3bp) the paired mirror CI is marginal;
+  the 10/10 sign test is the cost-free evidence.
+- NOVELTY (11-agent lit sweep, 5 angles, adversarial verify vs abstracts/
+  full text): 0/6 high-overlap threats. Nobody has published regime-
+  conditional banding (state-dependent buy/hold rank spread) implemented
+  empirically on a stock-selection book. Closest families, all must-cite:
+  * Static banding empirics: NMV RFS 2016 (full-text: fixed thresholds, no
+    "regime/state-dependent" anywhere), NMV FAJ 2019, DNMV JF 2023.
+  * Azevedo/Hoegner/Velikov SSRN 2024: static cost-mitigation on ML
+    strategies FAILS to improve net returns — perfect foil: conditioning
+    the band on regime is what makes mitigation work on an ML book.
+  * Theory anticipates state-dependent no-trade bands but never implements:
+    Jang/Koo/Liu/Loewenstein JF 2007 (regime-dependent no-trade boundaries,
+    one-asset model), Lynch/Tan JF 2011 (calibration), Garleanu/Pedersen
+    JF 2013 (unconditional trading speed).
+  * Collin-Dufresne/Daniel/Saglam JFE 2020: closest empirical — regime-
+    dependent trading SPEED, quadratic costs, market-timing exposure; not
+    banding, not cross-sectional selection.
+  * Regime-allocation line (Nystrup et al QF 2018; Shu/Yu/Mulvey JAM 2024):
+    HMM regimes drive asset-class exposure, costs a by-product.
+- Contribution sentence candidate: "theoretically anticipated (JKLL 2007;
+  Lynch-Tan 2011) but never implemented: we make the NMV buy/hold spread
+  state-dependent and show the band belongs to the regime."
+
 ## 6. Statistical honesty lines to keep
 - pi-band vs best unconditional band: consistent frontier leadership,
   paired CI includes zero ([-0.024,+0.060] spreads engine) — claim
