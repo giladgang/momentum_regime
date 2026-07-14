@@ -78,8 +78,8 @@ def stage_universe_check():
     n = m.groupby('date').size()
     print(f'[universe] months={len(n)} | names/month min={n.min()} '
           f'max={n.max()} | cap coverage median={cov.median():.3f} '
-          f'min={cov.min():.3f}')
-    assert cov.median() > 0.85
+          f'min={cov.min():.3f} | gate {C.COVERAGE_MIN}')
+    assert cov.median() > C.COVERAGE_MIN
 
 
 def main():

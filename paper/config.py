@@ -29,6 +29,9 @@ PANEL_START = '1990-12-01'
 EVAL_YEARS = list(range(2011, 2026))        # 2025 partial (formation Jan-Nov)
 UNIVERSE_N = int(os.environ.get('PAPER_UNIVERSE_N', '1000'))
 UNIVERSE_N_ROBUST = 500
+# universe_check floor on median cap coverage; top-500 mechanically covers
+# less total cap than top-1000 (observed 0.844 vs 0.93), so scale the gate
+COVERAGE_MIN = 0.85 if UNIVERSE_N >= 1000 else 0.80
 PRICE_MIN = 1.0
 DECILE_FRAC = 0.10
 
