@@ -102,6 +102,14 @@ def _members(g, score_col, policy, prev, pi_t, pi_prev, mi=0):
         keep = {p for p in prev if p in univ}
         fill = [p for p in ranked if p not in keep][:max(k - len(keep), 0)]
         return keep | set(fill)
+    if name == 'nmv_band':
+        # S6: literature banding (NMV 2016 / DNMV 2023 fn.11) — enter at the
+        # decile, HOLD until rank falls out of E; count floats (no fill-to-k).
+        # arg = (E_calm, E_panic) in percent; E switches on pi at formation.
+        ec, ep = arg
+        e = (ep if pi_t >= 0.5 else ec) / 100.0
+        keep = {p for p in prev if p in univ and rank_pct[p] <= e}
+        return set(ranked[:k]) | keep
     if name == 'regime_patient':
         # THE PRODUCT: benchmark (or wide-band tilt) in calm; one decisive
         # reorganization into the model basket when pi crosses enter;

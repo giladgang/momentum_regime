@@ -98,6 +98,26 @@ applied_results_full.md.
   vs economic restrictions) -> framing for the ML-in-a-long-only-restricted
   setting. Cite both when the draft is written.
 
+## 8. S6: regime-conditional NMV banding (2026-07-14, spec pre-registered)
+- Construction from the literature Marc sent (DNMV JF 2023 SecV / NMV RFS
+  2016): enter at the decile, hold until rank exits E, count floats.
+  Gate: (10,10) == walk bit-exact. Backing: s6_banding/{cells,grid_net_ir}.csv.
+- ANSWER to "does banding tighter in panic work": YES at the grid level.
+  Best cell (E_calm=40, E_panic=15): net IR@10bp 0.389 vs best fixed band
+  (40,40) 0.294 and monthly 0.060; breakeven 42bp vs ~1.4bp measured spreads.
+  All four registered expectations scored: E1 HIT (tighter-in-panic), E2 HIT
+  (+0.095 IR), E3 HIT (mechanism = calm turnover 48% vs 67%, panic active
+  unchanged +1.07 vs +1.04), E4 CI vs best diagonal [-0.001,+0.025] includes
+  zero -> claim "leads the frontier", NOT "dominates". vs monthly the CI
+  [+0.011,+0.053] excludes zero.
+- Also beats the S5 fill-to-k pi_band(30,15) (0.327@10bp): the literature
+  construction is the better implementation AND the better result.
+- Surprise worth prose: wide calm band raised calm active too (+0.23 vs
+  +0.14/mo) — letting winners run in calm, not just cost saving.
+- Caveats that travel: 5x5 grid chosen in-sample (179 mo); 54 panic months;
+  panic band 15 (tight re-rank), not 10 (full liquidation) — panic alpha
+  needs re-ranking but tolerates a small hold buffer.
+
 ## 6. Statistical honesty lines to keep
 - pi-band vs best unconditional band: consistent frontier leadership,
   paired CI includes zero ([-0.024,+0.060] spreads engine) — claim
