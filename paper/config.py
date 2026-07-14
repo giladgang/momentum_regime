@@ -17,6 +17,7 @@ STOCK_EXT = os.path.join(EXT_DIR, 'crsp_msf_ext.parquet')       # stocks, ..2025
 RESULTS = os.path.join(REPO, os.environ.get('PAPER_RESULTS_DIR',
                                             'paper/results'))
 DATA_OUT = os.path.join(REPO, 'paper/results/data')
+FF_LONG_LEGS = os.path.join(DATA_OUT, 'ff_long_legs.parquet')   # French long legs
 PANEL_PARQUET = os.path.join(DATA_OUT, 'panel.parquet')
 STOCKS_PARQUET = os.path.join(DATA_OUT, 'stocks.parquet')
 XSEC_DIR = os.path.join(RESULTS, 'xsec')

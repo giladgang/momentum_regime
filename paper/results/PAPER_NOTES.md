@@ -71,6 +71,33 @@ travel with it. Prose starts only after Gilad's numbers review.
   s5/half_spreads.parquet.
 - Caveat: closing-quote spreads are a lower bound in fast markets.
 
+## 7. Factor-alpha answer to Marc (2026-07-14 email) -- MUST be in the reply
+Marc asked: does the 15.6-vs-14.1 gap survive market + FF5/6 given beta>1, and
+do we benchmark the LONG-ONLY side of the factors? Both now built in
+compare_thesis.py (Panels B2 regime-conditional, B3 long-only legs) ->
+applied_results_full.md.
+- UNCONDITIONAL: no significant alpha. pi_rule_r FF5 +1.8% (t=0.39),
+  FF6 +1.6% (t=0.34). The gap is beta (~1.28) + factor tilts. Own this.
+- PANIC-conditional (the edge in the months it occurs): economically large,
+  statistically underpowered. pi_rule_r FF6 panic alpha +16.0% (t=1.15) on
+  n=53; calm -3.0% (t=-0.63). Do NOT claim "significant risk-adjusted alpha".
+- The BENCHMARK itself has panic alpha (top-1000 VW: FF6 +7.6% t=1.30, FF3
+  +9.9% t=2.08**) -- panic months carry recovery alpha the static factors do
+  not span; the strategy AMPLIFIES it (16 vs 7.6) but does not cleanly
+  separate at this n. Frame the edge as active-return/IR + cost + regime
+  concentration, not factor alpha.
+- LONG-ONLY LEGS (Marc's 2nd Q): built from French 2x3 sorts
+  (paper/fetch_long_legs.py -> paper/results/data/ff_long_legs.parquet).
+  pi_rule_r FF6-LO alpha +0.8% (t=0.17) -- SMALLER than the L/S-factor +1.6%.
+  Marc's instinct holds: the correct long-only benchmark weakens the null
+  further, because the winner long leg (15.4%/yr momentum) absorbs more of the
+  book than self-financing UMD did. Concede cleanly; it strengthens the
+  "no unconditional alpha, the value is WHEN you trade" message.
+- References Marc sent: Detzel/Novy-Marx/Velikov 2023 (JF, model comparison
+  with tx costs) -> S5 cost section; Avramov/Cheng/Metzker 2023 (Mgmt Sci, ML
+  vs economic restrictions) -> framing for the ML-in-a-long-only-restricted
+  setting. Cite both when the draft is written.
+
 ## 6. Statistical honesty lines to keep
 - pi-band vs best unconditional band: consistent frontier leadership,
   paired CI includes zero ([-0.024,+0.060] spreads engine) — claim
