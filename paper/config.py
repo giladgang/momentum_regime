@@ -60,3 +60,6 @@ ANNUAL_FOLDS = [(100 + k, f'{2010 + k}-01-01', f'{2011 + k}-01-01')
 # 2026) only feeds the live-2026 appendix selection, never EVAL_YEARS <= 2025
 VAL_END = {**{1: 1999, 2: 2001, 3: 2003, 4: 2005, 5: 2007, 6: 2009, 7: 2011},
            **{100 + k: 2011 + k for k in range(1, 16)}}
+
+# ── banding study (spec 2026-07-15) ──
+BANDING_DIR = os.path.join(RESULTS, 'banding_study')
