@@ -69,3 +69,7 @@ FF_DAILY = os.path.join(DATA_OUT, 'ff_daily.parquet')
 IVOL_MONTHLY = os.path.join(DATA_OUT, 'ivol_monthly.parquet')
 STUDY_START = '1992-01-01'          # momentum needs 12m of 1991 history
 SPLIT_DATE = '2011-01-01'           # in/out split for the selection honesty check
+E_GRID = [10, 15, 20, 30, 40]                    # S6 continuity
+STRESS_MULT = [3, 5]                             # panic-spread stress multiples
+BS_STRATEGIES = ['momentum', 'reversal', 'lowvol', 'xgb', 'value',
+                 'profitability', 'investment']
