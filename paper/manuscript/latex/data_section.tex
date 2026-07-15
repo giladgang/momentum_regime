@@ -7,11 +7,9 @@
 
 This chapter describes the stock-level sample and chooses the input for the regime classifier. The production HMM observes a single series: the market drawdown. Section~\ref{sec:feature_selection} develops the case for conditioning on drawdown alone, grounded in the momentum-crash literature and confirmed by a selection rule restricted to training information; Section~\ref{sec:hmm_features} defines the feature and explains what the HMM adds on top of it.
 
-% TODO(applied): this sample paragraph still describes the thesis configuration (full
-% CRSP universe, fixed 1990--2010 / 2011--2024 split, 167 test months). The applied
-% paper config is point-in-time top-1000, expanding-window walk, 2011-01..2025-11.
-% To be updated in a later pass after Gilad reviews.
-The stock-level sample spans January 1990 to November 2024 and includes all ordinary common shares listed on the NYSE, AMEX, or NASDAQ with a price above \$1.\footnote{The \$1 floor follows \citet{Gu2020}; value-weighting limits small-stock influence on the realized portfolio.} Following \citet{Shumway1997}, delisting returns are incorporated to prevent survivorship bias: actual delisting returns are used when available, and $-30\%$ is imputed for performance-related delistings with missing returns.\footnote{Full data sources and detailed variable definitions are provided in Appendix~\ref{app:data_summary}.} The sample is split into a training period (1990--2010) used to estimate all models and a test period (2011--2024, 167 months) used exclusively for out-of-sample evaluation. No model parameters are re-estimated during the test period. Table~\ref{tab:sample_summary} provides an overview.
+The stock-level sample comprises all ordinary common shares listed on the NYSE, AMEX, or NASDAQ with a price above \$1, from which a point-in-time universe of the 1{,}000 largest by month-end market capitalization is formed anew each month (a Russell 1000 proxy).\footnote{The \$1 floor follows \citet{Gu2020}; value-weighting within the top-1000 keeps the realized portfolio in liquid, large-capitalization names.} Following \citet{Shumway1997}, delisting returns are incorporated to prevent survivorship bias: actual delisting returns are used when available, and $-30\%$ is imputed for performance-related delistings with missing returns.\footnote{Full data sources and detailed variable definitions are provided in Appendix~\ref{app:data_summary}.} Both the regime model and the cross-sectional model are estimated on an expanding window: for each trading year they use only data through the prior December, and the out-of-sample walk runs from January 2011 to November 2025 (179 months). Table~\ref{tab:sample_summary} provides an overview.%
+% TODO(applied): table_sample_summary is still the thesis table (full-universe counts, 1990--2024);
+% it needs an applied regeneration for the point-in-time top-1000 universe.
 
 \input{tables/table_sample_summary}
 
@@ -67,7 +65,7 @@ The regime signal separates the states on drawdown exactly as intended. Across t
 
 \subsection{Cross-Sectional Features}\label{sec:cs_features}
 
-The cross-sectional models rank stocks each month using twelve trailing momentum signals together with the filtered panic probability $\pi_t^{\text{filter}}$. The latter varies only at the monthly market level (every stock in the same month receives the same value), so it functions as a conditioning variable rather than a stock-level predictor.
+The cross-sectional model ranks stocks each month using twelve trailing momentum signals together with the filtered panic probability $\pi_t^{\text{filter}}$. The latter varies only at the monthly market level (every stock in the same month receives the same value), so it functions as a conditioning variable rather than a stock-level predictor.
 
 Twelve trailing momentum signals are computed for each stock, corresponding to lookback horizons of 1 to 12 months:
 \begin{equation}
@@ -80,6 +78,6 @@ where $r_{t-\ell}^s$ is the adjusted return of stock $s$ in month $t - \ell$. Th
 % TODO(applied): international replication is out of scope for the applied paper
 % (design spec 2026-07-13). This subsection still describes the thesis analysis
 % (four-pass per-region selection); drop or rewrite in a later pass.
-For the robustness check in Section~\ref{sec:international}, the same pipeline is applied to UK and Japanese equities from Compustat Global over the same 1990--2024 window. The HMM feature set is re-selected per region using the four-pass procedure described in Section~\ref{sec:feature_selection}, run separately on each market's data, with the candidate pool adapted to use locally available stress indicators. Both regions select \emph{DD+VOL+REL\_N}. Long and short legs are formed from unconditional decile breakpoints across all listed stocks, since no NYSE-equivalent tier exists for either market. Per-region selection details and stability checks are in Appendix~\ref{app:intl_feature_selection}.
+For the robustness check in Section~\ref{sec:international}, the same pipeline is applied to UK and Japanese equities from Compustat Global over the same 1990--2024 window. The HMM feature set is re-selected per region on each market's data (Appendix~\ref{app:intl_feature_selection}), with the candidate pool adapted to use locally available stress indicators. Both regions select \emph{DD+VOL+REL\_N}. Long and short legs are formed from unconditional decile breakpoints across all listed stocks, since no NYSE-equivalent tier exists for either market. Per-region selection details and stability checks are in Appendix~\ref{app:intl_feature_selection}.
 
-With the regime signal and the cross-sectional features in place, the next chapter evaluates the three portfolio-construction methods out-of-sample and decomposes the XGBoost model's monthly selections.
+With the regime signal and the cross-sectional features in place, the next chapter evaluates the regime-conditioned portfolio out-of-sample and decomposes the model's monthly selections.

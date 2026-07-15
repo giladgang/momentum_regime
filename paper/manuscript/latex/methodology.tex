@@ -199,13 +199,13 @@ With all three blocks updated, the sampler returns to Step~1. After sufficient i
 
 \subsubsection{Implementation and Seed Averaging}\label{sec:implementation}
 
-The Gibbs sampler is estimated on the training sample only. To reduce sensitivity to MCMC initialization, the full sampler is run independently with $N_s = 200$ different random seeds. Each chain is run for $M=2{,}000$ iterations with the initialization described above. The first $B=500$ iterations are discarded as burn-in, leaving $1{,}500$ posterior draws per seed.
+The Gibbs sampler is re-estimated on the expanding training window each year (Section~\ref{sec:hmm_output}). To reduce sensitivity to MCMC initialization, the full sampler is run independently with $N_s = 50$ different random seeds. Each chain is run for $M=2{,}000$ iterations with the initialization described above. The first $B=500$ iterations are discarded as burn-in, leaving $1{,}500$ posterior draws per seed.
 
 For each seed, posterior mean parameters $\bar{\boldsymbol{\mu}}_k$, $\bar{\boldsymbol{\Sigma}}_k$, and $\bar{\mathbf{P}}$ are computed by averaging over the post-burn-in draws. The forward filter is then applied to the full sample using these parameters to obtain a seed-specific filtered probability $\pi_{t,s}^{\text{filter}}$. The final trading signal is the average across seeds:
 \begin{equation}
 \pi_t^{\text{filter}} = \frac{1}{N_s} \sum_{s=1}^{N_s} \pi_{t,s}^{\text{filter}}.
 \end{equation}
-Averaging across MCMC chains is a methodological requirement, not a performance optimization. A single Gibbs chain produces a noisy regime signal whose downstream Sharpe varies meaningfully across random initializations; averaging across chains reduces this noise, and the variance shrinks as more chains are added. At 200 chains the Sharpe has effectively stabilized; adding more chains changes it negligibly (Appendix~\ref{app:seed_convergence}). All out-of-sample numbers reported below are computed from this 200-chain ensemble, not from a single chain.
+Averaging across MCMC chains is a methodological requirement, not a performance optimization. A single Gibbs chain produces a noisy regime signal whose downstream Sharpe varies meaningfully across random initializations; averaging across chains reduces this noise, and the variance shrinks as more chains are added. By 50 chains the downstream Sharpe has effectively stabilized, with the plateau setting in well below that count (Appendix~\ref{app:seed_convergence}). All out-of-sample numbers reported below are computed from this 50-chain ensemble, not from a single chain.
 
 \subsubsection{Regime Identification and Trading Signal}\label{sec:regime_signal}
 
@@ -223,59 +223,25 @@ Using the posterior mean parameters $\bar{\boldsymbol{\mu}}_k$, $\bar{\boldsymbo
 =
 P(s_t=\text{panic} \mid \mathbf{z}_{1:t};\,\bar{\boldsymbol{\mu}},\bar{\boldsymbol{\Sigma}},\bar{\mathbf{P}}).
 \end{equation}
-A value near $0$ indicates high confidence in calm, near $1$ indicates panic, and intermediate values reflect genuine ambiguity. This filtered probability serves as the regime signal passed to the portfolio construction methods in Section~\ref{sec:methods}.
+A value near $0$ indicates high confidence in calm, near $1$ indicates panic, and intermediate values reflect genuine ambiguity. This filtered probability serves as the regime signal passed to the cross-sectional model in Section~\ref{sec:methods}.
 
 \subsection{Stage 2: Regime-Conditioned Portfolio Construction}\label{sec:stage2}
 
-The filtered regime probability $\pi_t^{\text{filter}}$ from Stage~1 provides a monthly measure of market stress, but on its own it does not select stocks. This stage translates the regime signal into cross-sectional portfolios. The main cross-sectional model is an XGBoost gradient-boosted tree regressor (XGB), benchmarked against two simpler same-input alternatives: a deterministic regime-adaptive momentum formula (DET) and a logistic regression classifier (LR). Each method combines $\pi_t^{\text{filter}}$ with momentum signals at multiple horizons to produce a monthly score for every stock, which is then used to rank stocks into a long-short portfolio: the top decile (using NYSE breakpoints) forms the long leg, the bottom decile forms the short leg, and both legs are value-weighted. The stock-level inputs (momentum horizons and the regime signal) are described in Section~\ref{sec:data}.
+The filtered regime probability $\pi_t^{\text{filter}}$ from Stage~1 provides a monthly measure of market stress, but on its own it does not select stocks. This stage translates the regime signal into a cross-sectional portfolio. The production model is an XGBoost gradient-boosted tree regressor (XGB) that combines $\pi_t^{\text{filter}}$ with momentum signals at twelve horizons to produce a monthly score for every stock. Each month, every stock in the point-in-time universe of the 1{,}000 largest by market capitalization is scored, and the top-scoring decile forms a long-only, value-weighted portfolio, held against the value-weighted top-1000 as the benchmark. The stock-level inputs (momentum horizons and the regime signal) are described in Section~\ref{sec:data}.
 
-One distinction from standard momentum strategies matters here. In the traditional approach \citep{JegadeeshTitman1993}, stocks are ranked by their raw trailing return at a fixed lookback, so the long leg always holds the highest-momentum stocks and the short leg the lowest. Here, stocks are ranked by their predicted forward return, a learned function of the regime signal and the full momentum term structure, so the long leg need not contain high-momentum stocks at all. In panic, it can hold stocks below the cross-sectional average at every horizon (Section~\ref{sec:heterogeneity_picks}). The deterministic formula (DET) serves as a transparent baseline. The two machine learning methods go further by jointly learning the regime-momentum interaction.
+One distinction from standard momentum strategies matters here. In the traditional approach \citep{JegadeeshTitman1993}, stocks are ranked by their raw trailing return at a fixed lookback, so the top decile always holds the highest-momentum stocks. Here, stocks are ranked by their predicted forward return, a learned function of the regime signal and the full momentum term structure, so the long portfolio need not contain high-momentum stocks at all. In panic, it can hold stocks below the cross-sectional average at every horizon (Section~\ref{sec:heterogeneity_picks}).
 
-We evaluate every method in long-short construction rather than long-only, for two reasons. First, the long-short portfolio is dollar-neutral by construction (\$1 long the top decile, \$1 short the bottom decile, both value-weighted), so the realized return reflects whether top-decile stocks outperform bottom-decile stocks rather than market direction. Second, long-short is the standard construction in the momentum literature \citep{JegadeeshTitman1993, DanielMoskowitz2016, BarrosoSantaClara2015}, which makes our Sharpe ratios and factor alphas directly comparable to existing results. The value-weighted market (long-only, $\beta = 1$) is reported alongside the long-short rows as a passive equity benchmark, but is not directly Sharpe-comparable with the long-short strategies, since it harvests the equity premium whereas the long-short rows earn their return from cross-sectional ranking.
+We evaluate the strategy in long-only construction, held against the value-weighted top-1000 benchmark, for two reasons. First, the deliverable is a large-cap, fully-invested mandate: the practitioner question is whether the regime signal improves an unlevered long book relative to the index it is measured against, not whether a dollar-neutral spread earns a premium. Second, restricting to the top-1000 and dropping the short leg removes the small-capitalization and short-side frictions that dominate long-short momentum results, isolating the regime-timing contribution on the tradable long side. Performance is therefore reported as active return, tracking error, and the information ratio against the benchmark rather than as a standalone Sharpe on a self-financing spread.
 
-\subsubsection{Cross-Sectional Stock Selection Methods}\label{sec:methods}
+\subsubsection{Cross-Sectional Stock Selection Model}\label{sec:methods}
 
-\paragraph{DET: Deterministic Regime-Adaptive Formula}\label{sec:method0}
-
-The simplest approach exploits the economic intuition that the optimal momentum lookback horizon varies with market conditions.\footnote{In the spirit of \citet{GHM2023}, simplified to a continuous panic probability and a single regime-dependent horizon.} The lookback horizon and stock score are:
-\begin{equation}
-    \ell_t = \text{round}\!\left(12 - 11 \cdot \pi_t^{\text{filter}}\right),
-\end{equation}
-\begin{equation}
-    \text{score}_{t}^{\,s} = \prod_{j=1}^{\ell_t}(1 + r_{t-j}^s) - 1.
-\end{equation}
-The first equation sets the lookback horizon as a function of the regime. The second compounds the past $\ell_t$ monthly returns into a stock score. Stocks are then ranked by this score. The top decile forms the long leg and the bottom decile the short leg, as described in Appendix~\ref{app:portfolio_construction}.
-
-At the calm extreme ($\pi_t^{\text{filter}} \approx 0$), $\ell_t = 12$: stocks are ranked by their 12-month cumulative return, with the top decile entering the long leg and the bottom the short. This recovers the 12-month cross-sectional momentum signal of \citet{JegadeeshTitman1993}. At the panic extreme ($\pi_t^{\text{filter}} \approx 1$), $\ell_t = 1$: the ranking shifts to the most recent monthly return, the horizon at which short-horizon cross-sectional return predictability is strongest \citep{Jegadeesh1990, Lehmann1990}. Between these extremes, the lookback smoothly interpolates.
-
-\paragraph{LR: Logistic Regression}\label{sec:method1}
-
-A logistic regression classifier is trained to predict whether a stock's forward return exceeds the cross-sectional median in each month. Classification is chosen over direct return regression because monthly stock returns are extremely noisy, and predicting the binary outcome ``above or below median'' is a more stable learning target that still produces a useful ranking of stocks. Continuous return regression remains the dominant target in the cross-sectional ML asset-pricing literature \citep{Gu2020}. Classification is used here as a deliberately simpler, lower-variance alternative for the linear baseline.\footnote{The logistic sigmoid function $\sigma(z) = 1/(1 + e^{-z})$ maps the linear combination $\boldsymbol{\beta}^\top \tilde{\mathbf{x}}$ from the real line to the interval $(0, 1)$, so the output can be interpreted as a probability.}
-\begin{equation}
-    P(y_t^s = 1 \mid \mathbf{x}_t^s) = \sigma(\boldsymbol{\beta}^\top \tilde{\mathbf{x}}_t^s),
-\end{equation}
-where $y_t^s = \mathds{1}(r_{t+1}^s > \text{median}_s\{r_{t+1}^s\})$ is a binary label indicating whether stock $s$ outperforms the cross-sectional median in the following month. The feature vector
-\[
-\tilde{\mathbf{x}}_t^s = (mom_{1,t}^s, \dots, mom_{12,t}^s, \pi_t^{\text{filter}})
-\]
-contains the 12 momentum lookbacks and the regime signal, standardized using training-set means and standard deviations. The model is estimated by maximizing the $\ell_2$-regularized log-likelihood:
-\begin{equation}
-    \hat{\boldsymbol{\beta}} = \arg\max_{\boldsymbol{\beta}} \left[\sum_{i} \Big(y_i \log \sigma(\boldsymbol{\beta}^\top \tilde{\mathbf{x}}_i) + (1 - y_i) \log(1 - \sigma(\boldsymbol{\beta}^\top \tilde{\mathbf{x}}_i))\Big) - \frac{1}{2C} \|\boldsymbol{\beta}\|_2^2\right],
-\end{equation}
-with regularization strength $C = 1.0$. The $\ell_2$ penalty shrinks coefficients toward zero to guard against overfitting given the large number of correlated momentum features. Once $\hat{\boldsymbol{\beta}}$ is estimated on the training sample, the stock score for any observation is obtained by plugging $\hat{\boldsymbol{\beta}}$ back into the prediction equation:
-\begin{equation}
-    score_t^s = \sigma(\hat{\boldsymbol{\beta}}^\top \tilde{\mathbf{x}}_t^s) = P(y_t^s = 1 \mid \mathbf{x}_t^s;\, \hat{\boldsymbol{\beta}}).
-\end{equation}
-
-\paragraph{XGB: XGBoost Regressor}\label{sec:method2}
-
-An XGBoost gradient-boosted tree regressor \citep{Chen2016} is trained to predict the forward monthly return directly. Unlike LR, which classifies stocks as above or below the median, XGBoost predicts the forward return directly. This preserves magnitude information. A stock expected to gain 10\% ranks higher than one expected to gain 2\%, a distinction that binary classification discards. The feature vector for each stock-month observation comprises the 13 features described in Section~\ref{sec:cs_features}: the 12 momentum lookbacks ($mom_1, \dots, mom_{12}$) and the regime signal ($\pi_t^{\text{filter}}$). By including all horizons jointly, XGBoost can learn how the full momentum term structure interacts with the regime signal, for example by conditioning its joint use of all 12 horizons on the level of $\pi_t^{\text{filter}}$ in ways that cannot be decomposed into per-horizon slope changes.
+An XGBoost gradient-boosted tree regressor \citep{Chen2016} is trained to predict the forward monthly return directly. Predicting the return rather than a binary above/below-median label preserves magnitude information: a stock expected to gain 10\% ranks higher than one expected to gain 2\%. The feature vector for each stock-month observation comprises the 13 features described in Section~\ref{sec:cs_features}: the 12 momentum lookbacks ($mom_1, \dots, mom_{12}$) and the regime signal ($\pi_t^{\text{filter}}$). By including all horizons jointly, XGBoost can learn how the full momentum term structure interacts with the regime signal, for example by conditioning its joint use of all 12 horizons on the level of $\pi_t^{\text{filter}}$ in ways that cannot be decomposed into per-horizon slope changes.
 
 XGBoost builds an additive ensemble of $M$ regression trees, where each successive tree fits the residuals of the current ensemble:
 \begin{equation}
     F(\mathbf{x}) = \sum_{m=1}^{M} \eta \cdot h_m(\mathbf{x}),
 \end{equation}
-where $h_m$ is the $m$-th decision tree and $\eta$ is the learning rate that shrinks each tree's contribution to prevent overfitting. Each tree $h_m$ is grown to minimize a regularized objective combining the squared-error loss on the current residuals with penalty terms on tree complexity (number of leaves and leaf weights). The predicted return $\hat{r}_{t+1}^s = F(\mathbf{x}_t^s)$ serves as the stock score. The model is trained with $M = 500$ trees, a learning rate of $\eta = 0.05$, maximum tree depth of 4, and row and column subsampling rates of 0.8. To reduce sensitivity to random initialization, an ensemble of 50 independent XGBoost models (each with a different random seed) is trained. Their predictions are averaged before ranking stocks into portfolio deciles.
+where $h_m$ is the $m$-th decision tree and $\eta$ is the learning rate that shrinks each tree's contribution to prevent overfitting. Each tree $h_m$ is grown to minimize a regularized objective combining the squared-error loss on the current residuals with penalty terms on tree complexity (number of leaves and leaf weights). The predicted return $\hat{r}_{t+1}^s = F(\mathbf{x}_t^s)$ serves as the stock score. The model is trained with $M = 500$ trees, a learning rate of $\eta = 0.05$, maximum tree depth of 4, and row and column subsampling rates of 0.8. To reduce sensitivity to random initialization, an ensemble of 20 independent XGBoost models (each with a different random seed) is trained. Their predictions are averaged before ranking stocks into portfolio deciles.
 
 Among the nonlinear architectures flagged in Section~\ref{sec:lit_ml} (gradient-boosted trees, random forests, neural networks), XGBoost is preferred because its sequential residual fitting concentrates splits on whichever feature most reduces error, turning the regime signal into the model's primary gating variable rather than one feature among thirteen.
 
