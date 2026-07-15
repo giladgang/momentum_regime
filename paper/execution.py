@@ -110,6 +110,15 @@ def _members(g, score_col, policy, prev, pi_t, pi_prev, mi=0):
         e = (ep if pi_t >= 0.5 else ec) / 100.0
         keep = {p for p in prev if p in univ and rank_pct[p] <= e}
         return set(ranked[:k]) | keep
+    if name == 'regime3_band':
+        # 3-state NMV banding: keep-band E switches on state3
+        # (0 calm, 1 crash, 2 recovery). Same buy/hold semantics as
+        # nmv_band: enter at the decile, hold until rank falls out of E.
+        ec, ecr, erec = arg
+        s3 = int(g['state3'].iloc[0]) if 'state3' in g else 0
+        e = {0: ec, 1: ecr, 2: erec}[s3] / 100.0
+        keep = {p for p in prev if p in univ and rank_pct[p] <= e}
+        return set(ranked[:k]) | keep
     if name == 'regime_patient':
         # THE PRODUCT: benchmark (or wide-band tilt) in calm; one decisive
         # reorganization into the model basket when pi crosses enter;
