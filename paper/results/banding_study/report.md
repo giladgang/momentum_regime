@@ -37,7 +37,7 @@ regime_best         mve       0.667             7       179 {'investment': 0.032
 ## Gates
 
 - G1 (majority delta>0, winner CIs exclude 0): MISS {'n_strategies': 7, 'n_delta_pos': 5, 'majority_delta_pos': True, 'n_winner_ci_excl0': 1, 'pass': False}
-- G2 (Spearman cost intensity vs delta > 0): HIT {'spearman': 0.5714285714285715, 'pass': True}
+- G2 (Spearman cost intensity vs delta > 0): HIT {'spearman': 0.5714285714285715, 'p_value': 0.18020198891152753, 'pass': True}
 - G3 (IR-weighted book Sharpe, regime > static): HIT {'monthly': 0.3449330649468468, 'static_best': 0.5628457200329199, 'regime_best': 0.5964461520977437, 'pass': True}
 
 ## Selection honesty (select pre-SPLIT, evaluate post; XGB exempt)
@@ -49,6 +49,13 @@ regime_best         mve       0.667             7       179 {'investment': 0.032
 profitability          (10, 10)      (30, 15, 10)      0.025                   0.053      -0.047                   -0.182
      reversal          (40, 40)      (40, 40, 30)      0.013                   0.022       0.023                    0.060
         value          (40, 40)          (30, 40)     -0.067                   0.033      -0.018                    0.033
+
+## Caveats (read before citing G2/G3)
+
+- 1/7 strategies are net-NEGATIVE even at their best band (banding cuts cost but the signal is still unprofitable net of measured spreads): reversal. 'Improves N/7' is NOT 'makes N/7 viable'.
+- Only 1/7 per-strategy regime-vs-static deltas have bootstrap CIs excluding 0 (no multiple-comparison correction across the 7 tests); G2/G3 aggregate claims rest on strategies whose individual deltas are not distinguishable from noise.
+- G2 Spearman is on n=7 points; p_value is reported above but the pre-registered pass rule is rho>0 (sign, not significance).
+- OUT-OF-SAMPLE (bands picked on 1992-2010, judged on 2011-25): 4/6 non-XGB strategies keep a positive regime-vs-static delta; this is the honest headline, not the in-sample full_delta.
 
 ## Fallback pricing share per strategy (mean hs_fallback_frac)
 

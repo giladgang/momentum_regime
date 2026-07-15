@@ -118,9 +118,10 @@ def select_best(cells):
 
 
 def gate2_spearman(best):
+    """(rho, p) of cost intensity vs regime-static delta across strategies."""
     from scipy.stats import spearmanr
-    return float(spearmanr(best['cost_intensity'],
-                           best['delta_net_ir']).statistic)
+    r = spearmanr(best['cost_intensity'], best['delta_net_ir'])
+    return float(r.statistic), float(r.pvalue)
 
 
 # ── spread pricing ────────────────────────────────────────────────────────
@@ -413,8 +414,10 @@ def evaluate_gates(cells, boot=None, frontier=None):
         g1['n_winner_ci_excl0'] = n_excl
         g1['pass'] = bool(g1['majority_delta_pos']
                           and n_excl > len(winners) / 2)
-    rho = gate2_spearman(best)
-    g2 = {'spearman': rho, 'pass': bool(rho > 0)}
+    rho, pval = gate2_spearman(best)
+    # pass rule stays the pre-registered rho>0; p_value reported for
+    # transparency (n=7 strategies, so significance is weak by construction).
+    g2 = {'spearman': rho, 'p_value': pval, 'pass': bool(rho > 0)}
     g3 = {}
     if frontier is not None:
         f = (frontier[frontier['method'] == 'ir_weighted']
@@ -579,6 +582,24 @@ def stage_report(smoke=False):
         '\n',
         (honesty.round(3).to_string(index=False) if len(honesty)
          else '(no pre-split data yet)'), '',
+        '## Caveats (read before citing G2/G3)\n',
+        f"- {int((best['regime_net_ir'] < 0).sum())}/{len(best)} strategies "
+        "are net-NEGATIVE even at their best band (banding cuts cost but the "
+        "signal is still unprofitable net of measured spreads): "
+        f"{', '.join(best.loc[best['regime_net_ir'] < 0, 'strategy'])}. "
+        "'Improves N/7' is NOT 'makes N/7 viable'.",
+        f"- Only {int(boot['excludes_zero'].sum())}/{len(boot)} per-strategy "
+        "regime-vs-static deltas have bootstrap CIs excluding 0 (no "
+        "multiple-comparison correction across the 7 tests); G2/G3 aggregate "
+        "claims rest on strategies whose individual deltas are not "
+        "distinguishable from noise.",
+        "- G2 Spearman is on n=7 points; p_value is reported above but the "
+        "pre-registered pass rule is rho>0 (sign, not significance).",
+        (f"- OUT-OF-SAMPLE (bands picked on 1992-2010, judged on 2011-25): "
+         f"{int((honesty['post_delta_preselected'] > 0).sum())}/{len(honesty)}"
+         " non-XGB strategies keep a positive regime-vs-static delta; this "
+         "is the honest headline, not the in-sample full_delta."
+         if len(honesty) else ""), '',
         '## Fallback pricing share per strategy (mean hs_fallback_frac)\n',
         cells.groupby('strategy')['hs_fallback_frac'].mean().round(3)
         .to_string(), '',

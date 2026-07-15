@@ -32,9 +32,11 @@ def test_best_cell_selection():
 
 def test_gate2_spearman_direction():
     best = B.select_best(_cells_fixture())
-    rho = B.gate2_spearman(best)
+    rho, pval = B.gate2_spearman(best)
     # strategy a: high cost intensity, big delta; b: low, small -> rho = +1
     assert rho > 0
+    # p-value is NaN on the degenerate n=2 fixture; just assert it's a float
+    assert isinstance(pval, float)
 
 
 def test_cost_intensity_uses_monthly_tier():
