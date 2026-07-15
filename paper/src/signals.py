@@ -44,6 +44,11 @@ def _attach_regime(x):
 
 def _finalize(x):
     x = x.dropna(subset=['score', 'ret_fwd', 'me'])
+    # me arrives as pandas nullable Float64 from stocks.parquet; cast the
+    # numeric columns to plain float64 so downstream weight/return math and
+    # statsmodels (which rejects FloatingArray) get numpy dtypes.
+    x = x.astype({'me': 'float64', 'pi': 'float64', 'score': 'float64',
+                  'mom_12': 'float64', 'ret_fwd': 'float64'})
     return (x[SCHEMA].sort_values(['date', 'permno'])
             .reset_index(drop=True))
 

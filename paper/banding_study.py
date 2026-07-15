@@ -192,8 +192,8 @@ def alpha_lo(act, design, cols):
         design[cols], how='inner').dropna()
     if len(m) < 24:
         return np.nan, np.nan
-    res = sm.OLS(m['ret'].values,
-                 sm.add_constant(m[cols].values)).fit(
+    res = sm.OLS(np.asarray(m['ret'], dtype=float),
+                 sm.add_constant(np.asarray(m[cols], dtype=float))).fit(
         cov_type='HAC', cov_kwds={'maxlags': HAC_LAGS})
     return float(res.params[0]) * 12, float(res.tvalues[0])
 
