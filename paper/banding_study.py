@@ -230,10 +230,15 @@ def _cell_metrics(strategy, policy, x, bench, sp_pack, design):
            'alpha_ff6lo': a6, 't_ff6lo': t6,
            'mean_hs_bp': mean_hs,
            'hs_fallback_frac': fb_frac,
-           'net_ir_meas_pre': M.ir(net[net.index < split],
-                                   net_b[net_b.index < split]),
-           'net_ir_meas_post': M.ir(net[net.index >= split],
-                                    net_b[net_b.index >= split])}
+           # XGB has no pre-2011 scores -> empty pre-split slice -> NaN
+           # (honesty-check-exempt); guard so ir() is never called on an
+           # empty series (its `std() > 0` is NA-ambiguous on empties).
+           'net_ir_meas_pre': (M.ir(net[net.index < split],
+                                    net_b[net_b.index < split])
+                               if (net.index < split).any() else np.nan),
+           'net_ir_meas_post': (M.ir(net[net.index >= split],
+                                     net_b[net_b.index >= split])
+                                if (net.index >= split).any() else np.nan)}
     for mult in C.STRESS_MULT:
         cst, _, _ = price_ledger(led, sp_pack, stress_mult=mult)
         row[f'net_ir_stress{mult}'] = M.ir(_net(r['gross'], cst),
