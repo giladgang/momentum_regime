@@ -55,3 +55,17 @@ def test_prep_strategy_filters_to_sweep_start(tmp_path):
     frame_path, _ = B._prep_strategy('momentum', str(tmp_path))
     x = pd.read_parquet(frame_path)
     assert x['date'].min() >= pd.Timestamp(C.SWEEP_START)
+
+
+def test_evaluate_gates_no_delta_name_collision():
+    # regression: boot (delta_bootstrap) already carries a 'delta_net_ir'
+    # column; evaluate_gates must not re-merge best's delta_net_ir onto it
+    # (pandas would suffix both to _x/_y and the G1 winner filter KeyErrors).
+    cells = _cells_fixture()
+    best = B.select_best(cells)
+    boot = best[['strategy', 'delta_net_ir']].copy()
+    boot['ci_lo'] = [0.01, -0.05]      # strategy 'a' excludes 0, 'b' doesn't
+    boot['ci_hi'] = [0.20, 0.05]
+    gates = B.evaluate_gates(cells, boot=boot)          # must not raise
+    assert 'G1' in gates and 'pass' in gates['G1']
+    assert gates['G1']['n_winner_ci_excl0'] >= 0

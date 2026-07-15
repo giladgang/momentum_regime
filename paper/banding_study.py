@@ -401,8 +401,9 @@ def evaluate_gates(cells, boot=None, frontier=None):
     g1 = {'n_strategies': n, 'n_delta_pos': n_pos,
           'majority_delta_pos': bool(n_pos > n / 2)}
     if boot is not None:
-        w = boot.merge(best[['strategy', 'delta_net_ir']], on='strategy')
-        winners = w[w['delta_net_ir'] > 0]
+        # boot already carries delta_net_ir (+ ci_lo/ci_hi) per strategy;
+        # do NOT re-merge best's delta_net_ir (name collision suffixes both).
+        winners = boot[boot['delta_net_ir'] > 0]
         n_excl = int(((winners['ci_lo'] > 0) | (winners['ci_hi'] < 0)).sum())
         g1['n_winner_ci_excl0'] = n_excl
         g1['pass'] = bool(g1['majority_delta_pos']
