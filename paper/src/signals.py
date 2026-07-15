@@ -98,7 +98,15 @@ def build(strategy):
     if strategy == 'lowvol':
         iv = pd.read_parquet(C.IVOL_MONTHLY)
         iv['date'] = pd.to_datetime(iv['date'])
-        x = _base_universe().merge(iv, on=['permno', 'date'], how='inner')
+        # IVOL is stamped at calendar month-end; the stock panel uses CRSP's
+        # last trading day of the month. Join on the year-month period so the
+        # ~1/3 of months whose calendar-end is a weekend/holiday are not
+        # silently dropped.
+        iv['ym'] = iv['date'].dt.to_period('M')
+        base = _base_universe()
+        base['ym'] = base['date'].dt.to_period('M')
+        x = base.merge(iv[['permno', 'ym', 'ivol']], on=['permno', 'ym'],
+                       how='inner').drop(columns='ym')
         x = x.assign(score=lambda d: -d['ivol'])
         return _finalize(_attach_regime(x))
     if strategy == 'xgb':

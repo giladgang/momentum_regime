@@ -55,3 +55,17 @@ def test_reversal_sign():
                         columns=['permno', 'date', 'mom_1']),
         on=['permno', 'date'])
     assert np.corrcoef(m['score'], m['mom_1'])[0, 1] < -0.99
+
+
+@pytest.mark.skipif(not _HAS_IVOL, reason='ivol panel not built')
+def test_lowvol_month_coverage_matches_universe():
+    # regression: IVOL is stamped at calendar month-end while the stock panel
+    # uses the last TRADING day; a naive date join drops ~1/3 of months. The
+    # year-month join must keep every universe month that has ivol coverage.
+    lv = signals.build('lowvol')
+    mom = signals.build('momentum')
+    win = pd.Timestamp('2011-01-01')          # ivol fully covers 2011+
+    lv_months = set(lv.loc[lv['date'] >= win, 'date'].dt.to_period('M'))
+    mom_months = set(mom.loc[mom['date'] >= win, 'date'].dt.to_period('M'))
+    assert lv_months == mom_months, (
+        f'lowvol drops {len(mom_months - lv_months)} months vs universe')
