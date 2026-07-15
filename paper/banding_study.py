@@ -127,12 +127,20 @@ def gate2_spearman(best):
 # ── spread pricing ────────────────────────────────────────────────────────
 
 def load_spreads():
-    """(panel[permno, ym, hs in bp], per-month median, full-panel median)."""
+    """(panel[permno, ym, hs in bp], PIT-safe per-month median fallback,
+    earliest-month median). Gap months with no spread coverage (e.g.
+    2010-01..2010-11) inherit the last PAST month's cross-sectional median
+    via forward-fill -- never the whole-panel median (which is microcap-
+    dominated AND draws on future months, a look-ahead into the pre-2011
+    selection metric)."""
     sp = pd.read_parquet(HS_PARQUET, columns=['permno', 'ym', 'hs'])
     sp = sp.dropna(subset=['hs']).copy()
     sp['hs'] = sp['hs'] * 1e4                    # decimal -> basis points
     month_med = sp.groupby('ym')['hs'].median()
-    return sp, month_med, float(sp['hs'].median())
+    full = pd.period_range(month_med.index.min(), month_med.index.max(),
+                           freq='M')
+    month_med_ff = month_med.reindex(full).ffill()
+    return sp, month_med_ff, float(month_med_ff.iloc[0])
 
 
 def price_ledger(led, sp_pack, stress_mult=None):
