@@ -88,8 +88,24 @@ def select_best(cells):
     for s, g in cells.groupby('strategy'):
         d = g[g['family'] == 'diag']
         r = g[g['family'] != 'diag']
+        if len(d) == 0:
+            raise ValueError(f'{s}: no diagonal cells in results — cannot '
+                             'pick static_best')
+        if len(r) == 0:
+            raise ValueError(f'{s}: no off-diagonal cells in results — '
+                             'cannot pick regime_best')
         bd = d.loc[d['net_ir_meas'].idxmax()]
         br = r.loc[r['net_ir_meas'].idxmax()]
+        # cost_intensity = monthly-tier (10, 10) to_mo x its own mean_hs_bp;
+        # both must come from the SAME (10, 10) row -- g's row order is
+        # cells.csv append order (nondeterministic imap_unordered), so
+        # g['mean_hs_bp'].iloc[0] is NOT necessarily the (10, 10) row.
+        mono = g[g['params'] == '(10, 10)']
+        if len(mono):
+            ci = (float(mono['to_mo'].iloc[0])
+                  * float(mono['mean_hs_bp'].iloc[0]))
+        else:
+            ci = float('nan')
         rows.append({'strategy': s,
                      'static_params': bd['params'],
                      'static_net_ir': bd['net_ir_meas'],
@@ -97,9 +113,7 @@ def select_best(cells):
                      'regime_family': br['family'],
                      'regime_net_ir': br['net_ir_meas'],
                      'delta_net_ir': br['net_ir_meas'] - bd['net_ir_meas'],
-                     'cost_intensity': (
-                         g[g['params'] == '(10, 10)']['to_mo'].iloc[0]
-                         * g['mean_hs_bp'].iloc[0])})
+                     'cost_intensity': ci})
     return pd.DataFrame(rows)
 
 
@@ -408,6 +422,10 @@ def _tier_net_ir(cells, best_row, tier):
     if tier == 'monthly':
         g = cells[(cells['strategy'] == best_row['strategy'])
                   & (cells['params'] == '(10, 10)')]
+        if len(g) == 0:
+            raise ValueError(f"{best_row['strategy']}: no (10, 10) "
+                             'monthly-tier cell in results — cannot '
+                             'compute monthly tier net IR')
         return float(g['net_ir_meas'].iloc[0])
     return float(best_row['static_net_ir' if tier == 'static_best'
                           else 'regime_net_ir'])

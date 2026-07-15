@@ -5,15 +5,20 @@ from paper import banding_study as B
 
 
 def _cells_fixture():
-    # two strategies, diagonal + one off-diagonal cell each
+    # two strategies, diagonal + one off-diagonal cell each.
+    # Strategy 'a' rows are NOT (10, 10)-first and mean_hs_bp is NOT
+    # constant across params: this catches cost_intensity accidentally
+    # reading g['mean_hs_bp'].iloc[0] (the first row in cells.csv append
+    # order -- nondeterministic under imap_unordered) instead of the
+    # (10, 10) row's own mean_hs_bp.
     return pd.DataFrame({
         'strategy': ['a', 'a', 'a', 'b', 'b', 'b'],
         'family': ['diag', 'diag', 'regime2', 'diag', 'diag', 'regime2'],
-        'params': ['(10, 10)', '(20, 20)', '(20, 10)',
+        'params': ['(20, 20)', '(10, 10)', '(20, 10)',
                    '(10, 10)', '(20, 20)', '(20, 10)'],
-        'net_ir_meas': [0.10, 0.20, 0.35, 0.30, 0.28, 0.29],
-        'to_mo': [0.70, 0.50, 0.55, 0.20, 0.15, 0.16],
-        'mean_hs_bp': [10.0, 10.0, 10.0, 1.0, 1.0, 1.0],
+        'net_ir_meas': [0.20, 0.10, 0.35, 0.30, 0.28, 0.29],
+        'to_mo': [0.50, 0.70, 0.55, 0.20, 0.15, 0.16],
+        'mean_hs_bp': [99.0, 10.0, 99.0, 1.0, 1.0, 1.0],
     })
 
 
@@ -29,3 +34,12 @@ def test_gate2_spearman_direction():
     rho = B.gate2_spearman(best)
     # strategy a: high cost intensity, big delta; b: low, small -> rho = +1
     assert rho > 0
+
+
+def test_cost_intensity_uses_monthly_tier():
+    best = B.select_best(_cells_fixture())
+    a = best[best['strategy'] == 'a'].iloc[0]
+    # (10, 10) row for 'a': to_mo=0.70, mean_hs_bp=10.0. The first row in
+    # append order for 'a' is (20, 20) with mean_hs_bp=99.0 -- cost_intensity
+    # must NOT pick that up via iloc[0].
+    assert np.isclose(a['cost_intensity'], 0.70 * 10.0)
