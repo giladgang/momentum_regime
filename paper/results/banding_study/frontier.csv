@@ -1,7 +1,7 @@
 tier,method,net_sharpe,n_strategies,n_months,weights
-monthly,ir_weighted,0.3449,7,407,"{'investment': 0.216, 'lowvol': 0.0, 'momentum': 0.199, 'profitability': 0.315, 'reversal': 0.0, 'value': 0.038, 'xgb': 0.232}"
+monthly,ir_weighted,0.355,7,407,"{'investment': 0.218, 'lowvol': 0.0, 'momentum': 0.204, 'profitability': 0.313, 'reversal': 0.0, 'value': 0.039, 'xgb': 0.226}"
 monthly,mve,0.3901,7,179,"{'investment': 0.158, 'lowvol': 0.0, 'momentum': 0.044, 'profitability': 0.638, 'reversal': 0.0, 'value': 0.0, 'xgb': 0.161}"
-static_best,ir_weighted,0.5628,7,407,"{'investment': 0.22, 'lowvol': 0.036, 'momentum': 0.123, 'profitability': 0.238, 'reversal': 0.0, 'value': 0.101, 'xgb': 0.282}"
+static_best,ir_weighted,0.5678,7,407,"{'investment': 0.221, 'lowvol': 0.036, 'momentum': 0.124, 'profitability': 0.238, 'reversal': 0.0, 'value': 0.101, 'xgb': 0.281}"
 static_best,mve,0.7896,7,179,"{'investment': 0.051, 'lowvol': 0.026, 'momentum': 0.0, 'profitability': 0.629, 'reversal': 0.0, 'value': 0.101, 'xgb': 0.193}"
-regime_best,ir_weighted,0.5964,7,407,"{'investment': 0.214, 'lowvol': 0.04, 'momentum': 0.151, 'profitability': 0.188, 'reversal': 0.0, 'value': 0.081, 'xgb': 0.327}"
+regime_best,ir_weighted,0.6029,7,407,"{'investment': 0.214, 'lowvol': 0.04, 'momentum': 0.152, 'profitability': 0.189, 'reversal': 0.0, 'value': 0.08, 'xgb': 0.324}"
 regime_best,mve,0.6666,7,179,"{'investment': 0.032, 'lowvol': 0.253, 'momentum': 0.007, 'profitability': 0.387, 'reversal': 0.0, 'value': 0.029, 'xgb': 0.292}"
