@@ -63,3 +63,4 @@ VAL_END = {**{1: 1999, 2: 2001, 3: 2003, 4: 2005, 5: 2007, 6: 2009, 7: 2011},
 
 # ── banding study (spec 2026-07-15) ──
 BANDING_DIR = os.path.join(RESULTS, 'banding_study')
+FUNDA_PARQUET = os.path.join(DATA_OUT, 'funda_linked.parquet')
