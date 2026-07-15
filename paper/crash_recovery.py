@@ -5,6 +5,18 @@ into calm / panic_crash / panic_recovery on the market's own path: panic
 (pi >= 0.5) months are RECOVERY when the market drawdown is healing
 (bench_ret > 0 this month, equivalently dd_t > dd_{t-1}), else CRASH.
 
+IMPORTANT — this is a CONTEMPORANEOUS, DESCRIPTIVE split, NOT the tradeable
+signal. bench_ret[t] is the market return earned over the SAME held month as
+the active return, so "recovery carries the edge" is a correct statement
+about co-timing. It is NOT what the banding sweep's regime3_band trades on:
+that uses `state3` = regime_labels.label_states on PANEL vwretd, which is
+only known at FORMATION (last month's direction) and is therefore a lagged,
+weak proxy for the phase. In short: the edge shows up in recovery months, but
+you cannot know at decision time whether next month is crash or recovery —
+which is exactly why regime-conditioning adds only a modest OOS increment and
+the practical lesson is patience, not faster reaction. Do not "align" this to
+state3; they answer different questions (descriptive vs implementable).
+
 Usage: .venv/bin/python -m paper.crash_recovery
 Output: paper/results/banding_study/crash_recovery.csv
 """
