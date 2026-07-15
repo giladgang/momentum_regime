@@ -5,53 +5,59 @@ Cells: 875 (/Users/giladgang/momentum_regime/paper/results/banding_study/cells.c
 ## Best cells (selected on net IR at measured spreads)
 
      strategy static_params  static_net_ir regime_params regime_family  regime_net_ir  delta_net_ir  cost_intensity
-   investment      (15, 15)          0.187  (15, 20, 10)       regime3          0.213         0.026           0.167
-       lowvol      (15, 15)          0.070      (30, 15)       regime2          0.119         0.048           0.287
-     momentum      (10, 10)          0.152  (40, 40, 10)       regime3          0.233         0.080           0.566
-profitability      (15, 15)          0.326  (40, 20, 10)       regime3          0.361         0.035           0.069
-     reversal      (40, 40)         -0.143  (40, 30, 10)       regime3         -0.065         0.078           1.595
-        value      (10, 10)         -0.070  (10, 15, 30)       regime3         -0.028         0.042           0.093
+   investment      (20, 20)          0.305      (40, 20)       regime2          0.323         0.018           1.840
+       lowvol      (20, 20)          0.050  (15, 20, 40)       regime3          0.060         0.010           3.123
+     momentum      (40, 40)          0.170  (40, 15, 10)       regime3          0.228         0.058           4.752
+profitability      (40, 40)          0.331  (40, 15, 10)       regime3          0.284        -0.047           1.128
+     reversal      (40, 40)         -0.143  (40, 40, 10)       regime3         -0.120         0.023          16.038
+        value      (40, 40)          0.140      (30, 40)       regime2          0.122        -0.018           1.267
           xgb      (40, 40)          0.392  (40, 15, 20)       regime3          0.494         0.102           1.302
 
 ## Paired block-bootstrap, regime_best - static_best (net-of-measured-cost active, CI x12)
 
      strategy  delta_net_ir   ci_lo  ci_hi  ci_lo_x12  ci_hi_x12  excludes_zero
-   investment        0.0260 -0.0002 0.0008    -0.0029     0.0099          False
-       lowvol        0.0482 -0.0004 0.0008    -0.0046     0.0095          False
-     momentum        0.0804 -0.0021 0.0031    -0.0257     0.0375          False
-profitability        0.0352 -0.0004 0.0006    -0.0048     0.0070          False
-     reversal        0.0782 -0.0004 0.0020    -0.0053     0.0243          False
-        value        0.0421  0.0000 0.0010     0.0001     0.0123           True
+   investment        0.0179 -0.0003 0.0004    -0.0035     0.0051          False
+       lowvol        0.0103 -0.0002 0.0003    -0.0029     0.0041          False
+     momentum        0.0582 -0.0007 0.0035    -0.0083     0.0424          False
+profitability       -0.0470 -0.0010 0.0010    -0.0116     0.0119          False
+     reversal        0.0235 -0.0004 0.0008    -0.0046     0.0098          False
+        value       -0.0180 -0.0005 0.0005    -0.0065     0.0064          False
           xgb        0.1025  0.0000 0.0022     0.0004     0.0262           True
 
 ## Frontier (combined book net Sharpe per tier)
 
        tier      method  net_sharpe  n_strategies  n_months                                                                                                                          weights
-    monthly ir_weighted       0.336             7       179     {'investment': 0.184, 'lowvol': 0.0, 'momentum': 0.193, 'profitability': 0.387, 'reversal': 0.0, 'value': 0.0, 'xgb': 0.235}
-    monthly         mve       0.390             7       179     {'investment': 0.157, 'lowvol': 0.0, 'momentum': 0.043, 'profitability': 0.638, 'reversal': 0.0, 'value': 0.0, 'xgb': 0.162}
-static_best ir_weighted       0.502             7       179   {'investment': 0.166, 'lowvol': 0.062, 'momentum': 0.135, 'profitability': 0.289, 'reversal': 0.0, 'value': 0.0, 'xgb': 0.347}
-static_best         mve       0.594             7       179   {'investment': 0.093, 'lowvol': 0.247, 'momentum': 0.006, 'profitability': 0.375, 'reversal': 0.0, 'value': 0.0, 'xgb': 0.279}
-regime_best ir_weighted       0.610             7       179    {'investment': 0.15, 'lowvol': 0.083, 'momentum': 0.164, 'profitability': 0.255, 'reversal': 0.0, 'value': 0.0, 'xgb': 0.348}
-regime_best         mve       0.726             7       179 {'investment': 0.062, 'lowvol': 0.303, 'momentum': 0.025, 'profitability': 0.336, 'reversal': 0.0, 'value': 0.023, 'xgb': 0.251}
+    monthly ir_weighted       0.345             7       407   {'investment': 0.216, 'lowvol': 0.0, 'momentum': 0.199, 'profitability': 0.315, 'reversal': 0.0, 'value': 0.038, 'xgb': 0.232}
+    monthly         mve       0.390             7       179     {'investment': 0.158, 'lowvol': 0.0, 'momentum': 0.044, 'profitability': 0.638, 'reversal': 0.0, 'value': 0.0, 'xgb': 0.161}
+static_best ir_weighted       0.563             7       407  {'investment': 0.22, 'lowvol': 0.036, 'momentum': 0.123, 'profitability': 0.238, 'reversal': 0.0, 'value': 0.101, 'xgb': 0.282}
+static_best         mve       0.790             7       179   {'investment': 0.051, 'lowvol': 0.026, 'momentum': 0.0, 'profitability': 0.629, 'reversal': 0.0, 'value': 0.101, 'xgb': 0.193}
+regime_best ir_weighted       0.596             7       407  {'investment': 0.214, 'lowvol': 0.04, 'momentum': 0.151, 'profitability': 0.188, 'reversal': 0.0, 'value': 0.081, 'xgb': 0.327}
+regime_best         mve       0.667             7       179 {'investment': 0.032, 'lowvol': 0.253, 'momentum': 0.007, 'profitability': 0.387, 'reversal': 0.0, 'value': 0.029, 'xgb': 0.292}
 
 ## Gates
 
-- G1 (majority delta>0, winner CIs exclude 0): MISS {'n_strategies': 7, 'n_delta_pos': 7, 'majority_delta_pos': True, 'n_winner_ci_excl0': 2, 'pass': False}
-- G2 (Spearman cost intensity vs delta > 0): HIT {'spearman': 0.7857142857142859, 'pass': True}
-- G3 (IR-weighted book Sharpe, regime > static): HIT {'monthly': 0.336378406365321, 'static_best': 0.5019089257612138, 'regime_best': 0.6097326236220887, 'pass': True}
+- G1 (majority delta>0, winner CIs exclude 0): MISS {'n_strategies': 7, 'n_delta_pos': 5, 'majority_delta_pos': True, 'n_winner_ci_excl0': 1, 'pass': False}
+- G2 (Spearman cost intensity vs delta > 0): HIT {'spearman': 0.5714285714285715, 'pass': True}
+- G3 (IR-weighted book Sharpe, regime > static): HIT {'monthly': 0.3449330649468468, 'static_best': 0.5628457200329199, 'regime_best': 0.5964461520977437, 'pass': True}
 
 ## Selection honesty (select pre-SPLIT, evaluate post; XGB exempt)
 
-(no pre-split data yet)
+     strategy pre_static_params pre_regime_params  pre_delta  post_delta_preselected  full_delta  post_delta_fullselected
+   investment          (20, 20)          (40, 20)      0.036                  -0.015       0.018                   -0.015
+       lowvol          (20, 20)      (20, 20, 40)      0.012                  -0.003       0.010                    0.012
+     momentum          (15, 15)          (40, 15)      0.051                   0.094       0.058                    0.041
+profitability          (10, 10)      (30, 15, 10)      0.025                   0.053      -0.047                   -0.182
+     reversal          (40, 40)      (40, 40, 30)      0.013                   0.022       0.023                    0.060
+        value          (40, 40)          (30, 40)     -0.067                   0.033      -0.018                    0.033
 
 ## Fallback pricing share per strategy (mean hs_fallback_frac)
 
 strategy
-investment       0.0
-lowvol           0.0
-momentum         0.0
-profitability    0.0
-reversal         0.0
-value            0.0
-xgb              0.0
+investment       0.027
+lowvol           0.000
+momentum         0.027
+profitability    0.028
+reversal         0.027
+value            0.029
+xgb              0.000
 
