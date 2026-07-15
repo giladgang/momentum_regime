@@ -294,6 +294,7 @@ def price_cells(x, bench_gross, bench_ledger, sp_pack):
 def _prep_strategy(strategy, tmp_dir):
     """Build the signal frame + priced benchmark once; persist for workers."""
     x = signals.build(strategy)
+    x = x[x['date'] >= C.SWEEP_START].reset_index(drop=True)
     b, bled = X.simulate(x, ('benchmark', None), score_col='score')
     bench = price_cells(x, b, bled, load_spreads())
     frame_path = os.path.join(tmp_dir, f'frame_{strategy}.parquet')
@@ -520,6 +521,7 @@ def stage_report(smoke=False):
         except Exception as e:                                  # noqa: BLE001
             print(f'[skip] {s}: {e}', flush=True)
             continue
+        x = x[x['date'] >= C.SWEEP_START].reset_index(drop=True)
         b, bled = X.simulate(x, ('benchmark', None), score_col='score')
         bench = price_cells(x, b, bled, sp_pack)
         tier_params = {'monthly': '(10, 10)',

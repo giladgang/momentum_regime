@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 
 from paper import banding_study as B
+from paper import config as C
 
 
 def _cells_fixture():
@@ -43,3 +44,14 @@ def test_cost_intensity_uses_monthly_tier():
     # append order for 'a' is (20, 20) with mean_hs_bp=99.0 -- cost_intensity
     # must NOT pick that up via iloc[0].
     assert np.isclose(a['cost_intensity'], 0.70 * 10.0)
+
+
+def test_prep_strategy_filters_to_sweep_start(tmp_path):
+    # momentum's raw signals.build frame starts 1992 (STUDY_START), but
+    # measured spreads only exist from 2010-12+, so the sweep driver must
+    # scope every strategy's priced frame to C.SWEEP_START (2011-01-01)
+    # before it reaches simulate()/price_cells(). This is the per-strategy
+    # frame builder the sweep (run_strategy) actually calls.
+    frame_path, _ = B._prep_strategy('momentum', str(tmp_path))
+    x = pd.read_parquet(frame_path)
+    assert x['date'].min() >= pd.Timestamp(C.SWEEP_START)
