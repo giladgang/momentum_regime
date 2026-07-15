@@ -179,3 +179,31 @@ A MISS on any gate is reported as such (null results are reportable).
 Direction expectation from S6 + the 2026-07-15 crash/recovery decomposition:
 wide band in crash, tighter band in recovery; but the grid explores all
 directions and the frontier decides.
+
+## Walk-forward supersedes the single 2011 split (2026-07-16) — DECISIVE
+
+The single-split OOS (select 1992-2010, eval 2011-25) gave "regime beats
+static 4/6, momentum +0.094". A walk-forward (expanding window, band
+re-selected EVERY year on prior data, ~25 OOS years) with an honest fit
+overturns the regime claim:
+
+- regime_argmax (raw argmax over the 120-cell regime grid each year): beats
+  static 5/7, but only momentum's delta is bootstrap-significant, and
+  momentum's walk-forward delta (+0.162) is LARGER than its single-split
+  (+0.094) -- the classic more-search = more-inflation signature.
+- regime_reg (1-SE complexity-regularized: adopt a more complex band only if
+  it beats the simpler one by > one Sharpe-SE): 0/7. Collapses to the static
+  band for every strategy in every year (reg_pct_3state = 0). Regime
+  conditioning never clears the noise bar.
+
+Honest conclusion: **regime-conditional banding does not robustly beat a
+well-chosen static band out-of-sample**; the apparent edge is full-grid
+in-sample search inflation. Caveat: the 1-SE rule is conservative on short
+samples, so the precise statement is "the regime-vs-static edge is within one
+Sharpe-SE" (equivalently: 6/7 single-split bootstrap CIs already straddled 0).
+
+Secondary: even STATIC banding beats monthly for only 5/7 OOS (momentum and
+profitability are WORSE banded). So "banding reduces net-of-cost turnover" is
+a real mechanism but not a universal free lunch.
+
+Backing: paper/results/banding_study/walkforward.{md,csv}, paper/walkforward_banding.py.
