@@ -1,0 +1,137 @@
+%% ═══════════════════════════════════════════════════════════════
+%% APPLIED PAPER MANUSCRIPT (working copy seeded from the thesis)
+%% Lives in paper/manuscript/. The thesis (repo root main.tex, latex/)
+%% is untouched. Compile from this directory; tables/ and plots/ resolve
+%% to the repo root via \graphicspath and \input@path below.
+%% ═══════════════════════════════════════════════════════════════
+\documentclass[12pt, a4paper]{article}
+
+%% --Packages --
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath, amssymb, amsfonts}
+\usepackage{dsfont}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{setspace}
+\usepackage[round]{natbib}
+\usepackage{hyperref}
+\usepackage{cleveref}
+\usepackage{titlesec}
+\usepackage[bottom]{footmisc}
+
+\interfootnotelinepenalty=10000   % prevent footnotes from splitting across pages
+
+%% --Settings --
+\graphicspath{{./}{../../}}  % local first, then repo root (plots/thesis/...)
+\makeatletter
+\def\input@path{{./}{../../}} % local latex/ copies first, then repo-root tables/
+\makeatother
+\onehalfspacing
+\hypersetup{
+    colorlinks = true,
+    linkcolor  = blue!60!black,
+    citecolor  = blue!60!black,
+    urlcolor   = blue!60!black
+}
+
+% Block-style paragraph headings: title on its own line, body below without indent.
+\titleformat{\paragraph}[block]{\normalfont\bfseries}{}{0pt}{}
+\titlespacing*{\paragraph}{0pt}{1ex}{0.5ex}
+
+\hyphenation{con-ser-vatism}
+
+%% ═══════════════════════════════════════════════════════════════
+\begin{document}
+
+\begin{titlepage}
+\centering
+\vspace*{1cm}
+
+\includegraphics[width=0.55\textwidth]{plots/thesis/tilburg_logo.pdf}
+
+\vspace{1.5cm}
+
+{\Large\bfseries Momentum Across Market Regimes -- A Machine Learning Approach\par}
+
+\vspace{2cm}
+
+By\\[0.5cm]
+Gilad Gang (2148871)\\
+B.Sc.\ The Hebrew University of Jerusalem
+
+\vspace{2cm}
+
+A thesis submitted in partial fulfillment of the requirements for the degree of Master of Science in\\[0.3cm]
+Quantitative Finance and Actuarial Science
+
+\vspace{1cm}
+
+Tilburg School of Economics and Management\\
+Tilburg University
+
+\vspace{1cm}
+
+Supervisor\\
+Denis Kojevnikov
+
+\vspace{1cm}
+
+Date: June 2026
+
+\end{titlepage}
+
+\section*{Acknowledgements}
+I would like to thank my supervisor, Denis Kojevnikov, for his guidance and feedback throughout this project. I am also grateful to Tilburg University's School of Economics and Management for providing access to WRDS data. Finally, I thank my family and friends for their support throughout my studies. Any remaining errors are my own.
+
+\bigskip
+
+\noindent\textit{AI Disclosure.} In accordance with the MSc BAOR/EME/QFAS \emph{Policy on the use of AI Tools for written assignments} (November 2024), the author discloses the following uses of Claude (Anthropic) during the preparation of this thesis.
+\begin{itemize}
+    \item \textbf{Proofreading and clarity.} Grammar correction, copy-editing, and suggestions for improving the readability of the author's drafts.
+    \item \textbf{Idea generation.} Brainstorming structural framings, exploring alternative phrasings, and surfacing candidate literature.
+    \item \textbf{Code support.} Code review, refactoring suggestions, and debugging assistance for the analytical scripts.
+    \item \textbf{Verification.} Cross-checking consistency between prose, tables, and source data.
+\end{itemize}
+All AI-suggested phrasings and references were reviewed and verified by the author against the original sources. AI was not used to fabricate data or references, or to generate substantive content the author does not understand. The empirical analysis, model design, and economic conclusions are the author's own work, and the author bears full responsibility for the content of this thesis.
+
+\newpage
+
+\section*{Abstract}
+
+Cross-sectional momentum, the tendency for recent stock-market winners to keep winning and losers to keep losing, is one of the most profitable anomalies in finance and one of the most fragile. Momentum portfolios suffered losses exceeding 50\% during the 2009 market rebound and have crashed repeatedly around regime transitions. The standard responses scale exposure during stress or blend horizon weights, leaving the selection rule itself unconditional. This thesis asks a different question: how does the cross-sectional structure of momentum reorganize between calm and panic regimes, and what mechanism drives that reorganization?
+
+The empirical framework has two stages. A Bayesian two-state Hidden Markov Model, estimated by Gibbs sampling on four monthly macrofinancial stress indicators, produces a continuous filtered probability of market panic that updates each month. This regime signal is then combined with twelve momentum horizons inside a cross-sectional stock-selection model (an XGBoost gradient-boosted regressor, benchmarked against a deterministic formula and a logistic regression).  Stocks are ranked monthly and the top and bottom deciles enter a value-weighted long-short portfolio. All models are estimated on 1990--2010 U.S. equities and evaluated out-of-sample on the 167-month 2011--2024 window, with international replication on UK and Japanese equities. The combination of an HMM regime signal with an XGBoost cross-sectional model is, to the author's knowledge, novel, and extracts a stronger momentum signal than conventional regime indicators such as market drawdown.
+
+This thesis develops a more flexible regime-dependent momentum framework that optimizes portfolio weights directly from stock-level signals. The portfolio selected is not restricted to forming portfolios from pre-specified momentum rankings, whether by selecting the top-ranked stocks within a single horizon, rotating across a small set of predefined horizons, or lowering exposure when market conditions deteriorate. Instead, the model learns how stock-level signals, and not horizon level signals, should translate into portfolio positions in each regime. The empirical results show that the learned rule behaves conventionally in calm regimes, allocating the long leg to recent winners. However, in panic regimes, the long leg is not simply drawn from the winners of another horizon. It is rebuilt from a distinct set of stocks not top-ranked at any individual momentum horizon, a novel form of selection whose portfolio relevance emerges only after conditioning on the panic state and combining information across signals.
+
+\newpage
+\tableofcontents
+\newpage
+
+%% --Body --
+\input{latex/introduction}
+\input{latex/literature_review}
+\input{latex/methodology}
+\input{latex/data_section}
+\input{latex/main_results}
+\input{latex/conclusion}
+
+%% --Bibliography --
+\newpage
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+%% --Appendix --
+\newpage
+\appendix
+\renewcommand{\thesection}{\Alph{section}}
+\titleformat{\section}{\normalfont\Large\bfseries}{Appendix~\thesection:}{0.5em}{}
+\addtocontents{toc}{\bigskip\noindent\textbf{Appendices}\par\medskip}
+\input{latex/appendix}
+
+\end{document}
