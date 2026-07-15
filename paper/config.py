@@ -67,3 +67,5 @@ FUNDA_PARQUET = os.path.join(DATA_OUT, 'funda_linked.parquet')
 PI_MONTHLY = os.path.join(DATA_OUT, 'pi_monthly.parquet')
 FF_DAILY = os.path.join(DATA_OUT, 'ff_daily.parquet')
 IVOL_MONTHLY = os.path.join(DATA_OUT, 'ivol_monthly.parquet')
+STUDY_START = '1992-01-01'          # momentum needs 12m of 1991 history
+SPLIT_DATE = '2011-01-01'           # in/out split for the selection honesty check
