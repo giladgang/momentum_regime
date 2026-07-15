@@ -159,3 +159,23 @@ applied_results_full.md.
   "leads the frontier", not "dominates".
 - Policy layer chosen in-sample: live-2026 (and top-500 when run) are the
   policy-level OOS tests.
+
+## 9. Banding-study registered expectations (2026-07-15, PRE-RUN)
+
+Registered before paper/banding_study.py produced any cells. Spec:
+docs/superpowers/specs/2026-07-15-regime-conditional-banding-study-design.md.
+
+- G1: regime-conditional banding (best 2- or 3-state cell, selected on net IR
+  at measured spreads) beats the best STATIC band (best diagonal) on net IR
+  for a MAJORITY of the 7 strategies; per-strategy paired block-bootstrap CI
+  of the net-active difference excludes 0 for at least the majority winners.
+- G2: the improvement d(net IR) is LARGER for high-cost strategies (low-vol,
+  short-term reversal) than for low-cost ones (value): Spearman rank corr
+  between cost intensity (monthly-tier TO x mean hs) and d(net IR) > 0.
+- G3: the IR-weighted combined book across the 7 strategies has a higher net
+  Sharpe under regime-conditional banding than under static banding.
+
+A MISS on any gate is reported as such (null results are reportable).
+Direction expectation from S6 + the 2026-07-15 crash/recovery decomposition:
+wide band in crash, tighter band in recovery; but the grid explores all
+directions and the frontier decides.
