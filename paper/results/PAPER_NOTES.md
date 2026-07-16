@@ -233,3 +233,26 @@ Honest paper claim: "regime-conditional banding derived from first principles
 delivers a small but out-of-sample-significant net-of-cost improvement for
 momentum specifically; across other large-cap anomalies it does not." Backing:
 paper/gp_bands.py, paper/results/banding_study/gp_bands.{md,csv}.
+
+## Momentum GP-band robustness battery (2026-07-16) — effect does NOT survive
+
+Stress-tested the load-bearing momentum result (theory-band beats static
++0.066, single-seed CI [+0.001,+0.022]). It does not hold up:
+
+- Bootstrap seed x block: CI excludes 0 in only 20/30 combos (block=6 straddles
+  0). Marginal, not robust.
+- OOS start year: dIR consistently POSITIVE (+0.018 @1998, +0.066 @2001,
+  +0.108 @2004, +0.064 @2007) but CI excludes 0 for only 2/4 starts, both
+  barely. Direction robust; significance flickers.
+- Ratio sensitivity: any tighter-in-panic band (ratio 0.5-0.9) helps momentum
+  (+0.04 to +0.11); ratio=1.0 (no regime)=0. So the DIRECTION is robust but
+  the theory ratio isn't special -- any panic-tightening works.
+- Multiple testing (Benjamini-Hochberg across all 7 strategies): momentum
+  two-sided block-bootstrap p=0.203; 0/7 survive FDR at q=0.05.
+
+CONCLUSION: regime-conditional banding shows a CONSISTENT POSITIVE DIRECTION
+for momentum (tighter band in panic helps) but is NOT statistically
+significant once bootstrap fragility + multiple testing are accounted for.
+We cannot reject the null of no regime effect for any strategy. The one robust
+finding remains that plain (static) banding reduces net-of-cost turnover
+(helps 5/7 OOS). Backing: paper/gp_robustness.py.
