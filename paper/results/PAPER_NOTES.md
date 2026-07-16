@@ -281,3 +281,29 @@ answer to "can cluster features give better banding": no. The paper's robust
 finding remains plain static banding; the contribution is the cautionary
 methods result that state/cluster-conditioned cost-mitigation overfits as a
 class (regime AND clusters, month AND stock level, econ AND GP fits).
+
+## Cluster-conditioned banding, ALL 7 strategies + FDR (2026-07-16) — comprehensive null
+
+Extended cluster_bands.py to all 7 (momentum, reversal, lowvol, xgb, value,
+profitability, investment) x 5 conditioning arms = 35 honest walk-forward OOS
+tests. Stock labels PIT-computed once (strategy-independent). BH-FDR q=0.05.
+
+Headline: Positive vs static 9/35; CI excludes 0: 5/35; survive BH-FDR: 2/35 --
+BUT the 2 "survivors" (xgb cluster_month_gp, cluster_stock_gp) have
+minus_static = 0.000 EXACTLY: the GP cluster ratios ~1 so those arms ARE the
+static band (degenerate significant-zeros, not a real effect). Of the 5 cells
+with a nonzero CI excluding 0, FOUR are NEGATIVE (reversal/lowvol/xgb
+cluster_month_gp and xgb cluster_month_econ/stock_econ significantly HURT);
+the only nonzero-positive CI-excl-0 is momentum regime (+0.066, p=0.203, does
+NOT survive FDR -- the fragile one we already debunked). Every positive point
+estimate (momentum month_econ +0.136 p=0.109, profitability month_gp +0.090
+p=0.077) is insignificant and flips sign across strategies (momentum month_econ
++0.136 vs xgb -0.151).
+
+CONCLUSION: across 7 strategies x 5 conditioning fits, ZERO show a robust
+positive net-of-cost improvement over static banding; the only significant
+nonzero effects are NEGATIVE. Cluster-conditioning fails comprehensively, at
+every granularity and fit. Combined with regime (2/3-state) and the GP band,
+this is a complete, multi-signal demonstration that state-conditioned
+cost-mitigation banding overfits as a class. Robust finding = plain static
+banding only. Backing: cluster_bands.{md,csv}.
