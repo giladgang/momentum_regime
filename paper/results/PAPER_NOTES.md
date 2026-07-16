@@ -338,3 +338,31 @@ banding-beats-monthly win misattributed to a panic-freeze mechanism.
 FINAL: static banding (trade less) is the only robust cost-mitigation result.
 Regime, crash/recovery, month-cluster, stock-cluster, GP, econ, AND
 parameter-free panic-freeze / beaten-down-hold rules ALL fail to beat it OOS.
+
+## Trained per-cluster band — profitability SURVIVES robustness (2026-07-16)
+
+"Train band adjustment on cluster state": learn per-cluster band on prior data
+(argmax over 81 vectors, clusters in {10,20,40}), 1-SE regularized, apply OOS.
+6/7 strategies collapse to static under regularization. profitability does NOT:
+trained_reg beats static +0.137 IR (0.341 vs 0.205), p=0.015, BH-sig.
+
+Robustness battery (paper/cluster_trained_robust.py) -- survives everything
+that killed the momentum-GP result:
+- seed x block: CI excludes 0 in 30/30 combos.
+- OOS start year 1998/2001/2004/2007: dIR +0.107/+0.137/+0.164/+0.150, CI
+  excludes 0 all 4.
+- cluster K=3/4/5: +0.137 (stable; verify the K-override propagates -- flagged).
+
+This is the FIRST robustness-surviving positive in the study. HONEST CAVEATS:
+(1) 1 of 7 strategies, and ONE survivor of a very broad multi-hypothesis
+search across the whole session (>100 strategy x arm x method tests) -- the
+within-result robustness rules out estimation-instability but NOT
+false-discovery from the broad search; treat as a HYPOTHESIS to validate on
+fresh data, not a confirmed effect. (2) plausible but POST-HOC story: the
+momentum-shape cluster of a profitability book may flag "beaten-down quality"
+months (high-profitability stocks that also got cheap) that are worth holding.
+(3) verify which band vector trained_reg picks per cluster (is it "hold the
+loser-cluster months wider"?) before believing the mechanism.
+
+So: cluster-conditioned banding is null for 6/7 but there is ONE robust
+exception worth a clean out-of-sample re-test.
