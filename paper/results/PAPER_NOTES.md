@@ -366,3 +366,23 @@ loser-cluster months wider"?) before believing the mechanism.
 
 So: cluster-conditioned banding is null for 6/7 but there is ONE robust
 exception worth a clean out-of-sample re-test.
+
+## CORRECTION: the profitability "survivor" is NOT a cluster effect
+
+Mechanism inspection kills it. trained_reg for profitability picks a UNIFORM
+band every year -- (40,40,40,40) in 18/25 years, (10,10,10,10) in 7 -- NEVER
+cluster-differentiated (the 1-SE regularization collapses to complexity-1).
+So the +0.137 is not cluster-conditioning: it is a plain band-WIDTH artifact,
+"a wide uniform band (E=40, trade least) beats the walk-forward static
+baseline's width selection for profitability" (my static grid was {10,15,20,
+30,40}; the uniform-40 vector from the trained grid beat static's yearly pick).
+Per-cluster active means for profitability are flat (0.0001-0.0018) -- no
+cluster signal. K-override verified genuine (K=3/4/5 give 3/4/5 clusters), so
+the K-invariance was because the pick is uniform regardless of K.
+
+FINAL (stands): cluster-conditioning contributes NOTHING. Even the one
+robustness-surviving positive, on inspection, is a uniform (non-cluster) band
+that the regularization chose by discarding the clusters. The comprehensive
+null holds across regime, crash/recovery, month+stock clusters, panic-freeze,
+beaten-down-hold, fixed-ratio AND trained-per-cluster fits. The sole robust
+cost-mitigation lever is plain static band width (trade less), set uniformly.
