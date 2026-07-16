@@ -446,3 +446,22 @@ band, significantly HURTS the main model. Combined with regime, crash/recovery,
 month+stock clusters, panic-freeze, hold-losers, and trained-per-cluster: the
 conditioning question is closed. Cost is reduced by trading LESS (uniform
 banding / lower frequency), full stop.
+
+## Turnover/cost diagnostic — WHY conditioning failed (2026-07-16)
+
+Decomposed each strategy's monthly-book turnover & cost by regime, transition,
+and trade cause. Backing: paper/turnover_diagnostic.py, turnover_diagnostic.{md,csv}.
+
+Three findings:
+1. Turnover is REGIME-INVARIANT: to_calm ~ to_panic for all 7 (momentum .33/.35,
+   reversal .92/.88, xgb .74/.80). No panic trading spike -> nothing for
+   regime/momentum conditioning to dampen. This is WHY every conditioning test
+   was null: trading is not state-dependent.
+2. Cost concentrates in panic (33-44% of cost in 25-31% of months) purely via
+   WIDER SPREADS, not more trading. Panic is a spread phenomenon.
+3. Cost is ~80-97% decile RESHUFFLING (entry+exit_rank, balanced), not drift
+   (weight small) and not regime. Reshuffling is uniform month to month.
+
+The two real cost sources map onto the two real levers: reshuffling ->
+uniform banding; panic spread premium -> liquidity provision. Coherent story;
+conditioning adds nothing because there is no state-specific trading to condition.
