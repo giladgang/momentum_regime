@@ -207,3 +207,29 @@ profitability are WORSE banded). So "banding reduces net-of-cost turnover" is
 a real mechanism but not a universal free lunch.
 
 Backing: paper/results/banding_study/walkforward.{md,csv}, paper/walkforward_banding.py.
+
+## GP/Constantinides analytic regime band (2026-07-16) — the regime effect, located
+
+Principled band-fit: panic/calm band-width RATIO derived from theory
+(w ~ (spread/(gamma*var))^(1/3)), so the regime ratio is parameter-free and
+only ONE global scale is fit -- matched to the static band's single parameter
+(no 120-vs-5 search asymmetry). Walk-forward, expanding, OOS 2001+ (xgb 2013).
+
+Estimated ratio ~0.68 for all non-xgb (0.46 xgb): theory says trade ~32% MORE
+in panic -- the regime VARIANCE spike (panic vol ~2-4x calm) dominates the
+modest spread spike (~1.15x), so you want to track the target more tightly
+despite higher costs.
+
+Result: theory-regime beats static OOS for 2/7, significant (bootstrap CI
+excludes 0) for 1/7 = MOMENTUM (+0.066 IR, CI [+0.001,+0.022]). For the other
+5 the theory band slightly hurts. So the ONE robust regime effect is momentum:
+it survives argmax (+0.162, inflated), dies under 1-SE grid regularization (0),
+and RE-APPEARS as a small, significant, principled effect under the GP band
+(+0.066). Interpretation: momentum banded is ~break-even net of cost (theory_ir
++0.003 vs static -0.063), and the regime band's value is that it stops static
+banding from HURTING momentum -- not that it makes momentum profitable.
+
+Honest paper claim: "regime-conditional banding derived from first principles
+delivers a small but out-of-sample-significant net-of-cost improvement for
+momentum specifically; across other large-cap anomalies it does not." Backing:
+paper/gp_bands.py, paper/results/banding_study/gp_bands.{md,csv}.
