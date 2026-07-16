@@ -119,6 +119,27 @@ def _members(g, score_col, policy, prev, pi_t, pi_prev, mi=0):
         e = {0: ec, 1: ecr, 2: erec}[s3] / 100.0
         keep = {p for p in prev if p in univ and rank_pct[p] <= e}
         return set(ranked[:k]) | keep
+    if name == 'cluster_band':
+        # K-state NMV banding: keep-band E switches on the MONTH's momentum-
+        # shape cluster label (constant within the month, like state3).
+        # arg = (E_0, ..., E_{K-1}); reduces to nmv_band(E,E) when all equal.
+        s = int(g['cluster'].iloc[0]) if 'cluster' in g else 0
+        e = arg[s] / 100.0
+        keep = {p for p in prev if p in univ and rank_pct[p] <= e}
+        return set(ranked[:k]) | keep
+    if name == 'stock_cluster_band':
+        # per-STOCK NMV band: keep stock p if its rank_pct <= E[cluster_of_p].
+        # arg = {cluster -> E}. Reduces to nmv_band(E,E) when all E equal.
+        cl = (g.set_index('permno')['stock_cluster']
+              if 'stock_cluster' in g else None)
+        keep = set()
+        for p in prev:
+            if p not in univ:
+                continue
+            c = int(cl[p]) if cl is not None and p in cl.index else 0
+            if rank_pct[p] <= arg[c] / 100.0:
+                keep.add(p)
+        return set(ranked[:k]) | keep
     if name == 'regime_patient':
         # THE PRODUCT: benchmark (or wide-band tilt) in calm; one decisive
         # reorganization into the model basket when pi crosses enter;
