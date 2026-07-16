@@ -256,3 +256,28 @@ significant once bootstrap fragility + multiple testing are accounted for.
 We cannot reject the null of no regime effect for any strategy. The one robust
 finding remains that plain (static) banding reduces net-of-cost turnover
 (helps 5/7 OOS). Backing: paper/gp_robustness.py.
+
+## Cluster-conditioned banding (2026-07-16) — also does NOT survive
+
+Tested banding conditioned on the momentum-shape clusters (C4 deep-loser /
+C3 recovery), both MONTH-level and STOCK-level, both economic-direction (hold
+deep-losers wider) and GP (spread/var)^(1/3), PIT expanding-refit clusters,
+one global scale per arm walk-forward-selected (matched to static), walk-
+forward OOS from 2001 (xgb 2013). Backing: paper/cluster_bands.py,
+paper/src/clusters.py, cluster_bands.{md,csv}.
+
+Result: no robust improvement.
+- cluster_month_econ: momentum +0.136 vs static (CI includes 0, insig) but
+  xgb -0.151 (CI [-0.030,-0.002], significantly NEGATIVE). Opposite signs
+  across strategies = noise, not effect.
+- cluster_stock_* (the higher-power arm we expected to rescue it): momentum
+  +0.032 / xgb -0.023, both insignificant. Cross-sectional power did not help.
+- gp cluster arms collapse to static (clusters barely differ in spread/var,
+  so ratios ~1).
+
+No arm is consistently positive with a CI excluding 0. Cluster-conditioning
+joins regime-conditioning in failing the honest test. This is the decisive
+answer to "can cluster features give better banding": no. The paper's robust
+finding remains plain static banding; the contribution is the cautionary
+methods result that state/cluster-conditioned cost-mitigation overfits as a
+class (regime AND clusters, month AND stock level, econ AND GP fits).
