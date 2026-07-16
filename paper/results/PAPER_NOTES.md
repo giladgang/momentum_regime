@@ -386,3 +386,26 @@ that the regularization chose by discarding the clusters. The comprehensive
 null holds across regime, crash/recovery, month+stock clusters, panic-freeze,
 beaten-down-hold, fixed-ratio AND trained-per-cluster fits. The sole robust
 cost-mitigation lever is plain static band width (trade less), set uniformly.
+
+## Rebound-enabled liquidity provision — the SPREAD lever (2026-07-16)
+
+New direction: not turnover (banding) but the spread side. The rebound result
+de-risks providing liquidity on panic buys of beaten-down names (they come
+back, so you're not catching a falling knife) -> earn the half-spread instead
+of crossing the wide panic spread. Backing: paper/liquidity_provision.py,
+liquidity_provision.{md,csv}. Monthly book, per-stock hs, panic = pi>=0.5,
+beaten-down = below-median mom_12, buy = dw>0.
+
+Result: mechanism validates -- 0 saving for momentum (buys winners), biggest
+for loser-buyers (reversal -25% of cost / 0.87%/yr; xgb -17% / 0.05%/yr; value
+-28%). Saving concentrated on the panic beaten-down buys (8-14% of total cost
+sits there). BUT absolute magnitude small on LARGE CAPS: large-cap spreads are
+~2-3bp so even flipping the sign on panic buys saves ~0.05-0.9%/yr. Composes
+with banding (different lever). Best-case bound (assumes passive fills in
+panic; adverse selection would erode it).
+
+Positioning: real + novel + directly flips Marc's panic-liquidity critique
+(rebound => you PROVIDE liquidity, earning the widest spreads instead of
+paying them), but the large-cap focus is where it matters least. Turnover
+lever (banding) remains the main cost story; LP is a real secondary lever,
+strongest for higher-turnover / higher-spread strategies.
