@@ -409,3 +409,17 @@ Positioning: real + novel + directly flips Marc's panic-liquidity critique
 paying them), but the large-cap focus is where it matters least. Turnover
 lever (banding) remains the main cost story; LP is a real secondary lever,
 strongest for higher-turnover / higher-spread strategies.
+
+## LP saving — defensible range (2026-07-16), lp_sensitivity.py
+
+Swept realized execution factor f (+1 pay half-spread=naive ... 0 cross-at-mid
+... -1 earn half-spread=best). Realistic passive provision ~ f in [-0.2,+0.2]
+(realized spread ~30-50% of quoted x partial fill) => the mid (f=0) column is
+the honest central estimate. Saving %/yr:
+- xgb (applied large-cap model): 0.027 realistic, 0.054 best. ~3bp/yr.
+- reversal (high turnover, buys losers): 0.44 realistic, 0.87 best.
+- others (lowvol/value/profitability/investment): 0.02-0.07 realistic.
+- momentum: 0 (control -- buys winners, no beaten-down panic buys).
+Conclusion: the spread lever is real + correctly targeted but economically
+SMALL on large caps (single-digit bp/yr even best-case); material only for
+high-turnover strategies. Turnover lever (banding) remains the cost story.
