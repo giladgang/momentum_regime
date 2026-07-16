@@ -155,6 +155,25 @@ def _members(g, score_col, policy, prev, pi_t, pi_prev, mi=0):
             if rank_pct[p] <= arg[c] / 100.0:
                 keep.add(p)
         return set(ranked[:k]) | keep
+    if name == 'rm_band':
+        # band width as a function of (regime x past-momentum bucket):
+        # keep-band E depends on the month regime (pi>=0.5) and whether the
+        # held stock's mom_12 is below the month median. arg =
+        # (E_calm_hi, E_calm_lo, E_panic_hi, E_panic_lo). Reduces to
+        # nmv_band(E,E) when all four equal.
+        ech, ecl, eph, epl = arg
+        panic = pi_t >= 0.5
+        mom = g.set_index('permno')['mom_12']
+        med = float(mom.median())
+        keep = set()
+        for p in prev:
+            if p not in univ:
+                continue
+            low = (p in mom.index) and (mom[p] <= med)
+            e = (epl if low else eph) if panic else (ecl if low else ech)
+            if rank_pct[p] <= e / 100.0:
+                keep.add(p)
+        return set(ranked[:k]) | keep
     if name == 'regime_patient':
         # THE PRODUCT: benchmark (or wide-band tilt) in calm; one decisive
         # reorganization into the model basket when pi crosses enter;

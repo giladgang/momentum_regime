@@ -423,3 +423,26 @@ the honest central estimate. Saving %/yr:
 Conclusion: the spread lever is real + correctly targeted but economically
 SMALL on large caps (single-digit bp/yr even best-case); material only for
 high-turnover strategies. Turnover lever (banding) remains the cost story.
+
+## Band = f(regime x past-momentum) — DEFINITIVE head-on test (2026-07-16)
+
+The exact "condition banding on regime AND past momentum" idea, as a 4-state
+band (calm/panic x high/low-momentum). Three fits vs WF-selected static, all 7,
+BH-FDR. Backing: paper/rm_band_test.py, paper/execution.py rm_band policy,
+rm_band.{md,csv}.
+
+Result: 0/21 positive-and-significant.
+- econ (hold panic low-momentum names wider = Gilad's intuition): HURTS xgb
+  -0.114 and reversal -0.090; mixed/insignificant elsewhere; the one CI-excl-0
+  econ cell (value -0.018) is NEGATIVE.
+- argmax (learn the 4-cell band): momentum +0.124 / xgb +0.084 but insignificant
+  (p 0.17-0.40) -- the usual search inflation.
+- reg: collapses to static (0.000) for 6/7; profitability +0.137 recurs but is
+  the SAME uniform-band artifact (reg picks (40,40,40,40)), not conditioning.
+
+DEFINITIVE: conditioning the band on regime x past-momentum does not beat plain
+static banding OOS. The economic "hold beaten-down in panic" version, done as a
+band, significantly HURTS the main model. Combined with regime, crash/recovery,
+month+stock clusters, panic-freeze, hold-losers, and trained-per-cluster: the
+conditioning question is closed. Cost is reduced by trading LESS (uniform
+banding / lower frequency), full stop.
