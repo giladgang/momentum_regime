@@ -307,3 +307,34 @@ every granularity and fit. Combined with regime (2/3-state) and the GP band,
 this is a complete, multi-signal demonstration that state-conditioned
 cost-mitigation banding overfits as a class. Robust finding = plain static
 banding only. Backing: cluster_bands.{md,csv}.
+
+## Beaten-down-hold / panic_no_sell — honest WF test (2026-07-16), the gap closed
+
+Gilad flagged that panic_no_sell (the strong pre-tonight S5 result, net IR 0.33
+vs monthly 0.06) never got a walk-forward test -- it was a FREEZE policy, not a
+band width, so it fell outside the width-grid pipeline. Tested it now
+(parameter-free, so NO overfitting excuse): panic_no_sell, panic_hold_losers
+(freeze only below-median-momentum held names in panic), + a 1-param thr
+variant, vs walk-forward-selected static, all 7 strategies, BH-FDR.
+Backing: paper/hold_losers.py, paper/execution.py panic_hold_losers policy,
+hold_losers.{md,csv}.
+
+Result: Positive vs static 7/21; CI excludes 0: 2/21; survive BH-FDR: 1/21;
+POSITIVE-AND-SIGNIFICANT: 0/21. The 2 significant cells are both NEGATIVE
+(reversal panic_no_sell -0.246, panic_hold_losers_wf -0.329 -- freezing a
+reversal book is catastrophic, as expected). Positive point estimates
+(momentum +0.039, profitability +0.058) are insignificant (p 0.3-0.9) and, for
+momentum, don't even beat plain monthly (+0.106) -- i.e. "trade less" not
+"freeze in panic".
+
+KEY REINTERPRETATION: the original 0.33-vs-0.06 was panic_no_sell vs MONTHLY --
+i.e. freeze-beats-churn, which is just the general "banding beats monthly"
+effect. Benchmarked against a proper (walk-forward-selected) STATIC band and
+evaluated OOS, panic_no_sell adds NOTHING robust. Because the rule is
+parameter-free, this is not overfitting -- there is genuinely no panic-specific
+freeze edge beyond trading less overall. The strong pre-tonight number was the
+banding-beats-monthly win misattributed to a panic-freeze mechanism.
+
+FINAL: static banding (trade less) is the only robust cost-mitigation result.
+Regime, crash/recovery, month-cluster, stock-cluster, GP, econ, AND
+parameter-free panic-freeze / beaten-down-hold rules ALL fail to beat it OOS.

@@ -88,6 +88,21 @@ def _members(g, score_col, policy, prev, pi_t, pi_prev, mi=0):
         keep = {p for p in prev if p in univ}
         fill = [p for p in ranked if p not in keep][:max(k - len(keep), 0)]
         return keep | set(fill)
+    if name == 'panic_hold_losers':
+        # in panic, DON'T sell the beaten-down held names (below-median
+        # momentum among current holdings); trade the rest to the decile.
+        # Parameter-free; targets "hold the fallen names through recovery" as
+        # a turnover reducer. thr = momentum-percentile cutoff (default 0.5).
+        thr = arg if arg is not None else 0.5
+        if pi_t < 0.5 or not prev:
+            return set(ranked[:k])
+        held = [p for p in prev if p in univ]
+        mom = g.set_index('permno')['mom_12']
+        mh = mom.reindex(held).dropna()
+        cut = mh.quantile(thr) if len(mh) else np.nan
+        losers = {p for p in held if p in mom.index and mom[p] <= cut}
+        fill = [p for p in ranked if p not in losers][:max(k - len(losers), 0)]
+        return losers | set(fill)
     if name == 'flip_freeze':
         flip = (pi_prev is None) or ((pi_t >= 0.5) != (pi_prev >= 0.5))
         if flip or not prev:
