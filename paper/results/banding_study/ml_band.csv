@@ -1,0 +1,15 @@
+strategy,arm,test_ir,static_test_ir,minus_static,excl0,p_boot,top_factors,bh_sig
+momentum,learned_unreg,0.187,0.0727,0.1143,False,0.327,"REL_N_z:+1.20, TERM_z:+1.01, LVIX_z:-0.96",False
+momentum,learned_reg,0.2158,0.0727,0.143,False,0.182,"LVIX_z:-1.06, DD_z:-0.75, TERM_z:+0.67",False
+reversal,learned_unreg,-0.3489,-0.1364,-0.2126,False,0.884,"CS_z:-1.12, REL_N_z:+0.78, DISP_z:+0.67",False
+reversal,learned_reg,-0.3489,-0.1364,-0.2126,False,0.884,"CS_z:-1.12, REL_N_z:+0.78, DISP_z:+0.67",False
+lowvol,learned_unreg,-0.1231,-0.0862,-0.0369,False,0.868,"TERM_z:-1.02, CS_z:+0.80, DD_z:-0.70",False
+lowvol,learned_reg,-0.1231,-0.0862,-0.0369,False,0.868,"TERM_z:-1.02, CS_z:+0.80, DD_z:-0.70",False
+xgb,learned_unreg,0.7979,0.8947,-0.0968,True,0.47,"CS_z:-1.19, pi:+1.03, REL_N_z:-1.02",False
+xgb,learned_reg,1.0829,0.8947,0.1882,False,0.114,"DD_z:+0.95, REL_N_z:+0.87, TERM_z:-0.46",False
+value,learned_unreg,0.0409,-0.0094,0.0503,False,0.579,"VOL_z:+1.19, LVIX_z:+1.16, TERM_z:-1.16",False
+value,learned_reg,0.007,-0.0094,0.0164,False,0.849,"LVIX_z:+0.63, DISP_z:-0.43, CS_z:-0.37",False
+profitability,learned_unreg,0.3744,0.5291,-0.1547,False,0.828,"REL_N_z:+0.70, VOL_z:+0.48, CS_z:+0.32",False
+profitability,learned_reg,0.3744,0.5291,-0.1547,False,0.828,"REL_N_z:+0.70, VOL_z:+0.48, CS_z:+0.32",False
+investment,learned_unreg,0.1127,0.1604,-0.0477,False,0.697,"DD_z:+1.12, pi:-1.08, REL_N_z:+0.99",False
+investment,learned_reg,0.1129,0.1604,-0.0475,False,0.529,"REL_N_z:+0.80, SKEW_z:+0.63, DD_z:+0.48",False

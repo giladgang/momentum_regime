@@ -487,3 +487,31 @@ confirming the mechanistic argument (turnover regime-invariant; spread effect
 offset by rebound; splitting the sample adds variance for ~0 bias reduction).
 The rigid band is not a limitation we settled for -- it is what optimization
 selects.
+
+## Learned flexible band (learned factor weights) — null (2026-07-17)
+
+Addresses the limitation of var_band (fixed equal-weight composite, single
+slope): here w is a LEARNED 9-vector over pi + 8 panel z-factors.
+E_t=clip(E_base*exp(z.w),5,100); black-box policy search (900 draws) over
+(E_base,w) maximizing TRAIN net-IR on 60% of months; evaluated on the disjoint
+40% OOS test. lambda=0 (unreg) and 0.3 (L2 shrink toward static w=0).
+Backing: paper/ml_band.py, ml_band.{md,csv}.
+
+Result: positive vs static 5/14 (coin flip); CI excl 0 1/14 -- and that cell is
+xgb learned_unreg at MINUS 0.097 (learned band WORSE); positive+BH-sig 0/14.
+Best cells (momentum reg +0.143 p=0.18; xgb reg +0.188 p=0.11) insignificant.
+
+KEY DIAGNOSTIC -- weight instability: for the same strategy and same training
+data, the unreg and reg fits select DIFFERENT factors with FLIPPED signs
+(momentum: REL_N+1.20/TERM+1.01 vs LVIX-1.06/DD-0.75; xgb: CS-1.19/pi+1.03/
+REL_N-1.02 vs DD+0.95/REL_N+0.87). A real factor->band mapping would be
+recovered by both fits. The instability is direct evidence there is no stable
+mapping to learn -- the optimizer fits noise, and a mild penalty change moves
+which noise it grabs.
+
+Caveats (honest): single 60/40 split (not walk-forward like var_band); random
+search over 9-dim is coarse; link is log-linear (no tree/GBM interactions).
+But it converges with the walk-forward var_band result (which selected beta=0),
+and the weight instability explains why. Conditioning the band on market state
+is closed across: discrete state grids, learned per-state, continuous single-
+slope (WF-optimized -> beta=0), and learned multi-factor weights.
