@@ -515,3 +515,33 @@ But it converges with the walk-forward var_band result (which selected beta=0),
 and the weight instability explains why. Conditioning the band on market state
 is closed across: discrete state grids, learned per-state, continuous single-
 slope (WF-optimized -> beta=0), and learned multi-factor weights.
+
+## Cluster-conditioned band, COST as outcome, thesis labels, all 4 clusters (2026-07-17)
+
+Direct cost measurement (not IR) of widening the no-trade band in each THESIS
+k=4 cluster, one at a time, all 7 strategies, 2011-01..2024-11 (thesis label
+coverage). Backing: paper/cluster_cost_study.py, cluster_cost.{md,csv}.
+In-sample upper bound (thesis labels are a full-sample fit).
+
+Result confirms the ~2.9% spread-timing ceiling:
+- Most any cluster beats uniform banding at MATCHED turnover, across 224 cells:
+  momentum C2 E=60, +0.230 bp/yr = 1.48% of cost. All 7 strategies <= 1.48%
+  (ceiling ~2.9%). 93/224 cells positive (coin flip around zero). Ceiling NOT
+  falsified.
+- C3 (deep-loser) widening beats uniform in 6/7 strategies but by <=0.107 bp/yr
+  (reversal), ~0.1 bp/yr / ~0.3% of cost. Sign is consistent because C3 is the
+  highest-spread cluster (1.60bp) -> skipped trades marginally dearer; the
+  spread-timing channel the ceiling bounds. Real, mechanistically coherent,
+  economically negligible.
+- The large RAW savings (reversal 23%, xgb 22%) are a FREQUENCY artifact:
+  widening in C1 (37% of months) is partial uniform banding; at matched
+  turnover those cells are WORSE than uniform (reversal -1.29 bp/yr). The
+  matched-turnover test strips the artifact.
+
+Conclusion: conditioning the band on the cluster does not cut cost better than
+plain uniform banding on a modern large-cap long-only book. Confirms, in cost
+terms and on the thesis labels, the earlier IR null (cluster_bands.py) and the
+analytic ceiling. Novelty check (2026-07-17): the METHOD (regime/cluster-
+conditioned banding) is genuinely unclaimed, but the null carries only if the
+ceiling is framed as the general bound; DanielJagannathanKim2019 pre-empts the
+signal story.
