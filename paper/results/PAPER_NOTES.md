@@ -605,3 +605,28 @@ modern large-cap book. The promising 29% momentum-spread dispersion does not
 help because the strategy's trades don't span it. Closes the continuous-band
 conditioning question, consistent with the discrete cluster nulls, var_band
 (beta=0), ml_band, and the clean-room regime null.
+
+## Trained per-stock band on (momentum score, regime score), walk-forward (2026-07-17)
+
+The band Gilad asked for: E_it = clip(E_base*exp(a*mom_z_it + b*(pi_t-.5)),5,100),
+(E_base,a,b) FIT on an expanding window (1992->) to maximize TRAIN net-of-cost
+active IR, applied OOS, 7 strategies. Per-stock (each stock's band depends on its
+OWN momentum z-score) -- distinct from var_band/ml_band (per-month market
+factors). Engine: stock_var_band. Backing: paper/train_band.py, train_band.{md,csv}.
+
+Result -- the regularized trained band IS the static band:
+- reg (1-SE regularized toward static) minus static = +0.000 for ALL 7
+  strategies. The honest trained band reverts EXACTLY to the uniform static band
+  every walk-forward year: no momentum/regime conditioning candidate ever beats
+  the best static candidate by >1 Sharpe-SE on training data.
+- argmax (UNregularized) minus static: momentum +0.093, xgb +0.067, reversal
+  +0.031, profitability +0.016, value -0.013, lowvol -0.053, investment -0.091.
+  4 positive / 3 negative, mean ~+0.007. Random-signed noise = the overfitting
+  signature: without the guard the trained band grabs in-sample patterns that are
+  a coin flip OOS.
+
+Conclusion: given freedom to train the band on per-stock momentum score and
+regime score, the honestly-regularized optimizer chooses NO conditioning -- it
+reverts to the static band. Per-stock version of var_band's beta=0. Closes the
+"train the band on momentum + regime" question; consistent with every prior null
+(clusters, var_band, ml_band, rm_band, mom_pi_band, clean-room).

@@ -1,0 +1,8 @@
+strategy,n_oos_mo,ir_static,ir_argmax_overfit,ir_reg_trained,reg_minus_static,argmax_minus_static,ci_lo,ci_hi,p_boot,excl0
+momentum,299,-0.037,0.056,-0.037,0.0,0.093,0.0,0.0,2.0,False
+reversal,299,0.002,0.033,0.002,0.0,0.031,0.0,0.0,2.0,False
+lowvol,288,0.096,0.044,0.096,0.0,-0.053,0.0,0.0,2.0,False
+xgb,119,0.585,0.651,0.585,0.0,0.067,0.0,0.0,2.0,False
+value,299,0.086,0.073,0.086,0.0,-0.013,0.0,0.0,2.0,False
+profitability,299,0.244,0.26,0.244,0.0,0.016,0.0,0.0,2.0,False
+investment,299,0.313,0.222,0.313,0.0,-0.091,0.0,0.0,2.0,False
