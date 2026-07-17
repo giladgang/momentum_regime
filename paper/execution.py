@@ -162,6 +162,21 @@ def _members(g, score_col, policy, prev, pi_t, pi_prev, mi=0):
         e = (float(g['eband'].iloc[0]) if 'eband' in g else arg) / 100.0
         keep = {p for p in prev if p in univ and rank_pct[p] <= e}
         return set(ranked[:k]) | keep
+    if name == 'stock_var_band':
+        # continuous PER-STOCK band width from the per-stock-month column
+        # 'eband' (E_it = smooth function of the stock's momentum / spread and
+        # market pi, computed upstream). keep stock p if rank_pct[p] <=
+        # eband_p/100. Reduces to nmv_band(E,E) when eband is constant = E.
+        eb = (g.set_index('permno')['eband'] if 'eband' in g else None)
+        keep = set()
+        for p in prev:
+            if p not in univ:
+                continue
+            e_p = (float(eb[p]) if eb is not None and p in eb.index
+                   else float(arg)) / 100.0
+            if rank_pct[p] <= e_p:
+                keep.add(p)
+        return set(ranked[:k]) | keep
     if name == 'rm_band':
         # band width as a function of (regime x past-momentum bucket):
         # keep-band E depends on the month regime (pi>=0.5) and whether the

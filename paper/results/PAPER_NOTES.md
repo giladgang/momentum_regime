@@ -575,3 +575,33 @@ most ~0.5 bp/yr over uniform banding; out-of-sample this goes to ~0 (cf. every
 conditioning test this session). Optimizing the band per cluster does not
 materially reduce cost. Consistent with the cost-as-outcome marginal study and
 the IR null.
+
+## Continuous momentum/pi-shaped per-stock band, OOS, cost (2026-07-17)
+
+Motivated by a REAL channel: detrended half-spread is U-shaped in momentum,
+29% dispersion (losers 1.21 / mid 0.94 / winners 1.10), vs 5% for clusters.
+Per-stock band E_it = E_base*(pred_spread)^kappa*exp(beta*(pi-.5)), pred_spread
+from a PIT expanding-window momentum-decile->spread map; kappa=1/3 =
+Constantinides. New engine policy stock_var_band (execution.py) + tests.
+Backing: paper/mom_pi_band.py (exploratory), paper/mom_pi_band_oos.py (rigorous),
+mom_pi_band_oos.{md,csv}.
+
+Exploratory run (full-sample 1992-2024, in-sample grid-max -- FLAWED): momentum
+0.89% / pi 2.31% advantage over uniform. Two flaws: era-confound (panic months =
+high-spread 1990s/2008) and in-sample selection (max over kappa,beta,E_base).
+
+Rigorous run (test set 2011-2024 only; FIXED theory arms; advantage at FIXED
+operating points E in {20,30,40} -- no cherry-pick):
+- Momentum shaping (kappa=1/3): -0.10% to +0.11%, MEAN ~0%, often NEGATIVE. The
+  29% channel is unexploitable OOS because a momentum book trades in a narrow
+  winner band and never reaches the spread extremes. Dead.
+- pi/regime tilt (beta=0.5): +0.02% to +0.34%, mean ~0.2% -- collapsed from
+  2.31% (90% was era-confound + selection). ~0.03 bp/yr. Same regime-timing the
+  clean-room already killed; re-confirmed in cost terms.
+- Best arm anywhere: +0.38% (investment) = 0.015 bp/yr.
+
+Conclusion: neither momentum nor pi shaping of the band cuts cost OOS on a
+modern large-cap book. The promising 29% momentum-spread dispersion does not
+help because the strategy's trades don't span it. Closes the continuous-band
+conditioning question, consistent with the discrete cluster nulls, var_band
+(beta=0), ml_band, and the clean-room regime null.
