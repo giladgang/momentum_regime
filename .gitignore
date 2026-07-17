@@ -6,8 +6,11 @@ data/
 .idea/
 .vscode/
 .venv/
+.venv-1/
 .venv-2/
 __pycache__/
+.Rhistory
+.pytest_cache/
 
 # LaTeX build artifacts
 *.aux
@@ -25,11 +28,13 @@ main.log
 logs/
 artefacts/
 
-# Baseline snapshots taken before destructive pipeline operations (large, kept
-# locally only). Catches every baseline_pre_<change>_<timestamp>/ pattern per
-# the CLAUDE.md backup convention — Shumway, intl-Shumway, full-rerun,
-# restructure, and any future variants.
-baseline_pre_*/
+# Baseline snapshots taken around destructive pipeline operations (large, kept
+# locally only). Catches both baseline_pre_<change>_<timestamp>/ and the
+# baseline_post_<change>_<timestamp>/ variant per the CLAUDE.md backup
+# convention — Shumway, intl-Shumway, full-rerun, restructure, and any future
+# variants. The earlier baseline_pre_*/ rule missed the _post_ snapshots, so
+# baseline_post_intl_phase_c_20260429_155420/ was tracked by accident.
+baseline_*/
 .last_intl_baseline
 
 # CV smoke + pytest-integration artifacts (kept locally, not in git)
@@ -39,6 +44,12 @@ results/*_pytest_integration.csv
 results/expanding_pi_filter_pytest_integration.csv
 results/expanding_returns_pytest_integration.csv
 results/expanding_summary_pytest_integration.csv
+
+# Pipeline outputs that land at the repo root. scripts/tree_combo_grouped.py
+# (Step 16) writes tree_combo_grouped_results.xlsx to cwd, so tracking it means
+# a clean checkout goes dirty on every run. Regenerate via run_pipeline.py.
+tree_combo_grouped_results.xlsx
+tree_combo_results.xlsx
 
 # Thesis verification suite — generated artifacts (commit only fixtures via PROVENANCE)
 tests/thesis/coverage_report.md
