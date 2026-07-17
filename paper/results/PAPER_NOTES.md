@@ -545,3 +545,33 @@ analytic ceiling. Novelty check (2026-07-17): the METHOD (regime/cluster-
 conditioned banding) is genuinely unclaimed, but the null carries only if the
 ceiling is framed as the general bound; DanielJagannathanKim2019 pre-empts the
 signal story.
+
+## Jointly OPTIMAL per-cluster band (brute-force), cost, thesis labels (2026-07-17)
+
+Strongest case for cluster-conditioning: perfect-hindsight thesis labels AND a
+brute-force-optimized per-cluster band (E_0..E_3) in {10,20,35,60,100}^4, each
+combo compared to the uniform band at MATCHED turnover. Backing:
+paper/cluster_optimal_band.py, cluster_optimal.{md,csv}.
+
+Result (in-sample UPPER BOUND):
+- Max advantage over uniform at matched turnover, bp/yr: momentum 0.552,
+  reversal 0.515, xgb 0.519, lowvol 0.152, investment 0.120, profitability
+  0.067, value 0.048. MEAN 0.282 bp/yr. Economically nil.
+- In %: momentum 3.56%, profitability 2.79%, investment 2.11%, lowvol 1.91%,
+  xgb 1.57%, value 1.43%, reversal 1.35%.
+
+Ceiling reconciliation (honest): the RIGOROUS spread-reallocation bound is
+(sp_wavg - sp_min)/sp_wavg = 2.40% (detrended cluster spreads 0.977..1.028,
+turnover-weighted), TIGHTER than the ~2.9% rough proxy stated earlier. Momentum
+(3.56%) and profitability (2.79%) EXCEED 2.40%. This exceedance is NOT cluster
+spread-timing: (a) magnitudes are <=0.55 bp/yr; (b) the optimal vecs do not
+follow the clean widen-dear/tighten-cheap pattern -- momentum's (100,10,100,100)
+widens the CHEAPEST cluster C0; (c) it is the max of 625 in-sample combos on the
+strategies most prone to overfitting. So the % breach is in-sample selection
+noise + stock-level composition, not a real cluster-timing channel.
+
+Conclusion: even a fully-optimized, perfect-hindsight per-cluster band saves at
+most ~0.5 bp/yr over uniform banding; out-of-sample this goes to ~0 (cf. every
+conditioning test this session). Optimizing the band per cluster does not
+materially reduce cost. Consistent with the cost-as-outcome marginal study and
+the IR null.
