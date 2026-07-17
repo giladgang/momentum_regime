@@ -6,203 +6,201 @@
 
 ## Question
 
-Can the thesis's momentum-shape clusters be used to expand and contract the
-no-trade band — trade less in some clusters, more in others — so as to reduce
-transaction costs on the 7 benchmark strategies?
+Using the thesis's k=4 momentum-shape clusters, can we widen (or tighten) the
+no-trade band in each cluster — trade less in some market states, more in others
+— to reduce the transaction cost of the 7 benchmark strategies? Test each cluster
+one at a time.
 
-**Cost is the outcome variable.** Not information ratio. This is the pivot that
-makes the study well-posed: cost is measured directly (turnover x spread, precise
-to under a basis point), whereas cost-driven differences in IR are provably
-undetectable on this book (cost moves IR by <=0.03 against a 0.054 noise floor —
-a 162x gap, established by clean-room rebuild 2026-07-17).
+**Cost is the outcome variable, not information ratio.** Cost is measured directly
+(turnover x spread, precise to under a basis point). Cost-driven differences in IR
+are provably undetectable on this book — cost moves IR by <=0.03 against a 0.054
+noise floor, a 162x gap (clean-room rebuild, 2026-07-17). Measuring cost directly
+sidesteps that entirely.
 
-## Sample — the thesis test set ONLY
+## Sample
 
-**2011-01-01 .. 2025-11-30, 179 months.** (`TRAIN_END`/`SPLIT_DATE` = 2011-01-01;
-`EVAL_YEARS` = 2011..2025. RESULTS_LOG.md updated to 179 by Gilad 2026-07-17.)
+**2011-01 .. 2024-11, 167 months.** This is the thesis test set AND the native
+coverage of the thesis cluster labels (which end 2024-11, the thesis data cutoff).
 
-Consequence, stated up front: 2011-2025 is the low-spread era. Measured top-1000
+Consequence, stated up front: 2011-2024 is the low-spread era. Measured top-1000
 median half-spread by decade: 51.3bp (1990s) / 3.98bp (2000s) / 1.28bp (2010s) /
-1.58bp (2020s). Restricting to the test set removes the entire high-spread era,
-where nearly all cost and all cost savings live. This is not a flaw in the design;
-it is the design's central finding (see "Expected result").
+1.58bp (2020s). The whole sample sits in the ~1.3-1.6bp world. This is not a flaw;
+it is the study's central quantitative finding (see "Expected result").
 
-## The cost budget (the whole pie) — measured, test set
+Extension to 2025-11 was considered and deferred: the thesis clusters derive from
+NYSE-decile splits of the PRODUCTION XGB score (`scripts/zscore_time_by_horizon.py`,
+`artefacts/cs_artefacts_data.pkl`), so labelling 2025 requires re-scoring the
+thesis XGB model on 2025 stocks and rebuilding the long-short z-curve feature — a
+mini-pipeline with divergence risk, buying ~3 extra C3 months. Not worth it for a
+result bounded at ~3%. Can be added later as an isolated task if 2011-2025
+coverage is wanted for cross-exhibit consistency.
 
-| strategy | turnover/yr | COST bp/yr | a 42% NMV-scale cut saves |
-|---|---|---|---|
-| momentum | 4.03 | 13.5 | 5.7 |
-| reversal | 11.02 | 38.4 | 16.1 |
-| lowvol | 2.59 | 6.8 | 2.9 |
-| xgb | 9.08 | 31.2 | 13.1 |
-| value | 0.53 | 2.0 | 0.8 |
-| profitability | 0.51 | 1.5 | 0.6 |
-| investment | 1.17 | 3.8 | 1.6 |
-| **mean** | **4.13** | **13.9** | **5.8** |
+## Cluster labels — the thesis object (authoritative)
 
-Implied test-window effective trade-weighted half-spread ~3.4bp across all seven.
-Corroboration: `xgb` exists only from 2011 and shows 1.72bp trade-weighted,
-consistent with the 1.28bp 2010s median.
+**Source: `results/thesis/cluster_k4_member_dates.csv`** (date -> cluster in
+{0,1,2,3}), with frozen centroids in
+`results/thesis/cluster_k4_descriptor_table.csv` (`z_centroid_mom_1..12`).
 
-**Everything this study can achieve is a fraction of the COST column.**
+- **k=4, fit on the long-short book's cross-sectional momentum term-structure**
+  (XGB-decile legs, z-scored per horizon). Distinct object from the paper's
+  long-only book; do NOT re-derive from `paper/src/clusters.py`.
+- Cluster identities from the frozen centroids (z_centroid across mom_1..12):
+  **C0 = winner** (+0.26..+0.80), C1 = mild-winner (~+0.1..+0.3),
+  C2 = mild-loser (~-0.3), **C3 = deep loser** (-0.73..-0.87 across all horizons).
+- **These labels are a FULL-SAMPLE (2011-2024) fit** => conditioning on them uses
+  information not available in real time. Every result is therefore an **in-sample
+  UPPER BOUND** on the cost a cluster-timed band could save: "with perfect
+  hindsight knowledge of the cluster, widening in cluster c saves at most X."
+  If even the hindsight upper bound is below the ceiling (which the ~3% bound
+  predicts), no real-time version can do better — a clean, strong negative.
+  This framing was chosen deliberately (Gilad, 2026-07-17): use the thesis
+  clusters as-is, report the upper bound.
 
-## Identification — can we know the cluster in real time?
+### Per-cluster facts on the momentum test set (measured, thesis labels)
 
-Cluster = KMeans(k=4) on the book's momentum term-structure z-curve
-(`mom_1..mom_12`, cross-sectionally z-scored), centroids fit on data strictly
-before month t, labels ordered by z-level (0 = most winner-tilted .. 3 = deepest
-loser). The curve is built from past returns, so it is observable at t.
+| thesis cluster | months (mom) | book momentum | turnover/yr | raw half-spread | cost bp/yr |
+|---|---|---|---|---|---|
+| C0 (winner) | 37 | 0.275 | 3.68 | 1.30bp | 12.1 |
+| C1 | 44 | 0.189 | 4.25 | 1.29bp | 13.7 |
+| C2 | 20 | 0.326 | 4.59 | 1.50bp | 16.7 |
+| C3 (deep loser) | 17 | 0.046 | 3.85 | 1.60bp | 14.2 |
 
-Measured real-time (PIT) vs hindsight agreement, 73.4% overall:
+(118 of the 167 months carry a label on the momentum strategy; cluster counts
+vary slightly by strategy. C3 is the smallest cell — 17 months — so inference on
+C3 is the least powered.)
 
-| hindsight says | real-time agreed |
-|---|---|
-| C0 | 69% |
-| C1 | **44%** — coin flip, unusable |
-| C2 | 76% |
-| C3 | **99%** — 92% precision |
+Note two things the labels changed from an earlier draft built on re-derived
+clusters:
+1. **C3 is NOT the highest-turnover cluster** (C2 is, 4.59 vs 3.85). The rationale
+   "widen in C3 because it trades most" does NOT hold on the thesis labels. C3's
+   case rests on it being the highest-SPREAD state (1.60bp), i.e. trade less where
+   trading is dearest.
+2. The "99% real-time identifiable" figure was for the re-derived PIT clusters,
+   NOT these thesis labels. It does not apply here and is removed.
 
-**C3 is the one cluster that is genuinely knowable in real time.** This is a
-necessary condition for tradability and it is a finding in its own right.
-
-### PIT cluster distribution on the test set
-
-| cluster | months | share | verdict |
-|---|---|---|---|
-| C0 | 1 | 0.6% | untestable (n=1) |
-| C1 | 26 | 14.5% | unusable (44% identification) |
-| C2 | 113 | 63.1% | "widen in C2" IS a uniform band |
-| C3 | **39** | **21.8%** | the only real treatment |
-
-C3's 39 months fall in **19 distinct episodes** (longest 9, in 2016). Effective
-n = 19, not 39. Inference must use block bootstrap at episode scale.
-
-## The ceiling (the interpretive frame)
+## The ceiling (the interpretive frame — and, per the novelty check, the actual contribution)
 
 Cost = sum_t (turnover_t x spread_t). A state-conditional band can only change
 *when* you trade, so it can only exploit **spread variation across states**.
 
-Detrended (year-demeaned log) spread faced by the book, by cluster:
+Detrended (year-demeaned log) half-spread faced by the book across the thesis
+clusters: **max/min = 1.052x => cost saving from cluster timing is capped at
+~2.9%.** Arithmetic, not an estimate. The raw cross-cluster spread differences are
+mostly calendar (spreads fell ~40x over the full sample; within 2011-2024 the
+residual trend still loads on cluster).
 
-| cluster | raw (bp) | detrended ratio |
-|---|---|---|
-| C0 | 42.32 | 0.990 |
-| C1 | 26.23 | 1.028 |
-| C2 | 3.42 | 1.001 |
-| C3 | 11.33 | 0.981 |
-| | **12x** | **1.047x** |
+Contrast: the HMM regime carries real spread information (1.19x, t=6.09) because
+spreads track market stress; clusters describe book shape, not stress. Hence the
+cluster ceiling is even tighter than the regime ceiling.
 
-The raw 12x cluster spread gap is **pure calendar** — C0 months live in the 1990s,
-C2 months in the 2010s. Detrended, spreads vary 4.7% across clusters.
+**The novelty check (2026-07-17) makes the ceiling the paper's contribution, not
+a caveat.** Regime/cluster-conditioned no-trade banding for cross-sectional equity
+factors is genuinely unclaimed as a method — NMV banding is static (one knob
+away); GP (2013) and CDS (2020) use quadratic-impact costs under which no
+no-trade band exists at all, so this is NOT a special case of their frameworks.
+But "novel method, null result" is weak on its own; a referee will ask "is the
+null your specific labels or fundamental?" **Only a ceiling framed as a GENERAL
+bound answers that** — the maximum cost any state-conditioning of factor execution
+can save over static banding. Lead with the ceiling; the cluster grid confirms it.
 
-**=> Cost saving from cluster timing alone is capped at ~1.9%.** Arithmetic, not
-an estimate. (Contrast: the HMM regime carries real spread information, 1.19x at
-t=6.09, because spreads track market stress; clusters describe book shape, not
-stress. Hence the difference.)
+## Design — exhibits
 
-But turnover DOES vary by cluster — C0 0.282 / C1 0.326 / C2 0.333 / **C3 0.366**.
-C3 is the highest-trading state. So widening in C3 removes real turnover. The live
-question is therefore not "can clusters time spreads" (no, 1.9%) but **"does
-widening in high-turnover clusters cut cost more efficiently than widening
-uniformly?"** Both sides measured in cost and turnover — precise, no IR.
+### Exhibit 1 — Cluster labels & cost budget
+The frozen-centroid identities, the per-cluster table above, and the total cost
+budget per strategy (13.9 bp/yr mean; 1.5-38 bp/yr range). States the whole pie:
+everything downstream is a fraction of this.
 
-## Design
+### Exhibit 2 — The ceiling
+The raw-vs-detrended spread-by-cluster table; the ~2.9% bound derived; the
+regime-vs-cluster contrast; the general-bound framing.
 
-### Exhibit 1 — Identification
-The PIT-vs-hindsight table and the test-set cluster distribution. Gates
-everything: C0/C1 results are null by construction and must be labelled as such.
-
-### Exhibit 2 — Ceiling
-Raw-vs-detrended spread-by-cluster table; the 1.9% bound derived.
-
-### Exhibit 3 — The 4x8 grid (the core)
-Per strategy, for cluster c in {0,1,2,3} and band level
+### Exhibit 3 — The 4x8 grid (the core; every cluster, one by one)
+For each strategy, each cluster c in {0,1,2,3}, and each band level
 E in {10, 15, 20, 25, 30, 40, 60, 100}: widen the band to E **only in cluster-c
-months**, baseline E=10 elsewhere. `E=10` is the no-op band (top-100 of top-1000
-= top 10%), i.e. plain monthly rebalancing; level 10 therefore recovers baseline
-and is the internal control.
+months**, baseline E=10 (= no-op band = plain monthly rebalance) elsewhere.
+Level 10 recovers baseline and is the internal control. 7 x 4 x 8 = 224 cells.
 
-Every cell reported **three** ways:
+Each cell reported **three** ways:
 1. **raw cost saved** (bp/yr)
-2. **cost saved per month of widening** — because raw saving is mechanically
-   proportional to the cluster's share of months, so C2 (63%) "wins" by being
-   common. That is arithmetic, not insight, and normalising kills it.
+2. **cost saved per month of widening** — raw saving is mechanically proportional
+   to a cluster's share of months, so a common cluster "wins" by frequency alone.
+   Normalising per treated-month removes that artifact.
 3. **turnover removed**
 
 Return impact rides along as a **reported column**, never a test statistic.
 
-### Exhibit 3b — Expand AND contract at matched turnover (the pure-timing arm)
-
-Exhibit 3 only widens. Contracting alone raises cost, so "expand and contract" is
-only meaningful as **reallocation**: contract the band where trading is cheap,
-expand it where trading is dear, holding **total turnover fixed by construction**.
-This isolates the spread-timing channel — the one the 1.9% ceiling bounds — and
-tests it directly rather than by inference.
-
-Construction: choose per-cluster widths `E_c = 10 * m_c` with the multiplier
-vector `m` tilted toward widening in high-spread clusters and tightening in
-low-spread clusters, then solve a single global scale so realised total turnover
-matches the uniform-band turnover at each of the 8 levels. Compare cost at that
-matched turnover. Any cost difference is **pure timing** and must be <= ~1.9%.
-
-Note C0 has n=1 on the test set, so the "contract" leg is exercised almost
-entirely through C1 (26 months, and only 44% identifiable). Report this as a
-power limitation, not a result.
+### Exhibit 3b — Expand AND contract at matched turnover (pure-timing arm)
+Widening alone only ever cuts cost; "expand and contract" is meaningful only as
+reallocation: contract the band where trading is cheap, expand where it is dear,
+holding **total turnover fixed by construction**. Choose per-cluster multipliers
+`m_c` tilted to widen high-spread clusters / tighten low-spread ones, solve one
+global scale so realised total turnover matches the uniform band at each level,
+compare cost. Any difference is **pure timing** and must be <= ~2.9%.
+(C0 is winner-tilted and low-spread, so the "contract" leg mostly acts through
+C0/C1; report as a power limitation, not a result.)
 
 ### Exhibit 4 — Uniform frontier (the matched test)
 Uniform band E in {10,12,15,18,22,26,30,35,40,50,60,80,100} traces a curve of
-(turnover removed, cost saved). Interpolate it. Then ask whether each cluster cell
-sits **above** that curve **at the same turnover removed**. That is the only
-meaning "more efficient" can have here, and both axes are precise.
+(turnover removed, cost saved). Interpolate it. Ask whether each cluster cell sits
+**above** that curve at the **same turnover removed** — the only meaning "more
+efficient" can have. Both axes precise.
 
 ### Exhibit 5 — Reconciliation
-Does the measured cluster-minus-uniform gap fall inside the 1.9% bound?
+Does the measured cluster-minus-uniform gap fall inside the ~2.9% bound?
 **Falsification condition, stated in advance:** if it lands materially outside the
 bound, the ceiling arithmetic is wrong and the study has found something real.
 
 ## Method
 
-- **PIT labels**: expanding refit (`_pit_month_labels`), centroids from pre-t data.
-- **Costing**: DNMV / Novy-Marx-Velikov effective half-spread, `cost = sum |dw| * hs`
-  (`banding_study.price_ledger`). `hs` is decimal in source; bp in the loaded panel.
+- **Labels**: join `cluster_k4_member_dates.csv` (month-end aligned) to each
+  strategy frame. In-sample by construction (see above); do not re-derive.
+- **Costing**: DNMV / Novy-Marx-Velikov effective half-spread,
+  `cost = sum |dw| * hs` (`banding_study.price_ledger`). `hs` decimal in source,
+  bp in the loaded panel.
 - **Baseline**: no-op band E=10 = monthly rebalance.
-- **Inference**: block bootstrap at **episode** scale (19 C3 episodes, not 39
-  months). Report intervals on the statistic actually being claimed.
+- **Engine**: `execution.simulate` with the existing `cluster_band` policy
+  (arg = (E_0..E_3)); a "widen cluster c only" cell is
+  `arg = (10,..,E at index c,..,10)`.
+- **Inference**: block bootstrap on the **cost** difference (the statistic being
+  claimed), block >= 12 to respect episode clustering (C3's 17 months are few
+  episodes). Report intervals on cost, never borrow an IR CI.
 
 ## Defects to fix before/while building (found 2026-07-17)
 
-1. **`_pit_month_labels` burn-in silently defaults to 0.** Months before the
-   24-month history threshold are labelled C0 without assignment (1992-1993 in the
-   full sample). Moot for a 2011+ test set but must not be inherited silently —
-   assert the test window is fully assigned.
-2. **Mean-CI reported beside an IR delta.** `paired_block_bootstrap` returns a CI
+1. **Mean-CI reported beside an IR delta.** `paired_block_bootstrap` returns a CI
    of `mean(a-b)`; `gp_bands.py:127-129`, `cluster_bands.py:180-185`,
    `var_band_test.py:103-108`, `ml_band.py:96-104` all print `excl0` from that CI
-   next to an IR-difference point estimate. Different statistics. **This study
-   reports cost, so the CI must be on the cost difference.** Do not repeat.
-3. **`_boot_p` returns 0.0 for an identically-zero difference**, which then passes
-   BH-FDR and prints "significant" on "no difference at all" (source of the fake
-   2/35 survivors in `cluster_bands.csv`). Guard it.
+   next to an IR-difference point estimate — different statistics. This study
+   reports COST, so the CI must be on the cost difference. Do not repeat the bug.
+2. **`_boot_p` returns 0.0 for an identically-zero difference**, which then passes
+   BH-FDR and prints "significant" on "no difference at all" (the fake 2/35
+   survivors in `cluster_bands.csv` were exactly this). Guard it.
+3. **`_pit_month_labels` burn-in defaults to 0** — irrelevant here (thesis labels
+   used directly, not `_pit_month_labels`), but do not accidentally reintroduce it.
 
 ## Expected result — stated in advance, both directions publishable
 
-The pie is 13.9bp/yr on average. C3 covers 21.8% of months. The spread-timing
-ceiling is 1.9%. So the honest prior is that a C3 band saves **~1-3bp/yr on
-momentum** and the cluster curve lies **on** the uniform frontier, not above it.
+Pie ~13.9 bp/yr average. C3 covers ~14% of labelled months. Spread-timing ceiling
+~2.9%. Honest prior: widening in any single cluster saves ~1-3 bp/yr on the
+higher-turnover strategies and the cluster curve lies **on** the uniform frontier,
+not above it.
 
-If so, the result is not "clusters fail" — it is the sharper and more useful
-**"on a modern large-cap long-only book there is nothing left to cut."** 14bp/yr
-is not a constraint any practitioner manages around, and that is a direct,
-quantified answer to the implementability critique: costs are not what binds here.
+If so, the result is not "clusters fail" — it is **"on a modern large-cap
+long-only book there is nothing left to cut, and here is the general bound that
+says why."** 14 bp/yr is not a constraint any practitioner manages around; that is
+a direct, quantified answer to Marc's implementability critique.
 
-If the cluster curve lies **above** the uniform frontier by more than the 1.9%
-bound permits, the ceiling is wrong and that is a genuine finding.
+If a cluster cell beats the uniform frontier by more than ~2.9% at matched
+turnover, the ceiling is wrong and that is a genuine finding.
 
 ## Out of scope
 
 - Any IR / risk-adjusted-return significance claim (the 162x problem).
-- The return channel — whether C3 stocks rebound — is a separate question with its
-  own power characteristics; not this study.
-- Novelty relative to Novy-Marx-Velikov (2016 RFS), NMV (2019 FAJ), Detzel-
-  Novy-Marx-Velikov (2023 JF), Arnott-Li-Linnainmaa (2024 FAJ). **Unresolved and
-  independent of this study's outcome.** Marc must adjudicate.
+- The return channel (whether C3 stocks rebound) — separate question, separate
+  power profile; not this study.
+- **Novelty adjudication.** The METHOD is genuinely unclaimed (verified 2026-07-17:
+  not prior art in NMV static banding, not a special case of GP 2013 / CDS 2020).
+  But a null carries only if the ceiling is the contribution. Whether the finished
+  package clears JPM/FRL is Marc's call, and DanielJagannathanKim2019 (regime
+  momentum) is in the bib — the SIGNAL story is pre-empted; the EXECUTION story is
+  not. This study delivers the execution/ceiling result; it does not resolve venue.
