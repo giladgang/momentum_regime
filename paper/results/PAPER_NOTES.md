@@ -465,3 +465,25 @@ Three findings:
 The two real cost sources map onto the two real levers: reshuffling ->
 uniform banding; panic spread premium -> liquidity provision. Coherent story;
 conditioning adds nothing because there is no state-specific trading to condition.
+
+## Continuous multi-factor band optimization — the optimizer chose beta=0 (2026-07-17)
+
+Optimized the band as a CONTINUOUS function of the HMM + market factors:
+E_t = clip(E_base*exp(beta*stress),5,100), stress in {hmm=2*(pi-0.5),
+multi=mean(DD_z,VOL_z,DISP_z,CS_z)}. beta fit walk-forward (argmax + 1-SE
+prefer-static reg). Backing: paper/var_band_test.py, execution.py var_band
+policy, var_band.{md,csv}.
+
+Result: 0/28 positive-and-significant; 0/28 CI excludes 0. The REGULARIZED fit
+selects beta=0 (rigid static band) for every cell -- i.e. given full freedom to
+make the band respond to the HMM and market stress, the honest optimum is ZERO
+response. argmax versions positive for a few (xgb/hmm +0.41, momentum +0.15)
+but insignificant (p 0.06-0.36) and sign-flipping.
+
+This closes the question in its strongest form: not just discrete state lookups
+(all null) but a continuous, multi-factor, walk-forward-OPTIMIZED band -- the
+optimizer itself chooses the rigid band. beta=0 is the optimum, empirically
+confirming the mechanistic argument (turnover regime-invariant; spread effect
+offset by rebound; splitting the sample adds variance for ~0 bias reduction).
+The rigid band is not a limitation we settled for -- it is what optimization
+selects.

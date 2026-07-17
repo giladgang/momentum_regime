@@ -155,6 +155,13 @@ def _members(g, score_col, policy, prev, pi_t, pi_prev, mi=0):
             if rank_pct[p] <= arg[c] / 100.0:
                 keep.add(p)
         return set(ranked[:k]) | keep
+    if name == 'var_band':
+        # continuous per-month band width from the frame column 'eband'
+        # (E_t = smooth function of market factors, computed upstream).
+        # Reduces to nmv_band(E,E) when eband is constant = E.
+        e = (float(g['eband'].iloc[0]) if 'eband' in g else arg) / 100.0
+        keep = {p for p in prev if p in univ and rank_pct[p] <= e}
+        return set(ranked[:k]) | keep
     if name == 'rm_band':
         # band width as a function of (regime x past-momentum bucket):
         # keep-band E depends on the month regime (pi>=0.5) and whether the
