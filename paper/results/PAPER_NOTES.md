@@ -657,3 +657,28 @@ idea (Frazzini-Israel-Moskowitz; NMV cost-screened variants) -- magnitude on
 modern top-1000 with measured spreads is ours, mechanism is not; Marc to
 adjudicate novelty. (3) ML's real role: predict SPREAD (persistent, learnable)
 to steer the marginal pick -- not the band width.
+
+## The band as a LEARNED decision surface (XGBoost) — AUC 0.50, definitive null (2026-07-18)
+
+Gilad's request: change the banding itself with ML. Design: every band is a
+hold/sell rule for held-but-drifted stocks, so learn that rule directly.
+Decision points = drifted holdings of the static E=20 book (thousands per
+strategy); ex-post label GOOD_HOLD = ret_fwd(stock) - ret_fwd(replacement) +
+round-trip spread saved > 0; features (PIT): rank_pct, lagged rel spread,
+mom_z, log_me, pi; XGBoost (200 trees, depth 3), expanding-window annual refit;
+learned band = eband 100/10 by P(GOOD_HOLD), via stock_var_band. Train/serve
+skew caught & fixed pre-run (age feature dropped: engine can't know it).
+Backing: paper/learned_band.py, learned_band.{md,csv}.
+
+RESULT — OOS AUC: momentum .496, reversal .501, lowvol .505, xgb .515, value
+.486, profitability .512, investment .499 (mean .502 = coin flip, all 7).
+Cost vs uniform@matched-turnover random-signed (+13.9/+4.5/+3.9/-4.7/-22.4/
+-23.5/-23.2%); momentum's +13.9 is frontier-interpolation noise given AUC .496,
+not skill. Net deltas composition noise (162x caveat).
+
+WHY (the session's unifying fact): the deferral label is dominated by a
+one-month RELATIVE return forecast (stock vs replacement) — unforecastable.
+Every band conditioning (grids, parametric forms, full ML) failed for this one
+reason: the decision has no learnable signal. Capacity was never the
+constraint; the label is noise. Learnable spreads -> substitution works (~22%);
+unlearnable deferral value -> the band cannot be improved by ML or anything.

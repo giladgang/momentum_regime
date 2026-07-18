@@ -1,0 +1,14 @@
+# The band as a learned decision surface (XGBoost, expanding window)
+
+Hold/sell rule for drifted holdings learned from ex-post deferral labels; eband=100 if P(GOOD_HOLD)>0.5 else 10. OOS AUC ~0.5 => no signal. Cost compared to uniform band at MATCHED turnover.
+
+     strategy  n_decisions  oos_auc  cost_static  cost_learned  cost_unif_matched  learned_minus_matched_pct  to_learned  to_static  net_learned  net_static
+     momentum        19233    0.496        27.86         28.20              32.75                      13.88        2.73       2.29        11.76        9.83
+     reversal        35937    0.501       104.76         61.56              64.43                       4.45        5.92       9.91         7.85        8.30
+       lowvol        19300    0.505        11.63         15.22              15.84                       3.94        1.71       1.25         9.34        9.71
+          xgb        13292    0.515        27.58         20.25              19.34                      -4.70        5.63       7.95        21.62       24.16
+        value        12513    0.486         5.56         12.79              10.44                     -22.45        0.66       0.32         9.07        9.97
+profitability        11358    0.512         3.93         10.23               8.28                     -23.53        0.62       0.35        11.05       11.28
+   investment         9791    0.499         9.56         15.19              12.34                     -23.15        1.05       0.80        11.00       11.16
+
+net deltas carry the 162x composition-noise caveat.
