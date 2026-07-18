@@ -630,3 +630,30 @@ regime score, the honestly-regularized optimizer chooses NO conditioning -- it
 reverts to the static band. Per-stock version of var_band's beta=0. Closes the
 "train the band on momentum + regime" question; consistent with every prior null
 (clusters, var_band, ml_band, rm_band, mom_pi_band, clean-room).
+
+## Cost-aware SUBSTITUTION at the margin — the mechanism that works (2026-07-18)
+
+Gilad's idea: "I should have bought this instead of that." New engine policy
+cheap_pick (execution.py): fill open slots from the top f_pool% by score,
+choosing the CHEAPEST (PIT lagged spread hs_lag) instead of best-ranked;
+keep-band unchanged; reduces to nmv_band when f_pool=10. Tests:
+paper/tests/test_cheap_pick.py (2 passed).
+
+WHY bands failed but this works: a band DEFERS trades (the expensive sale still
+happens later, at the wide spread; entries are forced by rank). Substitution
+AVOIDS them (rank ~100 vs ~115 carry near-identical signal; spreads differ 3x).
+Oracle per-stock foresight ceiling ~20% of cost; lagged-spread-shaped BAND
+captured ~0 of it (defer!=avoid); substitution captures most of it.
+
+Result (pool=15%, E=20, 2011-2024, vs plain band E=20): cost saved momentum
+9.5% / reversal 26.5% / lowvol 18.2% / xgb 24.0% / value 29.1% / profitability
+20.1% / investment 24.8% -- MEAN ~22% of cost. First conditioning mechanism in
+the whole study that materially cuts cost.
+
+HONEST CAUTIONS: (1) gross deltas (+-0.5-0.9%/yr) dwarf the cost savings
+(0.002-0.09%/yr) -- the NET impact is composition noise (162x problem); only
+the COST claim is measured. (2) cost-aware selection is a known practitioner
+idea (Frazzini-Israel-Moskowitz; NMV cost-screened variants) -- magnitude on
+modern top-1000 with measured spreads is ours, mechanism is not; Marc to
+adjudicate novelty. (3) ML's real role: predict SPREAD (persistent, learnable)
+to steer the marginal pick -- not the band width.

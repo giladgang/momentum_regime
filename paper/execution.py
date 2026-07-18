@@ -155,6 +155,21 @@ def _members(g, score_col, policy, prev, pi_t, pi_prev, mi=0):
             if rank_pct[p] <= arg[c] / 100.0:
                 keep.add(p)
         return set(ranked[:k]) | keep
+    if name == 'cheap_pick':
+        # cost-aware SUBSTITUTION at the margin: fill open slots from the top
+        # f_pool% by score, choosing the CHEAPEST (per-stock 'hs_lag' column,
+        # PIT lagged spread) instead of the best-ranked. Keep-band E as in
+        # nmv_band. arg = (E, f_pool). Reduces to nmv_band(E,E) when
+        # f_pool == 10 (pool == the decile itself, no discretion).
+        e, fpool = arg
+        keep = {p for p in prev if p in univ and rank_pct[p] <= e / 100.0}
+        pool = [p for p in ranked[:max(int(round(len(univ) * fpool / 100.0)),
+                                       k)] if p not in keep]
+        hs = (g.set_index('permno')['hs_lag'].astype('float64')
+              .fillna(np.inf).to_dict() if 'hs_lag' in g else {})
+        pool.sort(key=lambda p: (hs.get(p, np.inf), ranked.index(p)))
+        fill = pool[:max(k - len(keep), 0)]
+        return keep | set(fill)
     if name == 'var_band':
         # continuous per-month band width from the frame column 'eband'
         # (E_t = smooth function of market factors, computed upstream).

@@ -15,7 +15,9 @@ Three walk-forward arms, all selected on prior data only:
            guard that this session showed is essential)
 
 Reports OOS net-of-cost active IR for each arm and reg-minus-static with an
-IR-difference block-bootstrap CI, for all 7 strategies. Also net cost bp/yr.
+IR-difference block-bootstrap CI, for all 7 strategies. (Non-xgb OOS from 2001;
+xgb effectively from 2016 -- it starts 2011 and the 60-month train-window guard
+skips 2013-2015.)
 
 Usage: .venv/bin/python -m paper.train_band
 Output: paper/results/banding_study/train_band.{md,csv}
