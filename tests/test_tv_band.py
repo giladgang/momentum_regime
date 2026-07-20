@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -113,3 +115,25 @@ def test_net_ir_and_bootstrap():
     assert lo <= delta <= hi
     # zero-variance guard
     assert T.net_ir(pd.Series([0.0, 0.0, 0.0])) == 0.0
+
+
+def test_oracle_ceiling_at_least_static():
+    panel = T.load_panel()
+    sp_pack = T.load_spreads()
+    feat = T.month_features(panel)
+    E_star, ir_static = T.best_static(panel, sp_pack)
+    # coarse pi x zc-level bins
+    lvl = feat[[f'zc_{h}' for h in range(1, 13)]].mean(axis=1)
+    bins = (pd.qcut(feat['pi'], 2, labels=False, duplicates='drop').astype(str)
+            + '_' + pd.qcut(lvl, 2, labels=False, duplicates='drop').astype(str))
+    ir_oracle, _ = T.oracle_bin_ir(panel, feat, sp_pack, bins,
+                                   exit_grid=(15, 20, 25, 30, 40))
+    # a per-bin optimal band cannot do worse than the single best static band
+    assert ir_oracle >= ir_static - 1e-9
+
+
+def test_run_gate0_writes_report():
+    res = T.run_gate0()
+    assert 'g0_pass' in res and isinstance(res['g0_pass'], bool)
+    assert os.path.exists(os.path.join(T.OUT_DIR, 'tv_band_gate0.md'))
+    assert os.path.exists(os.path.join(T.OUT_DIR, 'tv_band_gate0.csv'))

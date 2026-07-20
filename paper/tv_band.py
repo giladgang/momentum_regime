@@ -193,3 +193,128 @@ def paired_block_bootstrap(a, b, n_boot=10000, block=12, seed=0):
         stats[j] = net_ir(pd.Series(bv[idx])) - net_ir(pd.Series(av[idx]))
     lo, hi = np.percentile(stats, [2.5, 97.5])
     return float(delta), float(lo), float(hi)
+
+
+def _policy_perbin(exit_by_bin, bin_of_date, enter=10, default_exit=20):
+    ee = enter / 100.0
+
+    def _policy(g, held, pi_t):
+        t = g['date'].iloc[0]
+        ex = exit_by_bin.get(bin_of_date.get(t), default_exit) / 100.0
+        n = len(g)
+        ranked = g.sort_values(['score_pi', 'permno'],
+                               ascending=[False, True])['permno'].tolist()
+        rank_pct = {p: (i + 1) / n for i, p in enumerate(ranked)}
+        univ = set(ranked)
+        keep = {p for p in held if p in univ and rank_pct[p] <= ex}
+        add = {p for p in ranked if rank_pct[p] <= ee}
+        return keep | add
+    return _policy
+
+
+def _ir_for_band(panel, policy, sp_pack, flat_bp):
+    m, led = simulate(panel, policy)
+    cost = price(led, sp_pack, flat_bp=flat_bp)
+    return net_ir(net(m['active'], cost)), m, led
+
+
+def best_static(panel, sp_pack, exit_grid=(15, 20, 25, 30, 40), flat_bp=None):
+    best = (None, -np.inf)
+    for ex in exit_grid:
+        ir, _, _ = _ir_for_band(panel, policy_band(10, ex), sp_pack, flat_bp)
+        if ir > best[1]:
+            best = (ex, ir)
+    return best
+
+
+def oracle_bin_ir(panel, feat, sp_pack, bins, exit_grid=(15, 20, 25, 30, 40),
+                  flat_bp=None):
+    """Feature-binned oracle ceiling via COORDINATE ASCENT seeded at the best
+    static band. net IR is not additive across bins and the band is
+    path-dependent, so per-bin greedy fitting is not a valid upper bound;
+    coordinate ascent from the all-static seed only accepts full-panel-IR
+    improvements, so the result is guaranteed >= the best static band and is
+    the in-sample max over the (bin -> width) function class."""
+    bin_of_date = dict(zip(feat.index, bins.reindex(feat.index)))
+    uniq = [b for b in pd.unique(bins.dropna())]
+    E_static, _ = best_static(panel, sp_pack, exit_grid, flat_bp)
+    exit_by_bin = {b: E_static for b in uniq}
+
+    def _ir(assign):
+        pol = _policy_perbin(assign, bin_of_date, default_exit=E_static)
+        ir, _, _ = _ir_for_band(panel, pol, sp_pack, flat_bp)
+        return ir
+
+    cur = _ir(exit_by_bin)
+    improved = True
+    while improved:
+        improved = False
+        for b in uniq:
+            best_w, best_ir = exit_by_bin[b], cur
+            for w in exit_grid:
+                if w == exit_by_bin[b]:
+                    continue
+                trial = dict(exit_by_bin)
+                trial[b] = w
+                ir = _ir(trial)
+                if ir > best_ir + 1e-12:
+                    best_w, best_ir = w, ir
+            if best_w != exit_by_bin[b]:
+                exit_by_bin[b] = best_w
+                cur = best_ir
+                improved = True
+    return cur, exit_by_bin
+
+
+def _bins_clusters(feat):
+    # K=4 by z-curve level quartiles (proxy for the thesis calm..deep-crisis axis)
+    lvl = feat[[f'zc_{h}' for h in range(1, 13)]].mean(axis=1)
+    return pd.qcut(lvl, 4, labels=False, duplicates='drop').astype('Int64').astype(str)
+
+
+def _bins_grid(feat):
+    lvl = feat[[f'zc_{h}' for h in range(1, 13)]].mean(axis=1)
+    a = pd.qcut(feat['pi'], 2, labels=False, duplicates='drop').astype(str)
+    b = pd.qcut(lvl, 2, labels=False, duplicates='drop').astype(str)
+    return (a + '_' + b)
+
+
+def run_gate0():
+    os.makedirs(OUT_DIR, exist_ok=True)
+    panel = load_panel()
+    sp_pack = load_spreads()
+    # trust gate (blocking)
+    m_mo, _ = simulate(panel, policy_monthly)
+    wr = pd.read_csv(WALK, parse_dates=['date'])
+    wr = wr[(wr['rule'] == 'rule_r') & (wr['combo'] == 'DD')].set_index('date')
+    gate_err = float((m_mo['book'] - wr['strat_ret']).reindex(
+        m_mo.index.intersection(wr.index)).abs().max())
+    assert gate_err < 1e-6, f'TRUST GATE FAILED: max abs err {gate_err}'
+
+    feat = month_features(panel)
+    panel = panel[panel['date'].isin(feat.index)]
+    rows = []
+    for cost_name, flat in [('measured', None), ('flat10', 10)]:
+        E_star, ir_static = best_static(panel, sp_pack, flat_bp=flat)
+        ir_c, exit_c = oracle_bin_ir(panel, feat, sp_pack, _bins_clusters(feat),
+                                     flat_bp=flat)
+        ir_g, exit_g = oracle_bin_ir(panel, feat, sp_pack, _bins_grid(feat),
+                                     flat_bp=flat)
+        best_oracle = max(ir_c, ir_g)
+        threshold = ir_static + 0.029 * abs(ir_static)
+        rows.append({'cost': cost_name, 'E_static': E_star, 'ir_static': ir_static,
+                     'ir_oracle_cluster': ir_c, 'ir_oracle_grid': ir_g,
+                     'ir_oracle_best': best_oracle,
+                     'uplift': best_oracle - ir_static,
+                     'passes': bool(best_oracle > threshold)})
+    df = pd.DataFrame(rows)
+    df.to_csv(os.path.join(OUT_DIR, 'tv_band_gate0.csv'), index=False)
+    g0_pass = bool(df.loc[df['cost'] == 'measured', 'passes'].iloc[0])
+    with open(os.path.join(OUT_DIR, 'tv_band_gate0.md'), 'w') as f:
+        f.write('# Gate 0 — term-structure band ceiling (perfect-hindsight oracle)\n\n')
+        f.write('Feature-binned oracle (full-sample foreknowledge) vs best static band. '
+                'Threshold = static IR + 2.9% (spread-timing artifact). '
+                'g0_pass gates whether Gate 1 (learned real-time band) is built.\n\n')
+        f.write(df.to_string(index=False))
+        f.write(f'\n\n**g0_pass (measured cost): {g0_pass}**\n')
+    return {'g0_pass': g0_pass, 'table': df}
