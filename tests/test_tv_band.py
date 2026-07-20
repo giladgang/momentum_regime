@@ -100,3 +100,16 @@ def test_standardize_uses_train_only():
     assert abs(z.loc[mask, 'pi'].mean()) < 1e-9
     comp = T.compress_features(feat)
     assert {'level', 'slope', 'curv', 'pi'} == set(comp.columns)
+
+
+def test_net_ir_and_bootstrap():
+    rng = np.random.default_rng(0)
+    idx = pd.date_range('2011-01-31', periods=120, freq='ME')
+    a = pd.Series(rng.normal(0.01, 0.04, 120), index=idx)
+    b = a + 0.003                                     # b strictly better
+    assert T.net_ir(b) > T.net_ir(a)
+    delta, lo, hi = T.paired_block_bootstrap(a, b)
+    assert delta == pytest.approx(T.net_ir(b) - T.net_ir(a), abs=1e-9)
+    assert lo <= delta <= hi
+    # zero-variance guard
+    assert T.net_ir(pd.Series([0.0, 0.0, 0.0])) == 0.0

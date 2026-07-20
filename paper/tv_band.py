@@ -169,3 +169,27 @@ def standardize(feat, train_mask):
     mu = feat.loc[train_mask].mean()
     sd = feat.loc[train_mask].std(ddof=0).replace(0.0, 1.0)
     return (feat - mu) / sd
+
+
+def net_ir(r):
+    r = pd.Series(r).dropna()
+    if len(r) < 2 or r.std(ddof=1) == 0:
+        return 0.0
+    return float(r.mean() / r.std(ddof=1) * np.sqrt(12))
+
+
+def paired_block_bootstrap(a, b, n_boot=10000, block=12, seed=0):
+    a, b = a.align(b, join='inner')
+    d = (b - a).values
+    n = len(d)
+    delta = net_ir(b) - net_ir(a)
+    rng = np.random.default_rng(seed)
+    nblocks = int(np.ceil(n / block))
+    av, bv = a.values, b.values
+    stats = np.empty(n_boot)
+    for j in range(n_boot):
+        starts = rng.integers(0, n, nblocks)
+        idx = np.concatenate([np.arange(s, s + block) % n for s in starts])[:n]
+        stats[j] = net_ir(pd.Series(bv[idx])) - net_ir(pd.Series(av[idx]))
+    lo, hi = np.percentile(stats, [2.5, 97.5])
+    return float(delta), float(lo), float(hi)
