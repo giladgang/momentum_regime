@@ -23,3 +23,22 @@ def test_load_spreads_units():
     # hs converted to basis points, sane range
     assert 0.1 < sp['hs'].median() < 500
     assert np.isfinite(first_med)
+
+
+def test_trust_gate_reproduces_walk_returns():
+    panel = T.load_panel()
+    monthly, _ = T.simulate(panel, T.policy_monthly)
+    bench, _ = T.simulate(panel, T.policy_benchmark)
+    wr = pd.read_csv(T.WALK, parse_dates=['date'])
+    wr = wr[(wr['rule'] == 'rule_r') & (wr['combo'] == 'DD')].set_index('date')
+    j = monthly.join(wr[['strat_ret', 'bench_ret']], how='inner')
+    assert len(j) >= 100
+    assert (j['book'] - j['strat_ret']).abs().max() < 1e-6
+    b = bench.join(wr[['bench_ret']], how='inner')
+    assert (b['book'] - b['bench_ret']).abs().max() < 1e-6
+
+
+def test_simulate_active_is_book_minus_bench():
+    panel = T.load_panel()
+    m, _ = T.simulate(panel, T.policy_monthly)
+    assert np.allclose(m['active'], m['book'] - m['bench'])

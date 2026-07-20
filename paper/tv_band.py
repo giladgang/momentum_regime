@@ -49,3 +49,55 @@ def load_spreads():
     full = pd.period_range(month_med.index.min(), month_med.index.max(), freq='M')
     month_med = month_med.reindex(full).ffill()
     return sp, month_med, float(month_med.iloc[0])
+
+
+def _vw_weights(g, members):
+    me = g.set_index('permno')['me'].reindex(sorted(members))
+    w = me / me.sum()
+    return dict(zip(w.index, w.values))
+
+
+def policy_benchmark(g, held, pi_t):
+    return set(g['permno'])
+
+
+def policy_monthly(g, held, pi_t):
+    k = max(int(len(g) * 0.10), 1)
+    return set(g.sort_values(['score_pi', 'permno'], ascending=[False, True])
+               ['permno'].head(k))
+
+
+def simulate(panel, policy):
+    """Long-only VW active-return backtest with drift-adjusted turnover.
+    `policy(g, held, pi_t) -> set(permno)`; bench return uses the VW universe.
+    """
+    rows, ledger = [], []
+    hold, prev_ret = {}, {}
+    for t, g in panel.groupby('date', sort=True):
+        g = g.dropna(subset=['score_pi', 'me', 'ret_fwd'])
+        pi_t = float(g['pi'].iloc[0])
+        # drift last month's book by realized return, renormalize
+        drift = {p: w * (1 + prev_ret.get(p, 0.0)) for p, w in hold.items()}
+        tot = sum(drift.values()) or 1.0
+        drift = {p: w / tot for p, w in drift.items()}
+
+        members = policy(g, set(hold), pi_t)
+        tgt = _vw_weights(g, members)
+
+        traded = 0.0
+        for p in set(drift) | set(tgt):
+            dw = tgt.get(p, 0.0) - drift.get(p, 0.0)
+            if abs(dw) < 1e-12:
+                continue
+            traded += abs(dw)
+            ledger.append({'date': t, 'permno': p, 'dw': dw})
+        ret = g.set_index('permno')['ret_fwd']
+        book = float(sum(w * ret[p] for p, w in tgt.items()))
+        bench = float((g['me'] / g['me'].sum() * g['ret_fwd']).sum())
+        rows.append({'date': t, 'book': book, 'bench': bench,
+                     'active': book - bench, 'turnover': traded / 2,
+                     'n_names': len(tgt), 'pi': pi_t})
+        hold = tgt
+        prev_ret = {p: float(ret[p]) for p in tgt}
+    m = pd.DataFrame(rows).set_index('date')
+    return m, pd.DataFrame(ledger)
