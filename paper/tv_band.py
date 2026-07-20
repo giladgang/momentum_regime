@@ -318,3 +318,30 @@ def run_gate0():
         f.write(df.to_string(index=False))
         f.write(f'\n\n**g0_pass (measured cost): {g0_pass}**\n')
     return {'g0_pass': g0_pass, 'table': df}
+
+
+def regime_turnover(panel, pi_cut=0.5):
+    """Independent re-derivation of the 'trading is regime-invariant' finding:
+    mean no-band monthly turnover in calm (pi<cut) vs panic (pi>=cut) months."""
+    m, _ = simulate(panel, policy_monthly)
+    calm = m[m['pi'] < pi_cut]['turnover']
+    panic = m[m['pi'] >= pi_cut]['turnover']
+    to_c, to_p = float(calm.mean()), float(panic.mean())
+    return {'to_calm': to_c, 'to_panic': to_p,
+            'ratio': to_p / to_c if to_c else np.nan,
+            'n_calm': int(len(calm)), 'n_panic': int(len(panic))}
+
+
+def main():
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--stage', default='gate0', choices=['gate0'])
+    ap.parse_args()
+    res = run_gate0()
+    print('regime turnover:', regime_turnover(load_panel()))
+    print('g0_pass:', res['g0_pass'])
+    print(res['table'].to_string(index=False))
+
+
+if __name__ == '__main__':
+    main()

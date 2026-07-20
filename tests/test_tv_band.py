@@ -137,3 +137,12 @@ def test_run_gate0_writes_report():
     assert 'g0_pass' in res and isinstance(res['g0_pass'], bool)
     assert os.path.exists(os.path.join(T.OUT_DIR, 'tv_band_gate0.md'))
     assert os.path.exists(os.path.join(T.OUT_DIR, 'tv_band_gate0.csv'))
+
+
+def test_regime_turnover_independent():
+    panel = T.load_panel()
+    d = T.regime_turnover(panel)
+    assert {'to_calm', 'to_panic', 'ratio', 'n_calm', 'n_panic'} <= set(d)
+    assert d['n_calm'] > 0 and d['n_panic'] > 0
+    # sanity: turnover is a fraction in (0, 1]
+    assert 0 < d['to_calm'] <= 1 and 0 < d['to_panic'] <= 1
