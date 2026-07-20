@@ -101,3 +101,37 @@ def simulate(panel, policy):
         prev_ret = {p: float(ret[p]) for p in tgt}
     m = pd.DataFrame(rows).set_index('date')
     return m, pd.DataFrame(ledger)
+
+
+def policy_band(E_enter_pct, E_exit_pct):
+    ee, ex = E_enter_pct / 100.0, E_exit_pct / 100.0
+
+    def _policy(g, held, pi_t):
+        n = len(g)
+        ranked = g.sort_values(['score_pi', 'permno'],
+                               ascending=[False, True])['permno'].tolist()
+        rank_pct = {p: (i + 1) / n for i, p in enumerate(ranked)}
+        univ = set(ranked)
+        keep = {p for p in held if p in univ and rank_pct[p] <= ex}
+        add = {p for p in ranked if rank_pct[p] <= ee}
+        return keep | add
+    return _policy
+
+
+def price(ledger, sp_pack, flat_bp=None):
+    sp, month_med, full_med = sp_pack
+    if ledger is None or len(ledger) == 0:
+        return pd.Series(dtype=float)
+    m = ledger.copy()
+    m['ym'] = m['date'].dt.to_period('M')
+    if flat_bp is not None:
+        m['hs'] = float(flat_bp)
+    else:
+        m = m.merge(sp, on=['permno', 'ym'], how='left')
+        m['hs'] = m['hs'].fillna(m['ym'].map(month_med)).fillna(full_med)
+    cost = (m['dw'].abs() * m['hs'] / 1e4).groupby(m['date']).sum()
+    return cost
+
+
+def net(active, cost):
+    return active - cost.reindex(active.index).fillna(0.0)

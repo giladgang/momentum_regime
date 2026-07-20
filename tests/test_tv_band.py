@@ -42,3 +42,30 @@ def test_simulate_active_is_book_minus_bench():
     panel = T.load_panel()
     m, _ = T.simulate(panel, T.policy_monthly)
     assert np.allclose(m['active'], m['book'] - m['bench'])
+
+
+def test_band_reduces_turnover_monotonically():
+    panel = T.load_panel()
+    to = {}
+    for exit_pct in [10, 20, 40]:
+        m, _ = T.simulate(panel, T.policy_band(10, exit_pct))
+        to[exit_pct] = m['turnover'].mean()
+    # wider exit band => weakly lower turnover
+    assert to[40] < to[20] < to[10] + 1e-9
+    # E_enter=E_exit=10 reproduces the monthly turnover closely
+    m10, _ = T.simulate(panel, T.policy_band(10, 10))
+    mm, _ = T.simulate(panel, T.policy_monthly)
+    assert abs(m10['turnover'].mean() - mm['turnover'].mean()) < 5e-3
+
+
+def test_price_and_net():
+    panel = T.load_panel()
+    m, led = T.simulate(panel, T.policy_band(10, 20))
+    sp_pack = T.load_spreads()
+    cost = T.price(led, sp_pack)
+    assert (cost >= 0).all() and cost.mean() > 0
+    flat = T.price(led, sp_pack, flat_bp=10)
+    # flat 10bp cost == 10bp * two-way traded volume / 1e4
+    assert flat.mean() > 0
+    n = T.net(m['active'], cost)
+    assert np.allclose(n, m['active'] - cost.reindex(n.index).fillna(0.0))
