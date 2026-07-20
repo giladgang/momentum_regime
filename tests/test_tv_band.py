@@ -146,3 +146,29 @@ def test_regime_turnover_independent():
     assert d['n_calm'] > 0 and d['n_panic'] > 0
     # sanity: turnover is a fraction in (0, 1]
     assert 0 < d['to_calm'] <= 1 and 0 < d['to_panic'] <= 1
+
+
+def test_price_stress_multiplies_panic_only():
+    sp_pack = T.load_spreads()
+    led = pd.DataFrame({
+        'date': [pd.Timestamp('2020-03-31'), pd.Timestamp('2013-06-28')],
+        'permno': [10107, 10107], 'dw': [0.5, 0.5]})
+    pi_by_date = {pd.Timestamp('2020-03-31'): 0.9, pd.Timestamp('2013-06-28'): 0.1}
+    base = T.price(led, sp_pack, flat_bp=10)
+    stressed = T.price(led, sp_pack, flat_bp=10, stress_mult=3, pi_by_date=pi_by_date)
+    assert stressed.loc[pd.Timestamp('2020-03-31')] == pytest.approx(
+        3 * base.loc[pd.Timestamp('2020-03-31')])
+    assert stressed.loc[pd.Timestamp('2013-06-28')] == pytest.approx(
+        base.loc[pd.Timestamp('2013-06-28')])
+
+
+def test_band_regime_turnover_and_impl_report():
+    panel = T.load_panel()
+    calm, panic = T.band_regime_turnover(panel, T.policy_band(10, 20))
+    assert calm > 0 and panic > 0
+    res = T.run_gate0_impl(stress_grid=(1, 2))
+    df = res['table']
+    assert set(df['band']) == {'static', 'oracle'}
+    assert {'to_calm', 'to_panic', 'net_ir_stress1', 'net_ir_stress2'} <= set(df.columns)
+    assert 'MORE' in res['direction'] or 'LESS' in res['direction']
+    assert os.path.exists(os.path.join(T.OUT_DIR, 'tv_band_gate0_impl.md'))

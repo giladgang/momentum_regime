@@ -118,7 +118,7 @@ def policy_band(E_enter_pct, E_exit_pct):
     return _policy
 
 
-def price(ledger, sp_pack, flat_bp=None):
+def price(ledger, sp_pack, flat_bp=None, stress_mult=None, pi_by_date=None):
     sp, month_med, full_med = sp_pack
     if ledger is None or len(ledger) == 0:
         return pd.Series(dtype=float)
@@ -129,8 +129,10 @@ def price(ledger, sp_pack, flat_bp=None):
     else:
         m = m.merge(sp, on=['permno', 'ym'], how='left')
         m['hs'] = m['hs'].fillna(m['ym'].map(month_med)).fillna(full_med)
-    cost = (m['dw'].abs() * m['hs'] / 1e4).groupby(m['date']).sum()
-    return cost
+    if stress_mult is not None and pi_by_date is not None:
+        panic = m['date'].map(pi_by_date).fillna(0.0).ge(0.5)
+        m.loc[panic, 'hs'] = m.loc[panic, 'hs'] * float(stress_mult)
+    return (m['dw'].abs() * m['hs'] / 1e4).groupby(m['date']).sum()
 
 
 def net(active, cost):
@@ -332,6 +334,57 @@ def regime_turnover(panel, pi_cut=0.5):
             'n_calm': int(len(calm)), 'n_panic': int(len(panic))}
 
 
+def band_regime_turnover(panel, policy, pi_cut=0.5):
+    m, _ = simulate(panel, policy)
+    calm = float(m[m['pi'] < pi_cut]['turnover'].mean())
+    panic = float(m[m['pi'] >= pi_cut]['turnover'].mean())
+    return calm, panic
+
+
+def run_gate0_impl(stress_grid=(1, 2, 5)):
+    os.makedirs(OUT_DIR, exist_ok=True)
+    panel = load_panel()
+    sp_pack = load_spreads()
+    feat = month_features(panel)
+    panel = panel[panel['date'].isin(feat.index)]
+    pi_by_date = panel.groupby('date')['pi'].first().to_dict()
+    grid = _bins_grid(feat)
+
+    E_star, _ = best_static(panel, sp_pack)
+    _, exit_by_bin = oracle_bin_ir(panel, feat, sp_pack, grid)
+    bin_of_date = dict(zip(feat.index, grid.reindex(feat.index)))
+    bands = {'static': policy_band(10, E_star),
+             'oracle': _policy_perbin(exit_by_bin, bin_of_date, default_exit=E_star)}
+
+    rows = []
+    for name, pol in bands.items():
+        m, led = simulate(panel, pol)
+        calm_to, panic_to = band_regime_turnover(panel, pol)
+        row = {'band': name, 'to_calm': calm_to, 'to_panic': panic_to,
+               'panic_minus_calm_to': panic_to - calm_to}
+        for s in stress_grid:
+            cost = price(led, sp_pack, stress_mult=(None if s == 1 else s),
+                         pi_by_date=pi_by_date)
+            row[f'net_ir_stress{s}'] = net_ir(net(m['active'], cost))
+        rows.append(row)
+    df = pd.DataFrame(rows)
+
+    sp_panic = df.loc[df['band'] == 'static', 'to_panic'].iloc[0]
+    or_panic = df.loc[df['band'] == 'oracle', 'to_panic'].iloc[0]
+    direction = ('MORE in panic than static (FLAGGED: panic trading is harder / costlier)'
+                 if or_panic > sp_panic + 1e-9
+                 else 'LESS (or equal) in panic than static (implementable, on-narrative)')
+    df.to_csv(os.path.join(OUT_DIR, 'tv_band_gate0_impl.csv'), index=False)
+    with open(os.path.join(OUT_DIR, 'tv_band_gate0_impl.md'), 'w') as f:
+        f.write('# Gate 0 — implementability (G3): direction + panic-stress cost\n\n')
+        f.write('Per-band panic vs calm turnover, and net IR under panic-month (pi>=0.5) '
+                'half-spread stress multipliers. Direction = does the oracle band trade '
+                'MORE or LESS in panic than the static band.\n\n')
+        f.write(df.to_string(index=False))
+        f.write(f'\n\n**Oracle vs static panic-turnover direction: {direction}**\n')
+    return {'table': df, 'direction': direction}
+
+
 def main():
     import argparse
     ap = argparse.ArgumentParser()
@@ -341,6 +394,9 @@ def main():
     print('regime turnover:', regime_turnover(load_panel()))
     print('g0_pass:', res['g0_pass'])
     print(res['table'].to_string(index=False))
+    impl = run_gate0_impl()
+    print('implementability direction:', impl['direction'])
+    print(impl['table'].to_string(index=False))
 
 
 if __name__ == '__main__':
