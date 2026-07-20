@@ -62,9 +62,19 @@ momentum term structure and `pi_filter` beat a static band, net of costs, out of
 - **G2 (mechanism, reported regardless)** — Independent recomputation of turnover in calm vs
   panic months, reproducing (or contradicting) the regime-invariant-trading diagnostic that
   explains the null.
+- **G3 (implementability, reported regardless)** — Addresses the standing critique (Marc Stam)
+  that trading is *harder* in panic (wider spreads, thinner liquidity, one-sided sell-offs), so
+  a band that trades *more* in panic is less investable. Two reported checks: **(a) direction** —
+  for the best static band and the Gate-0 oracle band, report panic-vs-calm turnover and whether
+  the chosen band trades *more* or *less* in panic than static; trading *less* in panic (a wider
+  band while the market falls) is the implementable, on-narrative direction and is consistent
+  with the crash/recovery finding that the edge is a recovery-phase phenomenon, not an
+  active-panic one. **(b) panic-stress cost** — re-price with panic-month (pi≥0.5) half-spreads
+  multiplied by a stress factor (×2, ×5); a result that survives only under cheap panic execution
+  is flagged, not claimed.
 
 A null on G0 or G1 is reportable and is the expected outcome; the study is not conditioned on
-confirming G1.
+confirming G1. G3 is a robustness/implementability lens applied regardless of G0/G1.
 
 ## 3. Staged experimental design
 
@@ -120,6 +130,12 @@ real in-sample, not learnable in real time).
 evaluation* metric for every method (rationale: banding is a small-mean / high-variance,
 benchmark-relative problem — IR is the standardized effect size the significance test is built
 on, and is leverage-invariant; raw active return is *reported alongside* but not optimized).
+
+**Implementability lens (G3, on the Gate-0 static and oracle bands)**: (a) a *direction*
+diagnostic — panic-vs-calm turnover of each band and whether it trades more or less in panic than
+static; (b) a *panic-stress-cost* robustness — the cost model gains an optional panic multiplier
+that scales pi≥0.5-month half-spreads by a stress factor, re-pricing the same bands under ×2 and
+×5 to confirm no result depends on cheap panic execution.
 
 **Trainer A — linear-exp policy, fit by direct net-IR search.**
 `E_enter,t, E_exit,t = clip(base · exp(w·x_t), lo, hi)` with a shared/parallel weight map per

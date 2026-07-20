@@ -785,6 +785,155 @@ git commit -m "tv_band: regime-turnover diagnostic + Gate 0 CLI"
 
 ---
 
+### Task 8: Implementability (G3) — panic-stress cost + direction diagnostic
+
+**Files:**
+- Modify: `paper/tv_band.py`
+- Test: `tests/test_tv_band.py`
+
+**Interfaces:**
+- Consumes: `simulate`, `policy_band`, `best_static`, `oracle_bin_ir`, `_policy_perbin`,
+  `_bins_grid`, `month_features`, `price`, `net`, `net_ir`.
+- Modifies: `price(ledger, sp_pack, flat_bp=None, stress_mult=None, pi_by_date=None)` — adds an
+  optional panic multiplier that scales `hs` by `stress_mult` in months where
+  `pi_by_date[date] >= 0.5` (backward compatible: existing callers pass neither and are
+  unchanged).
+- Produces: `band_regime_turnover(panel, policy, pi_cut=0.5) -> (calm_to, panic_to)`.
+- Produces: `run_gate0_impl(stress_grid=(1, 2, 5)) -> dict` — writes
+  `paper/results/banding_study/tv_band_gate0_impl.{md,csv}` with per-band (static, oracle)
+  panic/calm turnover and net IR under each stress multiplier, plus the oracle-vs-static
+  panic-turnover direction verdict.
+
+- [ ] **Step 1: Write the failing test**
+
+```python
+def test_price_stress_multiplies_panic_only():
+    sp_pack = T.load_spreads()
+    led = pd.DataFrame({
+        'date': [pd.Timestamp('2020-03-31'), pd.Timestamp('2013-06-28')],
+        'permno': [10107, 10107], 'dw': [0.5, 0.5]})
+    pi_by_date = {pd.Timestamp('2020-03-31'): 0.9, pd.Timestamp('2013-06-28'): 0.1}
+    base = T.price(led, sp_pack, flat_bp=10)
+    stressed = T.price(led, sp_pack, flat_bp=10, stress_mult=3, pi_by_date=pi_by_date)
+    assert stressed.loc[pd.Timestamp('2020-03-31')] == pytest.approx(
+        3 * base.loc[pd.Timestamp('2020-03-31')])
+    assert stressed.loc[pd.Timestamp('2013-06-28')] == pytest.approx(
+        base.loc[pd.Timestamp('2013-06-28')])
+
+
+def test_band_regime_turnover_and_impl_report():
+    panel = T.load_panel()
+    calm, panic = T.band_regime_turnover(panel, T.policy_band(10, 20))
+    assert calm > 0 and panic > 0
+    res = T.run_gate0_impl(stress_grid=(1, 2))
+    df = res['table']
+    assert set(df['band']) == {'static', 'oracle'}
+    assert {'to_calm', 'to_panic', 'net_ir_stress1', 'net_ir_stress2'} <= set(df.columns)
+    assert 'MORE' in res['direction'] or 'LESS' in res['direction']
+    assert os.path.exists(os.path.join(T.OUT_DIR, 'tv_band_gate0_impl.md'))
+```
+
+- [ ] **Step 2: Run test to verify it fails**
+
+Run: `.venv/bin/python -m pytest tests/test_tv_band.py -k "stress or impl_report" -v`
+Expected: FAIL with `AttributeError: ... 'band_regime_turnover'` (and price() rejecting the new kwargs)
+
+- [ ] **Step 3: Write minimal implementation**
+
+Replace `price` with the stress-aware version and add the two new functions:
+
+```python
+def price(ledger, sp_pack, flat_bp=None, stress_mult=None, pi_by_date=None):
+    sp, month_med, full_med = sp_pack
+    if ledger is None or len(ledger) == 0:
+        return pd.Series(dtype=float)
+    m = ledger.copy()
+    m['ym'] = m['date'].dt.to_period('M')
+    if flat_bp is not None:
+        m['hs'] = float(flat_bp)
+    else:
+        m = m.merge(sp, on=['permno', 'ym'], how='left')
+        m['hs'] = m['hs'].fillna(m['ym'].map(month_med)).fillna(full_med)
+    if stress_mult is not None and pi_by_date is not None:
+        panic = m['date'].map(pi_by_date).fillna(0.0).ge(0.5)
+        m.loc[panic, 'hs'] = m.loc[panic, 'hs'] * float(stress_mult)
+    return (m['dw'].abs() * m['hs'] / 1e4).groupby(m['date']).sum()
+
+
+def band_regime_turnover(panel, policy, pi_cut=0.5):
+    m, _ = simulate(panel, policy)
+    calm = float(m[m['pi'] < pi_cut]['turnover'].mean())
+    panic = float(m[m['pi'] >= pi_cut]['turnover'].mean())
+    return calm, panic
+
+
+def run_gate0_impl(stress_grid=(1, 2, 5)):
+    os.makedirs(OUT_DIR, exist_ok=True)
+    panel = load_panel()
+    sp_pack = load_spreads()
+    feat = month_features(panel)
+    panel = panel[panel['date'].isin(feat.index)]
+    pi_by_date = panel.groupby('date')['pi'].first().to_dict()
+    grid = _bins_grid(feat)
+
+    E_star, _ = best_static(panel, sp_pack)
+    _, exit_by_bin = oracle_bin_ir(panel, feat, sp_pack, grid)
+    bin_of_date = dict(zip(feat.index, grid.reindex(feat.index)))
+    bands = {'static': policy_band(10, E_star),
+             'oracle': _policy_perbin(exit_by_bin, bin_of_date, default_exit=E_star)}
+
+    rows = []
+    for name, pol in bands.items():
+        m, led = simulate(panel, pol)
+        calm_to, panic_to = band_regime_turnover(panel, pol)
+        row = {'band': name, 'to_calm': calm_to, 'to_panic': panic_to,
+               'panic_minus_calm_to': panic_to - calm_to}
+        for s in stress_grid:
+            cost = price(led, sp_pack, stress_mult=(None if s == 1 else s),
+                         pi_by_date=pi_by_date)
+            row[f'net_ir_stress{s}'] = net_ir(net(m['active'], cost))
+        rows.append(row)
+    df = pd.DataFrame(rows)
+
+    sp_panic = df.loc[df['band'] == 'static', 'to_panic'].iloc[0]
+    or_panic = df.loc[df['band'] == 'oracle', 'to_panic'].iloc[0]
+    direction = ('MORE in panic than static (FLAGGED: panic trading is harder / costlier)'
+                 if or_panic > sp_panic + 1e-9
+                 else 'LESS (or equal) in panic than static (implementable, on-narrative)')
+    df.to_csv(os.path.join(OUT_DIR, 'tv_band_gate0_impl.csv'), index=False)
+    with open(os.path.join(OUT_DIR, 'tv_band_gate0_impl.md'), 'w') as f:
+        f.write('# Gate 0 — implementability (G3): direction + panic-stress cost\n\n')
+        f.write('Per-band panic vs calm turnover, and net IR under panic-month (pi>=0.5) '
+                'half-spread stress multipliers. Direction = does the oracle band trade '
+                'MORE or LESS in panic than the static band.\n\n')
+        f.write(df.to_string(index=False))
+        f.write(f'\n\n**Oracle vs static panic-turnover direction: {direction}**\n')
+    return {'table': df, 'direction': direction}
+```
+
+Then extend `main()` (added in Task 7) to also run the implementability report — after the
+`print('g0_pass:', ...)` line add:
+
+```python
+    impl = run_gate0_impl()
+    print('implementability direction:', impl['direction'])
+    print(impl['table'].to_string(index=False))
+```
+
+- [ ] **Step 4: Run test to verify it passes**
+
+Run: `.venv/bin/python -m pytest tests/test_tv_band.py -k "stress or impl_report" -v`
+Expected: PASS (2 tests). Existing `price` callers/tests still pass (backward-compatible kwargs).
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add paper/tv_band.py tests/test_tv_band.py
+git commit -m "tv_band: G3 implementability (panic-stress cost + panic-turnover direction)"
+```
+
+---
+
 ## Decision after Gate 0
 
 - **If `g0_pass` is True** (the feature-binned oracle beats static beyond the 2.9% artifact): the information exists in-sample. Write the **Gate 1 plan** (Trainers A/B/C + walk-forward OOS + honesty gate) per spec §5, §7.
