@@ -168,7 +168,7 @@ def test_band_regime_turnover_and_impl_report():
     assert calm > 0 and panic > 0
     res = T.run_gate0_impl(stress_grid=(1, 2))
     df = res['table']
-    assert set(df['band']) == {'static', 'oracle'}
+    assert set(df['band']) == {'static', 'oracle_cluster', 'oracle_grid'}
     assert {'to_calm', 'to_panic', 'net_ir_stress1', 'net_ir_stress2'} <= set(df.columns)
     assert 'MORE' in res['direction'] or 'LESS' in res['direction']
     assert os.path.exists(os.path.join(T.OUT_DIR, 'tv_band_gate0_impl.md'))

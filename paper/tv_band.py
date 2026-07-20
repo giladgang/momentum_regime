@@ -235,8 +235,13 @@ def oracle_bin_ir(panel, feat, sp_pack, bins, exit_grid=(15, 20, 25, 30, 40),
     static band. net IR is not additive across bins and the band is
     path-dependent, so per-bin greedy fitting is not a valid upper bound;
     coordinate ascent from the all-static seed only accepts full-panel-IR
-    improvements, so the result is guaranteed >= the best static band and is
-    the in-sample max over the (bin -> width) function class."""
+    improvements, so the result is guaranteed >= the best static band. It is
+    a coordinate-wise LOCAL optimum of the (bin -> width) function class, not
+    a verified global max, and is therefore a conservative (lower-bound)
+    estimate of the true bin-oracle ceiling. It also varies E_exit only
+    (entry fixed at 10%), a conservative subclass of the full (E_enter,
+    E_exit) design, so the measured ceiling is a lower bound on the true
+    (E_enter, E_exit) ceiling too."""
     bin_of_date = dict(zip(feat.index, bins.reindex(feat.index)))
     uniq = [b for b in pd.unique(bins.dropna())]
     E_static, _ = best_static(panel, sp_pack, exit_grid, flat_bp)
@@ -348,16 +353,24 @@ def run_gate0_impl(stress_grid=(1, 2, 5)):
     feat = month_features(panel)
     panel = panel[panel['date'].isin(feat.index)]
     pi_by_date = panel.groupby('date')['pi'].first().to_dict()
-    grid = _bins_grid(feat)
+    cluster_bins = _bins_clusters(feat)
+    grid_bins = _bins_grid(feat)
 
     E_star, _ = best_static(panel, sp_pack)
-    _, exit_by_bin = oracle_bin_ir(panel, feat, sp_pack, grid)
-    bin_of_date = dict(zip(feat.index, grid.reindex(feat.index)))
-    bands = {'static': policy_band(10, E_star),
-             'oracle': _policy_perbin(exit_by_bin, bin_of_date, default_exit=E_star)}
+    _, exit_c = oracle_bin_ir(panel, feat, sp_pack, cluster_bins)
+    _, exit_g = oracle_bin_ir(panel, feat, sp_pack, grid_bins)
+    cluster_bin_of_date = dict(zip(feat.index, cluster_bins.reindex(feat.index)))
+    grid_bin_of_date = dict(zip(feat.index, grid_bins.reindex(feat.index)))
+    bands = {
+        'static': policy_band(10, E_star),
+        # headline ceiling (best oracle reported by run_gate0)
+        'oracle_cluster': _policy_perbin(exit_c, cluster_bin_of_date, default_exit=E_star),
+        'oracle_grid': _policy_perbin(exit_g, grid_bin_of_date, default_exit=E_star),
+    }
 
     rows = []
-    for name, pol in bands.items():
+    for name in ['static', 'oracle_cluster', 'oracle_grid']:
+        pol = bands[name]
         m, led = simulate(panel, pol)
         calm_to, panic_to = band_regime_turnover(panel, pol)
         row = {'band': name, 'to_calm': calm_to, 'to_panic': panic_to,
@@ -370,18 +383,28 @@ def run_gate0_impl(stress_grid=(1, 2, 5)):
     df = pd.DataFrame(rows)
 
     sp_panic = df.loc[df['band'] == 'static', 'to_panic'].iloc[0]
-    or_panic = df.loc[df['band'] == 'oracle', 'to_panic'].iloc[0]
+    cl_panic = df.loc[df['band'] == 'oracle_cluster', 'to_panic'].iloc[0]
+    # verdict is based on the CLUSTER oracle: run_gate0 reports the best of
+    # {cluster, grid} oracles as the headline ceiling, and the cluster oracle
+    # is that headline band (net IR ~0.464 vs the grid oracle's ~0.440), so
+    # the implementability verdict must describe the band actually claimed
+    # as the ceiling, not the (also-reported) grid oracle.
     direction = ('MORE in panic than static (FLAGGED: panic trading is harder / costlier)'
-                 if or_panic > sp_panic + 1e-9
+                 if cl_panic > sp_panic + 1e-9
                  else 'LESS (or equal) in panic than static (implementable, on-narrative)')
     df.to_csv(os.path.join(OUT_DIR, 'tv_band_gate0_impl.csv'), index=False)
     with open(os.path.join(OUT_DIR, 'tv_band_gate0_impl.md'), 'w') as f:
         f.write('# Gate 0 — implementability (G3): direction + panic-stress cost\n\n')
         f.write('Per-band panic vs calm turnover, and net IR under panic-month (pi>=0.5) '
-                'half-spread stress multipliers. Direction = does the oracle band trade '
-                'MORE or LESS in panic than the static band.\n\n')
+                'half-spread stress multipliers, for the static band and BOTH feature-binned '
+                'oracles (cluster and grid). run_gate0 reports the headline ceiling as the '
+                'best of {oracle_cluster, oracle_grid} net IR, which is the oracle_cluster '
+                'band; direction/stress below are shown for both oracles, but the verdict is '
+                'based on oracle_cluster (the headline-ceiling band), i.e. does it trade MORE '
+                'or LESS in panic than the static band.\n\n')
         f.write(df.to_string(index=False))
-        f.write(f'\n\n**Oracle vs static panic-turnover direction: {direction}**\n')
+        f.write(f'\n\n**Oracle (cluster, headline ceiling) vs static panic-turnover '
+                f'direction: {direction}**\n')
     return {'table': df, 'direction': direction}
 
 
