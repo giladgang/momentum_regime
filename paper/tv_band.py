@@ -135,3 +135,37 @@ def price(ledger, sp_pack, flat_bp=None):
 
 def net(active, cost):
     return active - cost.reindex(active.index).fillna(0.0)
+
+
+def month_features(panel):
+    rows = []
+    for t, g in panel.groupby('date', sort=True):
+        g = g.dropna(subset=MOMS)
+        if len(g) < 20:
+            continue
+        cs = g[MOMS].mean()                              # cross-sectional term structure
+        z = (g[MOMS] - g[MOMS].mean()) / g[MOMS].std(ddof=0)
+        k = max(int(len(g) * 0.10), 1)
+        top_idx = g['score_pi'].nlargest(k).index
+        zc = z.loc[top_idx].mean()                       # long-leg z-curve
+        row = {'date': t, 'pi': float(g['pi'].iloc[0])}
+        row.update({f'zc_{h}': zc[f'mom_{h}'] for h in range(1, 13)})
+        row.update({f'cs_{h}': cs[f'mom_{h}'] for h in range(1, 13)})
+        rows.append(row)
+    return pd.DataFrame(rows).set_index('date')
+
+
+def compress_features(feat):
+    zc = feat[[f'zc_{h}' for h in range(1, 13)]].values
+    h = np.arange(1, 13)
+    level = zc.mean(axis=1)
+    slope = np.array([np.polyfit(h, r, 1)[0] for r in zc])
+    curv = np.array([np.polyfit(h, r, 2)[0] for r in zc])
+    return pd.DataFrame({'level': level, 'slope': slope, 'curv': curv,
+                         'pi': feat['pi'].values}, index=feat.index)
+
+
+def standardize(feat, train_mask):
+    mu = feat.loc[train_mask].mean()
+    sd = feat.loc[train_mask].std(ddof=0).replace(0.0, 1.0)
+    return (feat - mu) / sd

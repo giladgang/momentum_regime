@@ -69,3 +69,34 @@ def test_price_and_net():
     assert flat.mean() > 0
     n = T.net(m['active'], cost)
     assert np.allclose(n, m['active'] - cost.reindex(n.index).fillna(0.0))
+
+
+def test_month_features_zcurve_matches_definition():
+    panel = T.load_panel()
+    feat = T.month_features(panel)
+    assert {f'zc_{h}' for h in range(1, 13)}.issubset(feat.columns)
+    assert {f'cs_{h}' for h in range(1, 13)}.issubset(feat.columns)
+    assert 'pi' in feat.columns
+    # recompute zc for one month independently
+    d = feat.index[20]
+    g = panel[panel['date'] == d].dropna(subset=[f'mom_{h}' for h in range(1, 13)])
+    z = (g[[f'mom_{h}' for h in range(1, 13)]]
+         - g[[f'mom_{h}' for h in range(1, 13)]].mean()) / \
+        g[[f'mom_{h}' for h in range(1, 13)]].std(ddof=0)
+    z.columns = [f'zc_{h}' for h in range(1, 13)]
+    g2 = g.assign(**z)
+    k = max(int(len(g) * 0.10), 1)
+    top = g2.nlargest(k, 'score_pi')
+    exp1 = top['zc_1'].mean()
+    assert abs(feat.loc[d, 'zc_1'] - exp1) < 1e-9
+
+
+def test_standardize_uses_train_only():
+    panel = T.load_panel()
+    feat = T.month_features(panel)
+    mask = feat.index < pd.Timestamp('2018-01-01')
+    z = T.standardize(feat, mask)
+    # train-window columns are ~mean 0
+    assert abs(z.loc[mask, 'pi'].mean()) < 1e-9
+    comp = T.compress_features(feat)
+    assert {'level', 'slope', 'curv', 'pi'} == set(comp.columns)
