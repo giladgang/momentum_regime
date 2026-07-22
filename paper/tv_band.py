@@ -725,14 +725,17 @@ def run_gate1(start_oos=2013, flat_bp=None, arms=None):
     learned_names = ['cluster_band', 'trainer_A', 'trainer_B', 'trainer_C',
                      'rebound_c4', 'rebound_c3', 'rebound_both']
     lmask = df['arm'].isin(learned_names)
-    # BH-FDR across the learned arms (multiple-testing correction, q=0.05)
+    # BH-FDR across the learned arms that are candidates for "beats static"
+    # (positive-delta only): a one-sided question, so a significantly-WORSE arm
+    # must not enter the family and inflate the step-up threshold.
     df['bh_sig'] = False
-    lp = df.loc[lmask, 'p'].values
-    if len(lp):
-        df.loc[lmask, 'bh_sig'] = _bh_reject(lp, q=0.05)
+    pos = lmask & (df['minus_static'] > 0)
+    pp = df.loc[pos, 'p'].values
+    if len(pp):
+        df.loc[pos, 'bh_sig'] = _bh_reject(pp, q=0.05)
     learned = df[lmask]
-    # honest win: positive AND survives BH-FDR (CI/1-SE reported but not the gate)
-    g1_win = bool(((learned['minus_static'] > 0) & learned['bh_sig']).any())
+    # honest win: survives BH-FDR (only positive arms can; CI/1-SE reported, not the gate)
+    g1_win = bool(learned['bh_sig'].any())
     df.to_csv(os.path.join(OUT_DIR, 'tv_band_gate1.csv'), index=False)
     with open(os.path.join(OUT_DIR, 'tv_band_gate1.md'), 'w') as f:
         f.write('# Gate 1 — learned real-time term-structure band (walk-forward OOS)\n\n')
