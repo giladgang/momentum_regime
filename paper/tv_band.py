@@ -408,6 +408,93 @@ def run_gate0_impl(stress_grid=(1, 2, 5)):
     return {'table': df, 'direction': direction}
 
 
+def make_feature_policy(ee_ex_fn):
+    """simulate-compatible policy from a per-date (E_enter_pct, E_exit_pct) function."""
+    def _policy(g, held, pi_t):
+        t = g['date'].iloc[0]
+        ee_pct, ex_pct = ee_ex_fn(t)
+        ee, ex = ee_pct / 100.0, ex_pct / 100.0
+        n = len(g)
+        ranked = g.sort_values(['score_pi', 'permno'],
+                               ascending=[False, True])['permno'].tolist()
+        rank_pct = {p: (i + 1) / n for i, p in enumerate(ranked)}
+        univ = set(ranked)
+        keep = {p for p in held if p in univ and rank_pct[p] <= ex}
+        add = {p for p in ranked if rank_pct[p] <= ee}
+        return keep | add
+    return _policy
+
+
+def _train_subpanel(panel, feat, train_mask):
+    train_dates = set(feat.index[train_mask])
+    return panel[panel['date'].isin(train_dates)]
+
+
+def walkforward(panel, feat, sp_pack, fit_fn, start_oos=2013, flat_bp=None):
+    years = sorted({d.year for d in feat.index if d.year >= start_oos})
+    stitched = []
+    for Y in years:
+        train_mask = feat.index.year < Y
+        if train_mask.sum() < 24:
+            continue
+        policy = fit_fn(panel, feat, sp_pack, train_mask)
+        m, led = simulate(panel, policy)
+        cost = price(led, sp_pack, flat_bp=flat_bp)
+        r = net(m['active'], cost)
+        stitched.append(r[r.index.year == Y])
+    return pd.concat(stitched).sort_index()
+
+
+def fit_monthly(panel, feat, sp_pack, train_mask):
+    return policy_monthly
+
+
+def fit_static(panel, feat, sp_pack, train_mask):
+    sub = _train_subpanel(panel, feat, train_mask)
+    E, _ = best_static(sub, sp_pack)
+    return policy_band(10, E)
+
+
+def fit_cluster_band(panel, feat, sp_pack, train_mask, exit_grid=(15, 20, 25, 30, 40)):
+    # K=4 z-curve-level bins with edges fit on TRAIN only; per-bin exit width by
+    # coordinate ascent (seeded at best static) on the TRAIN sub-panel.
+    ftr = feat.loc[train_mask]
+    lvl_tr = ftr[[f'zc_{h}' for h in range(1, 13)]].mean(axis=1)
+    _, edges = pd.qcut(lvl_tr, 4, labels=False, retbins=True, duplicates='drop')
+    edges = edges.copy(); edges[0] = -np.inf; edges[-1] = np.inf
+    lvl_all = feat[[f'zc_{h}' for h in range(1, 13)]].mean(axis=1)
+    bin_all = pd.cut(lvl_all, bins=edges, labels=False, include_lowest=True)
+    bin_of_date = {d: (int(b) if pd.notna(b) else -1) for d, b in bin_all.items()}
+    uniq = sorted({b for d, b in bin_of_date.items() if train_mask[feat.index.get_loc(d)]})
+
+    sub = _train_subpanel(panel, feat, train_mask)
+    E0, _ = best_static(sub, sp_pack)
+    width = {b: E0 for b in uniq}
+
+    def _ir(assign):
+        pol = make_feature_policy(lambda t: (10, assign.get(bin_of_date.get(t, -1), E0)))
+        m, led = simulate(sub, pol)
+        return net_ir(net(m['active'], price(led, sp_pack)))
+
+    cur = _ir(width)
+    improved = True
+    while improved:
+        improved = False
+        for b in uniq:
+            best_w, best_ir = width[b], cur
+            for w in exit_grid:
+                if w == width[b]:
+                    continue
+                trial = dict(width); trial[b] = w
+                v = _ir(trial)
+                if v > best_ir + 1e-12:
+                    best_w, best_ir = w, v
+            if best_w != width[b]:
+                width[b] = best_w; cur = best_ir; improved = True
+
+    return make_feature_policy(lambda t: (10, width.get(bin_of_date.get(t, -1), E0)))
+
+
 def main():
     import argparse
     ap = argparse.ArgumentParser()

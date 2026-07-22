@@ -172,3 +172,29 @@ def test_band_regime_turnover_and_impl_report():
     assert {'to_calm', 'to_panic', 'net_ir_stress1', 'net_ir_stress2'} <= set(df.columns)
     assert 'MORE' in res['direction'] or 'LESS' in res['direction']
     assert os.path.exists(os.path.join(T.OUT_DIR, 'tv_band_gate0_impl.md'))
+
+
+def test_walkforward_static_and_cluster_band():
+    panel = T.load_panel()
+    feat = T.month_features(panel)
+    panel = panel[panel['date'].isin(feat.index)]
+    sp = T.load_spreads()
+    wf_static = T.walkforward(panel, feat, sp, T.fit_static, start_oos=2013)
+    wf_cluster = T.walkforward(panel, feat, sp, T.fit_cluster_band, start_oos=2013)
+    # OOS series cover 2013..2025, aligned, non-empty
+    assert wf_static.index.min().year == 2013
+    assert len(wf_static) == len(wf_cluster) > 100
+    # both are finite net-return series
+    assert wf_static.notna().all() and wf_cluster.notna().all()
+    # sanity: static WF net IR is in a plausible band for the main model
+    assert 0.0 < T.net_ir(wf_static) < 1.5
+
+
+def test_make_feature_policy_matches_static_band():
+    panel = T.load_panel()
+    # a constant feature policy (E_enter=10,E_exit=25 for all dates) must equal policy_band(10,25)
+    pol_feat = T.make_feature_policy(lambda t: (10, 25))
+    a, _ = T.simulate(panel, pol_feat)
+    b, _ = T.simulate(panel, T.policy_band(10, 25))
+    assert np.allclose(a['turnover'].values, b['turnover'].values)
+    assert np.allclose(a['book'].values, b['book'].values)
