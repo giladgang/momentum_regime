@@ -563,6 +563,169 @@ git commit -m "tv_band: Gate 1 walk-forward evaluation + honesty gate + report +
 
 ---
 
+### Task 6: Rebound-theory band arm (Test 3) + band-width interpretability
+
+Encodes the thesis rebound mechanism as a *constrained* band: WIDEN (trade less) during the
+below-average / reversal regimes (thesis clusters 3 and 4), never narrower than static. This is
+the *implementable* direction (trade less when it is hardest) and it is expected to **cost**
+return in cluster 4 (the establishment phase, where the Gate-0 oracle showed the profit comes
+from trading *more*) while being closer to free in cluster 3 (the hold-through-recovery phase).
+The decomposition (c4-only / c3-only / both) is the finding. Also adds the interpretability
+output: what market attributes correspond to each band width.
+
+Mapping: `_bins_clusters` sorts months into K=4 z-curve-level quartiles; the two lowest-level
+bins are the below-average baskets — **bin 0 ≈ thesis cluster 4** (deepest below average, active
+crisis), **bin 1 ≈ thesis cluster 3** (below average, recovery). Bins 2–3 are the above-average
+(continuation) baskets and are left at the static width.
+
+**Files:**
+- Modify: `paper/tv_band.py`
+- Test: `tests/test_tv_band.py`
+
+**Interfaces:**
+- Produces: `rebound_band_spec(panel, feat, sp_pack, train_mask, widen_bins, widen_grid=(30,40,50,60)) -> (policy, bin_of_date, width_by_bin)` — PIT K=4 z-curve-level bins (edges fit on train); for bins in `widen_bins`, tune ONE wider-than-static exit width on train net IR; other bins use best static.
+- Produces: `fit_rebound_c4`, `fit_rebound_c3`, `fit_rebound_both` — `fit_fn` wrappers (`widen_bins` = `(0,)`, `(1,)`, `(0,1)`).
+- Produces: `band_width_attributes(feat, bin_of_date, width_by_bin, pi_cut=0.5) -> pd.DataFrame` — per bin: chosen exit width + avg pi, frac panic, avg z-curve level, avg cross-sectional momentum, month count.
+- Modifies: `run_gate1` — adds the three rebound arms to the default arm set and to the learned-arm honesty gate; writes `tv_band_gate1_attributes.csv` from a full-sample `rebound_band_spec((0,1))`.
+
+- [ ] **Step 1: Write the failing test**
+
+```python
+def test_rebound_band_widens_only_in_rebound_bins():
+    panel = T.load_panel()
+    feat = T.month_features(panel)
+    panel = panel[panel['date'].isin(feat.index)]
+    sp = T.load_spreads()
+    mask = feat.index.year < 2020
+    pol, bod, wbb = T.rebound_band_spec(panel, feat, sp, mask, widen_bins=(0, 1))
+    E, _ = T.best_static(T._train_subpanel(panel, feat, mask), sp)
+    for b, w in wbb.items():
+        if b in (0, 1):
+            assert w >= E                 # rebound bins widen (or hold) — never tighter
+        else:
+            assert w == E                 # continuation bins stay at static
+    attrs = T.band_width_attributes(feat, bod, wbb)
+    # the two widened bins are the lowest z-curve-level (below-average) baskets
+    lo = set(attrs.sort_values('avg_zc_level').head(2)['bin'].tolist())
+    assert lo == {0, 1}
+    # panic concentrates in the deepest bin (bin 0 ≈ cluster 4)
+    a = attrs.set_index('bin')
+    assert a.loc[0, 'frac_panic'] >= a.loc[3, 'frac_panic']
+```
+
+- [ ] **Step 2: Run test to verify it fails**
+
+Run: `.venv/bin/python -m pytest tests/test_tv_band.py -k "rebound_band_widens" -v`
+Expected: FAIL with `AttributeError: ... 'rebound_band_spec'`
+
+- [ ] **Step 3: Write minimal implementation**
+
+```python
+def rebound_band_spec(panel, feat, sp_pack, train_mask, widen_bins,
+                      widen_grid=(30, 40, 50, 60)):
+    zc = [f'zc_{h}' for h in range(1, 13)]
+    ftr = feat.loc[train_mask]
+    _, edges = pd.qcut(ftr[zc].mean(axis=1), 4, labels=False,
+                       retbins=True, duplicates='drop')
+    edges = edges.copy(); edges[0] = -np.inf; edges[-1] = np.inf
+    bin_all = pd.cut(feat[zc].mean(axis=1), bins=edges, labels=False,
+                     include_lowest=True)
+    bin_of_date = {d: (int(b) if pd.notna(b) else -1) for d, b in bin_all.items()}
+    sub = _train_subpanel(panel, feat, train_mask)
+    E0, _ = best_static(sub, sp_pack)
+
+    def width_map(w):
+        return {b: (w if b in widen_bins else E0) for b in range(4)}
+
+    def ir_for(wbb):
+        pol = make_feature_policy(
+            lambda t, m=wbb: (10, m.get(bin_of_date.get(t, -1), E0)))
+        mo, led = simulate(sub, pol)
+        return net_ir(net(mo['active'], price(led, sp_pack)))
+
+    best_wbb, best_ir = width_map(E0), ir_for(width_map(E0))
+    for w in widen_grid:
+        if w <= E0:
+            continue
+        wbb = width_map(w); v = ir_for(wbb)
+        if v > best_ir + 1e-12:
+            best_wbb, best_ir = wbb, v
+    policy = make_feature_policy(
+        lambda t, m=best_wbb: (10, m.get(bin_of_date.get(t, -1), E0)))
+    return policy, bin_of_date, best_wbb
+
+
+def fit_rebound_c4(panel, feat, sp_pack, train_mask):
+    return rebound_band_spec(panel, feat, sp_pack, train_mask, (0,))[0]
+
+
+def fit_rebound_c3(panel, feat, sp_pack, train_mask):
+    return rebound_band_spec(panel, feat, sp_pack, train_mask, (1,))[0]
+
+
+def fit_rebound_both(panel, feat, sp_pack, train_mask):
+    return rebound_band_spec(panel, feat, sp_pack, train_mask, (0, 1))[0]
+
+
+def band_width_attributes(feat, bin_of_date, width_by_bin, pi_cut=0.5):
+    zc = [f'zc_{h}' for h in range(1, 13)]
+    cs = [f'cs_{h}' for h in range(1, 13)]
+    lvl, csl = feat[zc].mean(axis=1), feat[cs].mean(axis=1)
+    rows = []
+    for b in sorted(set(bin_of_date.values())):
+        idx = feat.index.isin([x for x, bb in bin_of_date.items() if bb == b])
+        s = feat[idx]
+        rows.append({'bin': b, 'exit_width': width_by_bin.get(b, np.nan),
+                     'n': int(idx.sum()), 'avg_pi': float(s['pi'].mean()),
+                     'frac_panic': float((s['pi'] >= pi_cut).mean()),
+                     'avg_zc_level': float(lvl[idx].mean()),
+                     'avg_cs_mom': float(csl[idx].mean())})
+    return pd.DataFrame(rows)
+```
+
+Then MODIFY `run_gate1` (from Task 5): add the three rebound arms to the default `arms` dict —
+
+```python
+        arms = {'monthly': fit_monthly, 'static': fit_static,
+                'cluster_band': fit_cluster_band, 'trainer_A': fit_trainer_A,
+                'trainer_B': fit_trainer_B, 'trainer_C': fit_trainer_C,
+                'rebound_c4': fit_rebound_c4, 'rebound_c3': fit_rebound_c3,
+                'rebound_both': fit_rebound_both}
+```
+
+— extend the learned-arm honesty filter to include them —
+
+```python
+    learned = df[df['arm'].isin(['cluster_band', 'trainer_A', 'trainer_B',
+                                 'trainer_C', 'rebound_c4', 'rebound_c3',
+                                 'rebound_both'])]
+```
+
+— and, after writing the main table, emit the interpretability CSV (full-sample spec; descriptive, not a performance claim) —
+
+```python
+    full_mask = np.ones(len(feat), dtype=bool)
+    _, bod, wbb = rebound_band_spec(panel, feat, sp, full_mask, widen_bins=(0, 1))
+    band_width_attributes(feat, bod, wbb).to_csv(
+        os.path.join(OUT_DIR, 'tv_band_gate1_attributes.csv'), index=False)
+```
+
+- [ ] **Step 4: Run test to verify it passes**
+
+Run: `.venv/bin/python -m pytest tests/test_tv_band.py -k "rebound_band_widens" -v`
+Expected: PASS. (rebound_band_spec on the train sub-panel is cheap — `best_static` + a 4-point widen grid — a few seconds.)
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add paper/tv_band.py tests/test_tv_band.py
+git commit -m "tv_band: Gate 1 rebound-theory band arm (c3/c4/both) + band-width interpretability"
+```
+
+Note: the three rebound arms are cheap (small train-only grid), so adding them to the full `run_gate1` sweep costs little beyond their three walk-forwards. The expected result is that `rebound_c3` is near-free vs static while `rebound_c4` costs return — the return-vs-implementability decomposition that is Test 3's finding.
+
+---
+
 ## Decision after Gate 1
 
 - **If `g1_win` is True** (a learned arm beats static OOS, CI excludes 0, survives 1-SE): the term-structure band is a real, realizable cost-mitigation result — the headline positive finding. Then run the implementability direction (Task 8 `run_gate0_impl` analog) on the winning OOS band, and write it into the paper.
