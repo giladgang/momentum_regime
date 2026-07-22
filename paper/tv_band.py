@@ -666,7 +666,9 @@ def band_width_attributes(feat, bin_of_date, width_by_bin, pi_cut=0.5):
 
 
 def _delta_ci(arm_series, static_series, n_boot=10000, block=12, seed=0):
-    """(delta, lo, hi, se) for net_ir(arm) - net_ir(static), circular block resample."""
+    """(delta, lo, hi, se, p) for net_ir(arm) - net_ir(static), circular block
+    resample. p is a two-sided bootstrap p-value (fraction of resamples on the
+    opposite side of 0, doubled)."""
     a, b = static_series.align(arm_series, join='inner')
     av, bv, n = a.values, b.values, len(a)
     delta = net_ir(b) - net_ir(a)
@@ -678,7 +680,22 @@ def _delta_ci(arm_series, static_series, n_boot=10000, block=12, seed=0):
                               for s in rng.integers(0, n, nb)])[:n]
         stats[j] = net_ir(pd.Series(bv[idx])) - net_ir(pd.Series(av[idx]))
     lo, hi = np.percentile(stats, [2.5, 97.5])
-    return float(delta), float(lo), float(hi), float(stats.std(ddof=1))
+    p = min(1.0, 2.0 * min((stats <= 0).mean(), (stats >= 0).mean()))
+    return float(delta), float(lo), float(hi), float(stats.std(ddof=1)), float(p)
+
+
+def _bh_reject(pvals, q=0.05):
+    """Benjamini-Hochberg: boolean array, True where H0 rejected at FDR q."""
+    p = np.asarray(pvals, dtype=float)
+    m = len(p)
+    order = np.argsort(p)
+    thresh = q * (np.arange(1, m + 1)) / m
+    passed = p[order] <= thresh
+    reject = np.zeros(m, dtype=bool)
+    if passed.any():
+        kmax = np.max(np.where(passed)[0])
+        reject[order[:kmax + 1]] = True
+    return reject
 
 
 def run_gate1(start_oos=2013, flat_bp=None, arms=None):
@@ -699,23 +716,32 @@ def run_gate1(start_oos=2013, flat_bp=None, arms=None):
     static_s = series['static']
     rows = []
     for name, s in series.items():
-        delta, lo, hi, se = _delta_ci(s, static_s)
+        delta, lo, hi, se, p = _delta_ci(s, static_s)
         rows.append({'arm': name, 'oos_ir': net_ir(s), 'minus_static': delta,
-                     'ci_lo': lo, 'ci_hi': hi, 'se': se,
+                     'ci_lo': lo, 'ci_hi': hi, 'se': se, 'p': p,
                      'excl0': bool(lo > 0 or hi < 0),
                      'passes_1se': bool(delta - se > 0)})
     df = pd.DataFrame(rows)
-    learned = df[df['arm'].isin(['cluster_band', 'trainer_A', 'trainer_B',
-                                 'trainer_C', 'rebound_c4', 'rebound_c3',
-                                 'rebound_both'])]
-    g1_win = bool(((learned['minus_static'] > 0) & learned['excl0'] &
-                   learned['passes_1se']).any())
+    learned_names = ['cluster_band', 'trainer_A', 'trainer_B', 'trainer_C',
+                     'rebound_c4', 'rebound_c3', 'rebound_both']
+    lmask = df['arm'].isin(learned_names)
+    # BH-FDR across the learned arms (multiple-testing correction, q=0.05)
+    df['bh_sig'] = False
+    lp = df.loc[lmask, 'p'].values
+    if len(lp):
+        df.loc[lmask, 'bh_sig'] = _bh_reject(lp, q=0.05)
+    learned = df[lmask]
+    # honest win: positive AND survives BH-FDR (CI/1-SE reported but not the gate)
+    g1_win = bool(((learned['minus_static'] > 0) & learned['bh_sig']).any())
     df.to_csv(os.path.join(OUT_DIR, 'tv_band_gate1.csv'), index=False)
     with open(os.path.join(OUT_DIR, 'tv_band_gate1.md'), 'w') as f:
         f.write('# Gate 1 — learned real-time term-structure band (walk-forward OOS)\n\n')
         f.write(f'OOS {start_oos}-2025, annual re-fit on prior months only, stitched. '
-                'A learned arm wins only if minus_static>0 AND its bootstrap CI excludes 0 '
-                'AND it survives 1-SE regularization (minus_static - SE > 0).\n\n')
+                'g1_win requires a learned arm with minus_static>0 that survives BH-FDR '
+                '(q=0.05) across the 7 learned arms (the multiple-testing correction the '
+                'prior campaign used). excl0 (bootstrap CI) and passes_1se are reported '
+                'alongside but are NOT the gate, since testing 7 arms inflates single-arm '
+                'significance.\n\n')
         f.write(df.to_string(index=False))
         f.write(f'\n\n**g1_win: {g1_win}**\n')
     if 'rebound_both' in arms:

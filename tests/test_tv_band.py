@@ -263,8 +263,19 @@ def test_delta_ci_zero_for_identical_series():
     rng = np.random.default_rng(0)
     idx = pd.date_range('2013-01-31', periods=120, freq='ME')
     s = pd.Series(rng.normal(0.01, 0.04, 120), index=idx)
-    delta, lo, hi, se = T._delta_ci(s, s)
+    delta, lo, hi, se, p = T._delta_ci(s, s)
     assert abs(delta) < 1e-9 and se >= 0 and lo <= 0 <= hi
+    assert p == pytest.approx(1.0)          # identical series => not significant
+
+
+def test_bh_reject_multiple_testing():
+    import numpy as _np
+    # one tiny p among 7 does NOT survive BH q=0.05 (threshold ~0.007 for the min)
+    p = _np.array([0.04, 0.3, 0.5, 0.6, 0.7, 0.8, 0.9])
+    assert not T._bh_reject(p, q=0.05).any()
+    # a genuinely tiny p does survive
+    p2 = _np.array([0.001, 0.3, 0.5, 0.6, 0.7, 0.8, 0.9])
+    assert T._bh_reject(p2, q=0.05)[0]
 
 
 def test_run_gate1_report_structure_and_gate_logic():
