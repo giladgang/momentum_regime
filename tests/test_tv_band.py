@@ -210,3 +210,69 @@ def test_trailing_optimal_targets():
     assert (tgt['tgt_enter'] <= tgt['tgt_exit']).all()
     assert tgt['tgt_exit'].isin([15, 20, 25, 30, 40]).all()
     assert len(tgt) > 100
+
+
+def test_trainer_A_beats_static_in_sample():
+    panel = T.load_panel()
+    feat = T.month_features(panel)
+    panel = panel[panel['date'].isin(feat.index)]
+    sp = T.load_spreads()
+    mask = feat.index.year < 2020
+    polA = T.fit_trainer_A(panel, feat, sp, mask)
+    sub = T._train_subpanel(panel, feat, mask)
+    mA, ledA = T.simulate(sub, polA)
+    irA = T.net_ir(T.net(mA['active'], T.price(ledA, sp)))
+    E, irS = T.best_static(sub, sp)
+    assert irA >= irS - 0.02
+
+
+def test_trainers_B_C_produce_valid_bands():
+    panel = T.load_panel()
+    feat = T.month_features(panel)
+    panel = panel[panel['date'].isin(feat.index)]
+    sp = T.load_spreads()
+    mask = feat.index.year < 2020
+    for fit in (T.fit_trainer_B, T.fit_trainer_C):
+        pol = fit(panel, feat, sp, mask)
+        m, led = T.simulate(panel, pol)
+        assert (m['n_names'] > 0).all()
+        assert T.net(m['active'], T.price(led, sp)).notna().all()
+
+
+def test_rebound_band_widens_only_in_rebound_bins():
+    panel = T.load_panel()
+    feat = T.month_features(panel)
+    panel = panel[panel['date'].isin(feat.index)]
+    sp = T.load_spreads()
+    mask = feat.index.year < 2020
+    pol, bod, wbb = T.rebound_band_spec(panel, feat, sp, mask, widen_bins=(0, 1))
+    E, _ = T.best_static(T._train_subpanel(panel, feat, mask), sp)
+    for b, w in wbb.items():
+        if b in (0, 1):
+            assert w >= E
+        else:
+            assert w == E
+    attrs = T.band_width_attributes(feat, bod, wbb)
+    lo = set(attrs.sort_values('avg_zc_level').head(2)['bin'].tolist())
+    assert lo == {0, 1}
+    a = attrs.set_index('bin')
+    assert a.loc[0, 'frac_panic'] >= a.loc[3, 'frac_panic']
+
+
+def test_delta_ci_zero_for_identical_series():
+    rng = np.random.default_rng(0)
+    idx = pd.date_range('2013-01-31', periods=120, freq='ME')
+    s = pd.Series(rng.normal(0.01, 0.04, 120), index=idx)
+    delta, lo, hi, se = T._delta_ci(s, s)
+    assert abs(delta) < 1e-9 and se >= 0 and lo <= 0 <= hi
+
+
+def test_run_gate1_report_structure_and_gate_logic():
+    res = T.run_gate1(start_oos=2013,
+                      arms={'monthly': T.fit_monthly, 'static': T.fit_static})
+    df = res['table']
+    assert {'monthly', 'static'} == set(df['arm'])
+    assert {'oos_ir', 'minus_static', 'ci_lo', 'ci_hi', 'se', 'passes_1se'}.issubset(df.columns)
+    assert abs(df.loc[df['arm'] == 'static', 'minus_static'].iloc[0]) < 1e-9
+    assert res['g1_win'] is False
+    assert os.path.exists(os.path.join(T.OUT_DIR, 'tv_band_gate1.md'))

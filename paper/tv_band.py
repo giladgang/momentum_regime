@@ -11,6 +11,9 @@ import sys
 
 import numpy as np
 import pandas as pd
+from scipy.optimize import minimize
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.linear_model import Ridge
 
 _REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, _REPO)
@@ -517,11 +520,222 @@ def trailing_optimal_targets(panel, feat, sp_pack, window=36,
     return pd.DataFrame(rows).set_index('date')
 
 
+_COMP_COLS = ['level', 'slope', 'curv', 'pi']
+
+
+def _feature_matrix(feat, cols, train_mask):
+    comp = compress_features(feat)[cols]
+    mu = comp.loc[train_mask].mean()
+    sd = comp.loc[train_mask].std(ddof=0).replace(0.0, 1.0)
+    return (comp - mu) / sd, mu, sd
+
+
+def fit_trainer_A(panel, feat, sp_pack, train_mask, feat_cols=None):
+    """Linear-exp band policy E=clip(base*exp(w.z),lo,hi), fit by Nelder-Mead
+    maximizing TRAIN net IR. Compressed 4-dim features keep the search low-dim."""
+    cols = feat_cols or _COMP_COLS
+    Z, _, _ = _feature_matrix(feat, cols, train_mask)
+    sub = _train_subpanel(panel, feat, train_mask)
+    E0, _ = best_static(sub, sp_pack)
+    k = len(cols)
+
+    def policy_from(theta):
+        be, bx = theta[0], theta[1]
+        we, wx = theta[2:2 + k], theta[2 + k:2 + 2 * k]
+
+        def ee_ex(t):
+            z = Z.loc[t].values
+            ee = float(np.clip(be * np.exp(z @ we), 5, 60))
+            ex = float(np.clip(bx * np.exp(z @ wx), ee, 60))
+            return ee, ex
+        return make_feature_policy(ee_ex)
+
+    def neg_ir(theta):
+        m, led = simulate(sub, policy_from(theta))
+        return -net_ir(net(m['active'], price(led, sp_pack)))
+
+    theta0 = np.concatenate([[10.0, float(E0)], np.zeros(2 * k)])
+    res = minimize(neg_ir, theta0, method='Nelder-Mead',
+                   options={'maxiter': 200, 'xatol': 1e-2, 'fatol': 1e-4})
+    theta = res.x if np.isfinite(res.fun) else theta0
+    if -neg_ir(theta) < -neg_ir(theta0):     # never worse than the static seed
+        theta = theta0
+    return policy_from(theta)
+
+
+_FULL_COLS = ([f'zc_{h}' for h in range(1, 13)] +
+              [f'cs_{h}' for h in range(1, 13)] + ['pi'])
+
+
+def _fit_supervised(panel, feat, sp_pack, train_mask, window, make_model):
+    tgt = trailing_optimal_targets(panel, feat, sp_pack, window=window)
+    mu = feat.loc[train_mask, _FULL_COLS].mean()
+    sd = feat.loc[train_mask, _FULL_COLS].std(ddof=0).replace(0.0, 1.0)
+    Z = (feat[_FULL_COLS] - mu) / sd
+    tr_idx = feat.index[train_mask]
+    Xtr = Z.loc[tr_idx].values
+    me = make_model().fit(Xtr, tgt.loc[tr_idx, 'tgt_enter'].values)
+    mx = make_model().fit(Xtr, tgt.loc[tr_idx, 'tgt_exit'].values)
+
+    def ee_ex(t):
+        z = Z.loc[t].values.reshape(1, -1)
+        ee = float(np.clip(me.predict(z)[0], 5, 15))
+        ex = float(np.clip(mx.predict(z)[0], ee, 40))
+        return ee, ex
+    return make_feature_policy(ee_ex)
+
+
+def fit_trainer_B(panel, feat, sp_pack, train_mask, window=36):
+    return _fit_supervised(panel, feat, sp_pack, train_mask, window,
+                           lambda: GradientBoostingRegressor(
+                               n_estimators=200, max_depth=2, learning_rate=0.05,
+                               subsample=0.8, random_state=0))
+
+
+def fit_trainer_C(panel, feat, sp_pack, train_mask, window=36):
+    return _fit_supervised(panel, feat, sp_pack, train_mask, window,
+                           lambda: Ridge(alpha=10.0))
+
+
+def rebound_band_spec(panel, feat, sp_pack, train_mask, widen_bins,
+                      widen_grid=(30, 40, 50, 60)):
+    """Rebound-theory band: WIDEN (trade less) in the below-average z-curve bins
+    (bin 0 ~ thesis cluster 4, bin 1 ~ cluster 3), never tighter than static.
+    Widen width tuned on TRAIN net IR. Returns (policy, bin_of_date, width_by_bin)."""
+    zc = [f'zc_{h}' for h in range(1, 13)]
+    ftr = feat.loc[train_mask]
+    _, edges = pd.qcut(ftr[zc].mean(axis=1), 4, labels=False,
+                       retbins=True, duplicates='drop')
+    edges = edges.copy()
+    edges[0] = -np.inf
+    edges[-1] = np.inf
+    bin_all = pd.cut(feat[zc].mean(axis=1), bins=edges, labels=False,
+                     include_lowest=True)
+    bin_of_date = {d: (int(b) if pd.notna(b) else -1) for d, b in bin_all.items()}
+    sub = _train_subpanel(panel, feat, train_mask)
+    E0, _ = best_static(sub, sp_pack)
+
+    def width_map(w):
+        return {b: (w if b in widen_bins else E0) for b in range(4)}
+
+    def ir_for(wbb):
+        pol = make_feature_policy(
+            lambda t, m=wbb: (10, m.get(bin_of_date.get(t, -1), E0)))
+        mo, led = simulate(sub, pol)
+        return net_ir(net(mo['active'], price(led, sp_pack)))
+
+    best_wbb, best_ir = width_map(E0), ir_for(width_map(E0))
+    for w in widen_grid:
+        if w <= E0:
+            continue
+        wbb = width_map(w)
+        v = ir_for(wbb)
+        if v > best_ir + 1e-12:
+            best_wbb, best_ir = wbb, v
+    policy = make_feature_policy(
+        lambda t, m=best_wbb: (10, m.get(bin_of_date.get(t, -1), E0)))
+    return policy, bin_of_date, best_wbb
+
+
+def fit_rebound_c4(panel, feat, sp_pack, train_mask):
+    return rebound_band_spec(panel, feat, sp_pack, train_mask, (0,))[0]
+
+
+def fit_rebound_c3(panel, feat, sp_pack, train_mask):
+    return rebound_band_spec(panel, feat, sp_pack, train_mask, (1,))[0]
+
+
+def fit_rebound_both(panel, feat, sp_pack, train_mask):
+    return rebound_band_spec(panel, feat, sp_pack, train_mask, (0, 1))[0]
+
+
+def band_width_attributes(feat, bin_of_date, width_by_bin, pi_cut=0.5):
+    zc = [f'zc_{h}' for h in range(1, 13)]
+    cs = [f'cs_{h}' for h in range(1, 13)]
+    lvl, csl = feat[zc].mean(axis=1), feat[cs].mean(axis=1)
+    rows = []
+    for b in sorted(set(bin_of_date.values())):
+        idx = feat.index.isin([x for x, bb in bin_of_date.items() if bb == b])
+        s = feat[idx]
+        rows.append({'bin': b, 'exit_width': width_by_bin.get(b, np.nan),
+                     'n': int(idx.sum()), 'avg_pi': float(s['pi'].mean()),
+                     'frac_panic': float((s['pi'] >= pi_cut).mean()),
+                     'avg_zc_level': float(lvl[idx].mean()),
+                     'avg_cs_mom': float(csl[idx].mean())})
+    return pd.DataFrame(rows)
+
+
+def _delta_ci(arm_series, static_series, n_boot=10000, block=12, seed=0):
+    """(delta, lo, hi, se) for net_ir(arm) - net_ir(static), circular block resample."""
+    a, b = static_series.align(arm_series, join='inner')
+    av, bv, n = a.values, b.values, len(a)
+    delta = net_ir(b) - net_ir(a)
+    rng = np.random.default_rng(seed)
+    nb = int(np.ceil(n / block))
+    stats = np.empty(n_boot)
+    for j in range(n_boot):
+        idx = np.concatenate([np.arange(s, s + block) % n
+                              for s in rng.integers(0, n, nb)])[:n]
+        stats[j] = net_ir(pd.Series(bv[idx])) - net_ir(pd.Series(av[idx]))
+    lo, hi = np.percentile(stats, [2.5, 97.5])
+    return float(delta), float(lo), float(hi), float(stats.std(ddof=1))
+
+
+def run_gate1(start_oos=2013, flat_bp=None, arms=None):
+    os.makedirs(OUT_DIR, exist_ok=True)
+    panel = load_panel()
+    feat = month_features(panel)
+    panel = panel[panel['date'].isin(feat.index)]
+    sp = load_spreads()
+    if arms is None:
+        arms = {'monthly': fit_monthly, 'static': fit_static,
+                'cluster_band': fit_cluster_band, 'trainer_A': fit_trainer_A,
+                'trainer_B': fit_trainer_B, 'trainer_C': fit_trainer_C,
+                'rebound_c4': fit_rebound_c4, 'rebound_c3': fit_rebound_c3,
+                'rebound_both': fit_rebound_both}
+    assert 'static' in arms, "run_gate1 requires the 'static' arm as the baseline"
+    series = {name: walkforward(panel, feat, sp, fn, start_oos, flat_bp)
+              for name, fn in arms.items()}
+    static_s = series['static']
+    rows = []
+    for name, s in series.items():
+        delta, lo, hi, se = _delta_ci(s, static_s)
+        rows.append({'arm': name, 'oos_ir': net_ir(s), 'minus_static': delta,
+                     'ci_lo': lo, 'ci_hi': hi, 'se': se,
+                     'excl0': bool(lo > 0 or hi < 0),
+                     'passes_1se': bool(delta - se > 0)})
+    df = pd.DataFrame(rows)
+    learned = df[df['arm'].isin(['cluster_band', 'trainer_A', 'trainer_B',
+                                 'trainer_C', 'rebound_c4', 'rebound_c3',
+                                 'rebound_both'])]
+    g1_win = bool(((learned['minus_static'] > 0) & learned['excl0'] &
+                   learned['passes_1se']).any())
+    df.to_csv(os.path.join(OUT_DIR, 'tv_band_gate1.csv'), index=False)
+    with open(os.path.join(OUT_DIR, 'tv_band_gate1.md'), 'w') as f:
+        f.write('# Gate 1 — learned real-time term-structure band (walk-forward OOS)\n\n')
+        f.write(f'OOS {start_oos}-2025, annual re-fit on prior months only, stitched. '
+                'A learned arm wins only if minus_static>0 AND its bootstrap CI excludes 0 '
+                'AND it survives 1-SE regularization (minus_static - SE > 0).\n\n')
+        f.write(df.to_string(index=False))
+        f.write(f'\n\n**g1_win: {g1_win}**\n')
+    if 'rebound_both' in arms:
+        full_mask = np.ones(len(feat), dtype=bool)
+        _, bod, wbb = rebound_band_spec(panel, feat, sp, full_mask, widen_bins=(0, 1))
+        band_width_attributes(feat, bod, wbb).to_csv(
+            os.path.join(OUT_DIR, 'tv_band_gate1_attributes.csv'), index=False)
+    return {'table': df, 'g1_win': g1_win}
+
+
 def main():
     import argparse
     ap = argparse.ArgumentParser()
-    ap.add_argument('--stage', default='gate0', choices=['gate0'])
-    ap.parse_args()
+    ap.add_argument('--stage', default='gate0', choices=['gate0', 'gate1'])
+    args = ap.parse_args()
+    if args.stage == 'gate1':
+        res = run_gate1()
+        print('g1_win:', res['g1_win'])
+        print(res['table'].to_string(index=False))
+        return
     res = run_gate0()
     print('regime turnover:', regime_turnover(load_panel()))
     print('g0_pass:', res['g0_pass'])
