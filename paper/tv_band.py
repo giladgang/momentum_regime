@@ -495,6 +495,28 @@ def fit_cluster_band(panel, feat, sp_pack, train_mask, exit_grid=(15, 20, 25, 30
     return make_feature_policy(lambda t: (10, width.get(bin_of_date.get(t, -1), E0)))
 
 
+def trailing_optimal_targets(panel, feat, sp_pack, window=36,
+                             enter_grid=(5, 10, 15), exit_grid=(15, 20, 25, 30, 40)):
+    """Per month t: the (E_enter, E_exit) maximizing net IR over the trailing
+    `window` months ending at t. Supervised target for Trainers B/C."""
+    dates = list(feat.index)
+    combos = [(ee, ex) for ee in enter_grid for ex in exit_grid if ee <= ex]
+    series = {}
+    for ee, ex in combos:
+        m, led = simulate(panel, policy_band(ee, ex))
+        series[(ee, ex)] = net(m['active'], price(led, sp_pack))
+    rows = []
+    for i, t in enumerate(dates):
+        win = dates[max(0, i - window + 1):i + 1]
+        best, best_ir = (10, 20), -np.inf
+        for c in combos:
+            ir = net_ir(series[c].reindex(win).dropna())
+            if ir > best_ir:
+                best, best_ir = c, ir
+        rows.append({'date': t, 'tgt_enter': best[0], 'tgt_exit': best[1]})
+    return pd.DataFrame(rows).set_index('date')
+
+
 def main():
     import argparse
     ap = argparse.ArgumentParser()

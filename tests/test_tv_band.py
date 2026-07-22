@@ -198,3 +198,15 @@ def test_make_feature_policy_matches_static_band():
     b, _ = T.simulate(panel, T.policy_band(10, 25))
     assert np.allclose(a['turnover'].values, b['turnover'].values)
     assert np.allclose(a['book'].values, b['book'].values)
+
+
+def test_trailing_optimal_targets():
+    panel = T.load_panel()
+    feat = T.month_features(panel)
+    panel = panel[panel['date'].isin(feat.index)]
+    sp = T.load_spreads()
+    tgt = T.trailing_optimal_targets(panel, feat, sp, window=36)
+    assert {'tgt_enter', 'tgt_exit'}.issubset(tgt.columns)
+    assert (tgt['tgt_enter'] <= tgt['tgt_exit']).all()
+    assert tgt['tgt_exit'].isin([15, 20, 25, 30, 40]).all()
+    assert len(tgt) > 100
