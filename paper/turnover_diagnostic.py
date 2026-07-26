@@ -31,28 +31,29 @@ from paper.src import signals                                   # noqa: E402
 def main():
     sp, month_med, _ = B.load_spreads()
     rows, cause_rows = [], []
-    for s in C.BS_STRATEGIES:
+    for s in C.BS_STRATEGIES:                          # each of the 7 strategies
         x = signals.build(s)
         x = x[x['date'] >= C.SWEEP_START].reset_index(drop=True)
+        # (10, 10) = enter==exit==decile => NO band; the raw monthly book to diagnose
         r, led = X.simulate(x, ('nmv_band', (10, 10)), score_col='score')
-        # per-trade cost
+        # per-trade cost = |weight change| * half-spread (PIT median fallback for missing names)
         m = led.copy()
         m['ym'] = m['date'].dt.to_period('M')
         m = m.merge(sp[['permno', 'ym', 'hs']], on=['permno', 'ym'], how='left')
         m['hs'] = (m['hs'].fillna(m['ym'].map(month_med))
                    .fillna(float(month_med.median())))
-        m['c'] = m['dw'].abs() * m['hs'] / 1e4
+        m['c'] = m['dw'].abs() * m['hs'] / 1e4         # bp -> decimal return units
         cost = m.groupby('date')['c'].sum().reindex(r.index).fillna(0)
-        # regime + transition flags per month
+        # per-month regime + transition flags
         pi = r['pi']
         panic = pi >= 0.5
-        trans = panic.ne(panic.shift(1)).fillna(False)
+        trans = panic.ne(panic.shift(1)).fillna(False)  # month where the calm/panic state flips
         to = r['turnover']
 
-        def share(mask):
+        def share(mask):                               # a slice's share of total cost
             return float(cost[mask].sum() / cost.sum()) if cost.sum() else 0.0
 
-        def mo(x_, mask):
+        def mo(x_, mask):                              # mean of x over the masked months
             return float(x_[mask].mean()) if mask.sum() else 0.0
         rows.append({
             'strategy': s, 'n_mo': len(r),

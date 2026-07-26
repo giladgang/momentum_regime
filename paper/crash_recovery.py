@@ -34,9 +34,14 @@ from paper import config as C                                   # noqa: E402
 
 
 def decompose(walk):
+    """Split the model's active return into calm / panic-crash / panic-recovery
+    and report each bucket's mean/t-stat and share of the total edge. `walk` has
+    columns date, strat_ret, bench_ret, pi (the production monthly returns)."""
     m = walk.sort_values('date').copy()
     m['active'] = m['strat_ret'] - m['bench_ret']
-    panic = m['pi'] >= 0.5
+    panic = m['pi'] >= 0.5                              # panic = high regime probability
+    # within panic, RECOVERY if the market rose this month (drawdown healing), else CRASH.
+    # NB contemporaneous: bench_ret[t] is earned over the same held month (see module docstring).
     m['bucket'] = np.where(~panic, 'calm',
                            np.where(m['bench_ret'] > 0,
                                     'panic_recovery', 'panic_crash'))
@@ -51,10 +56,11 @@ def decompose(walk):
             'strat_mo': g['strat_ret'].mean(),
             'bench_mo': g['bench_ret'].mean(),
             'active_mo': g['active'].mean(),
+            # simple one-sample t-stat of the bucket's monthly active return
             'active_t': (g['active'].mean() / std * np.sqrt(n)
                          if n > 1 and std > 0 else np.nan),
             'sum_active': g['active'].sum(),
-            'share_of_total_active': g['active'].sum() / tot,
+            'share_of_total_active': g['active'].sum() / tot,   # can exceed 1 (crash bucket is negative)
         })
     return pd.DataFrame(rows)
 
