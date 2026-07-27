@@ -1,0 +1,20 @@
+% Applied-window k=4 clustering of the strategy's OWN long-leg z-curves
+% (2011-01..2025-11, cluster_applied.py -> applied_cluster_k4_stats.csv).
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{l r r r r}
+\toprule
+ & 1 (calm) & 2 (transition) & 3 (post-panic) & 4 (deep crisis) \\
+\midrule
+Months ($n$) & 49 & 70 & 33 & 27 \\
+$\bar{\pi}_t^{\text{filter}}$ (mean panic prob.) & 0.28 & 0.16 & 0.33 & 0.70 \\
+Long-leg avg z-score $\bar{z}$ & $+$1.23 & $+$0.29 & $-$0.33 & $-$1.01 \\
+\midrule
+Cluster Sharpe & 0.76 & 0.84 & 0.66 & 0.92 \\
+Cluster IR (vs benchmark) & $+$0.33 & $+$0.03 & $-$0.30 & $+$0.73 \\
+\bottomrule
+\end{tabular}
+\caption{$K=4$ cluster descriptors, applied configuration, 2011--2025 ($n=179$ months). Clusters are formed by $K$-means ($L_2$) on the 12-dimensional monthly long-leg z-curves of the main model's own picks. $\bar{z}$ is the average cross-sectional z-score of the long leg across horizons (positive: picks above the cross-sectional momentum mean; negative: below). Cluster Sharpe and IR are computed over the months assigned to each cluster.}
+\label{tab:cluster_k4_descriptors}
+\end{table}

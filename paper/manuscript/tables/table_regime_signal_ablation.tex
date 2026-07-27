@@ -1,0 +1,17 @@
+\begin{table}[H]
+\centering
+\smallskip
+\begin{tabular}{l r r}
+\toprule
+Regime Signal Variant & Sharpe & IR \\
+\midrule
+XGB $+\ \pi_t^{\text{filter}}$ (HMM, drawdown; main) & 0.78 & 0.21 \\
+XGB, no regime signal                                & 0.71 & 0.12 \\
+XGB $+$ four raw indicators (DD, VOL, CS, LVIX)      & 0.72 & 0.12 \\
+XGB $+$ GHM turning-point rule (fair 20-seed budget) & 0.71 & 0.10 \\
+XGB $+$ 10 fundamentals                              & 0.69 & -0.13 \\
+\bottomrule
+\end{tabular}
+\caption{Regime-signal ablation, applied configuration (IR against the value-weighted top-1000 benchmark). The HMM-distilled drawdown probability $\pi_t^{\text{filter}}$ improves on dropping the signal, on feeding the raw stress indicators to the tree directly, and on the GHM turning-point rule at a fair seed budget. REL\_N-only is omitted: the single-feature HMM degenerates to $\pi \equiv 1$ post-2000 in the large-cap universe (a constant, hence equal to no-signal).}
+\label{tab:regime_signal_ablation}
+\end{table}

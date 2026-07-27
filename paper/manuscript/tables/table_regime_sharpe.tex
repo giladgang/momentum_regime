@@ -1,0 +1,17 @@
+\begin{table}[H]
+\centering
+\begin{tabular}{l r r r}
+\toprule
+ & Full & Calm & Panic \\
+\midrule
+VW top-1000 benchmark & 0.99 & 0.87 & 1.25 \\
+\midrule
+Unconditional 12-1 mom & 0.79 & 0.57 & 1.19 \\
+XGB, no regime signal & 0.71 & 0.29 & 1.38 \\
+XGB $+\ \pi$ (argmax) & 0.64 & 0.26 & 1.22 \\
+XGB $+\ \pi$ (DD, main) & 0.78 & 0.42 & 1.35 \\
+\bottomrule
+\end{tabular}
+\caption{Regime-conditional Sharpe ratios, applied configuration (125 calm months, 54 panic months; panic $= \pi_t^{\text{filter}} \geq 0.5$).}
+\label{tab:regime_sharpe}
+\end{table}
