@@ -1,0 +1,5 @@
+variant,n,sharpe,ir,calm_sh,panic_sh,act_calm,act_panic
+baseline (mom $+\ \pi$; main),179,0.78,0.21,0.75,0.9,0.04,0.72
+baseline $+$ 10 fundamentals,168,0.69,-0.11,0.68,0.72,-0.14,-0.03
+fundamentals only,179,0.76,0.07,0.73,0.88,-0.09,0.45
+momentum $+$ fund.\ (no $\pi$),179,0.77,0.2,0.65,1.05,-0.02,0.85

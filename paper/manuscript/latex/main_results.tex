@@ -24,8 +24,8 @@ The panic edge does not convert into factor alpha, and this qualification must t
 
 \begin{figure}[H]
     \centering
-    \noindent\textcolor{red}{[Figure placeholder: cumulative wealth paths, main model vs benchmark, from \$1 in January 2011, panic months shaded. Applied version of plots/applied\_cumulative\_regime\_shaded to be wired in.]}
-    \caption{Cumulative wealth paths (log scale) from \$1 in January 2011. Shaded bands indicate panic months ($\pi_t^{\text{filter}} \geq 0.5$).}
+    \includegraphics[width=\textwidth]{plots/applied_cumulative_ownpi.pdf}
+    \caption{Cumulative wealth paths (log scale) from \$1 in January 2011: the main model against the value-weighted top-1000 benchmark. Shaded bands indicate panic months under the main model's own signal ($\pi_t^{\text{filter}} \geq 0.5$; 45 months).}
     \label{fig:cumulative}
 \end{figure}
 
@@ -33,7 +33,7 @@ The Newey--West truncation of six lags is supported by Ljung--Box diagnostics on
 
 \subsubsection{Regime Signal Ablation}
 
-The regime signal is what does the work in point estimate, and the HMM stage is what makes it usable (Table~\ref{tab:regime_signal_ablation}). Dropping $\pi_t^{\text{filter}}$ and retraining on the twelve momentum features alone lowers the information ratio from $0.21$ to $0.12$. Feeding four raw stress indicators (DD, VOL, DISP, REL\_N) to the tree directly, rather than the HMM-distilled probability, does no better ($0.12$): with the extra dimensions the model must reconstruct the regime structure at each split, whereas the HMM solves regime identification upstream and hands the cross-sectional model a single conditioning variable one split can act on. The GHM turning-point rule, evaluated at the seed budget matching production, also trails ($0.10$), and adding firm-level fundamentals degrades the strategy ($-0.13$; Section~\ref{sec:fund_ablation}). With $179$ months, the IR differences across variants are directional evidence rather than individually significant, but they point the same way throughout: the drawdown-only HMM signal is the operative feature, and its parsimony (Section~\ref{sec:feature_selection}) is a feature rather than a limitation.
+The regime signal is what does the work in point estimate, and the HMM stage is what makes it usable (Table~\ref{tab:regime_signal_ablation}). Dropping $\pi_t^{\text{filter}}$ and retraining on the twelve momentum features alone lowers the information ratio from $0.21$ to $0.12$. Feeding four raw stress indicators (DD, VOL, DISP, REL\_N) to the tree directly, rather than the HMM-distilled probability, does no better ($0.12$): with the extra dimensions the model must reconstruct the regime structure at each split, whereas the HMM solves regime identification upstream and hands the cross-sectional model a single conditioning variable one split can act on. The GHM turning-point rule, evaluated at the seed budget matching production, also trails ($0.10$), and adding firm-level fundamentals degrades the strategy ($-0.12$; Section~\ref{sec:fund_ablation}). With $179$ months, the IR differences across variants are directional evidence rather than individually significant, but they point the same way throughout: the drawdown-only HMM signal is the operative feature, and its parsimony (Section~\ref{sec:feature_selection}) is a feature rather than a limitation.
 
 \input{tables/table_regime_signal_ablation}
 
@@ -41,9 +41,9 @@ The regime signal is what does the work in point estimate, and the HMM stage is 
 
 A complementary question is whether \emph{adding} firm-level fundamentals to the feature set strengthens the strategy. Ten characteristics are tested,\footnote{Book-to-market, return on equity, gross profitability, asset growth, leverage, earnings growth, log market equity, operating cash flow over assets, free cash flow over assets, and accruals; definitions in Appendix~\ref{app:fundamental_features}.} each trained at production settings.
 
-\noindent\textcolor{red}{[TODO: assemble the applied fundamentals-ablation panel (baseline / +10 fund / fund-only / fund$+\pi$ / mom$+$fund) with calm/panic splits and fund-SHAP shares from the existing abl\_fund* return series. Headline already known: adding fundamentals drops the IR to $-0.13$ and the loss concentrates in panic.]}
+\input{tables/table_fundamentals_ablation}
 
-Fundamentals describe firm-level characteristics whose cross-sectional ranking does not flip with the regime the way the optimal momentum tilt does, so they cannot reproduce the panic-side reversal that carries the strategy's active return, and adding them dilutes an essential mechanism rather than complementing it. A regime-conditional design that routes fundamentals into calm-regime predictions and momentum into panic-regime predictions is discussed in Section~\ref{sec:future_work}.
+The results split cleanly along the regime mechanism (Table~\ref{tab:fund_ablation}). Adding the ten fundamentals \emph{on top of} the regime-conditioned baseline is destructive: the information ratio falls from $+0.21$ to $-0.12$, and the loss is concentrated exactly where the strategy earns its keep, with panic-month active return collapsing from $+0.72\%$ to $-0.03\%$ per month. Fundamentals describe firm-level characteristics whose cross-sectional ranking does not flip with the regime the way the optimal momentum tilt does, so inside the regime-conditioned model they dilute the panic-side selection that carries the active return. A fundamentals-only model is close to the benchmark (IR $+0.07$). The interesting row is momentum plus fundamentals \emph{without} the regime signal: it reaches a comparable full-window information ratio ($+0.20$) by a different route, a stronger panic tilt ($+0.85\%$ per month) bought with a weaker calm profile (calm Sharpe $0.65$ against the main model's $0.75$). With 179 months these IR differences are directional rather than individually significant; what the panel establishes is that fundamentals do not combine with the regime signal, not that they carry no information. A regime-conditional design that routes fundamentals into calm-regime predictions and momentum into panic-regime predictions is discussed in Section~\ref{sec:future_work}. Fund-level SHAP shares are not recomputed for the applied configuration.
 
 
 \subsection{The Regime-Momentum Mechanism}\label{sec:regime_results}
@@ -69,8 +69,8 @@ To trace the picks themselves, we examine the cross-sectional z-scores of the st
 
 \begin{figure}[H]
     \centering
-    \noindent\textcolor{red}{[Figure placeholder: long-leg z-score heatmap by month and horizon, applied (plots/applied\_zscore\_long\_heatmap). Data in applied\_zscore\_long\_by\_month.csv.]}
-    \caption{Long-leg cross-sectional z-scores by month and momentum horizon, 2011--2025.}
+    \includegraphics[width=0.72\textwidth]{plots/applied_zscore_long_heatmap.pdf}
+    \caption{Long-leg cross-sectional z-scores by month and momentum horizon, 2011--2025. Each row is one of the 179 test months sorted chronologically; each column is one of the 12 momentum horizons; color shows the deviation of the long leg's mean momentum at that horizon from the cross-sectional mean that month.}
     \label{fig:zscore_long_heatmap}
 \end{figure}
 
