@@ -1,0 +1,18 @@
+% Sources: paper/results/s5/policy_ladder.csv (monthly, panic_no_sell) and
+% paper/results/s6_banding/report.md + grid_net_ir.csv (band rows).
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{l r r r r}
+\toprule
+Execution policy & Turnover (\%/mo) & Gross IR & Net IR @10bp & Breakeven (bp) \\
+\midrule
+Monthly full rebalance & 75.7 & 0.21 & 0.06 & 14 \\
+Panic no-sell overlay & 55.7 & 0.33 & 0.22 & 29 \\
+Best static band (40,40) & 49.7 & -- & 0.29 & 35 \\
+Regime band (40 calm, 15 panic) & 54.1 & -- & 0.39 & 42 \\
+\bottomrule
+\end{tabular}
+\caption{Execution-policy ladder for the main strategy (one-way turnover; net figures at a flat 10\,bp one-way cost; breakeven is the one-way cost at which net active return reaches zero). Banding follows the buy/hold-spread construction: a stock enters the long portfolio at the top decile and is held until its score rank falls below the exit threshold $E$; the regime band tightens the exit threshold in panic months only. The (10,10) band reproduces the monthly rebalance exactly.}
+\label{tab:cost_policies}
+\end{table}
