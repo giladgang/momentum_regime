@@ -1,17 +1,22 @@
+% Regime split under the MAIN MODEL'S OWN pi (rule_r), consistent with Section 4.3.
+% Source: paper/results/tables/regime_split_ownpi.csv (recomputed 2026-07-16).
 \begin{table}[H]
 \centering
-\begin{tabular}{l r r r}
+\small
+\begin{tabular}{l r r r r r}
 \toprule
- & Full & Calm & Panic \\
+ & \multicolumn{3}{c}{Sharpe} & \multicolumn{2}{c}{Mean active (\%/mo)} \\
+\cmidrule(lr){2-4} \cmidrule(lr){5-6}
+ & Full & Calm & Panic & Calm & Panic \\
 \midrule
-VW top-1000 benchmark & 0.99 & 0.87 & 1.25 \\
+VW top-1000 benchmark & 0.99 & 1.10 & 0.90 & -- & -- \\
 \midrule
-Unconditional 12-1 mom & 0.79 & 0.57 & 1.19 \\
-XGB, no regime signal & 0.71 & 0.29 & 1.38 \\
-XGB $+\ \pi$ (argmax) & 0.64 & 0.26 & 1.22 \\
-XGB $+\ \pi$ (DD, main) & 0.78 & 0.42 & 1.35 \\
+Unconditional 12-1 mom & 0.79 & 0.67 & 1.09 & $-$0.01 & $+$0.71 \\
+XGB, no regime signal & 0.71 & 0.59 & 0.99 & $-$0.11 & $+$0.82 \\
+XGB $+\ \pi$ (argmax) & 0.64 & 0.55 & 0.87 & $-$0.24 & $+$0.59 \\
+XGB $+\ \pi$ (DD, main) & 0.78 & 0.75 & 0.90 & $+$0.04 & $+$0.72 \\
 \bottomrule
 \end{tabular}
-\caption{Regime-conditional Sharpe ratios, applied configuration (125 calm months, 54 panic months; panic $= \pi_t^{\text{filter}} \geq 0.5$).}
+\caption{Regime-conditional performance, applied configuration. Panic is defined by the main model's own filtered probability at formation ($\pi_t^{\text{filter}} \geq 0.5$): 45 panic and 134 calm months, the same classification as Section~\ref{sec:hmm_output}. Mean active is the average monthly return over the value-weighted top-1000 benchmark within the regime.}
 \label{tab:regime_sharpe}
 \end{table}

@@ -682,3 +682,19 @@ Every band conditioning (grids, parametric forms, full ML) failed for this one
 reason: the decision has no learnable signal. Capacity was never the
 constraint; the label is noise. Learnable spreads -> substitution works (~22%);
 unlearnable deferral value -> the band cannot be improved by ML or anything.
+
+## 9. Regime-classification convention (2026-07-16, ch5 review finding)
+- regime_split.csv / panels B2-C (53-54 panic months) classify by the ARGMAX
+  variant's pi (legacy of argmax-primary spec); the paper's main model is
+  rule_r, whose OWN pi gives 45 panic / 134 calm (= ch4's 45/179).
+- Under own-pi the regime layer changes materially: panic Sharpe 1.35 -> 0.90
+  (= benchmark), calm -0.28%/mo -> +0.04%/mo, panic active +1.35 -> +0.72%/mo;
+  panic FF6 alpha +16% (t=1.15) -> +3.3% (t=0.32), CAPM +10.6% (t=0.98).
+  Robust story: active return concentrated in panic; regime signal's value =
+  calm discipline (no_pi earns MORE panic active +0.82 but bleeds -0.11 calm).
+- ch5 now reports own-pi throughout (footnotes disclose the legacy numbers).
+  New artifacts: tables/regime_split_ownpi.csv, tables/alphas_ownpi.csv.
+- Historical extension 2000-2025 (historical_stress.py, PIT z, DD-only):
+  tables/expanding_subperiods_applied.csv. Dot-com -65.6% vs bench -36.4%
+  (reversal failure, worse than index; full-sample MDD -77.3%); 2009 crash
+  window +49.8% vs +36.2%; 25y Sharpe 0.44 vs 0.62.

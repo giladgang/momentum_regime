@@ -1,0 +1,9 @@
+series,model,regime,alpha_ann,t,n
+rule_r,CAPM,full,0.028,0.55,179
+rule_r,CAPM,calm,0.013,0.25,134
+rule_r,CAPM,panic,0.106,0.98,45
+rule_r,FF6,full,0.016,0.34,179
+rule_r,FF6,calm,0.017,0.34,134
+rule_r,FF6,panic,0.033,0.32,45
+benchmark,CAPM,panic,0.051,1.18,45
+benchmark,FF6,panic,0.011,0.25,45
