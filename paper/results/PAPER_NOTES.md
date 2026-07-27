@@ -698,3 +698,19 @@ unlearnable deferral value -> the band cannot be improved by ML or anything.
   tables/expanding_subperiods_applied.csv. Dot-com -65.6% vs bench -36.4%
   (reversal failure, worse than index; full-sample MDD -77.3%); 2009 crash
   window +49.8% vs +36.2%; 25y Sharpe 0.44 vs 0.62.
+
+## 10. Final regeneration round (2026-07-28)
+- SHAP: panel-G figures (60/57/65) SUPERSEDED -- no generator script survives;
+  reproducible 3-seed walk-consistent run (extras_walk.py ->
+  extras/shap_sums_by_year.csv) gives pi share 37% overall / 38 calm / 33 panic
+  / 25 long-leg; momentum horizons 11+12 carry 22%+18%. ch5 updated.
+- Risk-aversion sweep (sigma-XGB 10-seed, dual-util long-only): gamma=0
+  reproduces headline EXACTLY (0.778). Vol penalty is ~free in large-cap
+  long-only: gamma=1 Sharpe 1.11, vol 13.9%, MDD -18%, IR 0.15 (no collapse).
+  OPPOSITE of the L/S thesis trade-off. tables/risk_aversion_sweep.csv.
+- International (fresh 2026-07 pull, mechanical 90%-coverage universes UK 200
+  / JP 750, DD-only, no tuning): JP replicates value-where-momentum-fails
+  (strategy IR +0.22 vs 12-1 -0.04); UK replicates panic-concentration
+  (+0.58 panic / +0.07 calm %/mo) but plain UK momentum wins full-window
+  (+0.43 vs +0.19, calm-concentrated +0.69/-0.19). Neither market shows both.
+  MDDs deeper than benchmarks in both. intl/intl_summary.csv.

@@ -1,0 +1,19 @@
+% Source: paper/results/intl/intl_summary.csv (applied intl walk, 2026-07 pull,
+% report window matched to the US: 2011-01..2025-11, 179 months).
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{l c c c c c c c c}
+\toprule
+ & \multicolumn{4}{c}{UK (top 200)} & \multicolumn{4}{c}{JP (top 750)} \\
+\cmidrule(lr){2-5} \cmidrule(lr){6-9}
+Strategy & Ann.\ Ret & Sharpe & Max DD & IR & Ann.\ Ret & Sharpe & Max DD & IR \\
+\midrule
+Local VW benchmark & 7.5\% & 0.64 & $-$23.5\% & -- & 12.9\% & 0.83 & $-$22.0\% & -- \\
+Unconditional 12-1 mom & 13.4\% & 0.79 & $-$26.3\% & $+$0.43 & 12.3\% & 0.60 & $-$29.3\% & $-$0.04 \\
+Regime-conditioned (main) & 10.2\% & 0.50 & $-$30.8\% & $+$0.19 & 15.2\% & 0.76 & $-$33.3\% & $+$0.22 \\
+\bottomrule
+\end{tabular}
+\caption{International replication, applied configuration, 2011--2025 (179 months, matched to the US window). Long-only top-decile value-weighted portfolios within mechanically chosen large-cap universes (smallest top-$N$ covering 90\% of listed market capitalization on the pre-2011 sample: UK $N=200$, JP $N=750$); drawdown-only regime signal from the regional market panel; same expanding walk and frozen hyperparameters as the US pipeline, no per-region tuning. IR is against the regional value-weighted benchmark.}
+\label{tab:international_results}
+\end{table}

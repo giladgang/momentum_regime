@@ -1,0 +1,7 @@
+region,universe_n,series,n_months,ann_ret,sharpe,max_dd,ir
+uk,200,benchmark,179,0.0751,0.64,-0.235,
+uk,200,mom_12_1,179,0.1335,0.79,-0.263,0.43
+uk,200,strategy,179,0.1022,0.5,-0.308,0.19
+jp,750,benchmark,179,0.1291,0.83,-0.22,
+jp,750,mom_12_1,179,0.1231,0.6,-0.293,-0.04
+jp,750,strategy,179,0.1521,0.76,-0.333,0.22
