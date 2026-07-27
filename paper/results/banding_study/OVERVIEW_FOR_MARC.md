@@ -15,8 +15,9 @@ rebalancing band* on the market state — i.e. widen the no-trade band (trade le
 (trade more) as a function of momentum, the momentum term structure, and the regime probability
 π — rather than using a single static band?
 
-**Headline finding.** No. A well-chosen **static band already sits at the optimum**, and no
-regime-conditioned band beats it out of sample. The signal *exists in-sample* (a perfect-hindsight
+**Headline finding.** No. A well-chosen **static band already sits at the optimum**, and no band
+conditioned on that state — the momentum term structure *and* the regime probability, via linear,
+tree, and direct-optimization models — beats it out of sample. The signal *exists in-sample* (a perfect-hindsight
 "oracle" band beats static by +18.5%), but it **does not survive out of sample** — the classic
 overfitting gap. Every direction we pushed — widen or narrow, in panic / recovery / calm, fit by
 XGB / ridge / direct optimization — is null or negative once tested honestly (walk-forward, with a
@@ -158,12 +159,15 @@ Plus GBM / ridge / direct-net-IR learned bands — all null.
 
 1. **A static band works** (net IR 0.414 vs 0.318 for rebalancing every month) — banding *is* a real
    cost-mitigation tool.
-2. **Conditioning the band on the regime does not add tradable value.** The reason is structural: a
-   band can only make you trade *less*, but the regime's genuine signal is about when to trade
-   *more* — establish the rebound at the panic peak, where all the profit lives (crash/recovery
-   decomposition). That direction is outside a band's range of actions, and forcing the band to
-   widen there *loses* money (rebound_c4). Everywhere else the effect is below the noise floor, so
-   the in-sample ceiling (+18.5%) is unlearnable and vanishes out of sample.
+2. **Conditioning the band on the full market state does not add tradable value.** "State" here is
+   not just the regime π — it is the 12-horizon momentum term structure (both the picks' z-curve
+   shape and the market's own cross-sectional momentum) *and* π, fed to linear, tree-ensemble (GBM),
+   and direct-optimization models. None beats static out of sample. The reason is structural: a band
+   can only make you trade *less*, but the state's genuine signal is about when to trade *more* —
+   establish the rebound at the panic peak, where all the profit lives (crash/recovery decomposition).
+   That direction is outside a band's range of actions, and forcing the band to widen there *loses*
+   money (rebound_c4). Everywhere else the effect is below the noise floor, so the in-sample ceiling
+   (+18.5%) is unlearnable and vanishes out of sample.
 3. **This is exactly your (Marc's) implementability point, made quantitative:** the profitable move
    requires trading precisely when trading is hardest/costliest, so the honest lesson is *patience*
    (hold through), not faster/smarter reaction.
@@ -172,8 +176,9 @@ Plus GBM / ridge / direct-net-IR learned bands — all null.
 
 **Net for a practitioner paper:** the defensible, novel-enough claim is not "a smart adaptive band
 beats static" (false) but *"a well-chosen static band mitigates cost and survives out of sample;
-conditioning it on the regime does not add tradable value — because the strategy's edge lives in
-the panic-recovery episodes where the profitable action is to trade more, not less."* That is a
+conditioning it on the full market state (the 12-horizon momentum term structure and the regime)
+does not add tradable value — because the strategy's edge lives in the panic-recovery episodes
+where the profitable action is to trade more, not less."* That is a
 clean characterization result with the mechanism explained, and it directly answers the
 implementability critique.
 
