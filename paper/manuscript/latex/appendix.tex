@@ -2,6 +2,11 @@
 %% APPENDIX -- included via \input{appendix} from main.tex
 %% ═══════════════════════════════════════════════════════════════════════════
 
+\paragraph*{Scope note}
+% TODO(Gilad): appendix content below largely documents the long-short,
+% full-universe companion configuration; a full applied conversion is pending.
+Unless labeled otherwise, the appendices below document the long-short, full-universe research configuration from which this framework was developed (four-feature regime signal, 200-seed HMM ensemble, NYSE-breakpoint long-short deciles, 2011--2024 evaluation). Methodological material referenced from the main text (estimation and convergence diagnostics, factor-model and SHAP definitions, the risk-aversion utility construction) carries over to the applied configuration unchanged; numerical results quoted in appendices refer to the companion configuration and are superseded, where they overlap, by the applied numbers in the main text.
+
 \section{Data Sources and Variable Definitions}\label{app:data_summary}
 
 Three primary data sources are used. \textbf{CRSP} (Center for Research in Security Prices, via WRDS) provides monthly stock-level returns, prices, shares outstanding, exchange codes, and share codes from the Monthly Stock File (\texttt{crsp.msf}), as well as daily market returns from the Daily Stock Index file (\texttt{crsp.dsi}). \textbf{Compustat} (via WRDS) provides quarterly fundamental accounting data from \texttt{comp.fundq}, linked to CRSP via the CCM bridge table using primary link types (LU, LC). \textbf{FRED} (Federal Reserve Economic Data) provides Moody's BAA and AAA corporate bond yields for computing the credit spread.
@@ -50,12 +55,12 @@ $\pi_t^{\text{filter}}$ & HMM output & Filtered panic probability & Section~\ref
 
 \medskip
 \small
-\textbf{Notes:} All data accessed via WRDS. Compustat linked to CRSP via the CCM bridge table using primary link types (LU, LC). Fundamentals are lagged four months from fiscal quarter end to ensure real-time availability. The sample covers January 1990 to November 2024 (training: 1990--2010, 240 months; test: 2011--2024, 167 months).
+\textbf{Notes:} All data accessed via WRDS. Compustat linked to CRSP via the CCM bridge table using primary link types (LU, LC). Fundamentals are lagged four months from fiscal quarter end to ensure real-time availability. The applied sample uses momentum lookbacks from January 1991, an initial training window of 1991--2010 (240 months), and an out-of-sample walk from January 2011 to November 2025 (179 months); see Table~\ref{tab:sample_summary}.
 \end{table}
 
 \section{HMM Feature Selection Tables}\label{app:hmm_feature_tables}
 
-The two tables in this section support the four-pass feature selection procedure described in Section~\ref{sec:feature_selection}. Table~\ref{tab:feature_selection} reports the top 10 candidate feature combinations on ensemble Sharpe and cross-seed stability. Table~\ref{tab:hmm_feature_ablation} reports include-one and leave-one-out ablations of the production four-feature set.
+The two tables in this section support the companion configuration's four-pass feature selection, which is distinct from the train-only one-standard-error rule of Section~\ref{sec:feature_selection}. Table~\ref{tab:feature_selection} reports the top 10 candidate feature combinations on ensemble Sharpe and cross-seed stability. Table~\ref{tab:hmm_feature_ablation} reports include-one and leave-one-out ablations of the companion four-feature set.
 
 \input{tables/table_feature_selection}
 
@@ -113,7 +118,7 @@ Strategy performance is assessed using four standard risk-adjusted metrics compu
 \begin{equation}
     SR = \frac{\bar{r}}{\sigma(r)} \cdot \sqrt{12},
 \end{equation}
-where $\bar{r}$ is the mean monthly return. Sharpe is computed from the arithmetic monthly mean annualized by $\sqrt{12}$, while annualized returns reported elsewhere in this thesis are compound (geometric); under high volatility the two definitions of average return differ, so Sharpe should not be inferred from a table by dividing annualized return by annualized volatility (e.g.\ at depth~1 in the methodology hyperparameter sweep, the reported Sharpe is $0.53$ but $8.7\% / 19.4\% = 0.45$).
+where $\bar{r}$ is the mean monthly return. Sharpe is computed from the arithmetic monthly mean annualized by $\sqrt{12}$, while annualized returns reported elsewhere in this paper are compound (geometric); under high volatility the two definitions of average return differ, so Sharpe should not be inferred from a table by dividing annualized return by annualized volatility (e.g.\ at depth~1 in the methodology hyperparameter sweep, the reported Sharpe is $0.53$ but $8.7\% / 19.4\% = 0.45$).
 
 \textbf{Maximum drawdown} Let $C_t = \prod_{\tau=1}^{t}(1 + r_\tau)$ denote the cumulative wealth path. The maximum drawdown is:
 \begin{equation}
@@ -138,7 +143,7 @@ where
 \[
 \bar{r}_{M_C} = \frac{1}{n_C} \sum_{t \in M_C} r_t, \qquad \sigma(r_{M_C}) = \sqrt{\frac{1}{n_C - 1} \sum_{t \in M_C} (r_t - \bar{r}_{M_C})^2}.
 \]
-The denominator is therefore the unbiased sample standard deviation of the in-cluster long-short monthly returns; annualisation by $\sqrt{12}$ follows the monthly-to-annual convention used throughout this thesis. Confidence intervals come from a block bootstrap (block size~6, 5{,}000 reps) on the in-cluster return series.
+The denominator is therefore the unbiased sample standard deviation of the in-cluster long-short monthly returns; annualisation by $\sqrt{12}$ follows the monthly-to-annual convention used throughout this paper. Confidence intervals come from a block bootstrap (block size~6, 5{,}000 reps) on the in-cluster return series.
 
 \section{Feature Importance Methods}
 
@@ -274,7 +279,7 @@ The historical evidence reported in Section~\ref{sec:historical_stress} comes fr
 
 The HMM's panic-state label is fixed by an economically motivated sign convention rather than the data-driven percentile comparison used elsewhere. The convention encodes the known direction of each feature in panic regimes: $-1$ for drawdown, $+1$ for cross-sectional dispersion, $-1$ for relative market participation, and $+1$ for the credit spread. The data-driven label-switching procedure used in the main pipeline is unstable on short training windows with few observed crisis months (under 20 months in the crisis windows used by the percentile comparison; see Appendix~\ref{app:label_switching}), so the fixed-sign fallback activates for retrainings before 2002. From 2002 onward the data-driven procedure resumes, by which point the training window contains the dot-com bust as a calibration anchor. The HMM seed loop is parallelised across CPU cores via \texttt{multiprocessing.Pool}; the parallel implementation is bit-identical to the serial reference (verified in the test suite by comparing per-seed pi-filter arrays).
 
-Each retraining produces 12 monthly out-of-sample long-short returns, which are stitched into a single monthly return series; this thesis reports the 25-year sub-sample from January 2000 to November 2024 (299 months). Every prediction is strictly causal: the model used for month~$t$ saw no information after month~$t-1$. The 167-month sub-window from January 2011 onward overlaps the main test period reported in Section~\ref{sec:performance_results} and serves as a methodological cross-check; expanding-window OOS produces a Sharpe of 0.88 over that window, within the production result's bootstrap interval.
+Each retraining produces 12 monthly out-of-sample long-short returns, which are stitched into a single monthly return series; this paper reports the 25-year sub-sample from January 2000 to November 2024 (299 months). Every prediction is strictly causal: the model used for month~$t$ saw no information after month~$t-1$. The 167-month sub-window from January 2011 onward overlaps the main test period reported in Section~\ref{sec:performance_results} and serves as a methodological cross-check; expanding-window OOS produces a Sharpe of 0.88 over that window, within the production result's bootstrap interval.
 
 \subsection{Factor Model Regressions}\label{app:factor_alphas}
 
@@ -424,7 +429,7 @@ Two patterns emerge. First, the mean Sharpe rises from 1.04 at $k = 1$ to 1.12 a
 \section{International HMM Feature Selection}\label{app:intl_feature_selection}
 
 \sloppy
-For the international robustness check (Section~\ref{sec:international}), the HMM feature set is selected per region using the same 4-pass procedure as the US production specification (Section~\ref{sec:feature_selection}): a quality screen on MCMC convergence and crisis-window alignment, a portfolio-Sharpe ranking on the surviving combinations, a definitive validation at higher seed counts, and an additional stability check across random seed partitions. The international candidate pool comprises the five locally-available stress features (DD, VOL, DISP, REL\_N, BANK\_REL); BANK\_REL is the value-weighted bank-sector excess return over the broad regional market, sign-flipped so high values indicate stress, and substitutes for the US-specific Moody's BAA--AAA spread. With DD required, the procedure evaluates fifteen combinations of size one to four. Both UK and Japan select \emph{DD+VOL+REL\_N} as the regional feature set. The transplanted-from-US template (DD+DISP+REL\_N+BANK\_REL) fails the Pass-1 quality screen for both regions (minimum effective sample size of 14 and 4 respectively), motivating per-region selection. Pass-by-pass CSV results and chosen-features JSON manifests are saved under \texttt{results/thesis/} with the prefix \texttt{intl\_<region>\_hmm}.
+This appendix documents the \emph{companion long-short study's} international replication, which selected regional feature sets with that configuration's four-pass procedure; the applied replication of Section~\ref{sec:international} instead imposes the univariate drawdown signal per region with no per-region selection (Section~\ref{sec:intl_sample}). In the companion procedure, the HMM feature set is selected per region via a quality screen on MCMC convergence and crisis-window alignment, a portfolio-Sharpe ranking on the surviving combinations, a definitive validation at higher seed counts, and an additional stability check across random seed partitions. The international candidate pool comprises the five locally-available stress features (DD, VOL, DISP, REL\_N, BANK\_REL); BANK\_REL is the value-weighted bank-sector excess return over the broad regional market, sign-flipped so high values indicate stress, and substitutes for the US-specific Moody's BAA--AAA spread. With DD required, the procedure evaluates fifteen combinations of size one to four. Both UK and Japan select \emph{DD+VOL+REL\_N} as the regional feature set. The transplanted-from-US template (DD+DISP+REL\_N+BANK\_REL) fails the Pass-1 quality screen for both regions (minimum effective sample size of 14 and 4 respectively), motivating per-region selection. Pass-by-pass CSV results and chosen-features JSON manifests are saved under \texttt{results/thesis/} with the prefix \texttt{intl\_<region>\_hmm}.
 
 \section{Fundamental Feature Definitions}\label{app:fundamental_features}
 

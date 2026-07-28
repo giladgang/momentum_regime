@@ -1,0 +1,18 @@
+% Applied-configuration sample summary. Computed 2026-07-28 from
+% paper/results/data/stocks.parquet + universe.top_n (see commit message).
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{l p{0.62\textwidth}}
+\toprule
+Universe & Point-in-time 1{,}000 largest U.S. common stocks by month-end market cap (NYSE/AMEX/NASDAQ, price $>$ \$1; Russell 1000 proxy) \\
+Capitalization coverage & 92.9\% of listed U.S. market cap (monthly average) \\
+Feature warm-up & Momentum lookbacks from January 1991 \\
+Initial training window & 1991--2010 (240 months; 240{,}000 stock-months; 3{,}249 distinct stocks) \\
+Out-of-sample walk & January 2011 -- November 2025 (179 months; 179{,}000 stock-months; 2{,}312 distinct stocks), model re-estimated each January on an expanding window; historical extension back to 2000 in Section~\ref{sec:historical_stress} \\
+Benchmark & Value-weighted portfolio of the same top-1000 universe \\
+\bottomrule
+\end{tabular}
+\caption{Sample overview, applied configuration.}
+\label{tab:sample_summary}
+\end{table}

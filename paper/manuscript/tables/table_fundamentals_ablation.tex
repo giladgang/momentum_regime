@@ -1,7 +1,8 @@
 % Own-pi regime split; source paper/results/tables/fund_ablation_ownpi.csv.
 \begin{table}[H]
 \centering
-\small
+\footnotesize
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{l c c c c c c}
 \toprule
  & Feat. & Sharpe & IR & Calm Sh. & Panic Sh. & Panic act.\ (\%/mo) \\
@@ -11,7 +12,8 @@ Baseline $+$ 10 fundamentals      & 23 & 0.69 & $-$0.12 & 0.68 & 0.72 & $-$0.03 
 Fundamentals only                 & 10 & 0.76 & $+$0.07 & 0.73 & 0.88 & $+$0.45 \\
 Momentum $+$ fund.\ (no $\pi$)    & 22 & 0.77 & $+$0.20 & 0.65 & 1.05 & $+$0.85 \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \caption{Feature-set ablation, applied configuration (5-seed ablation budget; regime split on the main model's own $\pi$). IR and active returns are measured against the common value-weighted top-1000 benchmark for every row. The fundamentals-augmented baseline covers 2011--2024 (fundamentals unavailable for 2025); other rows cover the full 179 months.}
 \label{tab:fund_ablation}
 \end{table}

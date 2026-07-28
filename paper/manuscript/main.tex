@@ -50,64 +50,32 @@
 
 \begin{titlepage}
 \centering
-\vspace*{1cm}
+\vspace*{2cm}
 
-\includegraphics[width=0.55\textwidth]{plots/thesis/tilburg_logo.pdf}
+% TODO(Gilad): provisional working-paper title; confirm or replace.
+{\Large\bfseries When Not to Trade:\\[0.3cm] Drawdown Regimes and the Implementation of Large-Cap Momentum\par}
+
+\vspace{2cm}
+
+Gilad Gang\footnote{Tilburg University. Contact: giladgang@gmail.com. I thank Denis Kojevnikov and Marc Stam for guidance and feedback, and Tilburg University's School of Economics and Management for access to WRDS data. Any remaining errors are my own.}
 
 \vspace{1.5cm}
 
-{\Large\bfseries Momentum Across Market Regimes -- A Machine Learning Approach\par}
+Working paper, July 2026
 
 \vspace{2cm}
 
-By\\[0.5cm]
-Gilad Gang (2148871)\\
-B.Sc.\ The Hebrew University of Jerusalem
-
-\vspace{2cm}
-
-A thesis submitted in partial fulfillment of the requirements for the degree of Master of Science in\\[0.3cm]
-Quantitative Finance and Actuarial Science
-
-\vspace{1cm}
-
-Tilburg School of Economics and Management\\
-Tilburg University
-
-\vspace{1cm}
-
-Supervisor\\
-Denis Kojevnikov
-
-\vspace{1cm}
-
-Date: June 2026
+\begin{minipage}{0.85\textwidth}
+\noindent\textbf{Keywords:} momentum; regime switching; transaction costs; trading bands; machine learning\\
+% TODO(Gilad): confirm JEL codes.
+\textbf{JEL classification:} G11, G12, G14
+\end{minipage}
 
 \end{titlepage}
 
-\section*{Acknowledgements}
-I would like to thank my supervisor, Denis Kojevnikov, for his guidance and feedback throughout this project. I am also grateful to Tilburg University's School of Economics and Management for providing access to WRDS data. Finally, I thank my family and friends for their support throughout my studies. Any remaining errors are my own.
-
-\bigskip
-
-\noindent\textit{AI Disclosure.} In accordance with the MSc BAOR/EME/QFAS \emph{Policy on the use of AI Tools for written assignments} (November 2024), the author discloses the following uses of Claude (Anthropic) during the preparation of this thesis.
-\begin{itemize}
-    \item \textbf{Proofreading and clarity.} Grammar correction, copy-editing, and suggestions for improving the readability of the author's drafts.
-    \item \textbf{Idea generation.} Brainstorming structural framings, exploring alternative phrasings, and surfacing candidate literature.
-    \item \textbf{Code support.} Code review, refactoring suggestions, and debugging assistance for the analytical scripts.
-    \item \textbf{Verification.} Cross-checking consistency between prose, tables, and source data.
-\end{itemize}
-All AI-suggested phrasings and references were reviewed and verified by the author against the original sources. AI was not used to fabricate data or references, or to generate substantive content the author does not understand. The empirical analysis, model design, and economic conclusions are the author's own work, and the author bears full responsibility for the content of this thesis.
-
-\newpage
-
 \section*{Abstract}
 
-Cross-sectional momentum, the tendency for recent stock-market winners to keep winning and losers to keep losing, is one of the most profitable anomalies in finance and one of the most fragile. Momentum portfolios suffered losses exceeding 50\% during the 2009 market rebound and have crashed repeatedly around regime transitions. The standard responses scale exposure during stress or blend horizon weights, leaving the selection rule itself unconditional. This thesis asks a different question: how does the cross-sectional structure of momentum reorganize between calm and panic regimes, and what mechanism drives that reorganization?
-
-The empirical framework has two stages. A Bayesian two-state Hidden Markov Model, estimated by Gibbs sampling on four monthly macrofinancial stress indicators, produces a continuous filtered probability of market panic that updates each month. This regime signal is then combined with twelve momentum horizons inside a cross-sectional stock-selection model (an XGBoost gradient-boosted regressor, benchmarked against a deterministic formula and a logistic regression).  Stocks are ranked monthly and the top and bottom deciles enter a value-weighted long-short portfolio. All models are estimated on 1990--2010 U.S. equities and evaluated out-of-sample on the 167-month 2011--2024 window, with international replication on UK and Japanese equities. The combination of an HMM regime signal with an XGBoost cross-sectional model is, to the author's knowledge, novel, and extracts a stronger momentum signal than conventional regime indicators such as market drawdown.
-
-This thesis develops a more flexible regime-dependent momentum framework that optimizes portfolio weights directly from stock-level signals. The portfolio selected is not restricted to forming portfolios from pre-specified momentum rankings, whether by selecting the top-ranked stocks within a single horizon, rotating across a small set of predefined horizons, or lowering exposure when market conditions deteriorate. Instead, the model learns how stock-level signals, and not horizon level signals, should translate into portfolio positions in each regime. The empirical results show that the learned rule behaves conventionally in calm regimes, allocating the long leg to recent winners. However, in panic regimes, the long leg is not simply drawn from the winners of another horizon. It is rebuilt from a distinct set of stocks not top-ranked at any individual momentum horizon, a novel form of selection whose portfolio relevance emerges only after conditioning on the panic state and combining information across signals.
+A large-cap, long-only momentum portfolio earns essentially all of its benchmark-beating return in a minority of months: those a real-time regime signal, filtered from the market drawdown alone, classifies as panic. We show this with a two-stage framework in which a Bayesian hidden Markov model turns the drawdown into a continuous panic probability and a gradient-boosted model conditions stock selection on that probability jointly with twelve momentum horizons, evaluated on an expanding out-of-sample walk over the point-in-time 1{,}000 largest U.S. stocks (2011--2025, extended back to 2000). The honest headline is negative: the strategy earns no unconditional risk-adjusted alpha in this configuration. Its gross active return concentrates in the quarter of months classified as panic ($+0.72\%$ versus $+0.04\%$ per month in calm), where selection inverts from past winners to beaten-down recovery candidates ranked, on average, below the cross-sectional average at every momentum horizon. The signal's practical product is a when-to-trade rule. Roughly three-quarters of a monthly-rebalanced book's turnover occurs in calm months that earn nothing, so conditioning a buy/hold trading band on the regime, wide in calm and tight in panic, raises the net information ratio at 10\,bp costs from $0.06$ under monthly rebalancing to $0.39$, against $0.29$ for the best static band, and the breakeven cost from $14$ to $42$ basis points, a statistically significant improvement over monthly rebalancing of the same signal. To our knowledge this is the first state-dependent buy/hold trading band implemented on a cross-sectional selection portfolio.
 
 \newpage
 \tableofcontents
