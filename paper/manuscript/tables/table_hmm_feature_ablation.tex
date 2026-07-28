@@ -1,0 +1,22 @@
+\begin{table}[H]
+\centering
+\smallskip
+\begin{tabular}{lcc}
+\toprule
+HMM Input Features & XGB Sharpe & $\Delta$ vs Full \\
+\midrule
+Full 4F baseline (DD+DISP+REL\_N+CS) & 0.97 & --- \\
+\midrule
+\multicolumn{3}{l}{\textit{Include-one (single-feature HMM)}} \\[2pt]
+DD only (market drawdown)              & 0.66 & $-$0.31 \\
+\midrule
+\multicolumn{3}{l}{\textit{Leave-one-out (three-feature HMM)}} \\[2pt]
+Drop DD                                & 0.51 & $-$0.46 \\
+Drop DISP                              & 0.96 & $-$0.01 \\
+Drop REL\_N                            & 0.43 & $-$0.54 \\
+Drop CS                                & 0.96 & $-$0.01 \\
+\bottomrule
+\end{tabular}
+\caption{HMM input feature ablation (long-short, feature-selection seed counts). The absolute Sharpe levels differ from the companion production model (long-short Sharpe 1.11) due to fewer seeds; the relative comparisons ($\Delta$) are the relevant quantities. DD alone is the strongest single-feature classifier but trails the full set by $-$0.31. Removing DD or REL\_N causes the largest leave-one-out drops ($-$0.46 and $-$0.54), while DISP and CS contribute marginally to the Sharpe but improve seed stability under the companion selection procedure (Appendix~\ref{app:hmm_feature_tables}).}
+\label{tab:hmm_feature_ablation}
+\end{table}

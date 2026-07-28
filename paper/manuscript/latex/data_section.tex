@@ -39,7 +39,7 @@ The HMM contributes what a raw drawdown threshold would not. First, the filter o
 
 The drawdown series is winsorized at the 1st and 99th percentiles\footnote{Winsorizing at the 1st and 99th percentiles caps any value below the 1st percentile at that bound and any value above the 99th percentile at that bound, limiting the influence of outliers without discarding the observations.} using training-sample statistics, and standardized to zero mean and unit variance.
 
-Panel~(a) of Figure~\ref{fig:dd_regime_signal} plots the standardized series over the sample. Panic regimes are characterized by deep drawdowns that are slow to close; calm regimes show shallow or no drawdown. The series deepens sharply in the 2000--2002 dot-com bust, the 2007--2009 Global Financial Crisis, the March 2020 COVID shock, and the 2022 tightening cycle, and sits near zero through the 2003--2007 and 2013--2019 expansions. The largest excursions align with the shaded NBER recession bands, though drawdown also flags equity-market stress that falls outside official recession dating.
+Panel~(a) of Figure~\ref{fig:dd_regime_signal} plots the standardized series over the sample. Panic regimes are characterized by deep drawdowns that are slow to close; calm regimes show shallow or no drawdown. The series deepens sharply in the 2000--2002 dot-com bust, the 2007--2009 Global Financial Crisis, the March 2020 COVID shock, and the 2022 tightening cycle, and, outside brief corrections such as 2015--16 and late 2018, sits near zero through the 2003--2007 and 2013--2019 expansions. The largest excursions align with the shaded NBER recession bands, though drawdown also flags equity-market stress that falls outside official recession dating.
 
 \subsection{Regime Estimation Results}\label{sec:hmm_output}
 
@@ -69,7 +69,7 @@ Twelve trailing momentum signals are computed for each stock, corresponding to l
 \begin{equation}
     \text{mom}_{k,t}^s = \prod_{\ell=1}^{k}(1 + r_{t-\ell}^s) - 1, \qquad k = 1, \dots, 12,
 \end{equation}
-where $r_{t-\ell}^s$ is the adjusted return of stock $s$ in month $t - \ell$. The current month's return is excluded from all lookbacks to avoid mechanical correlation with the forward return being predicted. Including all twelve horizons rather than a single lookback allows the models to learn how the full momentum term structure interacts with the regime signal.
+where $r_{t-\ell}^s$ is the adjusted return of stock $s$ in month $t - \ell$. The current month's return is excluded from all lookbacks to avoid mechanical correlation with the forward return being predicted. Including all twelve horizons rather than a single lookback allows the model to learn how the full momentum term structure interacts with the regime signal.
 
 \subsection{International Sample}\label{sec:intl_sample}
 

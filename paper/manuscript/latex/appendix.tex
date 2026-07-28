@@ -118,7 +118,7 @@ Strategy performance is assessed using four standard risk-adjusted metrics compu
 \begin{equation}
     SR = \frac{\bar{r}}{\sigma(r)} \cdot \sqrt{12},
 \end{equation}
-where $\bar{r}$ is the mean monthly return. Sharpe is computed from the arithmetic monthly mean annualized by $\sqrt{12}$, while annualized returns reported elsewhere in this paper are compound (geometric); under high volatility the two definitions of average return differ, so Sharpe should not be inferred from a table by dividing annualized return by annualized volatility (e.g.\ at depth~1 in the methodology hyperparameter sweep, the reported Sharpe is $0.53$ but $8.7\% / 19.4\% = 0.45$).
+where $\bar{r}$ is the mean monthly return. Sharpe is computed from the arithmetic monthly mean annualized by $\sqrt{12}$, while annualized returns reported elsewhere in this paper are compound (geometric); under high volatility the two definitions of average return differ, so Sharpe should not be inferred from a table by dividing annualized return by annualized volatility (e.g.\ at depth~1 in the hyperparameter sweep of Appendix~\ref{app:xgb_sensitivity}, the reported Sharpe is $0.53$ but $8.7\% / 19.4\% = 0.45$).
 
 \textbf{Maximum drawdown} Let $C_t = \prod_{\tau=1}^{t}(1 + r_\tau)$ denote the cumulative wealth path. The maximum drawdown is:
 \begin{equation}
@@ -135,7 +135,7 @@ This decomposition helps assess whether the strategy's alpha originates primaril
 
 \paragraph{Per-Cluster Sharpe}
 
-The cluster Sharpes reported in Section~\ref{sec:heterogeneity_picks} apply the standard Sharpe formula to the months in each cluster. Let $M_C$ denote the set of months assigned to cluster $C$, let $r_t$ be the long-short monthly portfolio return at month $t$, and let $n_C = |M_C|$. The point-estimate cluster Sharpe is
+The cluster Sharpes reported in Section~\ref{sec:heterogeneity_picks} apply the standard Sharpe formula to the months in each cluster. Let $M_C$ denote the set of months assigned to cluster $C$, let $r_t$ be the strategy's monthly portfolio return at month $t$ (long-only in the applied configuration), and let $n_C = |M_C|$. The point-estimate cluster Sharpe is
 \[
 \mathrm{Sharpe}_C = \frac{\bar{r}_{M_C}}{\sigma(r_{M_C})} \cdot \sqrt{12},
 \]
@@ -162,38 +162,39 @@ Two aggregations of $I_j$ appear in the main text. The first is the \emph{total 
 \begin{equation}
     \text{share}_j = \frac{I_j}{\sum_{k=1}^{13} I_k}.
 \end{equation}
-The 46\% figure reported for $\pi_t^{\text{filter}}$ in Section~\ref{sec:horizon_evidence} is $\text{share}_{\pi}$ computed across the full test set.
+The 37\% figure reported for $\pi_t^{\text{filter}}$ in Section~\ref{sec:horizon_evidence} is $\text{share}_{\pi}$ computed across the full test set.
 
-The second is the \emph{per-horizon momentum share by leg} plotted in Figure~\ref{fig:shap_per_horizon_by_leg}, which restricts attention to the twelve momentum horizons within a single leg-regime cell. For leg $\ell \in \{\text{long}, \text{short}\}$, regime $r \in \{\text{calm}, \text{panic}\}$, and horizon $h \in \{1, \ldots, 12\}$,
+The second is the \emph{per-horizon momentum share}, which restricts attention to the twelve momentum horizons within a cell of observations. In the general leg-regime form used by the companion study, for leg $\ell \in \{\text{long}, \text{short}\}$, regime $r \in \{\text{calm}, \text{panic}\}$, and horizon $h \in \{1, \ldots, 12\}$,
 \begin{equation}
     s_{\ell, r, h} = \frac{\sum_{i \in \mathcal{I}_{\ell, r}} |\phi_h(\mathbf{x}_i)|}{\sum_{h' = 1}^{12} \sum_{i \in \mathcal{I}_{\ell, r}} |\phi_{h'}(\mathbf{x}_i)|},
 \end{equation}
-where $\mathcal{I}_{\ell, r}$ is the set of test observations in leg $\ell$ and regime $r$. By construction the twelve shares within each $(\ell, r)$ sum to one. Pooling across regimes weighted by observation count gives the leg-level shares displayed in Figure~\ref{fig:shap_per_horizon_by_leg}:
+where $\mathcal{I}_{\ell, r}$ is the set of test observations in leg $\ell$ and regime $r$. By construction the twelve shares within each $(\ell, r)$ sum to one. Pooling across regimes weighted by observation count gives leg-level shares:
 \begin{equation}
     s_{\ell, h} = \frac{\sum_r n_{\ell, r} \, s_{\ell, r, h}}{\sum_r n_{\ell, r}}, \qquad n_{\ell, r} = |\mathcal{I}_{\ell, r}|.
 \end{equation}
+The applied Figure~\ref{fig:shap_per_horizon_by_leg} displays the two cells relevant to the long-only configuration: the per-horizon shares computed over all out-of-sample stock-months and over the long-leg picks.
 
 Two additional analyses are performed. First, the mean absolute SHAP value of $\pi_t^{\text{filter}}$ is computed separately for calm and panic months to assess whether the regime signal's influence varies across market states. Second, regime-specific XGBoost models are trained on calm-only and panic-only subsets of the training data, and their SHAP feature importances are compared to identify which features the model relies on differentially across regimes.
 
 \section{Alternative Training Targets for XGBoost}\label{app:alt_targets}
 
-Section~\ref{sec:risk_aversion_control} argues that embedding a risk penalty directly in the XGBoost training target degrades performance, motivating the per-direction utility specification used in the main text. Table~\ref{tab:alt_targets} shows this degradation is not an artefact of the mean-variance functional form: the same pattern appears under three families of training targets with varying risk tolerance.
+In the companion long-short configuration, embedding a risk penalty directly in the XGBoost training target degrades performance, which motivated scoring risk through a post-hoc utility (the approach the applied Section~\ref{sec:risk_aversion_control} inherits). Table~\ref{tab:alt_targets} shows this degradation is not an artefact of the mean-variance functional form: the same pattern appears under three families of training targets with varying risk tolerance.
 
 \input{tables/table_alt_targets}
 
-The pattern is consistent: returns fall faster than volatility under every risk penalty, regardless of functional form. The mildest adjustments (mean-variance with $\gamma = 0.5$, Sharpe-like with $a = 0.5$) come closest to the baseline but still underperform. This confirms that the diagnostic in Section~\ref{sec:risk_aversion_control} is not specific to the mean-variance utility formulation; the single-model training-target approach is structurally unsuited to incorporating risk aversion in a long-short setting, which the long-and-short utility construction resolves.
+The pattern is consistent: returns fall faster than volatility under every risk penalty, regardless of functional form. The mildest adjustments (mean-variance with $\gamma = 0.5$, Sharpe-like with $a = 0.5$) come closest to the baseline but still underperform. This confirms the diagnostic is not specific to the mean-variance utility formulation; the single-model training-target approach is structurally unsuited to incorporating risk aversion, which the post-hoc utility construction resolves.
 
 \section{Long-Short Utility Construction}\label{app:crra_construction}
 
-This appendix supplements the long-and-short utility specification in Section~\ref{sec:risk_aversion_control} with the volatility-forecast model, the high-$\gamma$ collapse mechanism, and the sweep grid.
+This appendix supplements the utility specification in Section~\ref{sec:risk_aversion_control} with the volatility-forecast model, the sweep grid, and, for the companion long-short configuration, the high-$\gamma$ collapse mechanism.
 
 \paragraph{Volatility forecast} The expected-return forecast $\hat r_t^s$ comes from the XGBoost ensemble described in Section~\ref{sec:methodology}. The volatility forecast $\hat\sigma_t^s$ comes from a second XGBoost ensemble trained on the realized 12-month forward volatility
 \[
     \sigma^s_{[t+1,\,t+12]} \;=\; \mathrm{std}\!\big(r^s_{t+1}, \ldots, r^s_{t+12}\big),
 \]
-using the same feature set augmented with trailing 12-month realized volatility. The 50-seed ensemble is trained on 1990--2010 and evaluated out-of-sample on 2011--2024.
+using the same feature set augmented with trailing 12-month realized volatility. In the companion configuration a 50-seed ensemble is trained on 1990--2010 and evaluated on 2011--2024; the applied configuration trains a ten-seed ensemble inside each year of the expanding walk, with forward-volatility labels restricted so no label window crosses into the trading year (Section~\ref{sec:risk_aversion_control}).
 
-\paragraph{Convergence to dollar-neutral noise at high $\gamma$} Stocks appearing in both top deciles of $u_{\text{long}}$ and $u_{\text{short}}$ (the overlap set, which grows with $\gamma$) are retained on both sides, and their contributions to the long and short books net out in $r_L - r_S$. This is the mechanism by which the long-short spread converges to zero as $\gamma$ rises beyond the useful range. At high $\gamma$, the volatility penalty dominates the return signal, low-$\hat\sigma$ stocks occupy both top deciles simultaneously, and the two legs become near-identical value-weighted low-volatility portfolios.
+\paragraph{Convergence to dollar-neutral noise at high $\gamma$ (companion long-short configuration)} In the companion long-short book, stocks appearing in both top deciles of $u_{\text{long}}$ and $u_{\text{short}}$ (the overlap set, which grows with $\gamma$) are retained on both sides, and their contributions to the long and short books net out in $r_L - r_S$. This is the mechanism by which the long-short spread converges to zero as $\gamma$ rises beyond the useful range. At high $\gamma$, the volatility penalty dominates the return signal, low-$\hat\sigma$ stocks occupy both top deciles simultaneously, and the two legs become near-identical value-weighted low-volatility portfolios.
 
 \paragraph{Sweep grid} The risk-aversion sweep in Figure~\ref{fig:risk_aversion} uses a 16-point grid over $[0, 1]$: step 0.05 up to 0.5, step 0.1 thereafter.
 
@@ -267,7 +268,7 @@ Momentum is known to reverse in January \citep{JegadeeshTitman1993}: past losers
 
 \subsection{Baseline Train/Test Split}\label{app:alt_splits}
 
-Table~\ref{tab:alt_splits} reports the baseline train/test split performance. Robustness across training windows and prediction horizons is provided separately by the 25-year expanding-window backtest (Appendix~\ref{app:expanding_window} below, also reported in Section~\ref{sec:historical_stress}), which re-estimates the full pipeline annually and therefore subsumes a continuum of alternative splits.
+Table~\ref{tab:alt_splits} reports the baseline train/test split performance. Robustness across training windows and prediction horizons is provided separately by the 25-year expanding-window backtest (Appendix~\ref{app:expanding_window} below; the applied analogue is reported in Section~\ref{sec:historical_stress}), which re-estimates the full pipeline annually and therefore subsumes a continuum of alternative splits.
 
 \input{tables/table_alt_splits}
 
@@ -275,11 +276,11 @@ In the baseline split (1990--2010 training, 2011--2024 test), XGB achieves a Sha
 
 \subsection{25-Year Expanding-Window Out-of-Sample Methodology}\label{app:expanding_window}
 
-The historical evidence reported in Section~\ref{sec:historical_stress} comes from a separate analysis from the one above: a 25-year out-of-sample backtest in which the full pipeline (HMM + XGBoost) is re-estimated every January, with annual retraining initialized in 2000 and each year's predictions made by a model trained only on data available through the prior December. Each retraining uses the production seed configuration described in Section~\ref{sec:methodology} (200 HMM seeds, 50 XGBoost seeds) and the same long-short construction described in Appendix~\ref{app:portfolio_construction}.
+This appendix documents the \emph{companion long-short study's} 25-year expanding-window backtest, a distinct analysis from the applied 2000--2025 extension reported in Section~\ref{sec:historical_stress} (which imposes the drawdown-only specification, long-only top-decile construction on the top-1000 universe, 50/20 seeds, and point-in-time drawdown standardization per fold). In the companion backtest, the full pipeline (HMM + XGBoost) is re-estimated every January, with annual retraining initialized in 2000 and each year's predictions made by a model trained only on data available through the prior December; each retraining uses the companion seed ensemble (200 HMM seeds, 50 XGBoost seeds) and the long-short construction described in Appendix~\ref{app:portfolio_construction}.
 
 The HMM's panic-state label is fixed by an economically motivated sign convention rather than the data-driven percentile comparison used elsewhere. The convention encodes the known direction of each feature in panic regimes: $-1$ for drawdown, $+1$ for cross-sectional dispersion, $-1$ for relative market participation, and $+1$ for the credit spread. The data-driven label-switching procedure used in the main pipeline is unstable on short training windows with few observed crisis months (under 20 months in the crisis windows used by the percentile comparison; see Appendix~\ref{app:label_switching}), so the fixed-sign fallback activates for retrainings before 2002. From 2002 onward the data-driven procedure resumes, by which point the training window contains the dot-com bust as a calibration anchor. The HMM seed loop is parallelised across CPU cores via \texttt{multiprocessing.Pool}; the parallel implementation is bit-identical to the serial reference (verified in the test suite by comparing per-seed pi-filter arrays).
 
-Each retraining produces 12 monthly out-of-sample long-short returns, which are stitched into a single monthly return series; this paper reports the 25-year sub-sample from January 2000 to November 2024 (299 months). Every prediction is strictly causal: the model used for month~$t$ saw no information after month~$t-1$. The 167-month sub-window from January 2011 onward overlaps the main test period reported in Section~\ref{sec:performance_results} and serves as a methodological cross-check; expanding-window OOS produces a Sharpe of 0.88 over that window, within the production result's bootstrap interval.
+Each retraining produces 12 monthly out-of-sample long-short returns, which are stitched into a single monthly return series; the companion study reports the sub-sample from January 2000 to November 2024 (299 months). Every prediction is strictly causal: the model used for month~$t$ saw no information after month~$t-1$. Within the companion configuration, the 167-month sub-window from January 2011 onward serves as a methodological cross-check against its fixed-split headline, producing an expanding-window Sharpe of 0.88 inside that headline's bootstrap interval.
 
 \subsection{Factor Model Regressions}\label{app:factor_alphas}
 
@@ -292,7 +293,7 @@ where $\mathbf{f}_t$ is the factor return vector for the specification in questi
 
 \input{tables/table_factor_alphas}
 
-For completeness, Table~\ref{tab:fund_alphas} reports the same regressions for the fund-augmented variant (XGB: mom+$\pi$+fund) discussed in Section~\ref{sec:fund_ablation}. Alphas remain statistically significant under all five specifications ($t > 2.9$) but are materially smaller than the baseline's, consistent with the dilution documented in the main text.
+For completeness, Table~\ref{tab:fund_alphas} reports the same regressions for the \emph{companion long-short study's} fund-augmented variant (XGB: mom+$\pi$+fund). In that configuration, alphas remain statistically significant under all five specifications ($t > 2.9$) but are materially smaller than the baseline's; in the applied configuration the corresponding variant earns no positive active return at all (Section~\ref{sec:fund_ablation}).
 
 \input{tables/table_fund_alphas}
 
@@ -314,11 +315,11 @@ To assess the sampling variability of XGB's Sharpe ratio and test its outperform
 
 \input{tables/table_bootstrap}
 
-XGB's Sharpe confidence interval is [0.67, 1.53], comfortably above zero, while every benchmark's interval straddles zero. The paired tests reject equality of Sharpe ratios between XGB and each benchmark at $p < 0.025$. Within XGB, the panic-period Sharpe exceeds the calm-period Sharpe in point estimate (1.53 vs 0.84), but with only 59 panic months the paired difference is not statistically significant ($p = 0.109$); the 95\% interval $[-0.16, 1.59]$ straddles zero. The point-estimate gap is consistent with the regime-conditional selection mechanism described in Section~\ref{sec:regime_results}, but its statistical confirmation would require a longer panic sample. These intervals describe sampling variability within the 2011--2024 sample; out-of-sample generalization is addressed separately by the 25-year expanding-window backtest (Section~\ref{sec:historical_stress}; methodology in Appendix~\ref{app:expanding_window}) and the sub-period analysis (Appendix~\ref{app:subperiod}).
+XGB's Sharpe confidence interval is [0.67, 1.53], comfortably above zero, while every benchmark's interval straddles zero. The paired tests reject equality of Sharpe ratios between XGB and each benchmark at $p < 0.025$. Within XGB, the panic-period Sharpe exceeds the calm-period Sharpe in point estimate (1.53 vs 0.84), but with only 59 panic months the paired difference is not statistically significant ($p = 0.109$); the 95\% interval $[-0.16, 1.59]$ straddles zero. The point-estimate gap is consistent with the regime-conditional selection mechanism described in Section~\ref{sec:regime_results}, but its statistical confirmation would require a longer panic sample. These intervals describe sampling variability within the 2011--2024 sample; out-of-sample generalization is addressed separately by the 25-year expanding-window backtests (the companion version in Appendix~\ref{app:expanding_window}; the applied analogue in Section~\ref{sec:historical_stress}) and the sub-period analysis (Appendix~\ref{app:subperiod}).
 
 \subsection{Leg-Level CAPM Betas by Regime}\label{app:leg_betas}
 
-The D\&M comparison in Section~\ref{sec:stress_test} characterizes XGB's contribution as stock selection rather than exposure scaling. A direct test of this framing is to compute leg-level CAPM betas separately by regime: if XGB reorganizes which stocks it holds across regimes (cross-sectional re-ranking), the long-leg and short-leg betas should shift between calm and panic in opposite directions; if instead XGB mechanically scales exposure, both legs' betas should move together.
+The paper characterizes the model's contribution as stock selection rather than exposure scaling, with composition absorbing the regime change (Section~\ref{sec:discussion}). A direct test of this framing is to compute leg-level CAPM betas separately by regime: if XGB reorganizes which stocks it holds across regimes (cross-sectional re-ranking), the long-leg and short-leg betas should shift between calm and panic in opposite directions; if instead XGB mechanically scales exposure, both legs' betas should move together.
 
 \input{tables/table_leg_betas}
 
@@ -326,7 +327,7 @@ The pattern in Table~\ref{tab:leg_betas} is consistent with the cross-sectional 
 
 \subsection{Per-cluster Feature Signature ($K=4$ Partition)}\label{app:cluster_k4_features}
 
-Section~\ref{sec:heterogeneity_picks} reports a $K=4$ partition of the 167 test months and characterizes each cluster narratively. Table~\ref{tab:cluster_k4_features_appendix} provides the full per-cluster feature signature for completeness: cross-section context features (regime composition, momentum landscape, dispersion, skewness, recent strategy performance) computed at the month level and averaged across each cluster's months; long-leg pick raw momentum at each horizon, averaged across each cluster's months; and long-leg pick cross-sectional z-score (deviation from the cross-section mean at each horizon, in units of cross-section std) averaged across cluster months. Per-cluster Sharpes and other strategy outcomes appear in Table~\ref{tab:cluster_k4_descriptors} in the main text.
+Section~\ref{sec:heterogeneity_picks} reports a $K=4$ partition of the applied 179-month window. Table~\ref{tab:cluster_k4_features_appendix} provides, for completeness, the analogous per-cluster feature signature computed on the \emph{companion configuration's} 167-month partition (a separate clustering of the long-short model's picks, not the applied partition of Table~\ref{tab:cluster_k4_descriptors}): cross-section context features (regime composition, momentum landscape, dispersion, skewness, recent strategy performance) computed at the month level and averaged across each cluster's months; long-leg pick raw momentum at each horizon, averaged across each cluster's months; and long-leg pick cross-sectional z-score (deviation from the cross-section mean at each horizon, in units of cross-section std) averaged across cluster months. The applied partition's per-cluster Sharpes and other outcomes appear in Table~\ref{tab:cluster_k4_descriptors} in the main text.
 
 \input{tables/table_cluster_k4_features_appendix}
 
@@ -340,7 +341,7 @@ XGB retains long-leg $\beta >$ short-leg $\beta$ in every cluster (spreads $+0.6
 \input{tables/table_cluster_k4_leg_betas}
 
 \paragraph{$\pi_t^{\text{filter}}$'s SHAP share by cluster}
-Combined long-and-short SHAP shares are $0.50$, $0.46$, $0.54$, $0.24$ for clusters 1--4 (Table~\ref{tab:cluster_k4_shap_shares}). These are consistent with the panic-aggregate $41\%$ share reported in Section~\ref{sec:horizon_evidence}: the $41\%$ averages across all panic months, and the cluster-level shares show that the collapse is concentrated in cluster~4 (deep panic, share $0.24$), exactly where the main-text discussion attributes the decline to $\pi_t^{\text{filter}}$ saturating near~$1$. The pattern is consistent with the routing interpretation: $\pi_t^{\text{filter}}$ contributes most where the cross-section is ambiguous (cluster 3) and least where it is unambiguously crisis-shaped (cluster 4, where momentum splits alone suffice to produce the loser portfolio).
+In the companion configuration's partition, combined long-and-short SHAP shares are $0.50$, $0.46$, $0.54$, $0.24$ for clusters 1--4 (Table~\ref{tab:cluster_k4_shap_shares}). The cluster-level shares show the decline is concentrated in the deep-panic cluster (share $0.24$), where $\pi_t^{\text{filter}}$ saturates near~$1$; this is the same qualitative pattern as the applied configuration's lower panic-month share ($33\%$ against $38\%$ in calm, Section~\ref{sec:horizon_evidence}). The pattern is consistent with the routing interpretation: $\pi_t^{\text{filter}}$ contributes most where the cross-section is ambiguous and least where it is unambiguously crisis-shaped, where momentum splits alone suffice to produce the loser portfolio.
 
 \input{tables/table_cluster_k4_shap_shares}
 
@@ -424,7 +425,7 @@ To measure this dependence, we subsample $k \in \{1, 2, 3, 5, 10, 15, 20, 30, 50
 
 \input{tables/table_seed_convergence}
 
-Two patterns emerge. First, the mean Sharpe rises from 1.04 at $k = 1$ to 1.12 at $k = 100$, so a single-chain point estimate understates the strategy's performance by roughly 0.08 in Sharpe units. The gap closes approximately monotonically (with minor non-monotonic dips at $k = 3$ and $k = 5$ before the trend resumes), and most of the lift is realized by $k = 30$. Second, the interquartile range across random subsets collapses from 0.10 at $k = 1$ to 0.02 at $k = 50$: once $k \geq 50$, any two random subsets of the seed pool produce nearly the same XGBoost portfolio. The production configuration ($N_s = 200$) sits well inside this plateau, which is why the 1.11 Sharpe reported in Section~\ref{sec:results} is insensitive to which specific seeds were drawn. The practical implication is methodological rather than cosmetic: a single-chain HMM would not reliably support the main conclusions, so the seed ensemble is a requirement of the design, not a late-stage performance tuning.
+Two patterns emerge. First, the mean Sharpe rises from 1.04 at $k = 1$ to 1.12 at $k = 100$, so a single-chain point estimate understates the strategy's performance by roughly 0.08 in Sharpe units. The gap closes approximately monotonically (with minor non-monotonic dips at $k = 3$ and $k = 5$ before the trend resumes), and most of the lift is realized by $k = 30$. Second, the interquartile range across random subsets collapses from 0.10 at $k = 1$ to 0.02 at $k = 50$: once $k \geq 50$, any two random subsets of the seed pool produce nearly the same XGBoost portfolio. Both the companion configuration ($N_s = 200$) and the applied configuration ($N_s = 50$) sit inside this plateau, which is why the headline results of Section~\ref{sec:results} are insensitive to which specific seeds were drawn. The practical implication is methodological rather than cosmetic: a single-chain HMM would not reliably support the main conclusions, so the seed ensemble is a requirement of the design, not a late-stage performance tuning.
 
 \section{International HMM Feature Selection}\label{app:intl_feature_selection}
 
