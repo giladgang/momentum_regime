@@ -714,3 +714,19 @@ unlearnable deferral value -> the band cannot be improved by ML or anything.
   (+0.58 panic / +0.07 calm %/mo) but plain UK momentum wins full-window
   (+0.43 vs +0.19, calm-concentrated +0.69/-0.19). Neither market shows both.
   MDDs deeper than benchmarks in both. intl/intl_summary.csv.
+
+## 11. Cluster analysis restored in full + pi correction (2026-07-28)
+- Full per-cluster analysis (4 narrative paragraphs, 4-panel z-curve figure,
+  stability, two-fold nesting) restored to ch5 in applied form; every number
+  computed from labels + zscore csv + walk_returns + xsec files.
+- cluster_applied.py's mean_pi used the ARGMAX comparator pi (same legacy as
+  regime_split). Own-pi cluster means: 0.18/0.13/0.29/0.72 (was 0.28/0.16/
+  0.33/0.70). Table + prose + regenerated panel figure now own-pi;
+  applied_cluster_k4_stats_ownpi.csv is the corrected record.
+- New computed descriptors: C1 act +0.38%/mo hit 53%, long-leg trail
+  +10/+49/+92% vs xsec +2/+12/+23; C2 act +0.02 hit 49%, max run 7
+  (2017:11, 2021:9); C3 act -0.28 hit 45% (2012-13); C4 act +0.98 hit 48%,
+  best +20.7/worst -12.9, trail -10/-24/-22 vs xsec -1/0/+6 (2022:9, 2015:4).
+  Stability: mean pairwise ARI 0.81, 94% same-label (weaker than thesis
+  0.96/97.6% -- honest). Two-fold: 119 above-mean months pi 0.15 / 60 below
+  pi 0.48.
