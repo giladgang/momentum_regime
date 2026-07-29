@@ -9,7 +9,7 @@ XGB $+\ \pi_t^{\text{filter}}$ (HMM, drawdown; main) & 0.78 & 0.21 \\
 XGB, no regime signal                                & 0.71 & 0.12 \\
 XGB $+$ four raw indicators (DD, VOL, DISP, REL\_N)  & 0.72 & 0.12 \\
 XGB $+$ GHM turning-point rule                       & 0.71 & 0.10 \\
-XGB $+$ 10 fundamentals                              & 0.69 & -0.12 \\
+XGB $+$ 10 fundamentals                              & 0.69 & -0.11 \\
 \bottomrule
 \end{tabular}
 \caption{Regime-signal ablation, applied configuration (IR against the value-weighted top-1000 benchmark). The HMM-distilled drawdown probability $\pi_t^{\text{filter}}$ improves on dropping the signal and on feeding the raw stress indicators to the tree directly. Seed budgets: the main and no-signal rows use the production 20-seed budget; the raw-indicator and fundamentals rows use the 5-seed ablation budget; the GHM row is reported at the full 20-seed budget matching production (at the 5-seed budget its IR is $0.27$, so the estimate is seed-sensitive and the matched-budget figure is the fair comparison). The fundamentals row covers 2011--2024 (fundamentals unavailable for 2025). REL\_N-only is omitted: the single-feature HMM degenerates to $\pi \equiv 1$ post-2000 in the large-cap universe (a constant, hence equal to no-signal).}

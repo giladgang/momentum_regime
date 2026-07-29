@@ -205,7 +205,7 @@ For each seed, posterior mean parameters $\bar{\boldsymbol{\mu}}_k$, $\bar{\bold
 \begin{equation}
 \pi_t^{\text{filter}} = \frac{1}{N_s} \sum_{s=1}^{N_s} \pi_{t,s}^{\text{filter}}.
 \end{equation}
-Averaging across MCMC chains is a methodological requirement, not a performance optimization. A single Gibbs chain produces a noisy regime signal whose downstream Sharpe varies meaningfully across random initializations; averaging across chains reduces this noise, and the variance shrinks as more chains are added. By 50 chains the downstream Sharpe has effectively stabilized, with the plateau setting in well below that count (Appendix~\ref{app:seed_convergence}). All out-of-sample numbers reported below are computed from this 50-chain ensemble, not from a single chain.
+Averaging across MCMC chains is a methodological requirement, not a performance optimization. A single Gibbs chain produces a noisy regime signal whose downstream Sharpe varies meaningfully across random initializations; averaging across chains reduces this noise, and the variance shrinks as more chains are added. By 50 chains the downstream Sharpe has effectively stabilized; the seed-convergence analysis for this sampler places the plateau well below that count (Appendix~\ref{app:seed_convergence}), and the applied ensemble uses a 50-chain budget that sits comfortably above it. All out-of-sample numbers reported below are computed from this 50-chain ensemble, not from a single chain.
 
 \subsubsection{Regime Identification and Trading Signal}\label{sec:regime_signal}
 

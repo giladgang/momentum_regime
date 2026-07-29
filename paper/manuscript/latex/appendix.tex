@@ -229,7 +229,7 @@ The XGBoost hyperparameters are set on the training period and stress-tested out
 \input{tables/table_xgb_hyperparams}
 
 \paragraph{Hyperparameter sensitivity}
-At the baseline depth of 4, the Sharpe ratio ranges from 0.89 to 1.11 across learning rate and ensemble size variations. Performance peaks at depth 4 and falls off on either side (see Appendix~\ref{app:depth_selection} for the depth analysis). The results confirm that XGB's performance is not an artefact of a particular hyperparameter configuration.
+At the baseline depth of 4, the Sharpe ratio ranges from 0.96 to 1.11 across learning rate and ensemble size variations. Performance peaks at depth 4 and falls off on either side (see Appendix~\ref{app:depth_selection} for the depth analysis). The results confirm that XGB's performance is not an artefact of a particular hyperparameter configuration.
 
 \subsection{Tree Depth and Interaction Order}\label{app:depth_selection}
 
@@ -315,7 +315,7 @@ To assess the sampling variability of XGB's Sharpe ratio and test its outperform
 
 \input{tables/table_bootstrap}
 
-XGB's Sharpe confidence interval is [0.67, 1.53], comfortably above zero, while every benchmark's interval straddles zero. The paired tests reject equality of Sharpe ratios between XGB and each benchmark at $p < 0.025$. Within XGB, the panic-period Sharpe exceeds the calm-period Sharpe in point estimate (1.53 vs 0.84), but with only 59 panic months the paired difference is not statistically significant ($p = 0.109$); the 95\% interval $[-0.16, 1.59]$ straddles zero. The point-estimate gap is consistent with the regime-conditional selection mechanism described in Section~\ref{sec:regime_results}, but its statistical confirmation would require a longer panic sample. These intervals describe sampling variability within the 2011--2024 sample; out-of-sample generalization is addressed separately by the 25-year expanding-window backtests (the companion version in Appendix~\ref{app:expanding_window}; the applied analogue in Section~\ref{sec:historical_stress}) and the sub-period analysis (Appendix~\ref{app:subperiod}).
+XGB's Sharpe confidence interval is [0.67, 1.53], comfortably above zero, while every benchmark's interval straddles zero. The paired tests reject equality of Sharpe ratios between XGB and each benchmark at $p < 0.025$. Within XGB, the panic-period Sharpe exceeds the calm-period Sharpe in point estimate (1.54 vs 0.84), but with only 59 panic months the paired difference is not statistically significant ($p = 0.109$); the 95\% interval $[-0.16, 1.59]$ straddles zero. The point-estimate gap is consistent with the regime-conditional selection mechanism described in Section~\ref{sec:regime_results}, but its statistical confirmation would require a longer panic sample. These intervals describe sampling variability within the 2011--2024 sample; out-of-sample generalization is addressed separately by the 25-year expanding-window backtests (the companion version in Appendix~\ref{app:expanding_window}; the applied analogue in Section~\ref{sec:historical_stress}) and the sub-period analysis (Appendix~\ref{app:subperiod}).
 
 \subsection{Leg-Level CAPM Betas by Regime}\label{app:leg_betas}
 
@@ -358,7 +358,7 @@ The Student-$t$ model is estimated via data augmentation \citep{Geweke1993}: eac
 
 \input{tables/table_student_t_hmm}
 
-The Normal model achieves the lowest BIC (2257.3 vs.\ 2257.6 for the best Student-$t$ at $\nu = 100$), indicating no meaningful improvement from heavier tails. Regime classifications agree with the Normal HMM on at least 97.8\% of months across all $\nu$ values, and the correlation of filtered panic probabilities exceeds 0.98 everywhere.
+The Normal model achieves the lowest BIC (1739.5 vs.\ 1749.0 for the best Student-$t$ at $\nu = 100$), indicating no meaningful improvement from heavier tails. Regime classifications agree with the Normal HMM on at least 91.4\% of months across all $\nu$ values, and the correlation of filtered panic probabilities is at least 0.87, exceeding 0.96 for every $\nu \geq 5$.
 
 \section{Label Sign Correction}\label{app:label_switching}
 
