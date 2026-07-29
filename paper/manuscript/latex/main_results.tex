@@ -25,7 +25,7 @@ The panic edge does not convert into factor alpha, and this qualification must t
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{plots/applied_cumulative_ownpi.pdf}
-    \caption{Cumulative wealth paths (log scale) from \$1 in January 2011: the main model against the value-weighted top-1000 benchmark. Shaded bands indicate panic months under the main model's own signal ($\pi_t^{\text{filter}} \geq 0.5$; 45 months).}
+    \caption{Cumulative wealth paths (log scale) from \$1 in January 2011: the main model against the value-weighted top-1000 benchmark, unconditional 12-1 momentum, and the no-signal variant, with Sharpe ratios in the legend. Shaded bands indicate panic months under the main model's own signal ($\pi_t^{\text{filter}} \geq 0.5$; 45 months).}
     \label{fig:cumulative}
 \end{figure}
 
@@ -76,25 +76,46 @@ To trace the picks themselves, we examine the cross-sectional z-scores of the st
     \label{fig:zscore_long_heatmap}
 \end{figure}
 
-Clustering the $179$ monthly z-curves with $K$-means ($L_2$, $K=4$) on the applied strategy's own picks recovers four recurring selection modes (Table~\ref{tab:cluster_k4_descriptors}).\footnote{$K=4$ is retained for comparability with the mechanism decomposition; the clustering is run on this configuration's own long-leg z-curves rather than transplanted from the long-short, full-universe model.} The partition is stable across random initializations: the mean pairwise adjusted Rand index across six seeds is $0.81$, with $94\%$ of months keeping the same label on average. The four groups nest inside a coarser two-fold split. Clusters~1 and~2 are the $119$ months in which the long leg sits above the cross-sectional momentum mean (pooled mean $\pi = 0.15$); clusters~3 and~4 are the $60$ months below it (pooled mean $\pi = 0.48$). Within the folds, the modes are ordered by the tilt of the picks, not by regime probability: mean $\pi$ cleanly separates only the deep-crisis cluster ($0.72$), while clusters~1 and~3 sit at similar low-to-moderate levels ($0.18$ and $0.29$), so the loser tilt is triggered by the joint configuration of the regime signal and the term structure rather than by the probability level alone. Figure~\ref{fig:cluster_k4_panels} plots each cluster's member z-curves and centroid; per-cluster descriptions follow.
+Clustering the $179$ monthly z-curves with $K$-means ($L_2$, $K=4$) on the applied strategy's own picks recovers four recurring selection modes (Table~\ref{tab:cluster_k4_descriptors}).\footnote{$K=4$ is retained for comparability with the mechanism decomposition; the clustering is run on this configuration's own long-leg z-curves rather than transplanted from the long-short, full-universe model.} The partition is stable across random initializations: the mean pairwise adjusted Rand index across six seeds is $0.81$, with $94\%$ of months keeping the same label on average. The four groups nest inside a coarser two-fold split. Clusters~1 and~2 are the $119$ months in which the long leg sits above the cross-sectional momentum mean (pooled mean $\pi = 0.15$); clusters~3 and~4 are the $60$ months below it (pooled mean $\pi = 0.48$). Within the folds, the modes are ordered by the tilt of the picks, not by regime probability: mean $\pi$ cleanly separates only the deep-crisis cluster ($0.72$), while clusters~1 and~3 sit at similar low-to-moderate levels ($0.18$ and $0.29$), so the loser tilt is triggered by the joint configuration of the regime signal and the term structure rather than by the probability level alone. Per-cluster descriptive statistics are in Table~\ref{tab:cluster_k4_descriptors}; each cluster's z-curve panel appears immediately above its description (Figures~\ref{fig:zscore_k4_c0}--\ref{fig:zscore_k4_c3}), with thin lines the member-month z-curves and the bold line the cluster centroid. Cluster Sharpes and their block-bootstrap confidence intervals (block size~6, 5{,}000 reps) are reported in each panel title.
 
 \input{tables/table_cluster_k4_descriptors}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\textwidth]{plots/applied_cluster_k4_panels.pdf}
-    \caption{The four selection modes: member-month long-leg z-curves (thin grey) and cluster centroids (bold), applied configuration, 2011--2025. Mean $\pi$ per cluster is measured on the main model's own filtered probability.}
-    \label{fig:cluster_k4_panels}
+    \includegraphics[width=0.85\textwidth]{plots/applied_zscore_k4_panel_c0.pdf}
+    \caption{Cluster 1 (strong continuation): z-curves of the 49 member months and centroid. The centroid is humped and uniformly positive, rising from $+0.75$ at month~1 to a peak of $+1.46$ at month~9.}
+    \label{fig:zscore_k4_c0}
 \end{figure}
 
 \paragraph{Cluster 1 (strong continuation): committed winner selection}
 The long-leg z-curve is uniformly positive with a humped shape, from $+0.75$ at the one-month horizon to a peak of $+1.46$ at month~9 (cluster z-mean $+1.23$). In absolute terms the picks are pronounced winners: the long leg's mean trailing return is $+10\%$/$+49\%$/$+92\%$ over 1/6/12 months against a cross-sectional mean of $+2\%$/$+12\%$/$+23\%$. These 49 months carry a low mean $\pi$ of $0.18$ and are scattered across the sample's up-trending stretches (2011, 2014, 2019--2020, 2023--2024) in short spells of at most three consecutive months. This is the classical setting of \citet{JegadeeshTitman1993} winner selection with the intermediate-horizon peak of \citet{NovyMarx2012}, and it pays: mean active return is $+0.38\%$ per month (cluster IR $+0.33$), with $53\%$ of months beating the benchmark.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{plots/applied_zscore_k4_panel_c1.pdf}
+    \caption{Cluster 2 (calm, benchmark-like): z-curves of the 70 member months and centroid. The centroid is nearly flat, between $-0.11$ (month~4) and $+0.62$ (month~11).}
+    \label{fig:zscore_k4_c1}
+\end{figure}
+
 \paragraph{Cluster 2 (calm, benchmark-like): the index in disguise}
 The largest cluster ($n = 70$) has a nearly flat z-curve (z-mean $+0.29$, from $-0.11$ at month~4 to $+0.62$ at month~11): a hedged, modest winner tilt rather than a committed bet. It is also the calmest group (mean $\pi = 0.13$) and the most persistent, running up to seven consecutive months and dominating the quiet trending years (11 months of 2017, 9 of 2021). Its mean active return is $+0.02\%$ per month (IR $+0.03$) with a $49\%$ hit rate: the strategy is effectively holding the index. This mode is the portfolio-level expression of the calm-month null of Section~\ref{sec:performance_results}, and it is what the when-to-trade rule of Section~\ref{sec:cost} converts from a cost drag into a non-event.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{plots/applied_zscore_k4_panel_c2.pdf}
+    \caption{Cluster 3 (mild reversal): z-curves of the 33 member months and centroid. The centroid sits below the cross-sectional mean at every horizon, deepest at month~4 ($-0.65$).}
+    \label{fig:zscore_k4_c2}
+\end{figure}
+
 \paragraph{Cluster 3 (mild reversal): the expensive middle}
 The long-leg z-curve sits below the cross-sectional mean at every horizon at the centroid level (z-mean $-0.33$, deepest $-0.65$ at month~4, near zero at month~11), while the cross-section itself is rising (mean trailing return $+3\%$/$+14\%$/$+22\%$); the picks' own trailing returns are roughly flat ($-1\%$/$+2\%$/$+19\%$). The model is half-committed to reversal at low-to-moderate regime probability (mean $\pi = 0.29$), in scattered one-to-two-month bursts concentrated in 2012--2013. The bet does not pay: mean active return is $-0.28\%$ per month (IR $-0.30$) with a $45\%$ hit rate, despite the occasional large win (best month $+23.7\%$). Reversal selection without a clear panic state is the strategy's money-losing mode, which sharpens rather than undermines the mechanism: the loser tilt is profitable conditional on genuine stress, not as a standing style.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{plots/applied_zscore_k4_panel_c3.pdf}
+    \caption{Cluster 4 (deep crisis): z-curves of the 27 member months and centroid. The centroid sits uniformly between $-0.81$ and $-1.13$ across all 12 horizons.}
+    \label{fig:zscore_k4_c3}
+\end{figure}
 
 \paragraph{Cluster 4 (deep crisis): the rebound bet}
 At a mean $\pi$ of $0.72$, the highest of any cluster, the long-leg z-curve is uniformly deep, between $-0.81$ and $-1.13$ across all twelve horizons. The picks are outright losers in a falling market: the long leg's mean trailing return is $-10\%$/$-24\%$/$-22\%$ over 1/6/12 months against a cross-sectional mean of $-1\%$/$0\%$/$+6\%$. Nine of the 27 months sit in the 2022 bear market and four in the 2015 stress episode, in runs of up to four months. This is the beta-reversion rebound bet of \citet{DanielMoskowitz2016} implemented on the long side: fewer than half the months beat the benchmark ($48\%$ hit rate), but the wins are much larger than the losses (best month $+20.7\%$ against worst $-12.9\%$), producing the partition's strongest active return, $+0.98\%$ per month (IR $+0.73$).

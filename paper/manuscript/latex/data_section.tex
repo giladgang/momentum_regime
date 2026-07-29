@@ -39,7 +39,14 @@ The HMM contributes what a raw drawdown threshold would not. First, the filter o
 
 The drawdown series is winsorized at the 1st and 99th percentiles\footnote{Winsorizing at the 1st and 99th percentiles caps any value below the 1st percentile at that bound and any value above the 99th percentile at that bound, limiting the influence of outliers without discarding the observations.} using training-sample statistics, and standardized to zero mean and unit variance.
 
-Panel~(a) of Figure~\ref{fig:dd_regime_signal} plots the standardized series over the sample. Panic regimes are characterized by deep drawdowns that are slow to close; calm regimes show shallow or no drawdown. The series deepens sharply in the 2000--2002 dot-com bust, the 2007--2009 Global Financial Crisis, the March 2020 COVID shock, and the 2022 tightening cycle, and, outside brief corrections such as 2015--16 and late 2018, sits near zero through the 2003--2007 and 2013--2019 expansions. The largest excursions align with the shaded NBER recession bands, though drawdown also flags equity-market stress that falls outside official recession dating.
+Figure~\ref{fig:dd_feature} plots the standardized series over the sample. Panic regimes are characterized by deep drawdowns that are slow to close; calm regimes show shallow or no drawdown. The series deepens sharply in the 2000--2002 dot-com bust, the 2007--2009 Global Financial Crisis, the March 2020 COVID shock, and the 2022 tightening cycle, and, outside brief corrections such as 2015--16 and late 2018, sits near zero through the 2003--2007 and 2013--2019 expansions. The largest excursions align with the shaded NBER recession bands, though drawdown also flags equity-market stress that falls outside official recession dating.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{plots/dd_feature_series.pdf}
+    \caption{Time series of the HMM input feature, the standardized market drawdown, 1990--2025. Shaded regions indicate NBER recession periods; the dashed vertical line marks the start of the out-of-sample walk (January 2011).}
+    \label{fig:dd_feature}
+\end{figure}
 
 \subsection{Regime Estimation Results}\label{sec:hmm_output}
 
@@ -49,15 +56,15 @@ The regime model is re-estimated every year of the walk rather than once on a fi
 The sampler settings are inherited from the validated companion long-short study: 2{,}000 Gibbs iterations with 500 discarded as burn-in, with the filtered probability averaged across independent seeds per fit (Section~\ref{sec:implementation}). Convergence of the companion study's multi-feature specification is documented at length in Appendix~\ref{app:convergence} via the effective sample size and the Gelman--Rubin $\hat{R}$; the drawdown-only model estimated here is a one-dimensional restriction of that specification, so its emission space is far better identified, and label switching, the only genuine multimodality in a two-state Gaussian HMM, is resolved deterministically by assigning the deeper-drawdown cluster to the panic state (Section~\ref{sec:label_switching}). Averaging the filtered probability across seeds cancels the residual seed-specific Monte Carlo noise.
 
 \paragraph{Regime separation and the filtered signal}
-Panel~(b) of Figure~\ref{fig:dd_regime_signal} plots the resulting out-of-sample filtered probability $\pi_t^{\text{filter}}$ over the 2011--2025 evaluation window. The signal is sharply bimodal: its median is $0.005$ and it exceeds the $0.5$ panic threshold in $45$ of the $179$ months ($25\%$), so the great majority of months are classified as unambiguously calm. Elevated-probability episodes line up with the recognized stress windows of the period, the 2011 euro-area and U.S.\ downgrade sell-off, the 2015--2016 China and oil shock, the late-2018 drawdown, the March 2020 COVID crash, the 2022 tightening bear market, and the April 2025 tariff episode. The 2022 bear market is the longest single panic run at fourteen consecutive months.
+Figure~\ref{fig:regime_probabilities} plots the resulting out-of-sample filtered probability $\pi_t^{\text{filter}}$ over the 2011--2025 evaluation window. The signal is sharply bimodal: its median is $0.005$ and it exceeds the $0.5$ panic threshold in $45$ of the $179$ months ($25\%$), so the great majority of months are classified as unambiguously calm. Elevated-probability episodes line up with the recognized stress windows of the period, the 2011 euro-area and U.S.\ downgrade sell-off, the 2015--2016 China and oil shock, the late-2018 drawdown, the March 2020 COVID crash, the 2022 tightening bear market, and the April 2025 tariff episode. The 2022 bear market is the longest single panic run at fourteen consecutive months.
 
 The regime signal separates the states on drawdown exactly as intended. Across the evaluation window the market sits, on average, $9.9\%$ below its trailing peak in panic-classified months versus $0.7\%$ in calm months; in standardized units the mean drawdown is $-0.57$ in panic months against $+0.58$ in calm months. The filtered probability rises strongly with the depth of the drawdown, with a Pearson correlation of $0.86$ between $\pi_t^{\text{filter}}$ and the drawdown depth, but it responds to the full standardized-drawdown history rather than the contemporaneous level alone. The transition matrix supplies the persistence visible in the figure: isolated one-month dips do not trip the signal, whereas sustained declines push it toward one and hold it there until the drawdown closes.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{plots/dd_regime_signal.pdf}
-    \caption{The drawdown regime signal. Panel~(a): the standardized market drawdown, the sole HMM input feature, over 1990--2025; the dash-dotted line marks the start of the out-of-sample walk. Panel~(b): the out-of-sample filtered panic probability $\pi_t^{\text{filter}}$ from the drawdown-only model (the signal that drove the portfolio), 2011--2025, with the $0.5$ panic threshold dashed. Grey bands mark NBER recessions.}
-    \label{fig:dd_regime_signal}
+    \includegraphics[width=\textwidth]{plots/applied_regime_probabilities.pdf}
+    \caption{Filtered regime probability $\pi_t^{\text{filter}}$ over the out-of-sample walk (2011--2025), the signal that drove the portfolio. The pink area shows the filtered probability path, the dotted horizontal line marks the $0.5$ threshold above which a month is classified as panic, and the grey band marks the NBER recession. Major stress episodes are labeled at the top.}
+    \label{fig:regime_probabilities}
 \end{figure}
 
 
